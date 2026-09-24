@@ -2,7 +2,8 @@ import os
 import json
 from pypdf import PdfReader
 
-papers_dir = r"c:\Users\shiks\Downloads\res paper"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+papers_dir = os.path.normpath(os.path.join(script_dir, "..", "papers"))
 
 def get_text_from_pages(reader, page_indices):
     text = ""
@@ -70,7 +71,7 @@ detailed_analyses["paper 12"] = {
     "gaps_text": get_text_from_pages(p12_reader, range(34, min(42, len(p12_reader.pages))))
 }
 
-out_path = r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\deep_gaps_extraction.json"
+out_path = os.path.normpath(os.path.join(script_dir, "deep_gaps_extraction.json"))
 with open(out_path, "w", encoding="utf-8") as f:
     json.dump(detailed_analyses, f, indent=2, ensure_ascii=False)
 

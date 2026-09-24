@@ -7,22 +7,22 @@ We have synthesized the entire 15-paper literature base in `c:\Users\shiks\Downl
 ## 1. Primary Artifacts Delivered
 
 1. **Publication-Quality Research Paper Manuscript:**
-   - Location: [RESEARCH_PAPER_GAP3_UQ_DT.md](file:///c:/Users/shiks/Downloads/res%20paper/RESEARCH_PAPER_GAP3_UQ_DT.md)
+   - Location: [`../manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md`](../manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md)
    - Title: *UQ-DT: A Calibrated Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure Prognostics Under Environmental Drift*
    - Scope: Complete academic manuscript (8,500+ words, 10 sections) featuring master comparative deconstruction of all 15 corpus papers, rigorous mathematical proofs of finite-sample coverage, dual-engine uncertainty decoupling, benchmark tables, and full bibliography.
 2. **Modular Empirical Python Package (`uq_digital_twin/`):**
-   - Package Root: [`uq_digital_twin/`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/)
+   - Package Root: [`../uq_digital_twin/`](../uq_digital_twin/)
    - Modules:
-     - [`data_generator.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/data_generator.py): Physical degradation simulator with non-linear fatigue wear, diurnal thermal masking, and heteroscedastic noise.
-     - [`probabilistic_models.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/probabilistic_models.py): Heteroscedastic deep ensembles, gradient boosted pinball quantile regressors, and Monte Carlo dropout networks.
-     - [`conformal_calibrator.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/conformal_calibrator.py): Split Conformalized Quantile Regression (CQR) and normalized residual calibrator.
-     - [`baselines.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/baselines.py): Re-implementation of Paper 14 GA-Ensemble (Wang et al., 2026), Paper 6 Decision Forest (Hosseinzadeh et al., 2023), and Homoscedastic Gaussian Process.
-     - [`metrics.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/metrics.py): Benchmark metrics: PICP, NMPIW, CWC, Winkler Score, CRPS, NLL, RMSE, MAE.
-     - [`decision_engine.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/decision_engine.py): Risk-sensitive maintenance scheduler bridging Gap 3 with Gap 1 (DSS).
-     - [`visualize.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/visualize.py): 300-DPI publication visualizers.
-     - [`run_benchmarks.py`](file:///c:/Users/shiks/Downloads/res%20paper/uq_digital_twin/run_benchmarks.py): Master execution runner.
+     - [`data_generator.py`](../uq_digital_twin/data_generator.py): Physical degradation simulator with non-linear fatigue wear, diurnal thermal masking, and heteroscedastic noise.
+     - [`probabilistic_models.py`](../uq_digital_twin/probabilistic_models.py): Heteroscedastic deep ensembles, gradient boosted pinball quantile regressors, and Monte Carlo dropout networks.
+     - [`conformal_calibrator.py`](../uq_digital_twin/conformal_calibrator.py): Split Conformalized Quantile Regression (CQR) and normalized residual calibrator.
+     - [`baselines.py`](../uq_digital_twin/baselines.py): Re-implementation of Paper 14 GA-Ensemble (Wang et al., 2026), Paper 6 Decision Forest (Hosseinzadeh et al., 2023), and Homoscedastic Gaussian Process.
+     - [`metrics.py`](../uq_digital_twin/metrics.py): Benchmark metrics: PICP, NMPIW, CWC, Winkler Score, CRPS, NLL, RMSE, MAE.
+     - [`decision_engine.py`](../uq_digital_twin/decision_engine.py): Risk-sensitive maintenance scheduler bridging Gap 3 with Gap 1 (DSS).
+     - [`visualize.py`](../uq_digital_twin/visualize.py): 300-DPI publication visualizers.
+     - [`run_benchmarks.py`](../uq_digital_twin/run_benchmarks.py): Master execution runner.
 3. **Publication Figures & Benchmark Data:**
-   - Directory: [`figures/`](file:///c:/Users/shiks/Downloads/res%20paper/figures/)
+   - Directory: [`../figures/`](../figures/)
    - Contains 5 high-resolution 300-DPI publication plots and `benchmark_metrics_summary.json`.
 
 ---

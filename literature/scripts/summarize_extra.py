@@ -1,9 +1,16 @@
+import os
 import json
 
-with open(r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\extra_papers_deep.json", "r", encoding="utf-8") as f:
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, "extra_papers_deep.json")
+if not os.path.exists(json_path):
+    print(f"File not found: {json_path}")
+    exit(0)
+
+with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-out_summary = r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\extra_summary_clean.txt"
+out_summary = os.path.join(script_dir, "extra_summary_clean.txt")
 with open(out_summary, "w", encoding="utf-8") as out:
     for fname, content in data.items():
         out.write("=" * 80 + "\n")

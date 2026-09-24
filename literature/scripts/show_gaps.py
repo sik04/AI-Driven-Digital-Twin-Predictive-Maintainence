@@ -1,9 +1,16 @@
+import os
 import json
 
-with open(r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\deep_gaps_extraction.json", "r", encoding="utf-8") as f:
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, "deep_gaps_extraction.json")
+if not os.path.exists(json_path):
+    print(f"File not found: {json_path}. Run deep_extract.py first.")
+    exit(0)
+
+with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
-out_file = r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\extracted_gaps_summary.txt"
+out_file = os.path.join(script_dir, "extracted_gaps_summary.txt")
 with open(out_file, "w", encoding="utf-8") as out:
     for key, val in data.items():
         out.write("=" * 80 + "\n")

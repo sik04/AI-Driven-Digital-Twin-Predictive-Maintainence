@@ -3,7 +3,8 @@ import glob
 import json
 from pypdf import PdfReader
 
-papers_dir = r"c:\Users\shiks\Downloads\res paper"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+papers_dir = os.path.normpath(os.path.join(script_dir, "..", "papers"))
 pdf_files = sorted(glob.glob(os.path.join(papers_dir, "*.pdf")))
 
 results = []
@@ -56,7 +57,7 @@ for pdf_path in pdf_files:
             "error": str(e)
         })
 
-output_path = r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\papers_summary.json"
+output_path = os.path.normpath(os.path.join(script_dir, "papers_summary.json"))
 with open(output_path, "w", encoding="utf-8") as f:
     json.dump(results, f, indent=2, ensure_ascii=False)
 
