@@ -18,6 +18,7 @@ The complete, submission-ready academic research paper and deep research synthes
 * **Literature Gap Analysis:** [`docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md`](docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md)
 * **Granular Paper Deconstruction:** [`docs/deep_research_gap_analysis.md`](docs/deep_research_gap_analysis.md)
 * **Technical Walkthrough:** [`docs/walkthrough.md`](docs/walkthrough.md)
+* **Real-World Explanation & Architecture Guide:** [`docs/REAL_WORLD_EXPLANATION.md`](docs/REAL_WORLD_EXPLANATION.md)
 
 ---
 
@@ -55,6 +56,7 @@ AI-Driven-Digital-Twin-Predictive-Maintainence/
 ├── docs/                                  # Research documentation & gap syntheses
 │   ├── COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md # 15-paper thematic research gaps
 │   ├── deep_research_gap_analysis.md      # Detailed paper deconstruction & gap isolation
+│   ├── REAL_WORLD_EXPLANATION.md          # Real-world deployment & sensor acquisition guide
 │   └── walkthrough.md                     # Framework overview & empirical walkthrough
 ├── figures/                               # 300-DPI publication figures & benchmark logs
 │   ├── fig1_rul_calibrated_intervals.png  # Calibrated confidence ribbons across cycles
