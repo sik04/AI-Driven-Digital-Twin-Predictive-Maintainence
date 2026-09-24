@@ -1,4 +1,65 @@
+<style>
+  body, .markdown-body {
+    font-family: 'Times New Roman', Times, 'Nimbus Roman No9 L', serif;
+    font-size: 10pt;
+    line-height: 1.32;
+    color: #111;
+  }
+  .paper-header {
+    text-align: center;
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+  }
+  .paper-header h1 {
+    font-size: 19pt;
+    font-weight: bold;
+    line-height: 1.2;
+    border-bottom: none;
+    margin-bottom: 10px;
+  }
+  .authors-block {
+    font-size: 10pt;
+    line-height: 1.35;
+    margin-bottom: 14px;
+  }
+  .paper-columns {
+    column-count: 2;
+    column-gap: 22px;
+    text-align: justify;
+    hyphens: auto;
+  }
+  .full-width {
+    column-span: all;
+    margin: 14px 0;
+  }
+  .abstract-box {
+    margin-bottom: 14px;
+    text-align: justify;
+  }
+  table {
+    font-size: 8pt;
+    width: 100%;
+    margin: 10px 0;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 3px 4px;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  pre {
+    font-size: 7.5pt;
+    line-height: 1.15;
+  }
+</style>
+
+<div class="paper-header">
+
 # UQ-DT: Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure Prognostics Under Environmental Drift
+
+<div class="authors-block">
 
 **Antigravity Research Consortium in Cyber-Physical Systems and Infrastructure Analytics**  
 *Department of Civil, Environmental, and Infrastructure Engineering*  
@@ -7,13 +68,19 @@
 *Corresponding Author Email:* `research@antigravity-consortium.org`  
 *Target Venues:* IEEE Transactions on Industrial Informatics / Reliability Engineering & System Safety / Automation in Construction  
 
----
+</div>
+
+<div class="abstract-box">
 
 **Abstract**—Digital Twins (DTs) have emerged as the foundational paradigm for cyber-physical synchronization, structural health monitoring (SHM), and predictive maintenance (PdM) across smart civil and industrial infrastructure. However, an in-depth deconstruction of the state-of-the-art literature across 15 foundational papers reveals a critical, unresolved vulnerability designated herein as **Research Gap 3: The Missing Uncertainty Quantification (UQ) in Safety-Critical Digital Twins**. Contemporary frameworks predominantly generate deterministic scalar point predictions of Remaining Useful Life (RUL) or binary fault classifications. In high-consequence infrastructure assets—such as highway bridges, railway viaducts, power plant turbines, and building vertical transportation systems—a point prediction without rigorous confidence bounds is operationally hazardous. Concurrently, environmental dynamics (diurnal thermal swings and variable service loading) mask genuine mechanical deterioration, while catastrophic failure data remains severely scarce. To resolve this challenge, this paper presents **UQ-DT**, an end-to-end, calibrated Uncertainty-Quantified Digital Twin framework. The proposed framework mathematically decouples predictive variance into input-dependent **aleatoric uncertainty** (stochastic sensor noise and operational jitter) and **epistemic uncertainty** (model ignorance induced by data scarcity and environmental distribution shifts). To eliminate reliance on unverifiable parametric Gaussian assumptions, UQ-DT incorporates **Conformalized Quantile Regression (CQR)**, establishing mathematically proven, distribution-free finite-sample prediction intervals that guarantee nominal coverage ($1 - \alpha$). Furthermore, UQ-DT bridges the gap between prognostic uncertainty and operational decision-making by formulating a risk-sensitive maintenance dispatch policy based on tail failure probabilities. Extensive empirical evaluations conducted on multi-sensor degradation fleets—benchmarked against state-of-the-art baseline models from the primary corpus including Genetic Algorithm-optimized Ensembles (Paper 14), Gradient-Boosted Decision Forests (Paper 6), and Homoscedastic Gaussian Processes—demonstrate the superiority of UQ-DT. On in-distribution nominal test fleets, UQ-DT achieves a Prediction Interval Coverage Probability (PICP) of **91.97%** at a 90% nominal target (Winkler Score: **40.98**, NMPIW: **0.1428**), whereas uncalibrated models collapse to 76.57% coverage. Under severe out-of-distribution (OOD) thermal shocks and operational overloads, UQ-DT maintains **74.58%** empirical coverage (Winkler Score: **118.78**), outperforming corpus baselines which suffer catastrophic coverage collapse down to **58.05%** and Winkler scores exceeding **220.36**. Life-cycle maintenance simulations confirm that uncertainty-guided dispatch eliminates catastrophic failure events while avoiding excessive conservatism, reducing unmanaged risk by over **64%**.
 
 **Index Terms**—Digital Twin, Uncertainty Quantification, Remaining Useful Life (RUL), Conformal Prediction, Conformalized Quantile Regression, Deep Ensembles, Predictive Maintenance, Structural Health Monitoring, Decision Support Systems.
 
----
+</div>
+
+</div>
+
+<div class="paper-columns">
 
 ## I. INTRODUCTION
 
@@ -76,6 +143,8 @@ Operating civil and industrial assets are subjected to intense ambient environme
 
 Bridging digital twin analytics with operational execution requires dependable Decision Support Systems (DSS) and distributed computation. Shehadeh [7] demonstrates econometric life-cycle models for power plants, showing that catastrophic in-service asset failures cost 8 to 12 times more than scheduled preventive interventions. Belay et al. [15] explore edge-cloud federated learning via Digital Twin Knowledge Distillation (DTKD) across IIoT water networks, identifying edge-level uncertainty quantification as the single most critical open research frontier for decentralized cyber-physical synchronization.
 
+<div class="full-width">
+
 #### Table 1: Summary of Reviewed Prior Work Relative to UQ-DT
 
 | Work / Citation | Asset Domain | Output / Paradigm | Backbone / Method | Key Limitation Relative to UQ-DT (Research Gap 3) |
@@ -96,6 +165,8 @@ Bridging digital twin analytics with operational execution requires dependable D
 | **Wang et al. (2026)** [14] | Industrial Equipment | RUL Point Estimation | GA-Ensemble (RF+GB+ENet) | Sec 5: Explicitly calls for UQ and confidence intervals for operational dispatch. |
 | **Belay et al. (2026)** [15] | IIoT Water Distribution | Decentralized Monitoring | Federated Distillation (DTKD) | Sec V: Highlights edge uncertainty estimation as the top future research need. |
 | **UQ-DT (Proposed)** | Safety-Critical Infrastructure | Calibrated RUL Bounds + Tail Risk Dispatch | Heteroscedastic Deep Ensemble + Split CQR | Resolves Gap 3: Finite-sample coverage ($1 - \alpha$), aleatoric/epistemic decoupling, zero-failure dispatch. |
+
+</div>
 
 ---
 
@@ -563,3 +634,5 @@ Future research will extend UQ-DT to **Federated Conformal Digital Twins** (brid
 [24] H. Khosravi, S. Nahavandi, D. Creighton, and A. F. Atiya, "Comprehensive review of neural network-based prediction intervals and new advances," *IEEE Transactions on Neural Networks and Learning Systems*, vol. 22, no. 9, pp. 1341–1356, 2011.
 
 [25] R. T. Rockafellar and S. Uryasev, "Optimization of conditional value-at-risk," *Journal of Risk*, vol. 2, no. 3, pp. 21–42, 2000.
+
+</div>
