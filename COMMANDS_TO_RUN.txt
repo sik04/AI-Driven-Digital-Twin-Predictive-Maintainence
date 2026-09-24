@@ -4,7 +4,7 @@ Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure
 ================================================================================
 
 Open PowerShell or Command Prompt inside the project directory:
-cd "c:\Users\shiks\Downloads\res paper"
+cd "c:\www\AI-Driven-Digital-Twin-Predictive-Maintainence"
 
 --------------------------------------------------------------------------------
 STEP 1: INSTALL DEPENDENCIES
@@ -17,15 +17,19 @@ pip install -e .
 
 
 --------------------------------------------------------------------------------
-STEP 2: RUN INTERACTIVE REAL-TIME DIAGNOSTIC INSPECTION (DEMO CLI)
+STEP 2: RUN LIVE SENSOR TELEMETRY & UQ-DT PROGNOSTIC STREAM (RECOMMENDED FOR EVALUATOR)
 --------------------------------------------------------------------------------
-Command 2A (Nominal Fleet Inspection):
-Simulates real-time telemetry streaming under normal operating conditions.
-python demo_interactive_uq_dt.py --asset 0 --nominal
+Command 2A (Live Cyber-Physical Sensor Stream with Real-Time Telemetry):
+Simulates live streaming of all 4 physical sensors (Vibration, Strain, Temp, Acoustic)
+arriving cycle-by-cycle, live feature extraction, calibrated RUL intervals, and safety dispatch:
+python demo_live_sensor_stream.py --speed 0.04
 
-Command 2B (Severe Out-of-Distribution Thermal Shock Inspection):
-Simulates +8.5 deg C heatwave, sudden overload, and shows automated >> MAINTAIN NOW << work orders.
-python demo_interactive_uq_dt.py --asset 1 --ood --horizon 15
+Command 2B (Simulate Harsh Weather Shock / Out-of-Distribution Shift):
+Simulates sudden +8.5 deg C heatwave and shows how epistemic uncertainty triggers early dispatch:
+python demo_live_sensor_stream.py --ood --speed 0.04
+
+Command 2C (Compact Diagnostic Inspector):
+python demo_interactive_uq_dt.py --asset 0 --nominal
 
 
 --------------------------------------------------------------------------------
