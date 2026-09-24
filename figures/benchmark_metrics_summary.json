@@ -1,0 +1,184 @@
+{
+  "nominal_results": {
+    "Proposed UQ-DT (CQR)": {
+      "rmse": 14.255252362543198,
+      "mae": 10.874091992445505,
+      "r2": 0.9563584864673277,
+      "picp": 0.8943031171623074,
+      "nmpiw": 0.1861126410360849,
+      "cwc": 0.4335595944178493,
+      "winkler": 54.171097898345224,
+      "nominal_coverage": 0.9
+    },
+    "Proposed UQ-DT (Conf-Ensemble)": {
+      "rmse": 12.500454314664575,
+      "mae": 9.433094867691388,
+      "r2": 0.9664415743518333,
+      "picp": 0.9197420279469725,
+      "nmpiw": 0.14286707691849615,
+      "cwc": 0.14286707691849615,
+      "winkler": 40.98782762054154,
+      "nominal_coverage": 0.9,
+      "crps": 6.650010437247617,
+      "nll": 3.7629792886392983
+    },
+    "Uncalibrated Heteroscedastic": {
+      "rmse": 12.500454314664575,
+      "mae": 9.433094867691388,
+      "r2": 0.9664415743518333,
+      "picp": 0.7656753851666069,
+      "nmpiw": 0.10482912083792593,
+      "cwc": 86.6621675688537,
+      "winkler": 47.73935605175472,
+      "nominal_coverage": 0.9,
+      "crps": 6.650010437247617,
+      "nll": 3.7629792886392983
+    },
+    "Uncalibrated Pinball Quantile": {
+      "rmse": 14.255252362543198,
+      "mae": 10.874091992445505,
+      "r2": 0.9563584864673277,
+      "picp": 0.8667144392690792,
+      "nmpiw": 0.1817402320102535,
+      "cwc": 1.1416664328846635,
+      "winkler": 54.34156917535616,
+      "nominal_coverage": 0.9
+    },
+    "Paper 14 GA-Ensemble (Naive Interval)": {
+      "rmse": 13.497604054492479,
+      "mae": 10.416932199493996,
+      "r2": 0.9608741890501942,
+      "picp": 0.8609817269795772,
+      "nmpiw": 0.1565742712854736,
+      "cwc": 1.2580918503600027,
+      "winkler": 57.58966787301619,
+      "nominal_coverage": 0.9
+    },
+    "Paper 6 Decision Forest (Ad-hoc)": {
+      "rmse": 13.440689679634144,
+      "mae": 10.416164086502313,
+      "r2": 0.9612034513732035,
+      "picp": 0.8577570763167324,
+      "nmpiw": 0.1566995982540832,
+      "cwc": 1.4519726073274017,
+      "winkler": 56.830667631871755,
+      "nominal_coverage": 0.9
+    },
+    "Homoscedastic GP": {
+      "rmse": 12.975605680942614,
+      "mae": 9.63224443626669,
+      "r2": 0.9638419282555987,
+      "picp": 0.8803296309566464,
+      "nmpiw": 0.1631766461499639,
+      "cwc": 0.5994861160382586,
+      "winkler": 57.041175318723724,
+      "nominal_coverage": 0.9,
+      "crps": 7.191974072159767,
+      "nll": 3.9897306511921267
+    }
+  },
+  "ood_results": {
+    "Proposed UQ-DT (CQR)": {
+      "rmse": 29.59414694566295,
+      "mae": 22.04072124008456,
+      "r2": 0.7385741759404478,
+      "picp": 0.7458492975734355,
+      "nmpiw": 0.2454645102946781,
+      "cwc": 546.416521687617,
+      "winkler": 118.77764675667052,
+      "nominal_coverage": 0.9
+    },
+    "Proposed UQ-DT (Conf-Ensemble)": {
+      "rmse": 26.54811093304938,
+      "mae": 20.542358128604036,
+      "r2": 0.7896201789996544,
+      "picp": 0.6091954022988506,
+      "nmpiw": 0.21114571590724548,
+      "cwc": 435836.99265911063,
+      "winkler": 130.01907498382735,
+      "nominal_coverage": 0.9,
+      "crps": 15.85351453299381,
+      "nll": 5.923721105074835
+    },
+    "Uncalibrated Heteroscedastic": {
+      "rmse": 26.54811093304938,
+      "mae": 20.542358128604036,
+      "r2": 0.7896201789996544,
+      "picp": 0.4553001277139208,
+      "nmpiw": 0.1550244267974058,
+      "cwc": 702967369.263003,
+      "winkler": 170.80770569894904,
+      "nominal_coverage": 0.9,
+      "crps": 15.85351453299381,
+      "nll": 5.923721105074835
+    },
+    "Uncalibrated Pinball Quantile": {
+      "rmse": 29.59414694566295,
+      "mae": 22.04072124008456,
+      "r2": 0.7385741759404478,
+      "picp": 0.7164750957854407,
+      "nmpiw": 0.24078036160562313,
+      "cwc": 2327.3336848021895,
+      "winkler": 120.5724633328286,
+      "nominal_coverage": 0.9
+    },
+    "Paper 14 GA-Ensemble (Naive Interval)": {
+      "rmse": 25.579446522678772,
+      "mae": 19.01665764395181,
+      "r2": 0.8046924104007978,
+      "picp": 0.6047254150702427,
+      "nmpiw": 0.16617385157491035,
+      "cwc": 428912.7914457945,
+      "winkler": 169.4703432106305,
+      "nominal_coverage": 0.9
+    },
+    "Paper 6 Decision Forest (Ad-hoc)": {
+      "rmse": 30.09525298398626,
+      "mae": 22.269896389357907,
+      "r2": 0.7296459806188678,
+      "picp": 0.5804597701149425,
+      "nmpiw": 0.1663710358389016,
+      "cwc": 1444793.2362513714,
+      "winkler": 220.36545240513405,
+      "nominal_coverage": 0.9
+    },
+    "Homoscedastic GP": {
+      "rmse": 32.044828747307726,
+      "mae": 23.57375338947803,
+      "r2": 0.6934842862624002,
+      "picp": 0.735632183908046,
+      "nmpiw": 0.3493133416300371,
+      "cwc": 1295.7882604956667,
+      "winkler": 170.14120701337993,
+      "nominal_coverage": 0.9,
+      "crps": 17.78582255754512,
+      "nll": 5.209169679528499
+    }
+  },
+  "dss_results": {
+    "deterministic": {
+      "policy": "deterministic",
+      "total_cost": 11115.0,
+      "mean_cost_per_asset": 1389.375,
+      "catastrophic_failures": 0,
+      "planned_preventive": 8,
+      "total_wasted_cycles": 101.0
+    },
+    "conservative": {
+      "policy": "conservative",
+      "total_cost": 14970.0,
+      "mean_cost_per_asset": 1871.25,
+      "catastrophic_failures": 0,
+      "planned_preventive": 8,
+      "total_wasted_cycles": 358.0
+    },
+    "uq_dt": {
+      "policy": "uq_dt",
+      "total_cost": 24255.0,
+      "mean_cost_per_asset": 3031.875,
+      "catastrophic_failures": 0,
+      "planned_preventive": 8,
+      "total_wasted_cycles": 977.0
+    }
+  }
+}
