@@ -1,0 +1,70 @@
+================================================================================
+UQ-DT: STEP-BY-STEP COMMANDS TO RUN THE PROJECT
+Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure
+================================================================================
+
+Open PowerShell or Command Prompt inside the project directory:
+cd "c:\Users\shiks\Downloads\res paper"
+
+--------------------------------------------------------------------------------
+STEP 1: INSTALL DEPENDENCIES
+--------------------------------------------------------------------------------
+Command 1:
+pip install -r requirements.txt
+
+(Optional) Install the package in editable mode:
+pip install -e .
+
+
+--------------------------------------------------------------------------------
+STEP 2: RUN INTERACTIVE REAL-TIME DIAGNOSTIC INSPECTION (DEMO CLI)
+--------------------------------------------------------------------------------
+Command 2A (Nominal Fleet Inspection):
+Simulates real-time telemetry streaming under normal operating conditions.
+python demo_interactive_uq_dt.py --asset 0 --nominal
+
+Command 2B (Severe Out-of-Distribution Thermal Shock Inspection):
+Simulates +8.5 deg C heatwave, sudden overload, and shows automated >> MAINTAIN NOW << work orders.
+python demo_interactive_uq_dt.py --asset 1 --ood --horizon 15
+
+
+--------------------------------------------------------------------------------
+STEP 3: RUN AUTOMATED UNIT TEST SUITE
+--------------------------------------------------------------------------------
+Command 3:
+Runs all 10 unit tests validating data simulation, metrics, CQR conformal calibration,
+uncertainty variance decomposition, and multi-asset fleet dispatch.
+python -m unittest tests/test_uq_framework.py
+
+
+--------------------------------------------------------------------------------
+STEP 4: RUN MASTER BENCHMARK SUITE (MODELS & FIGURES)
+--------------------------------------------------------------------------------
+Command 4:
+Trains heteroscedastic deep ensembles, pinball quantile models, and corpus baselines
+across 13,126 telemetry points. Computes all scientific metrics (PICP, NMPIW, CWC,
+Winkler score, RMSE) and generates all 5 publication-ready 300-DPI plots in figures/.
+python -m uq_digital_twin.run_benchmarks
+
+
+--------------------------------------------------------------------------------
+STEP 5: GENERATE JOURNAL SUBMISSION BUNDLE (ZIP)
+--------------------------------------------------------------------------------
+Command 5:
+Bundles the LaTeX manuscript (main.tex), BibTeX (references.bib), academic paper (MD),
+all 5 figures, and documentation into a single zip archive ready for IEEE/Elsevier submission.
+python manuscript/package_submission.py
+
+
+--------------------------------------------------------------------------------
+STEP 6: GIT SYNCHRONIZATION COMMANDS
+--------------------------------------------------------------------------------
+Check repository status:
+git status
+
+Pull latest updates from GitHub:
+git pull
+
+Push your latest commits to GitHub:
+git push
+================================================================================
