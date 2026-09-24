@@ -9,11 +9,15 @@ An end-to-end, publication-grade research framework and empirical software suite
 
 ---
 
-## 📖 Research Paper Manuscript
+## 📖 Research Paper Manuscript & Documentation
 
-The complete, submission-ready academic research paper is available in two formats:
-* **Full Academic Markdown Manuscript (8,500+ words):** [`RESEARCH_PAPER_GAP3_UQ_DT.md`](RESEARCH_PAPER_GAP3_UQ_DT.md)
-* **IEEE/Elsevier LaTeX Source:** [`main.tex`](main.tex) and [`references.bib`](references.bib)
+The complete, submission-ready academic research paper and deep research syntheses are available in:
+* **Academic Markdown Manuscript (8,500+ words):** [`manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md`](manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md)
+* **IEEE/Elsevier LaTeX Source:** [`manuscript/main.tex`](manuscript/main.tex) and [`manuscript/references.bib`](manuscript/references.bib)
+* **Submission Packager:** [`manuscript/package_submission.py`](manuscript/package_submission.py) (creates [`manuscript/uq_dt_journal_submission_package.zip`](manuscript/uq_dt_journal_submission_package.zip))
+* **Literature Gap Analysis:** [`docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md`](docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md)
+* **Granular Paper Deconstruction:** [`docs/deep_research_gap_analysis.md`](docs/deep_research_gap_analysis.md)
+* **Technical Walkthrough:** [`docs/walkthrough.md`](docs/walkthrough.md)
 
 ---
 
@@ -47,31 +51,50 @@ Furthermore, environmental dynamics (diurnal thermal swings and variable service
 ## 📂 Repository Structure
 
 ```text
-res paper/
-├── uq_digital_twin/                   # Modular Python Empirical Package
-│   ├── __init__.py                    # Package initialization
-│   ├── data_generator.py              # Physical degradation simulator (wear, thermal drift, noise)
-│   ├── probabilistic_models.py        # Heteroscedastic deep ensembles, pinball quantile regressors
-│   ├── conformal_calibrator.py        # Split Conformalized Quantile Regression (CQR)
-│   ├── baselines.py                   # Paper 14 GA-Ensemble, Paper 6 Tree, Homoscedastic GP
-│   ├── metrics.py                     # PICP, NMPIW, CWC, Winkler Score, CRPS, NLL, RMSE
-│   ├── decision_engine.py             # Risk-sensitive maintenance scheduler (DSS integration)
-│   ├── visualize.py                   # 300-DPI publication figure generators
-│   └── run_benchmarks.py              # Master benchmark runner across fleet
-├── tests/
-│   └── test_uq_framework.py           # Comprehensive unit tests (9 tests, 100% pass)
-├── figures/                           # High-Resolution Publication Plots (300 DPI)
-│   ├── fig1_rul_calibrated_intervals.png
-│   ├── fig2_uncertainty_decomposition.png
-│   ├── fig3_reliability_calibration.png
-│   ├── fig4_pareto_coverage_width.png
-│   ├── fig5_dss_cost_comparison.png
-│   └── benchmark_metrics_summary.json # Raw benchmark metric logs
-├── demo_interactive_uq_dt.py          # Interactive diagnostic CLI tool
-├── RESEARCH_PAPER_GAP3_UQ_DT.md       # Full academic paper manuscript
-├── main.tex                           # IEEEtran / Elsevier LaTeX manuscript
-├── references.bib                     # Complete BibTeX bibliography (15 corpus papers + UQ citations)
-└── README.md                          # This documentation file
+AI-Driven-Digital-Twin-Predictive-Maintainence/
+├── docs/                                  # Research documentation & gap syntheses
+│   ├── COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md # 15-paper thematic research gaps
+│   ├── deep_research_gap_analysis.md      # Detailed paper deconstruction & gap isolation
+│   └── walkthrough.md                     # Framework overview & empirical walkthrough
+├── figures/                               # 300-DPI publication figures & benchmark logs
+│   ├── fig1_rul_calibrated_intervals.png  # Calibrated confidence ribbons across cycles
+│   ├── fig2_uncertainty_decomposition.png # Epistemic vs. aleatoric uncertainty separation
+│   ├── fig3_reliability_calibration.png   # Nominal vs. empirical coverage calibration
+│   ├── fig4_pareto_coverage_width.png     # Coverage vs. sharpness Pareto frontier
+│   ├── fig5_dss_cost_comparison.png       # Life-cycle maintenance decision cost analysis
+│   └── benchmark_metrics_summary.json     # Fleet benchmark evaluation metrics
+├── literature/                            # Foundational literature corpus & analysis tools
+│   ├── papers/                            # 15 source PDF research papers (Papers 1–15)
+│   ├── scripts/                           # Automated literature mining & extraction scripts
+│   │   ├── extract_papers.py              # PDF text parser for abstracts and conclusions
+│   │   ├── deep_extract.py                # Targeted gap and future work extractor
+│   │   ├── inspect_papers.py              # Inspection CLI for extracted summaries
+│   │   ├── show_gaps.py                   # Formatter for extracted gap statements
+│   │   ├── summarize_all.py               # Multi-paper cross-comparison summary
+│   │   └── summarize_extra.py             # Supplemental literature analysis
+│   └── README.md                          # Literature corpus index & paper mapping
+├── manuscript/                            # Journal publication submission package
+│   ├── main.tex                           # IEEEtran / Elsevier LaTeX manuscript
+│   ├── references.bib                     # Complete BibTeX bibliography (15 corpus + UQ citations)
+│   ├── RESEARCH_PAPER_GAP3_UQ_DT.md       # Full academic paper manuscript (8,500+ words)
+│   ├── package_submission.py              # Script to build submission archive
+│   └── uq_dt_journal_submission_package.zip # Pre-built journal submission package
+├── tests/                                 # Verification & test suite
+│   └── test_uq_framework.py               # Unit tests for simulator, models, CQR, and DSS
+├── uq_digital_twin/                       # Core empirical Python package
+│   ├── __init__.py                        # Package initialization
+│   ├── baselines.py                       # Paper 14 GA-Ensemble, Paper 6 Tree, Homoscedastic GP
+│   ├── conformal_calibrator.py            # Split Conformalized Quantile Regression (CQR)
+│   ├── data_generator.py                  # Physical degradation & environmental drift simulator
+│   ├── decision_engine.py                 # Risk-sensitive maintenance scheduler (DSS engine)
+│   ├── metrics.py                         # PICP, NMPIW, CWC, Winkler Score, CRPS, NLL, RMSE
+│   ├── probabilistic_models.py            # Heteroscedastic deep ensembles, pinball regressors
+│   ├── run_benchmarks.py                  # Master fleet benchmarking & figure generator
+│   └── visualize.py                       # Publication-grade figure plotting routines
+├── demo_interactive_uq_dt.py              # Interactive diagnostic CLI tool
+├── requirements.txt                       # Project dependencies
+├── setup.py                               # Package installation configuration
+└── README.md                              # This documentation file
 ```
 
 ---
@@ -108,6 +131,14 @@ python -m uq_digital_twin.run_benchmarks
 ### 3. Run Unit Tests
 ```powershell
 python -m unittest tests/test_uq_framework.py
+# or with uv:
+uv run --with numpy,scipy,scikit-learn,pandas,matplotlib python -m unittest discover tests
+```
+
+### 4. Build Journal Submission Bundle
+Generate the submission zip bundle containing the LaTeX manuscript, markdown paper, figures, and dependencies:
+```powershell
+python manuscript/package_submission.py
 ```
 
 ---

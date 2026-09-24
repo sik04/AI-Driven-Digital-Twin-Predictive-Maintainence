@@ -1,6 +1,11 @@
-import json
+import os
 
-json_path = r"C:\Users\shiks\.gemini\antigravity-ide\brain\3812dc48-8d39-4ddf-afd7-ff43db401eba\scratch\papers_summary.json"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+json_path = os.path.join(script_dir, "papers_summary.json")
+if not os.path.exists(json_path):
+    print(f"Summary file not found at {json_path}. Run extract_papers.py first.")
+    exit(0)
+
 with open(json_path, "r", encoding="utf-8") as f:
     papers = json.load(f)
 
