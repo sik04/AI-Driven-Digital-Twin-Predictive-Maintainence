@@ -72,7 +72,7 @@
 
 <div class="abstract-box">
 
-**Abstract**—Digital Twins (DTs) have emerged as the foundational paradigm for cyber-physical synchronization, structural health monitoring (SHM), and predictive maintenance (PdM) across smart civil and industrial infrastructure. However, an in-depth deconstruction of the state-of-the-art literature across 15 foundational papers reveals a critical, unresolved vulnerability designated herein as **Research Gap 3: The Missing Uncertainty Quantification (UQ) in Safety-Critical Digital Twins**. Contemporary frameworks predominantly generate deterministic scalar point predictions of Remaining Useful Life (RUL) or binary fault classifications. In high-consequence infrastructure assets—such as highway bridges, railway viaducts, power plant turbines, and building vertical transportation systems—a point prediction without rigorous confidence bounds is operationally hazardous. Concurrently, environmental dynamics (diurnal thermal swings and variable service loading) mask genuine mechanical deterioration, while catastrophic failure data remains severely scarce. To resolve this challenge, this paper presents **UQ-DT**, an end-to-end, calibrated Uncertainty-Quantified Digital Twin framework. The proposed framework mathematically decouples predictive variance into input-dependent **aleatoric uncertainty** (stochastic sensor noise and operational jitter) and **epistemic uncertainty** (model ignorance induced by data scarcity and environmental distribution shifts). To eliminate reliance on unverifiable parametric Gaussian assumptions, UQ-DT incorporates **Conformalized Quantile Regression (CQR)**, establishing mathematically proven, distribution-free finite-sample prediction intervals that guarantee nominal coverage ($1 - \alpha$). Furthermore, UQ-DT bridges the gap between prognostic uncertainty and operational decision-making by formulating a risk-sensitive maintenance dispatch policy based on tail failure probabilities. Extensive empirical evaluations conducted on multi-sensor degradation fleets—benchmarked against state-of-the-art baseline models from the primary corpus including Genetic Algorithm-optimized Ensembles (Paper 14), Gradient-Boosted Decision Forests (Paper 6), and Homoscedastic Gaussian Processes—demonstrate the superiority of UQ-DT. On in-distribution nominal test fleets, UQ-DT achieves a Prediction Interval Coverage Probability (PICP) of **91.97%** at a 90% nominal target (Winkler Score: **40.98**, NMPIW: **0.1428**), whereas uncalibrated models collapse to 76.57% coverage. Under severe out-of-distribution (OOD) thermal shocks and operational overloads, UQ-DT maintains **74.58%** empirical coverage (Winkler Score: **118.78**), outperforming corpus baselines which suffer catastrophic coverage collapse down to **58.05%** and Winkler scores exceeding **220.36**. Life-cycle maintenance simulations confirm that uncertainty-guided dispatch eliminates catastrophic failure events while avoiding excessive conservatism, reducing unmanaged risk by over **64%**.
+**Abstract**—Over the past decade, Digital Twins (DTs) have gained significant traction as the backbone of cyber-physical synchronization, structural health monitoring (SHM), and predictive maintenance (PdM) for large-scale civil and industrial systems. Yet a careful examination of fifteen key research contributions reveals a persistent blind spot that we term **Research Gap 3: The Missing Uncertainty Quantification (UQ) in Safety-Critical Digital Twins**. Most existing approaches rely on deterministic point estimates—either a single scalar value for Remaining Useful Life (RUL) or a binary fault/no-fault label—without offering any measure of how confident the model actually is. For high-consequence assets such as highway bridges, railway viaducts, power-plant turbines, and elevator systems, presenting a bare prediction without trustworthy confidence bounds poses genuine operational danger. Making matters worse, ambient environmental changes (day-night thermal swings, fluctuating traffic loads) tend to obscure the subtle signatures of real structural damage, while run-to-failure data for critical infrastructure remains exceptionally rare. This paper introduces **UQ-DT**, an integrated framework designed to address these shortcomings. UQ-DT carefully separates predictive variance into two distinct components: **aleatoric uncertainty**, which captures irreducible sensor noise and operational variability, and **epistemic uncertainty**, which reflects the model's own knowledge gaps caused by limited failure examples and unfamiliar operating conditions. Rather than forcing the data into a Gaussian mold, UQ-DT employs **Conformalized Quantile Regression (CQR)** to produce distribution-free prediction intervals that come with provable finite-sample coverage guarantees at any user-chosen confidence level ($1 - \alpha$). Beyond prognostics, the framework feeds these calibrated intervals into a risk-aware maintenance scheduler that prioritizes assets based on tail failure probabilities. We evaluate UQ-DT on synthetic multi-sensor degradation fleets and benchmark it against leading methods from the surveyed literature, including the Genetic Algorithm-optimized Ensemble of Wang et al. (Paper 14), the Gradient-Boosted Decision Forest of Hosseinzadeh et al. (Paper 6), and a standard Homoscedastic Gaussian Process. Under normal operating conditions, UQ-DT achieves a Prediction Interval Coverage Probability (PICP) of **91.97%** against a 90% target (Winkler Score: **40.98**, NMPIW: **0.1428**), compared with just 76.57% for an uncalibrated ensemble. When subjected to harsh out-of-distribution (OOD) thermal shocks and mechanical overloads, UQ-DT still delivers **74.58%** empirical coverage (Winkler Score: **118.78**), comfortably outperforming corpus baselines whose coverage drops as low as **58.05%** with Winkler scores exceeding **220.36**. Finally, life-cycle maintenance simulations show that uncertainty-driven dispatch completely eliminates catastrophic failures while cutting unmanaged risk exposure by more than **64%**.
 
 **Index Terms**—Digital Twin, Uncertainty Quantification, Remaining Useful Life (RUL), Conformal Prediction, Conformalized Quantile Regression, Deep Ensembles, Predictive Maintenance, Structural Health Monitoring, Decision Support Systems.
 
@@ -84,64 +84,64 @@
 
 ## I. INTRODUCTION
 
-The rapid expansion of the Internet of Things (IoT), Building Information Modeling (BIM), and high-capacity machine learning algorithms has catalyzed the deployment of Digital Twins (DTs) across the global infrastructure landscape [1], [2], [10]. A Digital Twin operates as a bidirectional, high-fidelity virtual representation of an engineered physical asset, continuously synchronizing operational telemetry (dynamic strain, vibration, acoustic emissions, and surface temperatures) with numerical and data-driven surrogate models [8], [12]. In civil infrastructure (bridges, tunnels, highway pavements) and capital-intensive industrial facilities (wind turbines, thermal power generation plants, automated HVAC systems), the primary economic and operational driver for digital twin adoption is **Predictive Maintenance (PdM)** and **Structural Health Monitoring (SHM)** [4], [7], [11]. By forecasting asset deterioration prior to physical manifestation, operators can preempt catastrophic failure, optimize resource allocation, and extend structural longevity [9], [14].
+Smart infrastructure systems around the world have been transformed by the convergence of Internet of Things (IoT) sensing, Building Information Modeling (BIM), and modern machine learning [1], [2], [10]. At the heart of this transformation sits the Digital Twin—a continuously updated virtual replica of a physical asset that ingests live telemetry (vibration, strain, acoustic emissions, surface temperature) and mirrors it through numerical or data-driven models [8], [12]. Whether the asset in question is a highway bridge, a wind-turbine drivetrain, a district heating plant, or a high-rise elevator shaft, the economic rationale for adopting digital twins almost always centers on two tightly related capabilities: **Predictive Maintenance (PdM)** and **Structural Health Monitoring (SHM)** [4], [7], [11]. When these capabilities work as intended, operators can detect incipient damage before it escalates, schedule repairs at convenient windows, and considerably extend the useful lifespan of expensive infrastructure [9], [14].
 
 ### A. The Deterministic Point-Prediction Hazard (Research Gap 3)
 
-Despite substantial investments and methodological sophistication, an exhaustive review of contemporary literature demonstrates that current digital twin prognostic engines operate almost exclusively within a **deterministic point-prediction paradigm** [6], [14]. Deep neural networks, Convolutional Neural Networks (CNNs), Long Short-Term Memory networks (LSTMs), and ensemble decision trees are routinely trained to minimize scalar regression losses (Mean Squared Error or Mean Absolute Error), producing single-point outputs:
+Despite the sophistication of current prognostic engines, a recurring pattern emerges when one surveys the literature in detail: the vast majority of digital twin models still treat prognosis as a **deterministic point-prediction problem** [6], [14]. Deep neural networks, Convolutional Neural Networks (CNNs), Long Short-Term Memory (LSTM) cells, and ensemble decision trees are all typically trained to minimize scalar regression losses such as Mean Squared Error, producing a single number as output:
 $$\widehat{\text{RUL}}_{t} = f_{\theta}(X_{1:t}) \in \mathbb{R}^+ \tag{1}$$
-or binary classification probabilities $\hat{y}_t \in [0, 1]$ [6], [11].
+or a binary classification probability $\hat{y}_t \in [0, 1]$ [6], [11].
 
-In safety-critical, high-consequence infrastructure, **a deterministic point prediction without calibrated uncertainty bounds is not merely suboptimal—it is legally, ethically, and operationally indefensible** [10], [14]. Consider an industrial bearing or bridge expansion joint where the model outputs an estimated remaining useful life of $\widehat{\text{RUL}} = 18.0 \text{ days}$. If the underlying, unmodeled 90% confidence interval spans $[16.5 \text{ days}, 19.5 \text{ days}]$, maintenance personnel can safely schedule a component replacement during the subsequent bi-weekly operational shutdown. Conversely, if the true predictive distribution exhibits severe variance spanning $[1.5 \text{ days}, 34.5 \text{ days}]$ due to sensor degradation or unfamiliar operational dynamics, the asset carries an imminent probability of catastrophic in-service collapse, demanding emergency decommissioning within hours. Point predictions conceal this distinction completely, inducing either catastrophic failure or unneeded, premature asset replacement [7], [9].
+For assets where failure carries severe consequences, **relying on a naked point estimate without any indication of its reliability is not simply a technical shortcoming—it represents a serious lapse in engineering judgment** [10], [14]. Imagine, for instance, a bridge expansion joint or an industrial bearing for which the model reports $\widehat{\text{RUL}} = 18.0 \text{ days}$. If the actual 90% confidence band turns out to be narrow—say $[16.5, 19.5]$ days—then maintenance can be comfortably scheduled during the next planned outage. But if unresolved model uncertainty stretches the true interval to $[1.5, 34.5]$ days because the sensors have drifted or the loading profile is unfamiliar, the component could fail without warning, demanding emergency shutdown. A single point forecast hides this crucial distinction, potentially leading to catastrophic collapse on one extreme or needless, premature replacement on the other [7], [9].
 
 ### B. Compounding Environmental and Data Complexities
 
-The absence of uncertainty quantification is compounded by two structural realities inherent to civil and industrial assets:
-1. *Environmental and Operational Masking (Thermal and Load Drift):* Structural sensors do not operate in climate-controlled laboratories. Diurnal and seasonal ambient temperature cycles induce structural thermal expansion, thermo-elastic stress, and boundary condition stiffening that produce sensor fluctuations often exceeding the amplitude of micro-crack damage signals [5], [8], [14]. Purely statistical models interpret these seasonal shifts as structural anomalies, generating unacceptable False Alarm Rates (FAR) [4], [11].
-2. *The "Zero-Failure Dilemma" (Extreme Data Imbalance):* High-value civil infrastructure is managed under conservative safety indices (e.g., Eurocode target reliability index $\beta \ge 3.8$) [9]. Catastrophic structural failures almost never occur during normal monitoring regimes [4], [10]. Consequently, machine learning models are trained predominantly on nominal, undamaged operational regimes. When confronted with novel, out-of-distribution (OOD) degradation pathways or unprecedented extreme load events, deterministic models produce wildly overconfident, inaccurate predictions [6], [15].
+Two structural realities endemic to civil and industrial monitoring further aggravate the absence of uncertainty quantification:
+1. *Environmental and Operational Masking (Thermal and Load Drift):* Sensors mounted on real-world structures are exposed to the full force of ambient conditions. Day-to-night temperature swings and seasonal climate cycles drive thermal expansion, thermo-elastic stresses, and shifts in boundary stiffness—all of which produce measurement fluctuations that can easily dwarf the subtle signal of a developing micro-crack [5], [8], [14]. A model that does not account for these confounders will misinterpret normal thermal behaviour as structural anomaly, resulting in unacceptably high false-alarm rates [4], [11].
+2. *The "Zero-Failure Dilemma" (Extreme Data Imbalance):* Well-maintained critical infrastructure is designed not to fail. Conservative safety indices (e.g., Eurocode reliability target $\beta \ge 3.8$) ensure that outright collapses are exceedingly rare during routine monitoring campaigns [9]. The training data available to machine learning models is therefore overwhelmingly drawn from healthy operating states [4], [10]. When such a model eventually encounters a genuinely novel degradation pathway or an extreme event it has never seen before, it tends to produce predictions that are both inaccurate and unjustifiably confident [6], [15].
 
 ### C. Core Research Questions
 
-To systematically resolve these challenges, this investigation formulates and addresses three core research questions:
-* **$RQ_1$:** *How can a digital twin architecture decouple aleatoric uncertainty (stochastic sensor noise and operational jitter) from epistemic uncertainty (model ignorance arising from failure data scarcity and environmental shifts)?*
-* **$RQ_2$:** *How can distribution-free prediction intervals be constructed with finite-sample mathematical coverage guarantees ($1 - \alpha$) without imposing unrealistic Gaussian error assumptions on non-linear degradation processes?*
-* **$RQ_3$:** *What quantitative life-cycle economic and reliability benefits are unlocked when predictive maintenance dispatch is governed by uncertainty-calibrated tail risk metrics rather than deterministic point thresholds?*
+Against this backdrop, our work is guided by three focused research questions:
+* **$RQ_1$:** *How should a digital twin architecture be designed so that it can cleanly separate aleatoric uncertainty (the stochastic noise inherent in sensor readings and operational variability) from epistemic uncertainty (the model's own ignorance, stemming from limited failure data and unfamiliar environmental conditions)?*
+* **$RQ_2$:** *Is it possible to construct prediction intervals that carry formal, distribution-free coverage guarantees ($1 - \alpha$) for finite samples—without having to assume that prediction errors follow a Gaussian distribution?*
+* **$RQ_3$:** *What measurable improvements in life-cycle cost and asset reliability emerge when maintenance scheduling is driven by calibrated tail-risk indicators rather than by conventional deterministic thresholds?*
 
 ### D. Primary Scientific Contributions
 
-To answer these questions, this paper establishes the following contributions:
-1. **Granular Systematic Deconstruction of the 15-Paper Literature Corpus:** We provide a comprehensive critical synthesis of 15 foundational papers spanning 2023–2026, constructing a formal taxonomy across asset classes, algorithmic paradigms, environmental sensitivities, and author-acknowledged research gaps, formally isolating Research Gap 3.
-2. **The UQ-DT Mathematical Framework:** We introduce `UQ-DT`, a dual-engine architecture combining **Heteroscedastic Deep Ensembles** (for continuous epistemic/aleatoric variance decomposition) with **Split Conformalized Quantile Regression (CQR)** (for non-parametric, finite-sample coverage guarantees).
-3. **Rigorous Finite-Sample Coverage Proof:** We formulate the mathematical calibration mechanism under exchangeability, proving that UQ-DT guarantees $P(y \in C(x)) \ge 1 - \alpha$ under non-stationary degradation kinetics.
-4. **Empirical Benchmarking Against Established Literature Models:** We benchmark UQ-DT against the primary models from the corpus, including the GA-Ensemble from Wang et al. (Paper 14) and the Gradient Boosted Decision Forest from Hosseinzadeh et al. (Paper 6), across both nominal operating conditions and severe OOD thermal-shock scenarios.
-5. **Closed-Loop Decision Support Integration (Bridging Gap 3 to Gap 1):** We formulate a risk-sensitive operational maintenance scheduler utilizing Conditional Value-at-Risk (CVaR) and failure probability thresholds, proving that UQ-DT achieves optimal life-cycle expenditure while reducing catastrophic failure risk to zero.
-6. **Open-Source Reproducible Codebase:** We provide a modular, fully tested Python framework (`uq_digital_twin/`) complete with automated benchmark pipelines, metric evaluators, and publication-ready 300-DPI visualizers.
+In answering these questions, this paper makes the following contributions:
+1. **Structured Critical Review of the 15-Paper Corpus:** We systematically synthesize fifteen foundational publications spanning 2023–2026, organizing them into a taxonomy by asset class, algorithmic approach, environmental sensitivity, and recognized limitations—culminating in the formal identification of Research Gap 3.
+2. **The UQ-DT Framework:** We present `UQ-DT`, a dual-engine architecture that pairs **Heteroscedastic Deep Ensembles** (for continuous decomposition of aleatoric and epistemic variance) with **Split Conformalized Quantile Regression (CQR)** (for non-parametric prediction intervals with finite-sample coverage guarantees).
+3. **Formal Finite-Sample Coverage Proof:** We state and prove that UQ-DT satisfies $P(y \in C(x)) \ge 1 - \alpha$ under the exchangeability assumption, even when the underlying degradation process is non-stationary.
+4. **Empirical Head-to-Head Benchmarking:** We compare UQ-DT against the principal models from the surveyed corpus—including the GA-Ensemble of Wang et al. (Paper 14) and the Gradient Boosted Decision Forest of Hosseinzadeh et al. (Paper 6)—under both nominal and severe OOD conditions.
+5. **Closed-Loop Decision Support (Bridging Gaps 3 and 1):** We design a risk-sensitive fleet maintenance scheduler using Conditional Value-at-Risk (CVaR) and tail failure probability thresholds, and demonstrate that it achieves optimal life-cycle spending while driving catastrophic failure risk to zero.
+6. **Open-Source, Reproducible Codebase:** All code is released as a modular Python framework (`uq_digital_twin/`) with automated benchmark pipelines, metric evaluators, and publication-quality figure generators.
 
 ### E. Paper Organization
 
-The remainder of this paper is organized as follows: Section II conducts a comprehensive literature review and taxonomy of the 15 corpus papers. Section III details the methodology, mathematical foundations, and calibration proofs of UQ-DT. Section IV presents empirical results, benchmark comparisons, multi-seed robustness evaluations, and decision support life-cycle analyses. Section V discusses practical engineering deployment considerations and threats to validity. Section VI concludes the paper and identifies future research trajectories.
+The rest of this paper proceeds as follows. Section II surveys the fifteen corpus papers and organizes them into a structured taxonomy. Section III lays out the UQ-DT methodology, its mathematical underpinnings, and the conformal calibration proof. Section IV reports the empirical results, including benchmark comparisons, multi-seed robustness checks, and decision-support life-cycle analyses. Section V discusses practical deployment considerations and threats to validity. Section VI concludes and sketches directions for future work.
 
 ---
 
 ## II. RELATED WORK & TAXONOMY OF PRIOR LITERATURE
 
-To ground this research, we deconstruct the 15 research papers comprising the primary research repository. The corpus spans premier journals and conferences across *Elsevier*, *MDPI*, *IEEE Transactions*, *Taylor & Francis*, and *Springer*.
+This section reviews the fifteen papers that form the primary corpus for our investigation. The works span leading journals and conferences published by *Elsevier*, *MDPI*, *IEEE Transactions*, *Taylor & Francis*, and *Springer*.
 
 ### A. Foundations, Architectures, and Asset Taxonomies
 
-The architectural foundations of infrastructure digital twins are established through cross-sectoral asset surveys. Diana et al. [1] examine qualitative adoption barriers across municipal infrastructure, emphasizing that without verifiable predictive trust, physical asset managers refuse to delegate dispatch decisions to automated twins. Mazzetto [3] synthesizes urban-scale digital twins (UDT) via PRISMA bibliometrics, demonstrating that regional twins link GIS and BIM but lack real-time predictive degradation mechanisms. Hu Wei [4] develops a Six-M Digital Twin architecture for smart building HVAC and vertical elevator systems, employing Semi-Supervised GANs to address sensor imbalance. Mousavi et al. [8] trace Bridge Management Systems (BMS) integrated with Bridge Information Modeling (BrIM) and terrestrial laser scanning, observing that high-fidelity geometric virtual twins remain decoupled from dynamic structural mechanics. Hisamuddin et al. [10] provide an exhaustive meta-survey across smart infrastructure, formally noting in Sections 9.5 and 9.6 that the absence of confidence bounds and black-box opacity remain primary impediments to industrial deployment.
+Several foundational studies establish the architectural landscape of infrastructure digital twins across different sectors. Diana et al. [1] survey adoption barriers in municipal settings and find that asset managers are reluctant to delegate dispatch decisions to automated twins unless the underlying predictions come with verifiable confidence measures. Mazzetto [3] applies PRISMA-based bibliometrics to urban-scale digital twins (UDTs), showing that while regional platforms increasingly link GIS with BIM, they still lack mechanisms for real-time degradation forecasting. Hu Wei [4] proposes a Six-M Digital Twin for smart-building HVAC and elevator systems, using Semi-Supervised GANs to cope with severe sensor-label imbalance. Mousavi et al. [8] examine how Bridge Management Systems (BMS) have been augmented with Bridge Information Modeling (BrIM) and terrestrial laser scanning, noting that even geometrically faithful virtual twins remain disconnected from the dynamic mechanics of structural degradation. Hisamuddin et al. [10] conduct a wide-ranging meta-survey of smart infrastructure, explicitly identifying (in Sections 9.5 and 9.6) the lack of confidence bounds and black-box opacity as primary barriers to industrial adoption.
 
 ### B. State-of-the-Art Deep Learning Models & Point-Prediction Vulnerability
 
-Algorithmic paradigms for digital twin prognostics have evolved rapidly from classical shallow learners to high-capacity deep networks. Huang et al. [2] survey artificial intelligence across the robotics and Industry 4.0 lifecycle, highlighting model drift when operational boundaries shift. Hosseinzadeh et al. [6] execute a comprehensive benchmark comparing ALSTM-FCN, AdaBoost, LightGBM, and Random Forests for tool wear diagnosis. While achieving 90%+ classification accuracy on benchmark splits, the models output uncalibrated scalar predictions that fail under sensor noise. Hasan & Crawford [12] conduct an extensive quality review across industrial sectors, establishing that existing twins provide static analytics rather than self-learning models with adaptive reliability envelopes. Pathri & Ganduri [13] examine digital twin utility barriers in aerospace and mechanical systems, showing that reduced-order models (ROMs) discard boundary condition uncertainties. Crucially, Wang et al. [14] develop a Genetic Algorithm-optimized Ensemble (combining Random Forest, Gradient Boosting, ElasticNet, and Ridge regression) for industrial equipment RUL estimation. In Section 5 of their treatise, Wang et al. explicitly declare that their model’s deterministic scalar output is an operational vulnerability, issuing a call for future research to establish calibrated confidence intervals to support risk-sensitive dispatch.
+Algorithmic development in digital twin prognostics has progressed swiftly from shallow classifiers to deep, high-capacity networks. Huang et al. [2] survey AI applications across the robotics and Industry 4.0 lifecycle, drawing attention to the problem of model drift when operational boundaries change. Hosseinzadeh et al. [6] benchmark several architectures—ALSTM-FCN, AdaBoost, LightGBM, and Random Forest—for tool-wear diagnosis, achieving over 90% classification accuracy on standard splits yet producing uncalibrated scalar outputs that break down under real sensor noise. Hasan & Crawford [12] review industrial digital twin quality across sectors and conclude that most existing platforms deliver static analytics rather than self-learning models equipped with adaptive reliability envelopes. Pathri & Ganduri [13] explore implementation barriers in aerospace and mechanical systems, highlighting how reduced-order models (ROMs) sacrifice boundary-condition uncertainties for computational speed. Most notably, Wang et al. [14] construct a Genetic Algorithm-optimized Ensemble (Random Forest, Gradient Boosting, ElasticNet, and Ridge Regression) for equipment RUL estimation and, in Section 5, explicitly state that their model's deterministic output is a vulnerability, calling for future work on calibrated confidence intervals to support risk-informed dispatch.
 
 ### C. Environmental Masking, Thermal Dynamics, & Sensor Noise
 
-Operating civil and industrial assets are subjected to intense ambient environmental drift. Bello et al. [5] investigate renewable energy microgrid twins, documenting frequent sensor dropouts, data corruption, and thermal fluctuations under harsh meteorological conditions. Brighenti et al. [9] formalize Markovian structural reliability models for concrete bridge decks, but acknowledge that static Markov transition matrices cannot ingest continuous multi-modal telemetry or account for diurnal thermo-elastic strain masking. Rezown et al. [11] implement Edge AI-driven twins for municipal HVAC and pavement monitoring, highlighting how high-frequency ambient thermal cycles mimic mechanical wear, creating severe false alarms unless models explicitly decouple aleatoric environmental noise from structural damage.
+Infrastructure sensors must contend with aggressive environmental drift. Bello et al. [5] study digital twins for renewable-energy microgrids and document persistent sensor dropouts, data corruption, and temperature-driven measurement distortions under harsh weather. Brighenti et al. [9] develop Markov-chain reliability models for concrete bridge decks but acknowledge that static transition matrices cannot absorb continuous multi-modal telemetry or handle the masking effect of diurnal thermo-elastic strain. Rezown et al. [11] deploy Edge AI twins for municipal HVAC and pavement monitoring, observing that high-frequency thermal cycles closely mimic mechanical wear signatures and trigger frequent false alarms unless aleatoric noise is explicitly separated from structural damage.
 
 ### D. Architectural, Distributed, and Decision-Support Defenses
 
-Bridging digital twin analytics with operational execution requires dependable Decision Support Systems (DSS) and distributed computation. Shehadeh [7] demonstrates econometric life-cycle models for power plants, showing that catastrophic in-service asset failures cost 8 to 12 times more than scheduled preventive interventions. Belay et al. [15] explore edge-cloud federated learning via Digital Twin Knowledge Distillation (DTKD) across IIoT water networks, identifying edge-level uncertainty quantification as the single most critical open research frontier for decentralized cyber-physical synchronization.
+Connecting prognostic analytics to real operational workflows requires robust Decision Support Systems (DSS) and scalable computation. Shehadeh [7] presents econometric life-cycle models for power plants, reporting that unplanned catastrophic failures cost 8 to 12 times more than proactive preventive interventions. Belay et al. [15] investigate edge-cloud federated learning through Digital Twin Knowledge Distillation (DTKD) in IIoT water networks, singling out edge-level uncertainty quantification as the most pressing open challenge for decentralized cyber-physical synchronization.
 
 <div class="full-width">
 
@@ -172,7 +172,7 @@ Bridging digital twin analytics with operational execution requires dependable D
 
 ## III. METHODOLOGY
 
-The architecture of `UQ-DT` is designed to provide mathematically rigorous, distribution-free uncertainty bounds while maintaining computational efficiency suitable for edge infrastructure gateways.
+The design philosophy behind `UQ-DT` is straightforward: deliver mathematically grounded, distribution-free uncertainty bounds while keeping the computational footprint small enough for deployment on edge gateways attached to bridges, turbines, or building management systems.
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -195,7 +195,7 @@ The architecture of `UQ-DT` is designed to provide mathematically rigorous, dist
       [ENGINE 1: VARIANCE DECOMPOSITION]                  [ENGINE 2: SPLIT CQR CALIBRATION]
       Heteroscedastic Deep Ensemble (M=4)                 Gradient Boosted Quantile Regressors
       - Loss: Negative Log-Likelihood (NLL)               - Pinball Loss at alpha/2 and 1-alpha/2
-      - Outputs: Mean mu(x) & Log-variance s(x)           - Held-Out Calibration Split D_calib
+      - Outputs: Mean mu(x) & Log-variance s(x)          - Held-Out Calibration Split D_calib
       - Epistemic Uncertainty: sigma_e^2(x)               - Non-Conformity Scores: E_k
       - Aleatoric Uncertainty: sigma_a^2(x)               - Conformal Quantile Shift: Q_hat
                    |                                                   |
@@ -218,25 +218,25 @@ The architecture of `UQ-DT` is designed to provide mathematically rigorous, dist
 
 ### A. Architectural Overview
 
-UQ-DT ingests high-frequency, multi-modal structural telemetry and executes a two-stage prognostic pipeline:
-1. *Engine 1 (Heteroscedastic Deep Ensemble):* Continuously decomposes predictive variance into aleatoric sensor noise $\sigma_a^2(x)$ and epistemic model ignorance $\sigma_e^2(x)$.
-2. *Engine 2 (Split Conformalized Quantile Regression):* Ingests non-parametric pinball quantiles and computes exact calibration shifts $\hat{Q}_{1-\alpha}$ over an exchangeable calibration fleet $\mathcal{D}_{calib}$, guaranteeing finite-sample coverage $P(y \in C(x)) \ge 1 - \alpha$ without parametric assumptions.
-3. *Engine 3 (Decision Support Engine):* Evaluates tail failure probabilities against an operational horizon, feeding an integer knapsack portfolio optimizer for fleet-wide maintenance dispatch.
+At a high level, UQ-DT takes in multi-modal structural telemetry and processes it through a two-stage prognostic pipeline:
+1. *Engine 1 (Heteroscedastic Deep Ensemble):* Continuously breaks down the total predictive variance into the aleatoric component $\sigma_a^2(x)$, arising from sensor noise and operational jitter, and the epistemic component $\sigma_e^2(x)$, arising from limited training data or unfamiliar conditions.
+2. *Engine 2 (Split Conformalized Quantile Regression):* Takes the raw pinball-loss quantile estimates, computes calibration adjustments $\hat{Q}_{1-\alpha}$ on a held-out fleet $\mathcal{D}_{calib}$, and produces prediction intervals that satisfy $P(y \in C(x)) \ge 1 - \alpha$ without assuming any particular error distribution.
+3. *Engine 3 (Decision Support Engine):* Translates the calibrated intervals into tail failure probabilities over a planning horizon and feeds them into an integer knapsack optimizer for fleet-wide maintenance scheduling.
 
 ### B. Multi-Modal Telemetry & Dataset Construction
 
-To replicate real-world civil and industrial asset dynamics, the physical degradation simulator models non-linear mechanical damage coupled with environmental fluctuations:
+To faithfully reproduce the complexities of real civil and industrial assets, our degradation simulator couples non-linear mechanical damage with realistic environmental fluctuations. The latent structural health of asset $k$ evolves as:
 $$H_k(t) = 1.0 - \left( \frac{t}{T_{fail, k}} \right)^{\gamma_k} - \beta_{load} \cdot \bar{L}_k(t) \tag{2}$$
-where $H_k(t) \in [0, 1]$ is the latent structural health index of asset $k$, $T_{fail, k}$ is the stochastic asset failure life, $\gamma_k \sim \mathcal{U}(1.2, 2.5)$ controls non-linear wear acceleration, and $\bar{L}_k(t)$ is the cumulative operational load. 
+Here, $H_k(t) \in [0, 1]$ represents the health index, $T_{fail, k}$ is the randomly assigned failure life, $\gamma_k \sim \mathcal{U}(1.2, 2.5)$ governs how aggressively wear accelerates, and $\bar{L}_k(t)$ captures cumulative operational loading.
 
-Telemetry channels are generated from the latent health index:
-* **Vibration RMS ($g$):** Accelerometer response exhibiting exponential acceleration under mechanical degradation:
+From this hidden health state, four telemetry channels are synthesized:
+* **Vibration RMS ($g$):** Accelerometer readings that grow exponentially as mechanical integrity deteriorates:
   $$V(t) = V_0 + V_{wear} (1 - H(t))^{1.8} + \mathcal{N}(0, \sigma_v^2(t)) \tag{3}$$
-* **Dynamic Strain ($\mu\epsilon$):** Strain gauge readings capturing cyclical mechanical loading combined with diurnal thermal expansion:
+* **Dynamic Strain ($\mu\epsilon$):** Strain-gauge output reflecting cyclic loading superimposed on diurnal thermal expansion:
   $$\epsilon(t) = \epsilon_{base} + \epsilon_{load}(t) + \alpha_{steel} \cdot (T(t) - T_0) + \Delta \epsilon_{damage}(t) \tag{4}$$
-* **Acoustic Emission ($dB$):** High-frequency transient stress wave energy released during micro-crack extension:
+* **Acoustic Emission ($dB$):** Burst energy released by micro-crack propagation events:
   $$AE(t) = AE_{ambient} + 45.0 \cdot \exp(2.5 \cdot (1 - H(t))) + \text{Poisson}(\lambda_{burst}) \tag{5}$$
-* **Surface Temperature ($^\circ\text{C}$):** Thermocouple telemetry governed by ambient diurnal thermal drift plus mechanical friction heat:
+* **Surface Temperature ($^\circ\text{C}$):** Thermocouple measurements combining ambient day-night swings with friction-generated heat:
   $$T(t) = T_{ambient} + A_{diurnal} \sin\left(\frac{2\pi t}{24}\right) + \Delta T_{friction} (1 - H(t))^2 + \eta_T(t) \tag{6}$$
 
 #### Table 2: UQ-DT Degradation Stage & Telemetry Feature Map: Definitions and Representative Profiles
@@ -251,7 +251,7 @@ Telemetry channels are generated from the latent health index:
 
 ### C. Validation, Calibration, and Test Protocol
 
-To avoid optimistic data leakage, all dataset partitioning is conducted strictly at the **asset trajectory level** rather than random sample splitting.
+To prevent optimistic data leakage, we split the data at the **asset-trajectory level** rather than randomly sampling individual time steps.
 
 #### Table 3: Multi-Asset Telemetry Fleet Distribution
 
@@ -265,92 +265,92 @@ To avoid optimistic data leakage, all dataset partitioning is conducted strictly
 
 ### D. Sensor Reliability, Jitter, and Preprocessing
 
-Real-world telemetry is corrupted by transmission dropouts, ADC quantization, and high-frequency jitter. Raw sensor streams pass through a multi-stage preprocessing pipeline:
-1. *Missing Data Imputation:* Spline interpolation for burst dropouts $\le 3$ timesteps; forward-hold with uncertainty inflation flags for gaps $> 3$ timesteps.
-2. *Thermal Detrending:* Diurnal baseline estimation via moving median filtering across a 24-hour rolling window ($W = 144$ samples at 10-minute intervals).
-3. *Feature Extraction:* Rolling window statistics (mean, variance, skewness, kurtosis, peak-to-peak amplitude) and FFT spectral band power across vibration channels, yielding an 18-dimensional feature vector $x_t \in \mathbb{R}^{18}$.
+Raw telemetry from real infrastructure is routinely corrupted by transmission dropouts, analogue-to-digital converter quantization, and high-frequency electrical jitter. Our preprocessing pipeline addresses these issues in three steps:
+1. *Missing Data Imputation:* Short burst dropouts ($\le 3$ timesteps) are filled by spline interpolation; longer gaps are handled with forward-hold imputation and uncertainty inflation flags.
+2. *Thermal Detrending:* Diurnal thermal baselines are estimated using a 24-hour rolling median filter ($W = 144$ samples at 10-minute intervals) and subtracted from raw readings.
+3. *Feature Extraction:* Rolling-window statistics—mean, variance, skewness, kurtosis, and peak-to-peak amplitude—are computed alongside FFT spectral band powers for each vibration channel, producing an 18-dimensional feature vector $x_t \in \mathbb{R}^{18}$.
 
 ### E. Dual-Engine Architecture (Heteroscedastic Deep Ensemble & Conformal Quantiles)
 
 #### 1) Engine 1: Heteroscedastic Deep Ensemble
-Engine 1 comprises an ensemble of $M = 4$ deep neural networks parameterized by $\theta_m$. Unlike standard networks that predict a scalar mean, each ensemble member outputs two values: a predictive mean $\mu_{\theta_m}(x)$ and an unconstrained log-variance $s_{\theta_m}(x) = \log \sigma_{\theta_m}^2(x)$. Each member is trained independently with distinct random weight initializations by minimizing the Gaussian Negative Log-Likelihood (NLL) loss:
+The first engine consists of $M = 4$ neural networks, each independently initialized and trained. Unlike conventional networks that output a single scalar, every member $m$ produces both a predictive mean $\mu_{\theta_m}(x)$ and an unconstrained log-variance $s_{\theta_m}(x) = \log \sigma_{\theta_m}^2(x)$. Training minimizes the Gaussian Negative Log-Likelihood:
 $$\mathcal{L}_{\text{NLL}}(\theta_m) = \frac{1}{2N} \sum_{j=1}^N \left( \frac{(y_j - \mu_{\theta_m}(x_j))^2}{\exp(s_{\theta_m}(x_j))} + s_{\theta_m}(x_j) \right) + \frac{\lambda_{reg}}{2} \|\theta_m\|_2^2 \tag{7}$$
 
-At test time, the ensemble predictions are aggregated to mathematically decouple predictive variance:
+At inference time, the ensemble predictions are combined to yield a clean decomposition of uncertainty:
 $$\bar{\mu}(x^*) = \frac{1}{M} \sum_{m=1}^M \mu_{\theta_m}(x^*) \tag{8}$$
 $$\sigma_{aleatoric}^2(x^*) = \frac{1}{M} \sum_{m=1}^M \exp\big(s_{\theta_m}(x^*)\big) \tag{9}$$
 $$\sigma_{epistemic}^2(x^*) = \frac{1}{M} \sum_{m=1}^M \big(\mu_{\theta_m}(x^*) - \bar{\mu}(x^*)\big)^2 \tag{10}$$
 $$\sigma_{total}^2(x^*) = \sigma_{aleatoric}^2(x^*) + \sigma_{epistemic}^2(x^*) \tag{11}$$
 
-This decomposition provides an indispensable diagnostic capability: **a surge in $\sigma_{epistemic}$ alerts operators to model ignorance and distribution shift, whereas elevated $\sigma_{aleatoric}$ indicates transient sensor degradation or physical turbulence.**
+This split is operationally invaluable: **a spike in $\sigma_{epistemic}$ tells operators the model is venturing into unfamiliar territory (e.g., distribution shift), whereas elevated $\sigma_{aleatoric}$ points to noisy sensors or genuine physical turbulence.**
 
 #### 2) Engine 2: Gradient Boosted Quantile Regressors
-Engine 2 constructs base lower and upper quantiles $\hat{q}_{\alpha/2}(x)$ and $\hat{q}_{1-\alpha/2}(x)$ by training Gradient Boosted Regressors minimizing the tilted pinball loss:
+The second engine learns the lower and upper conditional quantiles $\hat{q}_{\alpha/2}(x)$ and $\hat{q}_{1-\alpha/2}(x)$ by training Gradient Boosted Regressors with the tilted pinball loss:
 $$\rho_\tau(u) = u \cdot (\tau - \mathbb{I}(u < 0)) = \begin{cases} \tau \cdot u, & \text{if } u \ge 0 \\ (\tau - 1) \cdot u, & \text{if } u < 0 \end{cases} \tag{12}$$
 $$\mathcal{L}_{pinball}(\tau) = \frac{1}{N} \sum_{j=1}^N \rho_\tau\big(y_j - \hat{q}_\tau(x_j)\big) \tag{13}$$
 
 ### F. Conformal Finite-Sample Calibration Protocol & Mathematical Proof
 
-While pinball regression targets nominal quantiles asymptotically, empirical coverage on finite datasets routinely violates nominal targets due to overfitting and non-linearities. UQ-DT incorporates **Split Conformalized Quantile Regression (CQR)** to provide exact distribution-free coverage.
+Pinball regression targets the desired quantiles asymptotically, but on finite datasets, the resulting intervals often fail to achieve their nominal coverage due to overfitting and non-linearities. UQ-DT corrects for this with **Split Conformalized Quantile Regression (CQR)**, a post-hoc recalibration procedure that delivers exact, distribution-free coverage.
 
 #### 1) Calibration Protocol
-1. Base quantiles $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ are trained exclusively on $\mathcal{D}_{train}$.
-2. On the held-out calibration fleet $\mathcal{D}_{calib} = \{(x_k, y_k)\}_{k=1}^{n_{calib}}$, we evaluate non-conformity scores:
+1. The base quantile models $\hat{q}_{\alpha/2}$ and $\hat{q}_{1-\alpha/2}$ are fit using only $\mathcal{D}_{train}$.
+2. On the separate calibration fleet $\mathcal{D}_{calib} = \{(x_k, y_k)\}_{k=1}^{n_{calib}}$, we compute non-conformity scores:
    $$E_k = \max\Big( \hat{q}_{\alpha/2}(x_k) - y_k, \; y_k - \hat{q}_{1-\alpha/2}(x_k) \Big) \tag{14}$$
-   *Interpretation:* If $y_k$ falls outside the predicted interval, $E_k > 0$ represents the absolute distance by which the interval missed the true target; if $y_k$ falls within the interval, $E_k \le 0$.
-3. We compute the empirical conformal quantile adjustment $\hat{Q}_{1-\alpha}$:
+   A positive $E_k$ means the true value fell outside the predicted interval by that amount; a non-positive $E_k$ means it fell safely inside.
+3. The conformal adjustment $\hat{Q}_{1-\alpha}$ is obtained as:
    $$\hat{Q}_{1-\alpha} = \text{Quantile}\left( \frac{\lceil (n_{calib} + 1)(1 - \alpha) \rceil}{n_{calib}}, \; \{E_k\}_{k=1}^{n_{calib}} \right) \tag{15}$$
-4. For any novel test sample $x_{test}$, the calibrated prediction interval $C(x_{test})$ is constructed as:
+4. For any new test input $x_{test}$, the calibrated prediction interval becomes:
    $$C(x_{test}) = \left[ \max\big(0, \; \hat{q}_{\alpha/2}(x_{test}) - \hat{Q}_{1-\alpha}\big), \; \hat{q}_{1-\alpha/2}(x_{test}) + \hat{Q}_{1-\alpha} \right] \tag{16}$$
 
 #### 2) Finite-Sample Coverage Theorem & Proof
-**Theorem 1 (Finite-Sample Marginal Validity).** *Suppose the calibration samples $\{(x_k, y_k)\}_{k=1}^{n_{calib}}$ and test point $(x_{test}, y_{test})$ are exchangeable random variables drawn from an arbitrary, unknown joint probability distribution $\mathcal{P}_{X, Y}$. Then for any chosen significance level $\alpha \in (0, 1)$, the prediction interval $C(x_{test})$ constructed via Equations (14)–(16) satisfies:*
+**Theorem 1 (Finite-Sample Marginal Validity).** *Let the calibration samples $\{(x_k, y_k)\}_{k=1}^{n_{calib}}$ and the test point $(x_{test}, y_{test})$ be exchangeable random variables from an arbitrary, unknown joint distribution $\mathcal{P}_{X, Y}$. Then for any significance level $\alpha \in (0, 1)$, the interval $C(x_{test})$ from Equations (14)–(16) satisfies:*
 $$P\big(y_{test} \in C(x_{test})\big) \ge 1 - \alpha \tag{17}$$
-*Furthermore, if the non-conformity scores $E_k$ are almost surely distinct (continuous distribution), the coverage probability is upper bounded by:*
+*Moreover, when the non-conformity scores are almost surely distinct (i.e., the distribution is continuous), the coverage is also bounded above:*
 $$P\big(y_{test} \in C(x_{test})\big) \le 1 - \alpha + \frac{1}{n_{calib} + 1} \tag{18}$$
 
-*Proof.* Under the exchangeability hypothesis, the non-conformity score of the test observation:
+*Proof.* Under exchangeability, the test non-conformity score:
 $$E_{test} = \max\Big( \hat{q}_{\alpha/2}(x_{test}) - y_{test}, \; y_{test} - \hat{q}_{1-\alpha/2}(x_{test}) \Big)$$
-is exchangeable with the calibration non-conformity scores $\{E_1, \dots, E_{n_{calib}}\}$. By definition of exchangeable random variables, the rank of $E_{test}$ among the set $\{E_1, \dots, E_{n_{calib}}, E_{test}\}$ is uniformly distributed over the discrete set $\{1, 2, \dots, n_{calib} + 1\}$.
+is exchangeable with the calibration scores $\{E_1, \dots, E_{n_{calib}}\}$. Consequently, the rank of $E_{test}$ among $\{E_1, \dots, E_{n_{calib}}, E_{test}\}$ is uniformly distributed over $\{1, 2, \dots, n_{calib} + 1\}$.
 
-The event $y_{test} \in C(x_{test})$ occurs if and only if:
+The test point is covered, $y_{test} \in C(x_{test})$, precisely when:
 $$\hat{q}_{\alpha/2}(x_{test}) - \hat{Q}_{1-\alpha} \le y_{test} \le \hat{q}_{1-\alpha/2}(x_{test}) + \hat{Q}_{1-\alpha}$$
-which is algebraically equivalent to:
+which is equivalent to:
 $$E_{test} \le \hat{Q}_{1-\alpha}$$
 
-Since $\hat{Q}_{1-\alpha}$ is chosen as the $\lceil (n_{calib} + 1)(1 - \alpha) \rceil / n_{calib}$ empirical quantile of the calibration scores, exactly $\lceil (n_{calib} + 1)(1 - \alpha) \rceil$ out of the $n_{calib} + 1$ exchangeable variables are less than or equal to $\hat{Q}_{1-\alpha}$. Consequently:
+Because $\hat{Q}_{1-\alpha}$ is set to the $\lceil (n_{calib} + 1)(1 - \alpha) \rceil / n_{calib}$ empirical quantile, exactly $\lceil (n_{calib} + 1)(1 - \alpha) \rceil$ of the $n_{calib} + 1$ exchangeable scores are at most $\hat{Q}_{1-\alpha}$. Therefore:
 $$P(E_{test} \le \hat{Q}_{1-\alpha}) = \frac{\lceil (n_{calib} + 1)(1 - \alpha) \rceil}{n_{calib} + 1} \ge 1 - \alpha$$
-This guarantees the exact finite-sample lower bound in Equation (17). The upper bound follows directly from the fact that $\lceil z \rceil < z + 1$, yielding:
+This establishes the lower bound in Eq. (17). The upper bound follows from $\lceil z \rceil < z + 1$:
 $$P(E_{test} \le \hat{Q}_{1-\alpha}) \le \frac{(n_{calib} + 1)(1 - \alpha) + 1}{n_{calib} + 1} = 1 - \alpha + \frac{1}{n_{calib} + 1}$$
-which concludes the proof. $\blacksquare$
+which completes the proof. $\blacksquare$
 
 ### G. Baseline Model Development
 
-To provide rigorous comparative evaluation, we implemented and benchmarked four representative prognostic architectures from the literature corpus:
-1. *Paper 14 Baseline (Wang et al., 2026 [14]):* Genetic Algorithm-inspired ensemble combining Random Forest ($N_{est}=100$), Gradient Boosting ($N_{est}=100$), ElasticNet ($\alpha=0.1, \rho=0.5$), and Ridge Regression. Produces deterministic scalar RUL predictions. Naive Gaussian prediction intervals are constructed using historical training residual standard deviation: $\hat{\mu} \pm z_{1-\alpha/2} \cdot \sigma_{train}$.
-2. *Paper 6 Baseline (Hosseinzadeh et al., 2023 [6]):* Deep Gradient Boosted Decision Forest ($N_{est}=150$, $\text{max\_depth}=5$). Evaluated with conventional constant-width residual intervals.
-3. *Homoscedastic Gaussian Process Regressor:* Classical Bayesian benchmark utilizing a composite Matern/RBF kernel with White Noise ($k(x, x') = \sigma_f^2 \exp(-\frac{\|x-x'\|^2}{2\ell^2}) + \sigma_n^2 \mathbb{I}$). Assumes uniform homoscedastic observation noise across all degradation phases.
-4. *Uncalibrated Heteroscedastic Deep Ensemble:* The raw parametric Gaussian interval $\bar{\mu}(x) \pm z_{1-\alpha/2} \sigma_{total}(x)$ from Engine 1 without conformal recalibration.
+To ensure fair and rigorous comparison, we implemented four representative prognostic approaches drawn from the corpus:
+1. *Paper 14 Baseline (Wang et al., 2026 [14]):* A Genetic Algorithm-inspired ensemble combining Random Forest ($N_{est}=100$), Gradient Boosting ($N_{est}=100$), ElasticNet ($\alpha=0.1, \rho=0.5$), and Ridge Regression. This model outputs deterministic scalar RUL values. We construct naive Gaussian intervals using the training residual standard deviation: $\hat{\mu} \pm z_{1-\alpha/2} \cdot \sigma_{train}$.
+2. *Paper 6 Baseline (Hosseinzadeh et al., 2023 [6]):* A deep Gradient Boosted Decision Forest ($N_{est}=150$, $\text{max\_depth}=5$), also evaluated with fixed-width residual intervals.
+3. *Homoscedastic Gaussian Process Regressor:* A classical Bayesian baseline with a composite Matérn/RBF kernel and additive White Noise ($k(x, x') = \sigma_f^2 \exp(-\frac{\|x-x'\|^2}{2\ell^2}) + \sigma_n^2 \mathbb{I}$). Assumes constant observation noise regardless of degradation stage.
+4. *Uncalibrated Heteroscedastic Deep Ensemble:* The raw Gaussian interval $\bar{\mu}(x) \pm z_{1-\alpha/2} \sigma_{total}(x)$ from Engine 1 without any conformal recalibration.
 
 ### H. Error-Driven Boundary & Epistemic Uncertainty Analysis
 
-Under unfamiliar operating conditions (e.g., severe summer heatwaves), the epistemic uncertainty $\sigma_{epistemic}^2(x)$ surges. UQ-DT leverages this property to establish an automated **OOD Anomaly Detector**. When the ratio:
+When operating conditions stray far from the training distribution—during a severe summer heatwave, for example—epistemic uncertainty $\sigma_{epistemic}^2(x)$ tends to spike sharply. UQ-DT exploits this behaviour to build an automated **OOD Anomaly Detector**. Specifically, when the ratio:
 $$\Omega_{OOD}(x) = \frac{\sigma_{epistemic}^2(x)}{\sigma_{aleatoric}^2(x) + \epsilon_0} > \kappa_{threshold} \tag{19}$$
-exceeds a calibrated threshold $\kappa_{threshold}$, the Digital Twin triggers an alert indicating that predictive intervals are expanding due to model ignorance rather than actual mechanical wear, preventing unwarranted emergency shutdown.
+exceeds a pre-set threshold $\kappa_{threshold}$, the system raises an alert signaling that the widening intervals stem from model ignorance rather than from actual mechanical damage, thereby preventing unnecessary emergency shutdowns.
 
 ### I. Decision-Support Refinement Candidates for Risk-Sensitive Dispatch
 
-To bridge Research Gap 3 (Uncertainty Quantification) with Research Gap 1 (Decision Support Systems), UQ-DT integrates prognostic bounds directly into operational maintenance dispatch. In safety-critical infrastructure, dispatching maintenance based on the point estimate $\widehat{\text{RUL}} \le \tau_{horizon}$ ignores catastrophic tail risk. 
+To bridge Research Gap 3 (Uncertainty Quantification) with Research Gap 1 (Decision Support Systems), UQ-DT channels its calibrated prognostic intervals directly into operational maintenance scheduling. In safety-critical settings, acting on the point estimate alone—triggering maintenance whenever $\widehat{\text{RUL}} \le \tau_{horizon}$—ignores the tail risk that the true remaining life could be much shorter.
 
-We formulate fleet maintenance scheduling as a **Risk-Sensitive Knapsack Optimization**. For a fleet of $K$ monitored assets with maintenance budget $\mathcal{B}_t$:
+We cast fleet maintenance scheduling as a **Risk-Sensitive Knapsack Optimization**. Given $K$ monitored assets and a budget $\mathcal{B}_t$:
 $$\max_{\mathbf{x} \in \{0, 1\}^K} \sum_{i=1}^K x_i \cdot P_{\text{fail}, i}(t + \tau_{horizon}) \cdot C_{\text{fail}, i} \quad \text{s.t.} \quad \sum_{i=1}^K x_i C_{\text{prev}, i} \le \mathcal{B}_t \tag{20}$$
-where $x_i = 1$ denotes scheduling asset $i$ for immediate preventive maintenance, $C_{\text{prev}, i}$ is the planned maintenance cost, and $C_{\text{fail}, i}$ is the catastrophic failure cost ($C_{\text{fail}} / C_{\text{prev}} \approx 8 \text{ to } 12$ following Shehadeh [7]).
+where $x_i = 1$ means asset $i$ is scheduled for immediate preventive maintenance, $C_{\text{prev}, i}$ is the planned maintenance cost, and $C_{\text{fail}, i}$ is the cost of catastrophic failure ($C_{\text{fail}} / C_{\text{prev}} \approx 8 \text{ to } 12$, per Shehadeh [7]).
 
-Under UQ-DT, the tail failure probability over the planning horizon $\tau_{horizon}$ is computed using the calibrated lower predictive bound $C_{lo, i}(t)$:
+The tail failure probability over the planning horizon $\tau_{horizon}$ is evaluated using UQ-DT's calibrated lower bound $C_{lo, i}(t)$:
 $$P_{\text{fail}, i}(t + \tau_{horizon}) = \mathbb{I}\Big( C_{lo, i}(t) \le \tau_{horizon} \Big) \tag{21}$$
-The priority ranking under fractional knapsack relaxation is governed by the Benefit-to-Cost Ratio (BCR):
+Assets are prioritized by their Benefit-to-Cost Ratio (BCR):
 $$\lambda_i(t) = \frac{P_{\text{fail}, i}(t + \tau_{horizon}) \cdot C_{\text{fail}, i}}{C_{\text{prev}, i}} \tag{22}$$
-guaranteeing that capital is allocated strictly to assets with statistically certifiable downside failure risk.
+ensuring that maintenance capital flows strictly to the assets with the highest statistically certified downside risk.
 
 #### Table 4: Hyperparameter & Training Configuration
 
@@ -369,25 +369,25 @@ guaranteeing that capital is allocated strictly to assets with statistically cer
 
 ### J. Model Selection Criterion & Metric Definitions
 
-Prognostic uncertainty models are evaluated across six formal statistical metrics:
+We evaluate all prognostic uncertainty models against six well-established statistical metrics:
 1. *Prediction Interval Coverage Probability (PICP):*
    $$\text{PICP} = \frac{1}{N} \sum_{j=1}^N \mathbb{I}\big( y_j \in [C_{lo}(x_j), C_{hi}(x_j)] \big) \tag{23}$$
-   Target: $\text{PICP} \ge 1 - \alpha = 0.90$.
-2. *Normalized Mean Prediction Interval Width (NMPIW):* Measures interval sharpness normalized by target range:
+   The goal is $\text{PICP} \ge 1 - \alpha = 0.90$.
+2. *Normalized Mean Prediction Interval Width (NMPIW):* Captures how sharp (narrow) the intervals are, normalized by the observed target range:
    $$\text{NMPIW} = \frac{1}{N \cdot (y_{\max} - y_{\min})} \sum_{j=1}^N \big( C_{hi}(x_j) - C_{lo}(x_j) \big) \tag{24}$$
-3. *Coverage Width-based Criterion (CWC):* Penalizes coverage deficits exponentially:
+3. *Coverage Width-based Criterion (CWC):* Applies an exponential penalty whenever coverage drops below the nominal target:
    $$\text{CWC} = \text{NMPIW} \cdot \left( 1 + \gamma_{cwc} \cdot \exp\big(-\eta_{cwc} (\text{PICP} - (1 - \alpha))\big) \cdot \mathbb{I}(\text{PICP} < 1 - \alpha) \right) \tag{25}$$
-   where $\gamma_{cwc} = 100$ and $\eta_{cwc} = 50$.
-4. *Winkler Score (Interval Score):* Strictly proper scoring rule penalizing interval width and boundary violations:
+   with $\gamma_{cwc} = 100$ and $\eta_{cwc} = 50$.
+4. *Winkler Score (Interval Score):* A strictly proper scoring rule that penalizes both wide intervals and boundary violations:
    $$\text{Winkler} = \frac{1}{N} \sum_{j=1}^N \begin{cases} \Delta_j, & \text{if } y_j \in [C_{lo, j}, C_{hi, j}] \\ \Delta_j + \frac{2}{\alpha} (C_{lo, j} - y_j), & \text{if } y_j < C_{lo, j} \\ \Delta_j + \frac{2}{\alpha} (y_j - C_{hi, j}), & \text{if } y_j > C_{hi, j} \end{cases} \tag{26}$$
-   where $\Delta_j = C_{hi, j} - C_{lo, j}$. Lower Winkler scores indicate superior calibrated sharpness.
+   where $\Delta_j = C_{hi, j} - C_{lo, j}$. Lower values are better.
 5. *Continuous Ranked Probability Score (CRPS):*
    $$\text{CRPS}(F, y) = \int_{-\infty}^\infty \big( F(z) - \mathbb{I}(z \ge y) \big)^2 dz \tag{27}$$
 6. *Point Accuracy:* Root Mean Square Error (RMSE) and Mean Absolute Error (MAE).
 
 ### K. Multi-Seed Robustness Protocol
 
-To ensure empirical stability and eliminate seed bias, all benchmark pipelines are evaluated across **five independent random seeds** ($S \in \{42, 43, 44, 45, 46\}$). At each seed iteration, the full fleet generation, feature extraction, model fitting, conformal calibration, and test evaluations are executed from scratch, and results are reported as $\text{Mean} \pm \text{Standard Deviation}$.
+To guard against seed-dependent flukes and confirm the stability of our findings, every benchmark pipeline was executed across **five independent random seeds** ($S \in \{42, 43, 44, 45, 46\}$). For each seed, the complete workflow—fleet generation, feature extraction, model fitting, conformal calibration, and test evaluation—is re-run from scratch. Results are reported as $\text{Mean} \pm \text{Standard Deviation}$.
 
 ---
 
@@ -395,9 +395,9 @@ To ensure empirical stability and eliminate seed bias, all benchmark pipelines a
 
 ### A. Overall Comparison of Baseline and Proposed Models
 
-The complete empirical benchmark was executed across 13,126 multi-modal telemetry observations. Table 5 and the benchmark logs summarize model performance on the Nominal In-Distribution Fleet ($\mathcal{D}_{test}^{nom}$) and the Out-of-Distribution Stress Fleet ($\mathcal{D}_{test}^{ood}$).
+The full benchmark suite was evaluated on 13,126 multi-modal telemetry observations. Table 5 and the accompanying logs summarize performance on the Nominal In-Distribution Fleet ($\mathcal{D}_{test}^{nom}$) and the Out-of-Distribution Stress Fleet ($\mathcal{D}_{test}^{ood}$).
 
-On the nominal test fleet, **Proposed UQ-DT (Conf-Ensemble)** achieves an empirical coverage of **91.97%**, successfully meeting the 90% target coverage while maintaining the sharpest interval profile ($\text{NMPIW} = 0.1428$) and the lowest Winkler score (**40.98**). **Proposed UQ-DT (CQR)** achieves **89.43%** coverage with a Winkler score of **54.17**. In stark contrast, the **Uncalibrated Heteroscedastic Ensemble** collapses to **76.57%** coverage ($\text{CWC} = 86.66$), demonstrating that raw neural network variance estimates are systematically overconfident. The established literature baselines—**Paper 14 GA-Ensemble** (86.10% coverage, Winkler 57.59) and **Paper 6 Decision Forest** (85.78% coverage, Winkler 56.83)—fail to achieve nominal coverage due to their reliance on static, uncalibrated Gaussian residual assumptions.
+On the nominal test fleet, **UQ-DT (Conf-Ensemble)** reaches an empirical coverage of **91.97%**, comfortably surpassing the 90% target while maintaining the tightest interval profile ($\text{NMPIW} = 0.1428$) and the best Winkler score (**40.98**). The CQR variant of UQ-DT attains **89.43%** coverage with a Winkler score of **54.17**. By contrast, the **Uncalibrated Heteroscedastic Ensemble** manages only **76.57%** coverage ($\text{CWC} = 86.66$)—a stark illustration of how raw neural network variance estimates can be systematically overconfident. The literature baselines fare only somewhat better: the **Paper 14 GA-Ensemble** covers 86.10% of test targets (Winkler 57.59) and the **Paper 6 Decision Forest** reaches 85.78% (Winkler 56.83), both falling short of the 90% target because they rely on static Gaussian residual assumptions.
 
 #### Figure 1: RUL Prognostics Trajectory with Calibrated Prediction Intervals vs. Baseline
 
@@ -422,13 +422,13 @@ On the nominal test fleet, **Proposed UQ-DT (Conf-Ensemble)** achieves an empiri
 ```
 *(High-resolution 300-DPI publication vector rendered in `figures/fig1_rul_calibrated_intervals.png`)*
 
-Figure 1 illustrates an individual asset degradation trajectory from Cycle 0 to catastrophic failure at Cycle 92. The deterministic point prediction of Paper 14 exhibits severe lag during the final accelerated wear stage (cycles 60–90), falsely indicating 18+ cycles of remaining life when the true asset has less than 6 cycles remaining. UQ-DT’s calibrated lower confidence bound drops below the critical safety threshold at Cycle 74, triggering planned maintenance and eliminating failure risk.
+Figure 1 traces a single asset from its initial deployment to eventual failure at Cycle 92. The deterministic baseline from Paper 14 lags badly during the final acceleration phase (cycles 60–90), over-estimating remaining life by more than 18 cycles when fewer than 6 actually remain. UQ-DT's calibrated lower bound, by contrast, breaches the safety threshold at Cycle 74, giving operators ample time to arrange a planned intervention.
 
 ### B. Per-Class / Per-Asset Performance under Environmental Variation
 
-Under out-of-distribution environmental drift ($+8.5^\circ\text{C}$ thermal shock and $1.35\times$ overload), deterministic models experience severe degradation. As shown in the empirical evaluation, Paper 6 Decision Forest suffers catastrophic coverage collapse down to **58.05%** ($\text{Winkler} = 220.37$), while Paper 14 GA-Ensemble collapses to **60.47%** ($\text{Winkler} = 169.47$). The Uncalibrated Heteroscedastic model deteriorates to **45.53%** coverage with an astronomical CWC penalty ($7.03 \times 10^8$).
+When the test fleet is exposed to out-of-distribution environmental stress ($+8.5^\circ\text{C}$ thermal shock combined with a $1.35\times$ mechanical overload), deterministic models degrade sharply. Paper 6 Decision Forest collapses to just **58.05%** coverage ($\text{Winkler} = 220.37$), while Paper 14 GA-Ensemble drops to **60.47%** ($\text{Winkler} = 169.47$). The Uncalibrated Heteroscedastic model fares worst of all, falling to **45.53%** coverage with an astronomically inflated CWC penalty ($7.03 \times 10^8$).
 
-In contrast, **UQ-DT (CQR)** proves exceptionally resilient, maintaining **74.58%** empirical coverage with the lowest Winkler score (**118.78**), outperforming all baselines by over 14% absolute coverage.
+**UQ-DT (CQR)**, on the other hand, proves remarkably resilient under these same conditions, holding **74.58%** empirical coverage with the lowest Winkler score (**118.78**)—outperforming every baseline by at least 14 percentage points of absolute coverage.
 
 #### Figure 2: Epistemic vs. Aleatoric Uncertainty Decoupling Under Operational Drift
 
@@ -451,7 +451,7 @@ In contrast, **UQ-DT (CQR)** proves exceptionally resilient, maintaining **74.58
 ```
 *(High-resolution 300-DPI publication vector rendered in `figures/fig2_uncertainty_decomposition.png`)*
 
-Figure 2 demonstrates the epistemic and aleatoric decomposition across an asset undergoing thermal shock between Cycles 50 and 80. While aleatoric sensor variance remains relatively steady, epistemic uncertainty surges by **340%**, accounting for over 65% of total predictive variance. This enables the Digital Twin to diagnose that the anomaly is driven by environmental distribution shift rather than acute mechanical crack propagation.
+Figure 2 shows what happens to the two uncertainty components when a thermal shock is applied between Cycles 50 and 80. While aleatoric variance stays comparatively flat, epistemic uncertainty jumps by roughly **340%**, accounting for over 65% of total predictive variance. This tells operators that the model's sudden uncertainty is driven by encountering unfamiliar conditions, not by an actual spike in mechanical damage.
 
 ### C. Calibration & Reliability Matrix Analysis
 
@@ -478,11 +478,11 @@ Figure 2 demonstrates the epistemic and aleatoric decomposition across an asset 
 ```
 *(High-resolution 300-DPI publication vector rendered in `figures/fig3_reliability_calibration.png`)*
 
-Figure 3 displays the reliability diagram across nominal confidence levels $\alpha \in [0.10, 0.95]$. UQ-DT tracks the ideal $y = x$ calibration diagonal across all target levels. Conversely, the uncalibrated Gaussian ensemble exhibits a concave calibration trajectory, undercovering nominal targets by up to 15.4% across the entire operational spectrum.
+Figure 3 plots empirical coverage against the nominal target for each method across $\alpha \in [0.10, 0.95]$. UQ-DT hugs the ideal $y = x$ diagonal throughout. The uncalibrated Gaussian ensemble, by comparison, traces a concave curve that falls as much as 15.4% below the target across the entire range.
 
 ### D. Multi-Seed Robustness across Five Independent Runs
 
-Table 5 presents the empirical robustness results averaged across five independent seeds ($S \in \{42, 43, 44, 45, 46\}$).
+Table 5 aggregates results over five seeds ($S \in \{42, 43, 44, 45, 46\}$).
 
 #### Table 5: Multi-Seed Robustness (Five Independent Runs with Mean ± Std)
 
@@ -495,7 +495,7 @@ Table 5 presents the empirical robustness results averaged across five independe
 | Homoscedastic Gaussian Process | $88.00 \pm 2.04\%$ | $0.1682 \pm 0.0036$ | $54.39 \pm 2.61$ | $13.03 \pm 0.72$ |
 | Uncalibrated Heteroscedastic Ensemble | $70.23 \pm 3.93\%$ | $0.0962 \pm 0.0063$ | $53.01 \pm 4.34$ | $\mathbf{12.59 \pm 0.63}$ |
 
-The multi-seed evaluation confirms that **UQ-DT (CQR)** achieves exact nominal coverage ($90.04 \pm 2.59\%$), exhibiting tight variance across seeds. While Uncalibrated Heteroscedastic models produce deceptively narrow intervals ($\text{NMPIW} = 0.0962$), their catastrophic undercoverage ($70.23\%$) violates industrial safety requirements.
+The multi-seed analysis confirms that **UQ-DT (CQR)** hits the nominal 90% coverage target almost exactly ($90.04 \pm 2.59\%$) with low inter-seed variability. Although the Uncalibrated Heteroscedastic Ensemble produces appealingly narrow intervals ($\text{NMPIW} = 0.0962$), its coverage of just $70.23\%$ would be wholly unacceptable in any safety-critical context.
 
 #### Figure 4: Pareto Sharpness vs. Coverage Trade-off Curve
 
@@ -517,11 +517,11 @@ The multi-seed evaluation confirms that **UQ-DT (CQR)** achieves exact nominal c
 ```
 *(High-resolution 300-DPI publication vector rendered in `figures/fig4_pareto_coverage_width.png`)*
 
-Figure 4 maps all models onto the Sharpness-Coverage plane. UQ-DT (Conf-Ensemble) establishes the optimal Pareto knee, delivering maximal interval sharpness while fulfilling nominal coverage bounds.
+Figure 4 locates every model on the Sharpness-Coverage plane. UQ-DT (Conf-Ensemble) sits squarely at the Pareto knee—the sweet spot where intervals are as tight as possible while still meeting the coverage guarantee.
 
 ### E. Decision Support System (DSS) Life-Cycle Cost & Risk Comparison
 
-To demonstrate real-world operational utility, the prognostic outputs were connected to the knapsack maintenance dispatch engine across a simulated fleet life-cycle under varying cost penalty ratios ($C_{fail} / C_{prev} = 10.0$).
+To ground these statistical results in operational terms, we connected each model's prognostic output to the risk-sensitive knapsack maintenance dispatcher and ran life-cycle simulations with a cost-penalty ratio of $C_{fail} / C_{prev} = 10.0$.
 
 #### Figure 5: Operational Decision Cost & Safety Comparison
 
@@ -543,10 +543,10 @@ To demonstrate real-world operational utility, the prognostic outputs were conne
 ```
 *(High-resolution 300-DPI publication vector rendered in `figures/fig5_dss_cost_comparison.png`)*
 
-As shown in Figure 5:
-1. *Deterministic Point Policy (Paper 14 style):* Triggers maintenance at low nominal cost ($11,115) by delaying intervention until $\widehat{\text{RUL}} \le 15$. However, this policy leaves assets exposed to sudden failure when models lag actual damage, creating unmanaged liability exceeding $50,000.
-2. *Ultra-Conservative Heuristic:* Intervenes whenever any sensor registers minor anomalies, incurring $14,970 in maintenance with 358 prematurely wasted life cycles.
-3. *UQ-DT Risk-Sensitive Policy:* Balances failure probability against prevention costs, eliminating catastrophic in-service failures while avoiding excessive premature teardowns, reducing fleet risk exposure by **64.2%**.
+The life-cycle comparison in Figure 5 tells a clear story:
+1. *Deterministic Point Policy (Paper 14 style):* Keeps planned costs low (\$11,115) by deferring action until $\widehat{\text{RUL}} \le 15$. But because the model cannot flag situations where the true remaining life is far shorter than predicted, the fleet accumulates over \$50,000 in unmanaged failure exposure.
+2. *Ultra-Conservative Heuristic:* Triggers maintenance at the first sign of any sensor anomaly, spending \$14,970 and retiring 358 useful life-cycles prematurely.
+3. *UQ-DT Risk-Sensitive Policy:* Balances the probability of failure against the cost of prevention, eliminating catastrophic in-service failures entirely while avoiding the waste of premature teardowns. The net result is a **64.2%** reduction in unmanaged fleet risk.
 
 ---
 
@@ -554,32 +554,32 @@ As shown in Figure 5:
 
 ### A. Edge Gateway Latency, Compute Overhead, and Memory Footprint
 
-To verify deployability on resource-constrained infrastructure hardware (e.g., Raspberry Pi 4, NVIDIA Jetson Nano edge nodes mounted on bridges or wind turbine nacelles), execution latency and memory consumption were profiled:
+To verify that UQ-DT can run on the resource-constrained hardware typically found in infrastructure settings—think a Raspberry Pi 4 mounted inside a bridge pier or an NVIDIA Jetson Nano in a wind-turbine nacelle—we profiled inference latency and memory usage:
 * **Feature Extraction Latency:** $1.42 \pm 0.18 \text{ ms}$ per 10-minute sensor buffer.
-* **Engine 1 (Ensemble Inference):** $4.85 \pm 0.32 \text{ ms}$ on quad-core ARM Cortex-A72 CPU.
+* **Engine 1 (Ensemble Inference):** $4.85 \pm 0.32 \text{ ms}$ on a quad-core ARM Cortex-A72 CPU.
 * **Engine 2 (CQR Prediction):** $2.14 \pm 0.15 \text{ ms}$.
-* **Total Inference Latency:** **$8.41 \text{ ms}$**, which is four orders of magnitude faster than standard 10-minute SCADA polling cycles.
-* **Peak Memory Footprint:** **$38.4 \text{ MB}$**, making UQ-DT fully compatible with low-power IIoT gateways.
+* **Total Inference Latency:** **$8.41 \text{ ms}$**—four orders of magnitude faster than the 10-minute SCADA polling interval.
+* **Peak Memory Footprint:** **$38.4 \text{ MB}$**, well within the capacity of standard IIoT gateways.
 
 ### B. Non-Stationary Wear Dynamics and Online Adaptive Conformal Recalibration
 
-While static conformal calibration guarantees marginal coverage under exchangeability, multi-year infrastructure degradation induces non-stationary wear kinetics. To maintain validity over multi-year asset lifecycles, UQ-DT incorporates an **Adaptive Rolling Conformal Update**. At time $t_k$, when an asset completes an operational inspection or scheduled overhaul, the observed true wear state updates the calibration set $\mathcal{D}_{calib}$ using an exponential forgetting factor ($\lambda_{forget} = 0.98$), continuously adapting $\hat{Q}_{1-\alpha}$ to multi-year climate shifts.
+The finite-sample coverage guarantee derived in Section III-F assumes exchangeability between the calibration and test data. Over multi-year asset lifecycles, however, wear patterns can shift significantly. To handle this, UQ-DT supports an **Adaptive Rolling Conformal Update**: whenever an asset undergoes a scheduled inspection or overhaul at time $t_k$, the observed wear state is added to the calibration pool using an exponential forgetting factor ($\lambda_{forget} = 0.98$). This keeps the conformal adjustment $\hat{Q}_{1-\alpha}$ responsive to long-term climate and usage trends.
 
 ### C. Threats to Validity
 
-1. *Internal Validity:* Sensor degradation was simulated using established physical wear equations coupled with real-world diurnal thermal amplitudes. While synthetic fleets capture non-linear wear, extreme multi-axial structural interactions may introduce complex covariance patterns not fully modeled.
-2. *External Validity:* Fleet evaluations were conducted across 58 asset trajectories (13,126 observations). Generalization to hyper-large municipal portfolios ($>10,000$ assets) will require distributed federated calibration protocols.
-3. *Construct Validity:* The 90% target coverage was selected to match safety standards; application to nuclear or aerospace structures may mandate 99% coverage targets, requiring larger calibration sets ($n_{calib} \ge 200$) to satisfy conformal finite-sample bounds.
+1. *Internal Validity:* Our degradation simulator uses physically motivated wear equations coupled with realistic diurnal thermal amplitudes. Although this captures the essential non-linear dynamics, highly complex multi-axial structural interactions could introduce covariance structures not fully represented here.
+2. *External Validity:* The benchmark fleet comprises 58 asset trajectories and 13,126 observations. Scaling to very large municipal portfolios ($>10{,}000$ assets) will call for distributed, federated calibration protocols.
+3. *Construct Validity:* We targeted 90% coverage, consistent with common safety standards. Applications in nuclear or aerospace domains that demand 99% coverage would require substantially larger calibration sets ($n_{calib} \ge 200$) to satisfy the conformal finite-sample bounds.
 
 ---
 
 ## VI. CONCLUSION AND FUTURE OUTLOOK
 
-This paper resolved **Research Gap 3: Missing Uncertainty Quantification in Safety-Critical Digital Twins** through the development and empirical verification of `UQ-DT`. By integrating Heteroscedastic Deep Ensembles with Conformalized Quantile Regression (CQR), UQ-DT mathematically decouples environmental thermal drift from structural degradation and provides distribution-free, finite-sample prediction intervals guaranteeing nominal coverage ($1 - \alpha$).
+This paper set out to close **Research Gap 3—the absence of rigorous uncertainty quantification in safety-critical digital twins**—and did so through the development and empirical validation of `UQ-DT`. By pairing Heteroscedastic Deep Ensembles with Conformalized Quantile Regression, UQ-DT cleanly separates the noise inherent in sensors from the ignorance inherent in models, and wraps every prediction in a distribution-free interval with provable coverage ($1 - \alpha$).
 
-Benchmarking against established literature models (including the Paper 14 GA-Ensemble and Paper 6 Decision Forest) across 13,126 telemetry points demonstrated that UQ-DT achieves **91.97%** nominal coverage (Winkler score: 40.98), whereas uncalibrated models collapse to 76.57%. Under severe out-of-distribution thermal shocks, UQ-DT maintains **74.58%** coverage, while corpus baselines suffer catastrophic collapse to 58.05%. Integrating UQ-DT with risk-sensitive decision support eliminates catastrophic in-service collapses, providing certifiable cyber-physical reliability for smart infrastructure.
+Head-to-head benchmarks against established literature approaches (the Paper 14 GA-Ensemble and the Paper 6 Decision Forest) on 13,126 telemetry points showed that UQ-DT achieves **91.97%** nominal coverage with a Winkler score of 40.98, compared with just 76.57% for an uncalibrated ensemble. When subjected to severe out-of-distribution thermal shocks, UQ-DT still maintained **74.58%** coverage, whereas the strongest corpus baseline collapsed to 58.05%. Feeding these calibrated intervals into a risk-aware dispatcher eliminated catastrophic in-service failures entirely, demonstrating that uncertainty-quantified digital twins offer not just statistical but genuine operational advantages for smart infrastructure.
 
-Future research will extend UQ-DT to **Federated Conformal Digital Twins** (bridging to Paper 15 [15]), enabling privacy-preserving calibration across decentralized municipal fleets without centralizing raw sensor telemetry.
+Looking ahead, we plan to extend UQ-DT into the domain of **Federated Conformal Digital Twins** (building on the direction outlined by Paper 15 [15]), enabling privacy-preserving calibration across geographically distributed municipal fleets without the need to centralize raw sensor data.
 
 ---
 
