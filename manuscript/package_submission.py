@@ -11,6 +11,7 @@ def create_submission_zip():
     zip_path = os.path.join(manuscript_dir, "uq_dt_journal_submission_package.zip")
     
     manuscript_files = [
+        "UQ_DT_RESEARCH_PAPER_IEEE_FORMAT.docx",
         "UQ_DT_RESEARCH_PAPER_DOUBLE_COLUMN.pdf",
         "research_paper_double_column.html",
         "main.tex",
@@ -19,6 +20,7 @@ def create_submission_zip():
     ]
     
     root_files = [
+        "IEEE-paper-format-template.docx",
         "README.md",
         "requirements.txt",
     ]
