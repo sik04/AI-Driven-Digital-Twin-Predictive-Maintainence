@@ -130,14 +130,20 @@ Trains all probabilistic models and corpus baselines on 13,126 observation point
 python -m uq_digital_twin.run_benchmarks
 ```
 
-### 3. Run Unit Tests
+### 3. Verify Research Paper Empirical Claims
+Directly validates all tables, coverage numbers, and Winkler scores in `UQ_DT_RESEARCH_PAPER_DOUBLE_COLUMN.pdf` against model outputs side-by-side:
+```powershell
+python verify_paper_results.py
+```
+
+### 4. Run Unit Tests
 ```powershell
 python -m unittest tests/test_uq_framework.py
 # or with uv:
 uv run --with numpy,scipy,scikit-learn,pandas,matplotlib python -m unittest discover tests
 ```
 
-### 4. Build Journal Submission Bundle
+### 5. Build Journal Submission Bundle
 Generate the submission zip bundle containing the LaTeX manuscript, markdown paper, figures, and dependencies:
 ```powershell
 python manuscript/package_submission.py
