@@ -6,15 +6,23 @@ Computes PICP, NMPIW, Winkler Score, NASA C-MAPSS Score, RMSE, and MAE.
 import numpy as np
 
 
+def nasa_scoring_function(y_true, y_pred):
+    """NASA C-MAPSS asymmetric evaluation metric.
+    Penalizes late predictions (over-estimation) more severely than early predictions.
+    """
+    y_true = np.asarray(y_true)
+    y_pred = np.asarray(y_pred)
+    diff = y_pred - y_true
+    score = np.where(diff < 0, np.exp(-diff / 13.0) - 1.0, np.exp(diff / 10.0) - 1.0)
+    return float(np.sum(score))
+
+
 def compute_regression_metrics(y_true, y_pred):
     """Compute standard RUL regression metrics."""
-    diff = y_pred - y_true
+    diff = np.asarray(y_pred) - np.asarray(y_true)
     mae = float(np.mean(np.abs(diff)))
     rmse = float(np.sqrt(np.mean(diff ** 2)))
-
-    # NASA C-MAPSS asymmetric score
-    score = np.where(diff < 0, np.exp(-diff / 13.0) - 1.0, np.exp(diff / 10.0) - 1.0)
-    nasa_score = float(np.sum(score))
+    nasa_score = nasa_scoring_function(y_true, y_pred)
 
     return {
         "mae": mae,
