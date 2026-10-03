@@ -220,6 +220,6 @@
   "sequence_length": 30,
   "max_rul": 125,
   "rolling_window": 5,
-  "timestamp_utc": "2026-10-03T08:55:54.300736+00:00",
+  "timestamp_utc": "2026-10-03T09:10:23.096716+00:00",
   "preprocessing_rule": "StandardScaler and feature selection fitted strictly on train_units only"
 }
