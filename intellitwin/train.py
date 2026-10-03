@@ -178,18 +178,22 @@ def run_pipeline(output_dir="intellitwin/models"):
     setting_cols = ["setting_1", "setting_2", "setting_3"]
     sensor_cols = [c for c in feature_cols if c.startswith("sensor_") and not ("mean" in c or "std" in c)]
     env_handler = EnvironmentalConditionHandler(n_regimes=4)
-    env_handler.fit(train_df[setting_cols].values, train_df[sensor_cols].values)
+    # Fit strictly on training engines to prevent validation/test leakage
+    train_mask = train_df["unit"].isin(loader.train_units)
+    train_settings = train_df.loc[train_mask, setting_cols].values
+    train_sensors = train_df.loc[train_mask, sensor_cols].values
+    env_handler.fit(train_settings, train_sensors)
 
     test_residuals = env_handler.compute_condition_residuals(test_df[setting_cols].values, test_df[sensor_cols].values)
-    setting_shifts = np.linalg.norm(test_df[setting_cols].values - np.mean(train_df[setting_cols].values, axis=0), axis=1)
+    setting_shifts = np.linalg.norm(test_df[setting_cols].values - np.mean(train_settings, axis=0), axis=1)
     epistemic_unc = np.repeat(lstm_std_test.mean(), len(test_residuals))  # Proxy for epistemic uncertainty
 
     discriminator = FaultDiscriminator(residual_threshold=1.5, epistemic_threshold=20.0)
     cases, case_counts = discriminator.discriminate(test_residuals, setting_shifts, epistemic_unc)
     print(f"  Masking Discrimination Cases: {case_counts}")
 
-    # Catastrophic Failure Evaluation on Run-to-Failure validation units
-    val_units = train_df[train_df["unit"] > 80]["unit"].unique()
+    # Catastrophic Failure Evaluation on Authoritative Validation units (run-to-failure)
+    val_units = loader.val_units
     trajectories = []
     for u in val_units:
         u_data = train_df[train_df["unit"] == u]
@@ -215,6 +219,8 @@ def run_pipeline(output_dir="intellitwin/models"):
 
     results = {
         "dataset": "NASA C-MAPSS FD001",
+        "data_protocol": "Step-04 Authoritative Engine-Level Split Protocol (Strict Isolation)",
+        "protocol_status": "REQUIRES RECOMPUTATION UNDER CORRECTED PROTOCOL",
         "total_train_samples": len(train_df),
         "total_test_samples": len(test_df),
         "feature_count": num_features,

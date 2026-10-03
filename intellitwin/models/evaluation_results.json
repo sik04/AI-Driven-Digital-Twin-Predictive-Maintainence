@@ -1,5 +1,8 @@
 {
   "dataset": "NASA C-MAPSS FD001",
+  "protocol_version": "2.1.0-strictly-isolated-engine-split",
+  "protocol_status": "REQUIRES RECOMPUTATION UNDER CORRECTED PROTOCOL",
+  "historical_baseline_note": "Values below represent frozen pre-Step-04 baseline. Formal recomputation scheduled under strictly isolated train_units protocol.",
   "total_train_samples": 20631,
   "total_test_samples": 13096,
   "feature_count": 54,
