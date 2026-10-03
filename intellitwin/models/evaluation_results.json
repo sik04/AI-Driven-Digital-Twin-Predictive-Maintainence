@@ -1,0 +1,141 @@
+{
+  "dataset": "NASA C-MAPSS FD001",
+  "total_train_samples": 20631,
+  "total_test_samples": 13096,
+  "feature_count": 54,
+  "rul_regression_models": {
+    "LSTM_heteroscedastic": {
+      "mae": 12.333434410095215,
+      "rmse": 15.999846538642583,
+      "nasa_score": 542.1215102736413
+    },
+    "GRU": {
+      "mae": 12.254440159797669,
+      "rmse": 16.78189739436013,
+      "nasa_score": 665.0057105468101
+    },
+    "Random_Forest": {
+      "mae": 13.388016308501085,
+      "rmse": 18.12290876101394,
+      "nasa_score": 884.030647679691
+    },
+    "XGBoost": {
+      "mae": 12.486203298568725,
+      "rmse": 16.991453930181155,
+      "nasa_score": 715.7090775455293
+    }
+  },
+  "fault_classification_models": {
+    "Random_Forest": {
+      "model_type": "rf",
+      "accuracy": 0.89,
+      "precision_macro": 0.8610703812316715,
+      "recall_macro": 0.854983368971252,
+      "f1_macro": 0.8578816621499549,
+      "false_alarm_rate": 0.023809523809523808,
+      "missed_detection_rate": 0.125,
+      "confusion_matrix": [
+        [
+          58,
+          3,
+          0
+        ],
+        [
+          4,
+          17,
+          2
+        ],
+        [
+          0,
+          2,
+          14
+        ]
+      ],
+      "per_class": {
+        "Healthy": {
+          "precision": 0.9354838709677419,
+          "recall": 0.9508196721311475,
+          "f1": 0.943089430894309
+        },
+        "Degrading": {
+          "precision": 0.7727272727272727,
+          "recall": 0.7391304347826086,
+          "f1": 0.7555555555555555
+        },
+        "Critical": {
+          "precision": 0.875,
+          "recall": 0.875,
+          "f1": 0.875
+        }
+      }
+    },
+    "XGBoost": {
+      "model_type": "xgb",
+      "accuracy": 0.87,
+      "precision_macro": 0.8313881107998755,
+      "recall_macro": 0.8259978617248752,
+      "f1_macro": 0.8272143793524139,
+      "false_alarm_rate": 0.03571428571428571,
+      "missed_detection_rate": 0.125,
+      "confusion_matrix": [
+        [
+          58,
+          3,
+          0
+        ],
+        [
+          5,
+          15,
+          3
+        ],
+        [
+          0,
+          2,
+          14
+        ]
+      ],
+      "per_class": {
+        "Healthy": {
+          "precision": 0.9206349206349206,
+          "recall": 0.9508196721311475,
+          "f1": 0.9354838709677419
+        },
+        "Degrading": {
+          "precision": 0.75,
+          "recall": 0.6521739130434783,
+          "f1": 0.6976744186046512
+        },
+        "Critical": {
+          "precision": 0.8235294117647058,
+          "recall": 0.875,
+          "f1": 0.8484848484848485
+        }
+      }
+    }
+  },
+  "uncertainty_quantification": {
+    "target_coverage": 0.9,
+    "picp": 0.95,
+    "mpiw": 62.53653335571289,
+    "nmpiw": 0.5299706216585838,
+    "winkler_score": 70.905986328125,
+    "cwc": 0.5299706216585838,
+    "coverage_met": true
+  },
+  "masking_fault_discrimination": {
+    "normal_variation": 12700,
+    "genuine_degradation": 111,
+    "combined": 285,
+    "unfamiliar": 0
+  },
+  "catastrophic_failure_evaluation": {
+    "total_engines_evaluated": 20,
+    "mean_warning_lead_time_cycles": 41.1,
+    "min_warning_lead_time_cycles": 20.0,
+    "missed_catastrophic_failures": 0,
+    "missed_catastrophic_rate": 0.0,
+    "false_alarm_count": 0,
+    "false_alarm_rate": 0.0,
+    "catastrophic_prevention_success_rate": 1.0
+  }
+}

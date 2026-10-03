@@ -1,10 +1,11 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="uq-digital-twin",
-    version="1.0.0",
-    description="Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure Prognostics",
-    author="Antigravity Research Consortium",
+    name="intellitwin",
+    version="2.0.0",
+    description="IntelliTwin: An AI-Driven Digital Twin Framework for Predictive Maintenance of Engineering Assets",
+    author="Mayank Singh, Shiksha Pandey, Ruchi Gupta",
+    author_email="shikshapandey2004@gmail.com",
     packages=find_packages(),
     python_requires=">=3.10",
     install_requires=[
@@ -13,6 +14,8 @@ setup(
         "scikit-learn>=1.2.0",
         "pandas>=2.0.0",
         "matplotlib>=3.7.0",
+        "xgboost>=1.7.0",
+        "flask>=2.0.0",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

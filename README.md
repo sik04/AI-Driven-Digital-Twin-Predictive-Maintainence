@@ -1,206 +1,182 @@
-# UQ-DT: Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure
+# IntelliTwin: An AI-Driven Digital Twin Framework for Predictive Maintenance of Engineering Assets
 
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Research Gap](https://img.shields.io/badge/Research%20Gap-Gap%203%20(UQ)-red.svg)](#research-gap-3)
-[![Coverage Target](https://img.shields.io/badge/Conformal%20Coverage-91.97%25-brightgreen.svg)](#benchmark-results)
+[![Dataset: NASA C-MAPSS](https://img.shields.io/badge/Dataset-NASA%20C--MAPSS%20FD001-orange.svg)](data/cmapss/)
+[![Conformal Coverage](https://img.shields.io/badge/Conformal%20Coverage-95.00%25-brightgreen.svg)](#empirical-performance-on-nasa-c-mapss)
+[![Catastrophic Prevention](https://img.shields.io/badge/Catastrophic%20Prevention-100%25-emerald.svg)](#catastrophic-failure-prevention)
 
-An end-to-end, publication-grade research framework and empirical software suite addressing **Research Gap 3: Missing Uncertainty Quantification (UQ) in Safety-Critical Digital Twins**, developed through an exhaustive deconstruction of 15 foundational research papers across premier venues (*Elsevier, MDPI, IEEE, Taylor & Francis, Springer*).
-
----
-
-## 📖 Research Paper Manuscript & Documentation
-
-The complete, submission-ready academic research paper and deep research syntheses are available in:
-* **Academic Markdown Manuscript (8,500+ words):** [`manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md`](manuscript/RESEARCH_PAPER_GAP3_UQ_DT.md)
-* **IEEE/Elsevier LaTeX Source:** [`manuscript/main.tex`](manuscript/main.tex) and [`manuscript/references.bib`](manuscript/references.bib)
-* **Submission Packager:** [`manuscript/package_submission.py`](manuscript/package_submission.py) (creates [`manuscript/uq_dt_journal_submission_package.zip`](manuscript/uq_dt_journal_submission_package.zip))
-* **Literature Gap Analysis:** [`docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md`](docs/COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md)
-* **Granular Paper Deconstruction:** [`docs/deep_research_gap_analysis.md`](docs/deep_research_gap_analysis.md)
-* **Technical Walkthrough:** [`docs/walkthrough.md`](docs/walkthrough.md)
-* **Real-World Explanation & Architecture Guide:** [`docs/REAL_WORLD_EXPLANATION.md`](docs/REAL_WORLD_EXPLANATION.md)
+An end-to-end, publication-grade research framework and industrial cyber-physical software suite for predictive maintenance of engineering assets. IntelliTwin synchronizes multi-modal physical sensor telemetry with a dynamic virtual representation that decouples operational variations from structural wear, provides finite-sample calibrated uncertainty bounds for Remaining Useful Life (RUL), and triggers automated maintenance actions via a factory-floor dashboard.
 
 ---
 
-## 🎯 What is Research Gap 3?
-
-Across the 15 reviewed papers, contemporary Digital Twins (DTs) for Predictive Maintenance (PdM) and Structural Health Monitoring (SHM) exhibit a dangerous vulnerability: **deterministic point predictions in safety-critical systems**.
-
-Models such as the GA-Ensemble in **Paper 14 (Wang et al., *MDPI Sensors* 2026)** or the ALSTM-FCN/Tree models in **Paper 6 (Hosseinzadeh et al., *Elsevier Mfg Letters* 2023)** predict exact scalar values:
-$$\widehat{\text{RUL}} = 18.0 \text{ days}$$
-with **zero confidence intervals or uncertainty bounds**. 
-
-In high-consequence infrastructure (bridges, viaducts, turbines, pressurized pipelines, building elevators):
-- A prediction of $\text{RUL} = 18.0 \text{ days}$ with a true interval $[16.5, 19.5]$ permits scheduled bi-weekly replacement.
-- The same prediction with an unmodeled interval $[1.5, 34.5]$ indicates an imminent risk of **catastrophic in-service collapse**.
-
-Furthermore, environmental dynamics (diurnal thermal swings and variable service loading) mask genuine mechanical deterioration, while high-severity failure data remains virtually nonexistent in historical logs (the *"Zero-Failure Dilemma"* highlighted in Paper 4 and Paper 10).
+## 👥 Authors & Affiliations
+* **Mayank Singh** — *Department of Electronics and Communication Engineering (ECE)*, Ajay Kumar Garg Engineering College, Ghaziabad, India (`mayanksingh2745@gmail.com`)
+* **Shiksha Pandey** — *Department of Information Technology (IT)*, Ajay Kumar Garg Engineering College, Ghaziabad, India (`shikshapandey2004@gmail.com`)
+* **Ruchi Gupta** — *Department of Information Technology (IT)*, Ajay Kumar Garg Engineering College, Ghaziabad, India (`ruchigupta@akgec.ac.in`)
 
 ---
 
-## 💡 The UQ-DT Solution
+## 📖 Research Paper Manuscripts & Deliverables
 
-`UQ-DT` resolves Gap 3 via a dual-engine probabilistic architecture:
-1. **Heteroscedastic Deep Ensembles:** Learns input-dependent observation noise $\sigma_a^2(x)$ via negative log-likelihood (NLL) while measuring epistemic model ignorance $\sigma_e^2(x)$ through ensemble member disagreement.
-2. **Conformalized Quantile Regression (CQR):** Establishes mathematically proven, distribution-free finite-sample prediction intervals guaranteeing:
-   $$P\Big( y_{test} \in \big[ \hat{q}_{\alpha/2}(x) - \hat{Q}_{1-\alpha}, \, \hat{q}_{1-\alpha/2}(x) + \hat{Q}_{1-\alpha} \big] \Big) \ge 1 - \alpha$$
-   without requiring unrealistic Gaussian assumptions.
-3. **Risk-Sensitive Decision Support (Bridge to Gap 1):** Converts prediction intervals into failure probabilities $P(\text{RUL} \le \tau_{horizon})$ and Conditional Value-at-Risk (CVaR) dispatch rules.
+The complete, submission-ready academic research manuscripts and packages:
+* **IEEE Word Document (DOCX):** [`manuscript/INTELLITWIN_RESEARCH_PAPER_IEEE_FORMAT.docx`](manuscript/INTELLITWIN_RESEARCH_PAPER_IEEE_FORMAT.docx)
+* **IEEE Double-Column PDF:** [`manuscript/INTELLITWIN_RESEARCH_PAPER_DOUBLE_COLUMN.pdf`](manuscript/INTELLITWIN_RESEARCH_PAPER_DOUBLE_COLUMN.pdf)
+* **Interactive HTML Publication Paper:** [`manuscript/research_paper_double_column.html`](manuscript/research_paper_double_column.html)
+* **Academic Markdown Source (8,000+ words):** [`manuscript/RESEARCH_PAPER_INTELLITWIN.md`](manuscript/RESEARCH_PAPER_INTELLITWIN.md)
+* **BibTeX References (Descending Publication Year):** [`manuscript/references.bib`](manuscript/references.bib)
+* **Complete Journal Submission Package (ZIP):** [`manuscript/intellitwin_journal_submission_package.zip`](manuscript/intellitwin_journal_submission_package.zip)
+* **Step-by-Step Execution Guide:** [`COMMANDS_TO_RUN.txt`](COMMANDS_TO_RUN.txt)
+
+---
+
+## 🎯 The Four Industrial Prognostic Challenges Solved by IntelliTwin
+
+1. **Deterministic Overconfidence:** Conventional neural networks generate scalar point predictions of RUL with no confidence intervals. IntelliTwin introduces **Split Conformal Prediction** to guarantee finite-sample coverage: $P(y \in C(x)) \ge 1 - \alpha$.
+2. **The Environmental Masking Problem:** Operational adjustments (throttle, load, speed) create sensor shifts that imitate or conceal physical degradation. IntelliTwin computes **condition-normalized residuals** $r(t) = S(t) - \hat{S}_{\text{nominal}}(u(t))$ to isolate mechanical wear.
+3. **Catastrophic Failure Vulnerability:** Wear accelerates non-linearly near end-of-life. IntelliTwin optimizes a **heteroscedastic Gaussian NLL loss** and severe-risk alert thresholds, achieving **100% catastrophic failure prevention**.
+4. **Architectural Disconnect:** Connects physical sensors, digital twin state vectors $\mathbf{\Psi}(t)$, deep learning inference, and an interactive **cyber-physical factory dashboard**.
+
+---
+
+## 📊 Empirical Performance on NASA C-MAPSS (FD001)
+
+Evaluated across 100 training engines, 100 test engines, 20,631 cycles, and 20 complete run-to-failure fleets:
+
+### 1. Remaining Useful Life (RUL) Prognostics
+| Model Architecture | Input Representation | RMSE (cycles) | MAE (cycles) | NASA Score $S$ |
+|---|---|---|---|---|
+| Random Forest Regressor | Tabular (54-dim) | 18.12 | 13.39 | 884.0 |
+| XGBoost Regressor | Tabular (54-dim) | 16.99 | 12.49 | 715.7 |
+| GRU Baseline Network | Sequence ($30 \times 54$) | 16.78 | 12.25 | 665.0 |
+| **IntelliTwin Heteroscedastic LSTM** | **Sequence ($30 \times 54$)** | **16.00** | **12.33** | **542.1** |
+
+### 2. Multi-Class Health State Classification
+* **Overall Accuracy:** **89.00%** (Macro F1: 0.8579)
+* **Healthy State F1:** **0.9431** (Precision: 93.55%, Recall: 95.08%)
+* **Critical State F1:** **0.8750** (Precision: 87.50%, Recall: 87.50%)
+* **False Alarm Rate:** **2.38%** (0 healthy units misclassified as critical)
+
+### 3. Uncertainty Quantification & Conformal Calibration
+* **Nominal Target Coverage:** $90.00\%$ ($\alpha = 0.10$)
+* **Empirical Coverage (PICP):** **95.00%** (Rigorously satisfied)
+* **Mean Prediction Interval Width (MPIW):** 62.54 cycles (Winkler Score: 70.91)
+
+### 4. Catastrophic Failure Prevention
+* **Catastrophic Failure Prevention Rate:** **100.00%** (**0 missed critical failures**)
+* **Mean Early Warning Lead Time:** **41.1 cycles** prior to physical destruction
+* **False Alarm Rate During Healthy State:** **0.00%**
+
+---
+
+## 🖥️ Cyber-Physical Factory Dashboard
+
+The dashboard provides a real-time, responsive dark-mode monitoring environment:
+* **Fleet Overview:** Circular health gauges, active machine tallies (8/10 operational), and aggregate facility status.
+* **Multi-Machine Switching:** CNC Machine (94%), Robotic Arm (72%), Conveyor Belt (38% Critical), Air Compressor (89%), Hydraulic Press (65%).
+* **Conformal Uncertainty Display:** Visualizes 90% confidence bounds `[28 - 44 hrs]` alongside point predictions.
+* **Degradation Trends:** Interactive Chart.js line charts tracking health score decay and vibration spikes.
+* **Actionable AI Checklists:** Prescriptive mechanical maintenance actions with automated PDF report generation.
+* **REST API:** Powered by Flask (`intellitwin/api.py`).
+
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Install Dependencies
+```bash
+pip install -r requirements.txt
+pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+### 2. Start the Interactive Factory Dashboard
+```bash
+python intellitwin/api.py
+```
+Open your browser to `http://localhost:5000` or open `frontend/index.html` directly.
+
+### 3. Run Master Training & Benchmark Pipeline
+```bash
+python -m intellitwin.train
+```
+
+### 4. Generate 300-DPI Publication Figures
+```bash
+python intellitwin/generate_figures.py
+```
+
+### 5. Recompile IEEE Research Paper
+```bash
+python manuscript/generate_ieee_paper_docx.py
+python manuscript/build_double_column_paper.py
+```
+
+### 6. Verify Integrity & Deliverables
+```bash
+python intellitwin/verify_consistency.py
+```
 
 ---
 
 ## 📂 Repository Structure
 
 ```text
-AI-Driven-Digital-Twin-Predictive-Maintainence/
-├── docs/                                  # Research documentation & gap syntheses
-│   ├── COMPREHENSIVE_RESEARCH_GAPS_AND_OPPORTUNITIES.md # 15-paper thematic research gaps
-│   ├── deep_research_gap_analysis.md      # Detailed paper deconstruction & gap isolation
-│   ├── REAL_WORLD_EXPLANATION.md          # Real-world deployment & sensor acquisition guide
-│   └── walkthrough.md                     # Framework overview & empirical walkthrough
-├── figures/                               # 300-DPI publication figures & benchmark logs
-│   ├── fig1_rul_calibrated_intervals.png  # Calibrated confidence ribbons across cycles
-│   ├── fig2_uncertainty_decomposition.png # Epistemic vs. aleatoric uncertainty separation
-│   ├── fig3_reliability_calibration.png   # Nominal vs. empirical coverage calibration
-│   ├── fig4_pareto_coverage_width.png     # Coverage vs. sharpness Pareto frontier
-│   ├── fig5_dss_cost_comparison.png       # Life-cycle maintenance decision cost analysis
-│   └── benchmark_metrics_summary.json     # Fleet benchmark evaluation metrics
-├── literature/                            # Foundational literature corpus & analysis tools
-│   ├── papers/                            # 15 source PDF research papers (Papers 1–15)
-│   ├── scripts/                           # Automated literature mining & extraction scripts
-│   │   ├── extract_papers.py              # PDF text parser for abstracts and conclusions
-│   │   ├── deep_extract.py                # Targeted gap and future work extractor
-│   │   ├── inspect_papers.py              # Inspection CLI for extracted summaries
-│   │   ├── show_gaps.py                   # Formatter for extracted gap statements
-│   │   ├── summarize_all.py               # Multi-paper cross-comparison summary
-│   │   └── summarize_extra.py             # Supplemental literature analysis
-│   └── README.md                          # Literature corpus index & paper mapping
-├── manuscript/                            # Journal publication submission package
-│   ├── main.tex                           # IEEEtran / Elsevier LaTeX manuscript
-│   ├── references.bib                     # Complete BibTeX bibliography (15 corpus + UQ citations)
-│   ├── RESEARCH_PAPER_GAP3_UQ_DT.md       # Full academic paper manuscript (8,500+ words)
-│   ├── package_submission.py              # Script to build submission archive
-│   └── uq_dt_journal_submission_package.zip # Pre-built journal submission package
-├── tests/                                 # Verification & test suite
-│   └── test_uq_framework.py               # Unit tests for simulator, models, CQR, and DSS
-├── uq_digital_twin/                       # Core empirical Python package
+├── data/                                  # Public Benchmark Data
+│   └── cmapss/                            # NASA C-MAPSS dataset (FD001, FD002)
+├── figures/                               # 300-DPI publication figures
+│   ├── fig1_rul_calibrated_intervals.png  # Conformal prediction intervals
+│   ├── fig2_uncertainty_decomposition.png # Masking problem residual decoupling
+│   ├── fig3_reliability_calibration.png   # Confusion matrix & reliability curve
+│   ├── fig4_pareto_coverage_width.png     # Prognostic benchmark comparison
+│   └── fig5_dss_cost_comparison.png       # Catastrophic warning lead time
+├── frontend/                              # Cyber-Physical Web Dashboard
+│   ├── index.html                         # Factory dashboard single-page app
+│   ├── styles.css                         # Dark glassmorphic design system
+│   ├── app.js                             # Interactive state logic & Chart.js
+│   ├── generate_svgs.py                   # Industrial SVG generator
+│   └── assets/                            # Machine vector assets (CNC, Arm, Belt...)
+├── intellitwin/                           # Core Python Package
 │   ├── __init__.py                        # Package initialization
-│   ├── baselines.py                       # Paper 14 GA-Ensemble, Paper 6 Tree, Homoscedastic GP
-│   ├── conformal_calibrator.py            # Split Conformalized Quantile Regression (CQR)
-│   ├── data_generator.py                  # Physical degradation & environmental drift simulator
-│   ├── decision_engine.py                 # Risk-sensitive maintenance scheduler (DSS engine)
-│   ├── metrics.py                         # PICP, NMPIW, CWC, Winkler Score, CRPS, NLL, RMSE
-│   ├── probabilistic_models.py            # Heteroscedastic deep ensembles, pinball regressors
-│   ├── run_benchmarks.py                  # Master fleet benchmarking & figure generator
-│   └── visualize.py                       # Publication-grade figure plotting routines
-├── demo_interactive_uq_dt.py              # Interactive diagnostic CLI tool
-├── requirements.txt                       # Project dependencies
-├── setup.py                               # Package installation configuration
+│   ├── api.py                             # Flask REST API backend
+│   ├── data_loader.py                     # NASA C-MAPSS loader & preprocessor
+│   ├── conformal_calibrator.py            # Split Conformal Prediction engine
+│   ├── environmental_handler.py           # Condition-normalized residual engine
+│   ├── fault_discriminator.py             # 4-way masking problem discriminator
+│   ├── catastrophic_evaluator.py          # Early warning & lead-time evaluator
+│   ├── metrics.py                         # PICP, MPIW, Winkler, NASA score
+│   ├── train.py                           # Master training & evaluation pipeline
+│   ├── generate_figures.py                # Publication figure generation script
+│   ├── verify_consistency.py              # Deliverables integrity audit script
+│   └── models/                            # Model architectures & weights
+│       ├── lstm_rul.py                    # Heteroscedastic LSTM & GRU
+│       ├── fault_classifier.py            # Random Forest & XGBoost classifiers
+│       ├── anomaly_detector.py            # Isolation Forest + PCA detector
+│       ├── evaluation_results.json        # Verified empirical metrics
+│       └── lstm_rul.pt                    # Trained PyTorch model weights
+├── manuscript/                            # Publication Submission Package
+│   ├── RESEARCH_PAPER_INTELLITWIN.md      # Full academic research paper (8,000+ words)
+│   ├── INTELLITWIN_RESEARCH_PAPER_IEEE_FORMAT.docx # Official IEEE Word Document
+│   ├── INTELLITWIN_RESEARCH_PAPER_DOUBLE_COLUMN.pdf # Publication double-column PDF
+│   ├── research_paper_double_column.html  # Standalone HTML research paper
+│   ├── references.bib                     # IEEE BibTeX citations (descending year)
+│   ├── generate_ieee_paper_docx.py        # Word generator script
+│   ├── build_double_column_paper.py       # PDF compiler script
+│   ├── package_submission.py              # Journal zip packager
+│   └── intellitwin_journal_submission_package.zip # Pre-built journal bundle
+├── COMMANDS_TO_RUN.txt                    # Step-by-step execution guide
+├── requirements.txt                       # Python dependencies
 └── README.md                              # This documentation file
 ```
 
 ---
 
-## ⚡ Quickstart & Interactive Demonstration
-
-### 1. Run Interactive Diagnostic CLI
-Inspect real-time telemetry streams, uncertainty breakdowns, and automated dispatch actions for any asset:
-```powershell
-# Nominal operating conditions
-python demo_interactive_uq_dt.py --asset 0 --nominal
-
-# Severe out-of-distribution (OOD) thermal shock condition
-python demo_interactive_uq_dt.py --asset 1 --ood --horizon 15
-```
-
-Sample output:
-```text
- Cycle | True RUL | Pred RUL |    90% Conf Interval | Aleatoric | Epistemic |    Decision Action
----------------------------------------------------------------------------------------------------------
-     0 |    207.0 |    226.4 | [  144.2,   251.9] |     11.41 |      3.26 |         MONITORING
-    76 |    131.0 |    154.4 | [  111.9,   194.6] |      7.48 |      4.74 |         MONITORING
-   153 |     54.0 |     66.9 | [   39.7,    78.0] |      3.92 |      1.25 |         MONITORING
-   191 |     16.0 |     30.1 | [   22.8,    49.4] |      3.44 |      1.91 |         MONITORING
-   211 |      0.0 |      2.1 | [    0.0,    38.0] |      3.48 |      2.33 | >> MAINTAIN NOW <<
-```
-
-### 2. Run Full Experimental Benchmark Suite
-Trains all probabilistic models and corpus baselines on 13,126 observation points, computes metrics, and re-renders all 5 publication figures:
-```powershell
-python -m uq_digital_twin.run_benchmarks
-```
-
-### 3. Verify Research Paper Empirical Claims
-Directly validates all tables, coverage numbers, and Winkler scores in `UQ_DT_RESEARCH_PAPER_DOUBLE_COLUMN.pdf` against model outputs side-by-side:
-```powershell
-python verify_paper_results.py
-```
-
-### 4. Run Unit Tests
-```powershell
-python -m unittest tests/test_uq_framework.py
-# or with uv:
-uv run --with numpy,scipy,scikit-learn,pandas,matplotlib python -m unittest discover tests
-```
-
-### 5. Build Journal Submission Bundle
-Generate the submission zip bundle containing the LaTeX manuscript, markdown paper, figures, and dependencies:
-```powershell
-python manuscript/package_submission.py
-```
-
----
-
-## 📊 Benchmark Results
-
-### In-Distribution Nominal Fleet (Target PICP $\ge 90.0\%$)
-
-| Model Paradigm | Methodology Reference | RMSE (Cycles) | PICP (%) | NMPIW | Winkler Score |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **Proposed UQ-DT (Conf-Ensemble)** | **This Work** | **12.50** | **91.97%** | **0.1428** | **40.98** |
-| **Proposed UQ-DT (CQR)** | **This Work** | 14.26 | 89.43% | 0.1861 | 54.17 |
-| Uncalibrated Heteroscedastic | Deep Ensemble Baseline | 12.50 | 76.57% | 0.1048 | 47.74 |
-| Paper 14 GA-Ensemble | Wang et al. (*MDPI Sensors* 2026) | 13.50 | 86.10% | 0.1566 | 57.59 |
-| Paper 6 Decision Forest | Hosseinzadeh et al. (2023) | 13.44 | 85.78% | 0.1567 | 56.83 |
-| Homoscedastic GP | Classical Bayesian GP | 12.98 | 88.03% | 0.1632 | 57.04 |
-
-### Out-of-Distribution (OOD) Stress ($+8.5^\circ\text{C}$ Thermal Shock)
-
-| Model Paradigm | Methodology Reference | RMSE (Cycles) | PICP (%) | NMPIW | Winkler Score |
-| :--- | :--- | :---: | :---: | :---: | :---: |
-| **Proposed UQ-DT (CQR)** | **This Work** | 29.59 | **74.58%** | 0.2455 | **118.78** |
-| Proposed UQ-DT (Conf-Ensemble) | This Work | 26.55 | 60.92% | 0.2111 | 130.02 |
-| Uncalibrated Heteroscedastic | Deep Ensemble Baseline | 26.55 | 45.53% | 0.1550 | 170.81 |
-| Paper 14 GA-Ensemble | Wang et al. (*MDPI Sensors* 2026) | 25.58 | 60.47% | 0.1662 | 169.47 |
-| Paper 6 Decision Forest | Hosseinzadeh et al. (2023) | 30.10 | 58.05% | 0.1664 | 220.37 |
-| Homoscedastic GP | Classical Bayesian GP | 32.04 | 73.56% | 0.3493 | 170.14 |
-
----
-
-## 🖼️ Publication Figures
-
-| Figure | Description |
-| :---: | :--- |
-| **Fig 1** | **RUL Prognostics with Calibrated Confidence Ribbons:** Envelopes true degradation within 90% CQR bounds, eliminating the point-prediction trap. |
-| **Fig 2** | **Epistemic vs. Aleatoric Decoupling:** Proves that epistemic uncertainty $\sigma_e$ surges to >65% during thermal shock, identifying environmental drift. |
-| **Fig 3** | **Reliability Calibration Diagram:** Demonstrates strict adherence of UQ-DT to the ideal diagonal across nominal levels (50% to 95%). |
-| **Fig 4** | **Pareto Sharpness vs. Coverage:** Establishes UQ-DT on the optimal Pareto frontier, achieving $\ge 90\%$ coverage with minimum interval width. |
-| **Fig 5** | **Life-Cycle Decision Cost & Risk Comparison:** Proves that uncertainty-guided dispatch eliminates catastrophic failure events. |
-
----
-
 ## 📜 Citation
-
-If you utilize this framework or research manuscript, please cite:
-
 ```bibtex
-@article{uqdt2026antigravity,
-  author  = {Antigravity Research Consortium in Cyber-Physical Systems},
-  title   = {UQ-DT: A Calibrated Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure Prognostics Under Environmental Drift},
-  journal = {IEEE Transactions on Industrial Informatics / Reliability Engineering & System Safety (Under Review)},
-  year    = {2026}
+@article{singh2026intellitwin,
+  author    = {Singh, Mayank and Pandey, Shiksha and Gupta, Ruchi},
+  title     = {IntelliTwin: An {AI}-Driven Digital Twin Framework for Predictive Maintenance of Engineering Assets},
+  journal   = {IEEE Transactions on Industrial Informatics / IEEE Access},
+  year      = {2026},
+  note      = {Ajay Kumar Garg Engineering College, Ghaziabad, India}
 }
 ```
-
----
-*Developed as part of the Advanced Agentic Engineering and Cyber-Physical Systems Initiative.*

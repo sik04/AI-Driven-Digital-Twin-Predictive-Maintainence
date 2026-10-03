@@ -1,79 +1,98 @@
 ================================================================================
-UQ-DT: STEP-BY-STEP COMMANDS TO RUN THE PROJECT
-Uncertainty-Quantified Digital Twin Framework for Safety-Critical Infrastructure
+INTELLITWIN: STEP-BY-STEP COMMANDS TO RUN & DEMONSTRATE THE PROJECT
+An AI-Driven Digital Twin Framework for Predictive Maintenance of Engineering Assets
+Authors: Mayank Singh (ECE), Shiksha Pandey (IT), Ruchi Gupta (IT) @ AKGEC
 ================================================================================
 
 Open PowerShell or Command Prompt inside the project directory:
-cd "c:\www\AI-Driven-Digital-Twin-Predictive-Maintainence"
+cd "c:\Users\shiks\Downloads\res paper"
 
 --------------------------------------------------------------------------------
 STEP 1: INSTALL DEPENDENCIES
 --------------------------------------------------------------------------------
 Command 1:
 pip install -r requirements.txt
-
-(Optional) Install the package in editable mode:
-pip install -e .
+pip install torch --extra-index-url https://download.pytorch.org/whl/cpu
 
 
 --------------------------------------------------------------------------------
-STEP 2: RUN LIVE SENSOR TELEMETRY & UQ-DT PROGNOSTIC STREAM (RECOMMENDED FOR EVALUATOR)
+STEP 2: RUN THE INTERACTIVE FACTORY DASHBOARD & BACKEND API
 --------------------------------------------------------------------------------
-Command 2A (Live Cyber-Physical Sensor Stream with Real-Time Telemetry):
-Simulates live streaming of all 4 physical sensors (Vibration, Strain, Temp, Acoustic)
-arriving cycle-by-cycle, live feature extraction, calibrated RUL intervals, and safety dispatch:
-python demo_live_sensor_stream.py --speed 0.04
+Command 2A (Start Flask REST API & Web Dashboard):
+python intellitwin/api.py
 
-Command 2B (Simulate Harsh Weather Shock / Out-of-Distribution Shift):
-Simulates sudden +8.5 deg C heatwave and shows how epistemic uncertainty triggers early dispatch:
-python demo_live_sensor_stream.py --ood --speed 0.04
+Then open your browser to:
+http://localhost:5000
+(or open frontend/index.html directly in Chrome/Edge)
 
-Command 2C (Compact Diagnostic Inspector):
-python demo_interactive_uq_dt.py --asset 0 --nominal
+Features displayed:
+- Factory Overview with Overall Health ring (87% Good, 8/10 active machines)
+- Multi-Machine Selector:
+  1. CNC Machine - 01 (Healthy, 94%)
+  2. Robotic Arm - 02 (Caution, 72%)
+  3. Conveyor Belt - 03 (Critical, 38%)
+  4. Air Compressor - 04 (Healthy, 89%)
+  5. Hydraulic Press - 05 (Caution, 65%)
+- Selected Machine Detail Panel with 90% Conformal Confidence Bounds [28 - 44 hrs]
+- Live telemetry parameters (Temperature, Vibration, Current, Speed, Load, Power)
+- Real-time Chart.js degradation trends (Health score trend & Vibration trend)
+- Maintenance history table and AI suggestion checklist with "Generate Report"
 
 
 --------------------------------------------------------------------------------
-STEP 3: RUN AUTOMATED UNIT TEST SUITE
+STEP 3: TRAIN & EVALUATE MACHINE LEARNING MODELS ON NASA C-MAPSS
 --------------------------------------------------------------------------------
 Command 3:
-Runs all 10 unit tests validating data simulation, metrics, CQR conformal calibration,
-uncertainty variance decomposition, and multi-asset fleet dispatch.
-python -m unittest tests/test_uq_framework.py
+Trains Heteroscedastic LSTM, GRU, Random Forest, XGBoost, and Isolation Forest
+on 20,631 cycles from the NASA C-MAPSS FD001 dataset:
+python -m intellitwin.train
+
+Outputs generated:
+- Model weights: intellitwin/models/lstm_rul.pt
+- Empirical evaluation metrics: intellitwin/models/evaluation_results.json
+  (RMSE 16.00, NASA score 542.1, 89.0% health accuracy, 95% conformal coverage,
+   100% catastrophic failure prevention, 41.1 cycles mean lead time)
 
 
 --------------------------------------------------------------------------------
-STEP 4: RUN MASTER BENCHMARK SUITE (MODELS & FIGURES)
+STEP 4: GENERATE PUBLICATION-GRADE FIGURES (300 DPI)
 --------------------------------------------------------------------------------
-Command 4A (Full Retraining & Metric Regeneration):
-Trains heteroscedastic deep ensembles, pinball quantile models, and corpus baselines
-across 13,126 telemetry points. Computes all scientific metrics (PICP, NMPIW, CWC,
-Winkler score, RMSE) and generates all 5 publication-ready 300-DPI plots in figures/.
-python -m uq_digital_twin.run_benchmarks
+Command 4:
+python intellitwin/generate_figures.py
 
-Command 4B (Instant Verification of Research Paper Values):
-Compares every empirical metric in 'UQ_DT_RESEARCH_PAPER_DOUBLE_COLUMN.pdf' and 'main.tex'
-side-by-side with the model output logs with zero difference:
-python verify_paper_results.py
+Generates Figs 1-5 in figures/:
+- Fig 1: C-MAPSS RUL Trajectory with 90% Conformal Prediction Intervals
+- Fig 2: Decoupled Sensor Residuals Resolving the Masking Problem
+- Fig 3: Health State Confusion Matrix & Conformal Reliability Curve
+- Fig 4: Prognostic Benchmark Comparison (RMSE vs NASA Score)
+- Fig 5: Catastrophic Early Warning Lead Time Distribution
 
 
 --------------------------------------------------------------------------------
-STEP 5: GENERATE JOURNAL SUBMISSION BUNDLE (ZIP)
+STEP 5: REBUILD IEEE RESEARCH PAPER (DOCX, HTML, PDF)
 --------------------------------------------------------------------------------
-Command 5:
-Bundles the LaTeX manuscript (main.tex), BibTeX (references.bib), academic paper (MD),
-all 5 figures, and documentation into a single zip archive ready for IEEE/Elsevier submission.
+Command 5A (Build IEEE Word Document):
+python manuscript/generate_ieee_paper_docx.py
+-> Generates manuscript/INTELLITWIN_RESEARCH_PAPER_IEEE_FORMAT.docx
+
+Command 5B (Build IEEE Double-Column PDF via headless Chrome):
+python manuscript/build_double_column_paper.py
+-> Generates manuscript/INTELLITWIN_RESEARCH_PAPER_DOUBLE_COLUMN.pdf
+-> Generates manuscript/research_paper_double_column.html
+
+
+--------------------------------------------------------------------------------
+STEP 6: RUN COMPREHENSIVE INTEGRITY & CONSISTENCY AUDIT
+--------------------------------------------------------------------------------
+Command 6:
+python intellitwin/verify_consistency.py
+-> Checks all dataset files, models, frontend assets, figures, and manuscripts.
+
+
+--------------------------------------------------------------------------------
+STEP 7: GENERATE JOURNAL SUBMISSION ZIP ARCHIVE
+--------------------------------------------------------------------------------
+Command 7:
 python manuscript/package_submission.py
-
-
---------------------------------------------------------------------------------
-STEP 6: GIT SYNCHRONIZATION COMMANDS
---------------------------------------------------------------------------------
-Check repository status:
-git status
-
-Pull latest updates from GitHub:
-git pull
-
-Push your latest commits to GitHub:
-git push
+-> Generates manuscript/intellitwin_journal_submission_package.zip
 ================================================================================
