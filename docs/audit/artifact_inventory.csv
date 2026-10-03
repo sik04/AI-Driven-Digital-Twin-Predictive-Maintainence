@@ -1,0 +1,46 @@
+file,artifact_type,size_bytes,tracked_status,generated_or_source,associated_experiment,reproducibility_status
+data/cmapss/RUL_FD001.txt,Dataset,429,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/RUL_FD002.txt,Dataset,1110,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/readme.txt,Dataset,2442,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/test_FD001.txt,Dataset,2228855,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/test_FD002.txt,Dataset,5734587,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/train_FD001.txt,Dataset,3515356,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+data/cmapss/train_FD002.txt,Dataset,9082480,tracked,Source (NASA Benchmark),C-MAPSS Run-to-Failure Fleet Benchmark,"Verified (Complete raw data, fixed checksums)"
+figures/benchmark_metrics_summary.json,JSON Results,5681,tracked,Generated,Prior UQ-DT Benchmark Corpus,Unverified (Legacy benchmark keys)
+intellitwin/models/evaluation_results.json,JSON Results,3498,tracked,Generated,C-MAPSS FD001 Evaluation Pipeline,Verified (Consistent with paper Tables 1-4)
+intellitwin/models/gru_rul.pt,Model Weights,204479,tracked,Generated,C-MAPSS FD001 RUL Prognostics,"Verified (Loads state_dict, passes inference check)"
+intellitwin/models/lstm_rul.pt,Model Weights,269837,tracked,Generated,C-MAPSS FD001 RUL Prognostics,"Verified (Loads state_dict, passes inference check)"
+IntelliTwin_IEEE_Format.pdf,PDF Document,13364,tracked,Source (Author Reference),Research Paper Specification,Accessible (Reference PDF)
+literature/papers/paper 10.pdf,PDF Document,423850,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 11.pdf,PDF Document,561839,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 12.pdf,PDF Document,4344036,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 13.pdf,PDF Document,5525608,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 14.pdf,PDF Document,2010735,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 15.pdf,PDF Document,3189534,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 2.pdf,PDF Document,8252957,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 3.pdf,PDF Document,5798943,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 5.pdf,PDF Document,804102,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 6.pdf,PDF Document,1202130,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 7.pdf,PDF Document,1572250,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 8.pdf,PDF Document,7752855,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper 9.pdf,PDF Document,5183024,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper one.pdf,PDF Document,362383,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+literature/papers/paper4.pdf,PDF Document,7010219,tracked,Source (Literature Archive),Foundational Literature Review,Accessible (Original PDF)
+manuscript/INTELLITWIN_RESEARCH_PAPER_DOUBLE_COLUMN.pdf,PDF Document,1287734,tracked,Generated,Double-Column IEEE Manuscript,Verified (Regenerable via build_double_column_paper.py)
+Intelligent Predictive Maintenance System.pptx,Presentation Deck,6504370,tracked,Source,Project Defense / Presentation,Static Deliverable
+figures/fig1_rul_calibrated_intervals.png,Publication Figure,338050,tracked,Generated,IntelliTwin Paper Figures 1-5,Verified (Regenerable via generate_figures.py)
+figures/fig2_uncertainty_decomposition.png,Publication Figure,259697,tracked,Generated,IntelliTwin Paper Figures 1-5,Verified (Regenerable via generate_figures.py)
+figures/fig3_reliability_calibration.png,Publication Figure,178065,tracked,Generated,IntelliTwin Paper Figures 1-5,Verified (Regenerable via generate_figures.py)
+figures/fig4_pareto_coverage_width.png,Publication Figure,137501,tracked,Generated,IntelliTwin Paper Figures 1-5,Verified (Regenerable via generate_figures.py)
+figures/fig5_dss_cost_comparison.png,Publication Figure,139253,tracked,Generated,IntelliTwin Paper Figures 1-5,Verified (Regenerable via generate_figures.py)
+manuscript/intellitwin_journal_submission_package.zip,Submission Archive,9314014,tracked,Generated,Journal Submission Package,Verified (Regenerable via package_submission.py)
+WhatsApp Image 2026-09-28 at 10.24.35 PM.jpeg,UI Reference Image,245928,tracked,Source,UI Design Specification,Static Reference
+WhatsApp Image 2026-09-29 at 11.40.19 PM.jpeg,UI Reference Image,111115,tracked,Source,UI Design Specification,Static Reference
+frontend/assets/air_compressor.svg,Vector Graphic Asset,705,tracked,Generated,Factory Dashboard UI,Verified (Regenerable via generate_svgs.py)
+frontend/assets/cnc_machine.svg,Vector Graphic Asset,891,tracked,Generated,Factory Dashboard UI,Verified (Regenerable via generate_svgs.py)
+frontend/assets/conveyor_belt.svg,Vector Graphic Asset,1253,tracked,Generated,Factory Dashboard UI,Verified (Regenerable via generate_svgs.py)
+frontend/assets/hydraulic_press.svg,Vector Graphic Asset,699,tracked,Generated,Factory Dashboard UI,Verified (Regenerable via generate_svgs.py)
+frontend/assets/robotic_arm.svg,Vector Graphic Asset,784,tracked,Generated,Factory Dashboard UI,Verified (Regenerable via generate_svgs.py)
+IEEE-paper-format-template.docx,Word Document,1542993,tracked,Source / Template,IEEE Word Template,Static Template
+IEEE-paper-format-template.original.docx,Word Document,32335,tracked,Source / Template,IEEE Word Template,Static Template
+manuscript/INTELLITWIN_RESEARCH_PAPER_IEEE_FORMAT.docx,Word Document,2531198,tracked,Generated,IEEE Manuscript Document,Verified (Regenerable via generate_ieee_paper_docx.py)
