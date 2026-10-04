@@ -82,7 +82,8 @@ This document outlines the master research and development roadmap for the Intel
   - Gaps reflect genuine scholarly deficiencies identified in Phase 1 without unsupportable novelty claims.
   - Obsolete fixed numerical thresholds are removed from active research documentation; exact justified thresholds and statistical decision rules will be finalized before confirmatory testing.
 - **Dependencies**: Phase 1.
-- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics, unit-of-independence constraints, and success-criteria governance rules.
+- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics, unit-of-independence constraints, and success-criteria governance rules. Step 3 research-protocol specifications have now locked: primary metrics, supporting metrics, primary comparators, statistical unit (`engine`), uncertainty framework (95% engine-level paired/cluster-bootstrap CIs, non-independent time steps, secondary p-values), Supported / Unsupported / Inconclusive decision rules, evaluation terminology, primary vs secondary outcome hierarchy, no-post-hoc-change rule, and final pre-specified RQ evaluation map. Exact numerical practical-effect thresholds remain intentionally deferred until maintenance-simulator validation and possible bounded pilot assessment.
+
 
 ---
 
@@ -93,11 +94,13 @@ This document outlines the master research and development roadmap for the Intel
   - Exploratory data analysis notebook/script and summary report.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
+  - Protocol definition for maintenance simulator validation and pre-test threshold freezing.
 - **Acceptance Criteria**:
   - Strict train/validation/test engine isolation verified with automated assertions.
   - Preprocessing scalers fit only on training sets.
+  - Primary metrics and comparators remain locked; numerical practical-effect thresholds are finalized and frozen after maintenance simulator validation (and bounded pilot assessment if needed) prior to confirmatory testing.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds.
 
 ---
 
