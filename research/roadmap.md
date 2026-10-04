@@ -88,7 +88,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: Planned (Step 4 dataset qualification completed)
+- **Status**: Completed (Step 4 Dataset Qualification & Feasibility verified)
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
