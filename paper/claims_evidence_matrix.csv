@@ -1,0 +1,5 @@
+claim_id,proposed_claim,claim_type,supporting_evidence,artifact_path,experiment_id,source_or_citation,validation_status,notes
+CLM-01,Clean research-first repository foundation established with automated CI and strict typing,Engineering,Automated test suite and CI workflow,.github/workflows/ci.yml,N/A,Internal ADR-001,Validated,Verified in Phase 0 Step 1
+CLM-02,Provisional candidate research questions (RQ1-RQ4) formulated for RUL and UQ evaluation,Methodology,Provisional research questions document,research/research_questions.md,N/A,Internal,Planned,Subject to refinement post-literature review
+CLM-03,Proposed prognostic model outperforms standard recurrent baselines in asymmetric scoring,Performance,None (Experiment pending),TBD,TBD,TBD,Unvalidated,Hypothesis to be tested in Phase 6
+CLM-04,Uncertainty quantification achieves nominal coverage probability on held-out test engines,Methodology,None (Experiment pending),TBD,TBD,TBD,Unvalidated,Hypothesis to be tested in Phase 7

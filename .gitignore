@@ -1,0 +1,81 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing and Type Checking
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.coverage
+.coverage.*
+htmlcov/
+
+# Local datasets, weights, and temporary artifacts
+data/
+datasets/
+models/checkpoints/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+*.pkl
+*.joblib
+*.h5
+
+# Local scratch and backups
+scratch/
+*.zip
+*.tar.gz
+
+# Secrets and environment configurations
+.env
+.env.*
+*.pem
+*.key
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System files
+.DS_Store
+Thumbs.db
+Desktop.ini
