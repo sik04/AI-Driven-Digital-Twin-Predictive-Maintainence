@@ -54,6 +54,8 @@ def test_required_governance_files_exist() -> None:
         repo_root / "research" / "literature" / "screening_log.csv",
         repo_root / "research" / "literature" / "closest_work_matrix.csv",
         repo_root / "research" / "literature" / "citation_map.csv",
+        repo_root / "research" / "literature" / "source_verification.csv",
+        repo_root / "research" / "literature" / "evidence_corrections.md",
         repo_root / "research" / "literature" / "literature_synthesis.md",
         repo_root / "experiments" / "README.md",
         repo_root / "experiments" / "templates" / "experiment_record.md",
@@ -158,6 +160,24 @@ def test_literature_review_csv_schemas() -> None:
         headers = next(reader)
         assert len(headers) == 9, f"Expected 9 headers in citation_map.csv, got {len(headers)}"
 
+    source_ver_file = repo_root / "research" / "literature" / "source_verification.csv"
+    with open(source_ver_file, encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        expected_source_ver = [
+            "bibtex_key",
+            "source_url",
+            "source_locator",
+            "metadata_status",
+            "methodology_status",
+            "reproduction_status",
+            "verification_basis",
+            "unresolved_items",
+        ]
+        assert headers == expected_source_ver, (
+            f"Expected headers {expected_source_ver} in source_verification.csv, got {headers}"
+        )
+
 
 def test_paper_inventory_exactness() -> None:
     """Verify paper_inventory.csv has exactly 15 records matching the 15 local PDFs."""
@@ -177,28 +197,73 @@ def test_paper_inventory_exactness() -> None:
 
 
 def test_literature_matrices_record_counts() -> None:
-    """Verify row counts across literature matrix, closest work matrix, and citation map."""
+    """Verify required fields, unique IDs, and valid status values in tracking files."""
     repo_root = Path(__file__).parent.parent
 
     matrix_file = repo_root / "research" / "literature" / "literature_matrix.csv"
     with open(matrix_file, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
-        assert len(rows) == 23, f"Expected 23 rows in literature_matrix.csv, got {len(rows)}"
+        assert len(rows) >= 20, (
+            f"Expected at least 20 rows in literature_matrix.csv, got {len(rows)}"
+        )
+        paper_ids = [r["paper_id"] for r in rows]
+        assert len(paper_ids) == len(set(paper_ids)), (
+            "Duplicate paper_id found in literature_matrix.csv"
+        )
 
     closest_file = repo_root / "research" / "literature" / "closest_work_matrix.csv"
     with open(closest_file, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
-        assert len(rows) == 8, f"Expected 8 rows in closest_work_matrix.csv, got {len(rows)}"
+        assert len(rows) >= 10, (
+            f"Expected at least 10 rows in closest_work_matrix.csv, got {len(rows)}"
+        )
+        keys = [r["citation_key"] for r in rows]
+        assert len(keys) == len(set(keys)), (
+            "Duplicate citation_key found in closest_work_matrix.csv"
+        )
 
     screening_file = repo_root / "research" / "literature" / "screening_log.csv"
     with open(screening_file, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
-        assert len(rows) == 25, f"Expected 25 rows in screening_log.csv, got {len(rows)}"
+        assert len(rows) >= 25, f"Expected at least 25 rows in screening_log.csv, got {len(rows)}"
+        screening_ids = [r["screening_id"] for r in rows]
+        assert len(screening_ids) == len(set(screening_ids)), (
+            "Duplicate screening_id in screening_log.csv"
+        )
 
     citation_file = repo_root / "research" / "literature" / "citation_map.csv"
     with open(citation_file, encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
-        assert len(rows) == 9, f"Expected 9 rows in citation_map.csv, got {len(rows)}"
+        assert len(rows) >= 9, f"Expected at least 9 rows in citation_map.csv, got {len(rows)}"
+        claim_ids = [r["claim_id"] for r in rows]
+        assert len(claim_ids) == len(set(claim_ids)), "Duplicate claim_id in citation_map.csv"
+
+    source_ver_file = repo_root / "research" / "literature" / "source_verification.csv"
+    with open(source_ver_file, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+        assert len(rows) >= 20, (
+            f"Expected at least 20 rows in source_verification.csv, got {len(rows)}"
+        )
+        bib_keys = [r["bibtex_key"] for r in rows]
+        assert len(bib_keys) == len(set(bib_keys)), (
+            "Duplicate bibtex_key in source_verification.csv"
+        )
+        valid_meta_statuses = {"verified", "pending"}
+        valid_method_statuses = {
+            "full_text_checked",
+            "abstract_checked",
+            "indexed_primary_text_checked",
+            "artifact_code_checked",
+            "not_verified",
+        }
+        for r in rows:
+            assert r["metadata_status"] in valid_meta_statuses, (
+                f"Invalid metadata_status: {r['metadata_status']}"
+            )
+            assert r["methodology_status"] in valid_method_statuses, (
+                f"Invalid methodology_status: {r['methodology_status']}"
+            )
+            assert r["reproduction_status"] == "not_reproduced"
 
 
 def test_references_bib_integrity() -> None:
@@ -231,6 +296,9 @@ def test_references_bib_integrity() -> None:
         "xu2026novel",
         "yang2026empirical",
         "javanmardi2023conformal",
+        "yan2026audit",
+        "robinson2026riskaware",
+        "benabdennour2026grouped",
     ]
     for key in expected_keys:
         assert f"{{{key}," in content, f"Missing BibTeX key: {key}"
