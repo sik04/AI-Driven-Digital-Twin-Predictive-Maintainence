@@ -240,9 +240,9 @@ This log documents formal architectural, methodological, and research governance
   - Final confirmatory test results cannot be used post-hoc to revise thresholds.
 - **Expected Implications**:
   - Primary metrics and comparators locked in `hypothesis_framework.yaml`, `hypothesis_framework.tex`, `research_questions.md`, `experiment_map.md`, and `evaluation_criteria.md`.
-  - Future methodology and experimental protocol phases (Phase 3–4) will validate the simulator and freeze exact numerical effect thresholds prior to confirmatory model training.
+  - Future methodology and experimental protocol phases will freeze exact numerical effect thresholds following maintenance simulator implementation and validation in the later simulator stage of the governing research workflow (Step 6), with bounded pilot evidence used if needed, prior to confirmatory model training.
 - **Follow-up Review Date / Trigger**:
-  - Maintenance simulator validation milestone (Phase 3–4 protocol definition).
+  - Maintenance simulator validation milestone in Step 6.
 
 ---
 
@@ -263,9 +263,10 @@ This log documents formal architectural, methodological, and research governance
   - Once those numerical values are finalized, they must be frozen before confirmatory experiments.
 - **Expected Implications**:
   - Complete evaluation governance and final pre-specified evaluation map documented across `research/research_design/evaluation_criteria.md`, `research/hypotheses/hypothesis_framework.yaml`, `research/hypotheses/hypothesis_framework.tex`, `research/research_questions.md`, and `research/research_design/experiment_map.md`.
-  - Phase 3–4 protocol definition will implement and validate the maintenance simulator and freeze final numerical practical-effect thresholds prior to confirmatory testing.
+  - The later simulator stage of the governing research workflow (Step 6) will implement and validate the maintenance simulator and freeze final numerical practical-effect thresholds prior to confirmatory testing.
 - **Follow-up Review Date / Trigger**:
-  - Completion of maintenance simulator validation prior to confirmatory model training.
+  - Completion of maintenance simulator validation in Step 6 prior to confirmatory model training.
+
 
 
 
