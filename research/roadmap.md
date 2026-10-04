@@ -9,7 +9,7 @@ This document outlines the master research and development roadmap for the Intel
 | Phase | Title | Status | Primary Focus |
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
-| **Phase 1** | Systematic Literature Review | Planned | Comprehensive PRISMA review of RUL & UQ literature |
+| **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Planned | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
@@ -46,18 +46,23 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 1: Systematic Literature Review
-- **Status**: Planned
+- **Status**: In Progress (Step 2 active)
 - **Objective**: Conduct a thorough, evidence-based literature review of deep learning for RUL estimation, uncertainty quantification, and predictive maintenance digital twins.
 - **Expected Deliverables**:
-  - Fully populated `screening_log.csv` and `literature_matrix.csv`.
-  - Narrative literature synthesis document.
-  - Curated and validated BibTeX entries in `paper/references.bib`.
+  - Fully populated `screening_log.csv` (25 records audited across seed corpus, searches, and citation tracing).
+  - Complete `paper_inventory.csv` auditing all 15 local repository PDFs.
+  - Expanded `literature_matrix.csv` benchmarking 23 peer-reviewed studies.
+  - Stress-testing competitor matrix in `closest_work_matrix.csv`.
+  - Claim-to-source mapping in `citation_map.csv`.
+  - Thematic narrative literature synthesis in `literature_synthesis.md`.
+  - Curated and validated BibTeX entries in `paper/references.bib` (23 verified entries).
 - **Acceptance Criteria**:
   - All cited papers verified via genuine scholarly DOIs and venues.
   - Inclusion/exclusion criteria rigorously applied and documented.
-  - Zero fabricated citations or hallucinated findings.
+  - Zero fabricated citations, hallucinated findings, or unsubstantiated novelty claims.
+  - Phase 1 remains marked **In Progress** as ongoing literature surveillance continues, acknowledging institutional bulk-database access limitations.
 - **Dependencies**: Phase 0.
-- **Research Observations to Record**: Methodological patterns, prevailing benchmark splits, common evaluation pitfalls in literature.
+- **Research Observations to Record**: Methodological patterns, prevailing benchmark splits, common evaluation pitfalls in literature, and confirmation that Digital Twins, RUL point estimation, and conformal prediction alone are well-established.
 
 ---
 
