@@ -37,9 +37,17 @@ Prior to the completion of the systematic literature review (Phase 1), the follo
 
 ## 3. Current Project Status
 
-- **Active Milestone**: **Phase 0: Research Project Setup and Governance**
-- **Current Deliverable**: Clean research foundation, modern Python packaging layout (`src/intellitwin`), strict quality toolchain (Ruff, Mypy, Pytest), CI workflow, and complete research governance framework.
-- **Next Milestone**: **Phase 1: Systematic Literature Review** (PRISMA search, screening, and literature synthesis).
+- **Phase 0: Research Project Setup and Governance**: **Completed** (Repository reset, baseline backup, CI workflow, packaging, and governance framework verified).
+- **Active Milestone**: **Phase 1: Systematic Literature Review** (**In Progress**):
+  - 15 local repository papers audited in [`research/literature/paper_inventory.csv`](research/literature/paper_inventory.csv).
+  - 23 studies synthesized in expanded [`research/literature/literature_matrix.csv`](research/literature/literature_matrix.csv).
+  - 25 records screened and audited in [`research/literature/screening_log.csv`](research/literature/screening_log.csv).
+  - Closest-work competition analyzed in [`research/literature/closest_work_matrix.csv`](research/literature/closest_work_matrix.csv).
+  - Literature claims mapped to verified sources in [`research/literature/citation_map.csv`](research/literature/citation_map.csv).
+  - Thematic literature review synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md).
+  - Master bibliography expanded to 23 verified entries in [`paper/references.bib`](paper/references.bib).
+  - *Governance Note*: Phase 1 remains marked **In Progress** as ongoing literature surveillance continues, acknowledging institutional bulk-database access constraints.
+- **Next Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (Formalizing testable hypotheses for conditional calibration and maintenance decision consequences).
 
 ---
 
@@ -67,14 +75,18 @@ IntelliTwin/
 │   └── reproducibility.md             # Reproducibility charter and protocols
 ├── research/
 │   ├── roadmap.md                     # Phases 0 through 12 master roadmap
-│   ├── research_questions.md          # Formal candidate RQs and hypotheses
+│   ├── research_questions.md          # Provisional candidate RQs and hypotheses
 │   ├── decision_log.md                # Architecture Decision Records (ADRs)
 │   ├── risk_register.md               # Scientific and project risk register
 │   ├── author_contributions.md        # CRediT authorship tracking
 │   └── literature/
-│       ├── search_protocol.md         # Systematic literature review protocol
-│       ├── literature_matrix.csv      # Systematic literature extraction matrix
-│       └── screening_log.csv          # PRISMA literature screening log
+│       ├── paper_inventory.csv        # Inventory of 15 local PDF papers
+│       ├── literature_matrix.csv      # Expanded 23-study literature comparison matrix
+│       ├── screening_log.csv          # PRISMA literature screening log (25 entries)
+│       ├── closest_work_matrix.csv    # Direct closest-work comparison matrix
+│       ├── citation_map.csv           # Claim-to-source mapping matrix
+│       ├── literature_synthesis.md    # Thematic literature synthesis and gap analysis
+│       └── search_protocol.md         # Multi-source search protocol and limitations
 ├── experiments/
 │   ├── README.md                      # Experiment logging protocols
 │   └── templates/
@@ -82,12 +94,10 @@ IntelliTwin/
 ├── paper/
 │   ├── outline.md                     # Provisional manuscript/thesis outline
 │   ├── claims_evidence_matrix.csv     # Paper claims and validation audit
-│   └── references.bib                 # Verified scholarly bibliography
+│   └── references.bib                 # Verified scholarly bibliography (23 verified entries)
 ├── src/
 │   └── intellitwin/
 │       └── __init__.py                # Package initialization and metadata
-└── tests/
-    └── test_project_setup.py          # Setup, governance, and integrity tests
 ```
 
 ---

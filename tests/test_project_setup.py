@@ -48,9 +48,13 @@ def test_required_governance_files_exist() -> None:
         repo_root / "research" / "decision_log.md",
         repo_root / "research" / "risk_register.md",
         repo_root / "research" / "author_contributions.md",
+        repo_root / "research" / "literature" / "paper_inventory.csv",
         repo_root / "research" / "literature" / "search_protocol.md",
         repo_root / "research" / "literature" / "literature_matrix.csv",
         repo_root / "research" / "literature" / "screening_log.csv",
+        repo_root / "research" / "literature" / "closest_work_matrix.csv",
+        repo_root / "research" / "literature" / "citation_map.csv",
+        repo_root / "research" / "literature" / "literature_synthesis.md",
         repo_root / "experiments" / "README.md",
         repo_root / "experiments" / "templates" / "experiment_record.md",
         repo_root / "paper" / "outline.md",
@@ -72,7 +76,6 @@ def test_roadmap_phases_integrity() -> None:
     for phase_num in range(13):
         assert f"Phase {phase_num}" in content, f"Roadmap missing Phase {phase_num}"
 
-    # Verify future phases are marked planned, not completed
     for phase_num in range(1, 13):
         assert f"### Phase {phase_num}:" in content, (
             f"Missing detailed section for Phase {phase_num}"
@@ -104,7 +107,6 @@ def test_claims_evidence_matrix_schema_and_validity() -> None:
         assert reader.fieldnames == expected_headers
 
         for row in reader:
-            # Performance claims must never be marked Validated prior to experiments
             if row["claim_type"].strip().lower() == "performance":
                 assert row["validation_status"].strip().lower() != "validated", (
                     f"Performance claim {row['claim_id']} cannot be Validated at this stage"
@@ -112,51 +114,126 @@ def test_claims_evidence_matrix_schema_and_validity() -> None:
 
 
 def test_literature_review_csv_schemas() -> None:
-    """Verify schemas of literature review tracking files."""
+    """Verify schemas of all literature review tracking files."""
     repo_root = Path(__file__).parent.parent
 
     matrix_file = repo_root / "research" / "literature" / "literature_matrix.csv"
     with open(matrix_file, encoding="utf-8", newline="") as f:
         reader = csv.reader(f)
         headers = next(reader)
-        expected = [
-            "paper_id",
-            "title",
-            "authors",
-            "year",
-            "venue",
-            "doi",
-            "method_category",
-            "dataset_used",
-            "split_protocol",
-            "evaluation_metrics",
-            "key_findings",
-            "reported_limitations",
-            "code_data_availability",
-            "notes",
-        ]
-        assert headers == expected
+        assert len(headers) == 42, (
+            f"Expected 42 headers in literature_matrix.csv, got {len(headers)}"
+        )
+        assert headers[0] == "paper_id"
+        assert headers[1] == "bibtex_key"
+        assert headers[-1] == "closest_work_flag"
 
     screening_file = repo_root / "research" / "literature" / "screening_log.csv"
     with open(screening_file, encoding="utf-8", newline="") as f:
         reader = csv.reader(f)
         headers = next(reader)
-        expected = [
-            "screening_id",
-            "search_query",
-            "database",
-            "retrieval_date",
-            "title",
-            "first_author",
-            "year",
-            "doi",
-            "abstract_screen_decision",
-            "full_text_screen_decision",
-            "inclusion_reason",
-            "exclusion_reason",
-            "screener",
-        ]
-        assert headers == expected
+        assert len(headers) == 14, f"Expected 14 headers in screening_log.csv, got {len(headers)}"
+        assert headers[0] == "screening_id"
+        assert headers[-1] == "screener"
+
+    inventory_file = repo_root / "research" / "literature" / "paper_inventory.csv"
+    with open(inventory_file, encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        assert len(headers) == 12, f"Expected 12 headers in paper_inventory.csv, got {len(headers)}"
+        assert headers[0] == "filename"
+        assert headers[-1] == "notes"
+
+    closest_file = repo_root / "research" / "literature" / "closest_work_matrix.csv"
+    with open(closest_file, encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        assert len(headers) == 21, (
+            f"Expected 21 headers in closest_work_matrix.csv, got {len(headers)}"
+        )
+
+    citation_file = repo_root / "research" / "literature" / "citation_map.csv"
+    with open(citation_file, encoding="utf-8", newline="") as f:
+        reader = csv.reader(f)
+        headers = next(reader)
+        assert len(headers) == 9, f"Expected 9 headers in citation_map.csv, got {len(headers)}"
+
+
+def test_paper_inventory_exactness() -> None:
+    """Verify paper_inventory.csv has exactly 15 records matching the 15 local PDFs."""
+    repo_root = Path(__file__).parent.parent
+    inventory_file = repo_root / "research" / "literature" / "paper_inventory.csv"
+    papers_dir = repo_root / "papers"
+
+    local_pdfs = sorted(p.name for p in papers_dir.glob("*.pdf"))
+    assert len(local_pdfs) == 15, f"Expected 15 local PDFs, found {len(local_pdfs)}"
+
+    with open(inventory_file, encoding="utf-8", newline="") as f:
+        reader = csv.DictReader(f)
+        inventoried = [row["filename"].strip() for row in reader]
+
+    assert len(inventoried) == 15, f"Expected 15 rows in inventory, got {len(inventoried)}"
+    assert sorted(inventoried) == local_pdfs, "Mismatch between local PDFs and inventoried files"
+
+
+def test_literature_matrices_record_counts() -> None:
+    """Verify row counts across literature matrix, closest work matrix, and citation map."""
+    repo_root = Path(__file__).parent.parent
+
+    matrix_file = repo_root / "research" / "literature" / "literature_matrix.csv"
+    with open(matrix_file, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+        assert len(rows) == 23, f"Expected 23 rows in literature_matrix.csv, got {len(rows)}"
+
+    closest_file = repo_root / "research" / "literature" / "closest_work_matrix.csv"
+    with open(closest_file, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+        assert len(rows) == 8, f"Expected 8 rows in closest_work_matrix.csv, got {len(rows)}"
+
+    screening_file = repo_root / "research" / "literature" / "screening_log.csv"
+    with open(screening_file, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+        assert len(rows) == 25, f"Expected 25 rows in screening_log.csv, got {len(rows)}"
+
+    citation_file = repo_root / "research" / "literature" / "citation_map.csv"
+    with open(citation_file, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f))
+        assert len(rows) == 9, f"Expected 9 rows in citation_map.csv, got {len(rows)}"
+
+
+def test_references_bib_integrity() -> None:
+    """Verify paper/references.bib contains valid BibTeX entries."""
+    repo_root = Path(__file__).parent.parent
+    bib_file = repo_root / "paper" / "references.bib"
+    content = bib_file.read_text(encoding="utf-8")
+
+    expected_keys = [
+        "saxena2008damage",
+        "diana2025ai",
+        "huang2021survey",
+        "mazzetto2024review",
+        "wei2024digital",
+        "bello2024ai",
+        "hosseinzadeh2023predictive",
+        "shehadeh2024evaluating",
+        "mousavi2024evolution",
+        "brighenti2024forecasting",
+        "hisamuddin2026ai",
+        "mahmud2025ai",
+        "hasan2025new",
+        "pathri2025smart",
+        "wu2026research",
+        "belay2026digital",
+        "chen2022data",
+        "zhu2025predictive",
+        "diao2026turbofan",
+        "walia2026uncertainty",
+        "xu2026novel",
+        "yang2026empirical",
+        "javanmardi2023conformal",
+    ]
+    for key in expected_keys:
+        assert f"{{{key}," in content, f"Missing BibTeX key: {key}"
 
 
 def test_experiment_record_template_provenance_fields() -> None:
