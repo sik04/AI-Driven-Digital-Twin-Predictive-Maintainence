@@ -8,7 +8,7 @@ This document outlines the master research and development roadmap for the Intel
 
 | Phase | Title | Status | Primary Focus |
 | :--- | :--- | :--- | :--- |
-| **Phase 0** | Research Project Setup and Governance | In Progress | Repository reset, governance framework, tooling, CI |
+| **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | Planned | Comprehensive PRISMA review of RUL & UQ literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Planned | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
@@ -27,7 +27,7 @@ This document outlines the master research and development roadmap for the Intel
 ## Detailed Phase Specifications
 
 ### Phase 0: Research Project Setup and Governance
-- **Status**: In Progress (Step 1 implementation)
+- **Status**: Completed (Step 1 verified and merged)
 - **Objective**: Establish a clean, reproducible, research-first repository foundation with automated testing, CI, and governance documentation.
 - **Expected Deliverables**:
   - `pyproject.toml` with modern packaging, formatting (`ruff`), typing (`mypy`), and testing (`pytest`).
