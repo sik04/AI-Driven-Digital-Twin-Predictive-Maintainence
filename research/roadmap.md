@@ -10,7 +10,7 @@ This document outlines the master research and development roadmap for the Intel
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
-| **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | In Progress | Formalize gaps, testable hypotheses, contribution matrix |
+| **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
@@ -67,7 +67,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 2: Research Gap, Questions, Hypotheses, and Contributions
-- **Status**: In Progress
+- **Status**: Completed (PR #5 merged and verified on main)
 - **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, state expected scientific contributions, and establish hypothesis governance rules.
 - **Expected Deliverables**:
   - Finalized central research problem / gap statement in `research/research_design/research_gap.md`.
