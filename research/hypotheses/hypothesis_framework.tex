@@ -1,0 +1,283 @@
+% This LaTeX document is a human-readable rendering of hypothesis_framework.yaml.
+% The YAML file is the authoritative source of truth.
+
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{microtype}
+
+\geometry{margin=1in}
+
+% Flexible wrapped table column
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+\title{\textbf{IntelliTwin: Formal Research Hypothesis Framework (v1)}}
+\author{Mayank Singh \quad Shiksha Pandey \quad Ruchi Gupta}
+\date{Locked Date: October 4, 2026 \quad|\quad Version: 1.0 (Locked v1)}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document presents the formal, human-readable LaTeX rendering of the pre-specified hypothesis framework for the IntelliTwin project. It defines the central research gap, research questions (RQ1--RQ4), null ($H_0$) and alternative ($H_1$) hypotheses, pre-specified practical effect-size thresholds, primary metrics, decision rules, falsification criteria, and experiment mappings. The canonical, machine-readable source of truth for all parameters herein is maintained in \texttt{research/hypotheses/hypothesis\_framework.yaml}.
+\end{abstract}
+
+\section{Framework Overview and Governance}
+
+\begin{itemize}
+    \item \textbf{Framework Version}: 1.0 (\texttt{locked\_for\_current\_research\_iteration})
+    \item \textbf{Date Locked}: October 4, 2026
+    \item \textbf{Authors}: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+    \item \textbf{Primary Nominal Coverage Target}: $1 - \alpha = 0.90$ ($90\%$)
+    \item \textbf{Core Pre-Specification Principle}: Hypotheses and practical thresholds are pre-specified prior to conducting final experiments. They may only be revised when new empirical evidence or methodological constraints justify a documented research-design revision logged in \texttt{research/decision\_log.md}.
+\end{itemize}
+
+\section{Research Question 1: Conditional RUL Interval Reliability}
+
+\subsection{Research Question Formulation}
+
+\textbf{RQ1}: \textit{To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?}
+
+\subsection{Formal Hypotheses}
+
+\begin{itemize}
+    \item \textbf{Null Hypothesis ($H_{0,1}$)}: Once nominal marginal calibration has been achieved, RUL prediction-interval coverage does not exhibit practically or statistically meaningful differences across degradation stages or operating regimes.
+
+    \item \textbf{Alternative Hypothesis ($H_{1,1}$)}: RUL prediction intervals that satisfy nominal marginal coverage exhibit systematic conditional coverage deviations across one or more degradation stages or operating regimes.
+\end{itemize}
+
+\subsection{Practical Thresholds and Metrics}
+
+\begin{itemize}
+    \item \textbf{Experiment Mapping}: Experiment A (\textit{Conditional Reliability Audit})
+
+    \item \textbf{Status}: Locked v1
+
+    \item \textbf{Practical Threshold}: Pre-specified conditional coverage gap tolerance $\delta = 5$ percentage points. At $90\%$ nominal coverage ($1-\alpha = 0.90$), a pre-defined subgroup $g$ with conditional coverage $\text{PICP}_g < 85\%$ represents a practically meaningful undercoverage signal.
+
+    \item \textbf{Primary Metrics}: Marginal Coverage ($\text{PICP}$), Conditional Coverage ($\text{PICP}_g$), Worst-Group Coverage ($\text{WGC} = \min_g \text{PICP}_g$), Conditional Coverage Error ($\text{CE}_g = |\text{PICP}_g - (1-\alpha)|$), Maximum Conditional Calibration Gap ($\text{MCG} = \max_g |\text{PICP}_g - (1-\alpha)|$), Mean Prediction Interval Width ($\text{MPIW}$), and Winkler Interval Score.
+\end{itemize}
+
+\subsection{Decision and Falsification Rules}
+
+\begin{itemize}
+    \item \textbf{Decision Rule}: At $90\%$ nominal coverage, a pre-defined subgroup with coverage below $85\%$ represents practically meaningful undercoverage. Evidence must be evaluated using engine-level uncertainty estimates (e.g., engine-level bootstrap) to prevent sampling variability from being mistaken for systematic failure.
+
+    \item \textbf{Falsification Rule}: $H_{1,1}$ receives weak or no support if marginal coverage is near nominal ($\text{PICP} \approx 0.90$), conditional coverage remains near nominal across all relevant groups ($\text{PICP}_g \approx 0.90$), worst-group coverage remains acceptable ($\text{WGC} \ge 0.85$), and observed deviations are consistent with sampling variability.
+\end{itemize}
+
+\section{Research Question 2: Condition-Aware Calibration Efficacy}
+
+\subsection{Research Question Formulation}
+
+\textbf{RQ2}: \textit{Can condition-aware calibration methods improve worst-group RUL reliability across degradation stages and operating regimes without making prediction intervals excessively wide?}
+
+\subsection{Formal Hypotheses}
+
+\begin{itemize}
+    \item \textbf{Null Hypothesis ($H_{0,2}$)}: Condition-aware calibration does not meaningfully improve worst-group RUL reliability compared with global calibration, or any apparent reliability improvement is achieved primarily through excessively wider prediction intervals.
+
+    \item \textbf{Alternative Hypothesis ($H_{1,2}$)}: Condition-aware calibration improves worst-group RUL reliability and reduces conditional calibration error compared with global calibration while maintaining practically useful prediction-interval sharpness.
+\end{itemize}
+
+\subsection{Practical Thresholds and Metrics}
+
+\begin{itemize}
+    \item \textbf{Experiment Mapping}: Experiment B (\textit{Condition-Aware Calibration Evaluation})
+
+    \item \textbf{Status}: Locked v1
+
+    \item \textbf{Practical Thresholds}: Minimum worst-group coverage improvement of $5$ percentage points over global calibration ($\Delta \text{WGC} \ge +5\%$), while constraining maximum acceptable mean interval width expansion to $\Delta \text{MPIW} \le 15\%$.
+
+    \item \textbf{Primary Metrics}: Worst-Group Coverage ($\text{WGC}$), Conditional Coverage Error ($\text{CE}_g$), Maximum Conditional Calibration Gap ($\text{MCG}$), Marginal Coverage ($\text{PICP}$), Mean Prediction Interval Width ($\text{MPIW}$), and Winkler Interval Score.
+\end{itemize}
+
+\subsection{Decision and Falsification Rules}
+
+\begin{itemize}
+    \item \textbf{Decision Rule}: $H_{1,2}$ is supported if condition-aware calibration improves worst-group coverage by at least $5$ percentage points over global calibration while limiting $\text{MPIW}$ expansion to no more than $15\%$.
+
+    \item \textbf{Falsification Rule}: $H_{1,2}$ receives weak or no support if worst-group coverage improvement is below $5$ percentage points or if achieving coverage improvement requires an $\text{MPIW}$ increase exceeding $15\%$.
+\end{itemize}
+
+\section{Research Question 3: Maintenance Decision Utility}
+
+\subsection{Research Question Formulation}
+
+\textbf{RQ3}: \textit{Do improvements in conditional RUL calibration lead to better maintenance decisions than point-estimate and globally calibrated maintenance policies?}
+
+\subsection{Formal Hypotheses}
+
+\begin{itemize}
+    \item \textbf{Null Hypothesis ($H_{0,3}$)}: Improvements in conditional RUL calibration do not produce practically meaningful improvements in downstream maintenance outcomes compared with point-estimate or globally calibrated policies.
+
+    \item \textbf{Alternative Hypothesis ($H_{1,3}$)}: Improved conditional RUL calibration produces better downstream maintenance outcomes by reducing late interventions and failure risk while limiting premature maintenance, wasted useful life, and total maintenance cost.
+\end{itemize}
+
+\subsection{Practical Thresholds and Metrics}
+
+\begin{itemize}
+    \item \textbf{Experiment Mapping}: Experiment C (\textit{Maintenance Decision Impact})
+
+    \item \textbf{Status}: Locked v1
+
+    \item \textbf{Practical Thresholds}: Minimum relative reduction of $10\%$ in late interventions or failure events ($\ge 10\%$ reduction), maximum allowed deterioration of $10\%$ in premature maintenance or wasted life ($\le 10\%$ increase), and requirement for lower total simulated maintenance cost ($C_{\text{total}}$).
+
+    \item \textbf{Primary Metrics}: Late interventions, failure events (missed safe-intervention opportunities), premature interventions, wasted Remaining Useful Life ($RUL_{\text{wasted}}$), intervention lead time distribution, preventive maintenance frequency, total simulated maintenance cost ($C_{\text{total}}$), failure-related cost, and premature-replacement cost.
+\end{itemize}
+
+\subsection{Decision and Falsification Rules}
+
+\begin{itemize}
+    \item \textbf{Decision Rule}: $H_{1,3}$ is supported if the conditionally calibrated maintenance policy achieves at least a $10\%$ relative reduction in late interventions or failure events compared with point-estimate and globally calibrated policies, without increasing premature maintenance or wasted life by more than $10\%$, resulting in a lower total simulated maintenance cost.
+
+    \item \textbf{Falsification Rule}: $H_{1,3}$ receives weak or no support if late intervention or failure reductions are below $10\%$, or if operational cost increases due to excessive premature replacements.
+\end{itemize}
+
+\section{Research Question 4: Robustness and Generalization}
+
+\subsection{Research Question Formulation}
+
+\textbf{RQ4}: \textit{Are the observed conditional calibration failures and their maintenance-decision consequences consistent across different operating conditions, fault modes, base RUL models, and random seeds?}
+
+\subsection{Formal Hypotheses}
+
+\begin{itemize}
+    \item \textbf{Null Hypothesis ($H_{0,4}$)}: The observed conditional calibration and maintenance-decision effects are not robust and depend strongly on a particular dataset, model architecture, operating condition, fault mode, or random seed.
+
+    \item \textbf{Alternative Hypothesis ($H_{1,4}$)}: The principal conditional calibration and maintenance-decision findings persist across multiple operating conditions, fault modes, base RUL models, and repeated experimental runs.
+\end{itemize}
+
+\subsection{Practical Thresholds and Metrics}
+
+\begin{itemize}
+    \item \textbf{Experiment Mapping}: Experiment D (\textit{Robustness and Generalization})
+
+    \item \textbf{Status}: Locked v1
+
+    \item \textbf{Practical Thresholds}: Minimum configuration consistency fraction of $0.75$ ($75\%$, i.e., $3$ out of $4$ experimental configurations) and mandatory persistence across both Gradient Boosting Regressor (GBR) and Long Short-Term Memory (LSTM) model families.
+
+    \item \textbf{Primary Metrics}: Configuration consistency fraction, standardized effect size, and engine-level bootstrap confidence intervals.
+\end{itemize}
+
+\subsection{Decision and Falsification Rules}
+
+\begin{itemize}
+    \item \textbf{Decision Rule}: $H_{1,4}$ is supported if the primary conditional calibration failure and decision improvements persist in at least $75\%$ ($3$ of $4$) of tested experimental configurations and hold across both GBR and LSTM base model families.
+
+    \item \textbf{Falsification Rule}: $H_{1,4}$ receives weak or no support if findings hold in fewer than $75\%$ of evaluated configurations or fail completely on one of the primary model families.
+\end{itemize}
+
+\section{Summary Matrix of Hypothesis Framework}
+
+% ------------------------------------------------------------------
+% IMPORTANT:
+% tabularx is used instead of a normal tabular environment so that
+% long text automatically wraps and cannot overflow the page margins.
+% ------------------------------------------------------------------
+
+\begin{table}[htbp]
+\centering
+\caption{Summary of Hypothesis Framework (v1)}
+\label{tab:hypothesis_summary}
+
+\footnotesize
+\renewcommand{\arraystretch}{1.35}
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabularx}{\textwidth}{
+    @{}
+    >{\RaggedRight\arraybackslash}p{0.055\textwidth}
+    >{\RaggedRight\arraybackslash}p{0.080\textwidth}
+    >{\RaggedRight\arraybackslash}p{0.170\textwidth}
+    Y
+    Y
+    @{}
+}
+\toprule
+\textbf{RQ}
+&
+\textbf{Experiment}
+&
+\textbf{Primary Target}
+&
+\textbf{Key Threshold}
+&
+\textbf{Falsification Rule}
+\\
+\midrule
+
+RQ1
+&
+Exp A
+&
+Conditional subgroup undercoverage
+&
+$\delta = 5$ percentage points; at $90\%$ nominal coverage,
+$\text{PICP}_g < 85\%$ indicates practically meaningful undercoverage.
+&
+Weak/no support if $\text{WGC} \ge 85\%$ and subgroup deviations are
+consistent with engine-level sampling uncertainty.
+\\
+
+\addlinespace
+
+RQ2
+&
+Exp B
+&
+Worst-group calibration improvement
+&
+$\Delta\text{WGC} \ge 5$ percentage points while
+$\Delta\text{MPIW} \le 15\%$.
+&
+Weak/no support if $\Delta\text{WGC} < 5$ percentage points or interval
+width increases by more than $15\%$.
+\\
+
+\addlinespace
+
+RQ3
+&
+Exp C
+&
+Maintenance decision utility and cost
+&
+At least $10\%$ reduction in late/failure outcomes, no more than
+$10\%$ deterioration in premature maintenance or wasted life, and lower
+$C_{\text{total}}$.
+&
+Weak/no support if failure/late-intervention reduction is below $10\%$,
+premature-maintenance penalties exceed the tolerance, or total cost does
+not decrease.
+\\
+
+\addlinespace
+
+RQ4
+&
+Exp D
+&
+Robustness and generalization
+&
+Primary effect persists in at least $75\%$ of predefined configurations
+and across both GBR and LSTM model families.
+&
+Weak/no support if consistency is below $75\%$ or the effect fails
+completely for either primary model family.
+\\
+
+\bottomrule
+\end{tabularx}
+
+\end{table}
+
+\end{document}

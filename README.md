@@ -24,15 +24,15 @@ The project prioritizes **scientific rigor, statistical validity, and reproducib
 
 ## 2. Research Questions and Direction (Version 1)
 
-Following the Phase 1 Systematic Literature Review, the core research gap and RQ1 have been formally formulated and locked for the current research iteration:
+Following the Phase 1 Systematic Literature Review, the core research gap and RQ1–RQ4 have been formally formulated and locked for the current research iteration:
 
 - **Research Gap v1**: Although recent turbofan prognostic studies provide well-calibrated prediction intervals, evaluation remains dominated by aggregate marginal metrics, concealing potential conditional miscalibration across degradation stages and operating regimes.
-- **RQ1 (Locked / Provisional v1)**: *To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?*
-  - **$H_{0,1}$**: RUL interval coverage does not exhibit practically or statistically meaningful differences across degradation stages or operating regimes once nominal marginal calibration is achieved.
-  - **$H_{1,1}$**: RUL intervals satisfying nominal marginal coverage exhibit systematic conditional coverage deviations across degradation stages or operating regimes.
-- **RQ2–RQ4**: *TBD / Formulated in subsequent Phase 2 iterations.*
+- **RQ1 (Locked v1)**: *To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?*
+- **RQ2 (Locked v1)**: *Can condition-aware calibration methods improve worst-group RUL reliability across degradation stages and operating regimes without making prediction intervals excessively wide?*
+- **RQ3 (Locked v1)**: *Do improvements in conditional RUL calibration lead to better maintenance decisions than point-estimate and globally calibrated maintenance policies?*
+- **RQ4 (Locked v1)**: *Are the observed conditional calibration failures and their maintenance-decision consequences consistent across different operating conditions, fault modes, base RUL models, and random seeds?*
 
-> *Detailed metrics, target leakage constraints, and falsification criteria are documented in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).*
+> *Formal $H_0/H_1$ definitions, pre-specified practical thresholds, and decision rules are maintained in [`research/hypotheses/hypothesis_framework.yaml`](research/hypotheses/hypothesis_framework.yaml) (authoritative source) and rendered in [`research/hypotheses/hypothesis_framework.tex`](research/hypotheses/hypothesis_framework.tex) (academic LaTeX). Detailed design protocols are documented in [`research/research_design/research_gap.md`](research/research_design/research_gap.md) and [`research/research_design/experiment_map.md`](research/research_design/experiment_map.md).*
 
 ---
 
@@ -41,9 +41,12 @@ Following the Phase 1 Systematic Literature Review, the core research gap and RQ
 - **Phase 0: Research Project Setup and Governance**: **Completed** (Repository reset, baseline backup, CI workflow, packaging, and governance framework verified).
 - **Phase 1: Systematic Literature Review**: **In Progress** (Surveillance ongoing; 23 verified scholarly works synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md) and [`paper/references.bib`](paper/references.bib)).
 - **Active Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (**In Progress**):
-  - Research Gap v1 and RQ1 v1 locked in [`research/research_questions.md`](research/research_questions.md).
-  - Detailed Phase 2 formulation, candidate metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), target leakage constraints, and falsification criteria completed in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).
-  - Architectural decision log updated with ADR-002 in [`research/decision_log.md`](research/decision_log.md).
+  - Research Gap v1 and RQ1–RQ4 v1 locked in [`research/research_questions.md`](research/research_questions.md).
+  - Machine-readable formal hypothesis framework created in [`research/hypotheses/hypothesis_framework.yaml`](research/hypotheses/hypothesis_framework.yaml) and rendered in [`research/hypotheses/hypothesis_framework.tex`](research/hypotheses/hypothesis_framework.tex).
+  - Research gap rationale and statistical cautions documented in [`research/research_design/research_gap.md`](research/research_design/research_gap.md).
+  - Master experiment map (Experiments A–D) defined in [`research/research_design/experiment_map.md`](research/research_design/experiment_map.md).
+  - Detailed Experiment A protocol designed in [`research/research_design/experiment_a_design.md`](research/research_design/experiment_a_design.md).
+  - Architectural decision log updated with ADR-002, ADR-003, and ADR-004 in [`research/decision_log.md`](research/decision_log.md).
   - Claims evidence matrix updated in [`paper/claims_evidence_matrix.csv`](paper/claims_evidence_matrix.csv).
 
 
@@ -73,10 +76,17 @@ IntelliTwin/
 │   └── reproducibility.md             # Reproducibility charter and protocols
 ├── research/
 │   ├── roadmap.md                     # Phases 0 through 12 master roadmap
-│   ├── research_questions.md          # Provisional candidate RQs and hypotheses
+│   ├── research_questions.md          # Human-readable summary of locked RQs
 │   ├── decision_log.md                # Architecture Decision Records (ADRs)
 │   ├── risk_register.md               # Scientific and project risk register
 │   ├── author_contributions.md        # CRediT authorship tracking
+│   ├── hypotheses/
+│   │   ├── hypothesis_framework.yaml  # Authoritative machine-readable hypothesis registry
+│   │   └── hypothesis_framework.tex   # Human-readable academic LaTeX rendering
+│   ├── research_design/
+│   │   ├── research_gap.md            # Research gap, scope, non-claims, and statistical cautions
+│   │   ├── experiment_map.md          # Master experiment map (Experiments A–D)
+│   │   └── experiment_a_design.md     # Experiment A v1 detailed protocol design
 │   └── literature/
 │       ├── paper_inventory.csv        # Inventory of 15 local PDF papers
 │       ├── literature_matrix.csv      # Expanded 23-study literature comparison matrix

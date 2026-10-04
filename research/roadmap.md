@@ -67,18 +67,21 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 2: Research Gap, Questions, Hypotheses, and Contributions
-- **Status**: In Progress (Research Gap v1, RQ1 v1, H0_1/H1_1 locked)
+- **Status**: In Progress (Research Gap v1, RQ1–RQ4 v1 locked, Experiment Map A–D defined)
 - **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, and state expected scientific contributions.
 - **Expected Deliverables**:
-  - Detailed Phase 2 formulation in `research/phase-2/research_gap_rq1_hypothesis.md`.
-  - Updated `research_questions.md` with locked RQ1 v1 and pre-specified hypotheses ($H_{0,1}$ / $H_{1,1}$).
-  - Documented ADR-002 in `research/decision_log.md`.
+  - Detailed research gap formulation in `research/research_design/research_gap.md`.
+  - Machine-readable formal hypothesis framework registry in `research/hypotheses/hypothesis_framework.yaml`.
+  - Master experiment map in `research/research_design/experiment_map.md`.
+  - Detailed Experiment A protocol design in `research/research_design/experiment_a_design.md`.
+  - Updated `research_questions.md` referencing research gap and YAML hypothesis registry.
+  - Documented ADR-002, ADR-003, and ADR-004 in `research/decision_log.md`.
   - Author-aligned contributions matrix and claims evidence mapping (`paper/claims_evidence_matrix.csv`).
 - **Acceptance Criteria**:
-  - Every research question maps to specific, measurable experiments and target leakage constraints.
+  - Every research question maps to specific, measurable experiments, pre-specified practical effect-size thresholds, and target leakage constraints.
   - Gaps reflect genuine scholarly deficiencies identified in Phase 1 without unsupportable novelty claims.
 - **Dependencies**: Phase 1.
-- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), unit-of-independence constraints, and falsification criteria.
+- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$, decision metrics), unit-of-independence constraints, and falsification rules.
 
 ---
 

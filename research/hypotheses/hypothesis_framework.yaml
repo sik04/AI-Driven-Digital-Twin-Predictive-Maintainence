@@ -1,0 +1,202 @@
+framework:
+  version: "1.0"
+  status: "locked_for_current_research_iteration"
+  date_locked: "2026-10-04"
+  authors:
+    - "Mayank Singh"
+    - "Shiksha Pandey"
+    - "Ruchi Gupta"
+  principle: >
+    Hypotheses are pre-specified before final experimentation and may only
+    be revised when new evidence or methodological constraints justify a
+    documented research-design revision.
+  primary_nominal_coverage: 0.90
+  revision_policy: >
+    Locked for the current research iteration. Any revision must occur
+    before the corresponding final test results are inspected and must be
+    justified in research/decision_log.md.
+
+hypotheses:
+  RQ1:
+    research_question: >
+      To what extent can nominally calibrated RUL prediction intervals
+      conceal conditional reliability failures across degradation stages
+      and operating regimes in turbofan prognostics?
+
+    null_hypothesis: >
+      Once nominal marginal calibration has been achieved, RUL
+      prediction-interval coverage does not exhibit practically or
+      statistically meaningful differences across degradation stages
+      or operating regimes.
+
+    alternative_hypothesis: >
+      RUL prediction intervals that satisfy nominal marginal coverage
+      exhibit systematic conditional coverage deviations across one or
+      more degradation stages or operating regimes.
+
+    experiment: "Experiment A"
+
+    status: "locked_v1"
+
+    practical_thresholds:
+      conditional_coverage_gap_percentage_points: 5
+      pre_specified_tolerance_note: >
+        At 90 percent nominal coverage, a pre-defined subgroup with coverage
+        below 85 percent represents a practically meaningful undercoverage signal.
+        This 5 percentage point gap is our pre-specified practical tolerance for
+        this study and may only be changed through a documented protocol revision.
+
+    primary_metrics:
+      - marginal_picp
+      - conditional_picp
+      - worst_group_coverage
+      - conditional_coverage_error
+      - maximum_conditional_calibration_gap
+      - mpiw
+      - interval_score
+
+    decision_rule: >
+      At 90 percent nominal coverage, a pre-defined subgroup with coverage
+      below 85 percent represents practically meaningful undercoverage.
+      Evidence should also be evaluated with engine-level uncertainty
+      estimates so that sampling variability is not mistaken for a
+      systematic conditional failure.
+
+    falsification_rule: >
+      H1 receives weak or no support if marginal coverage is near nominal,
+      conditional coverage remains near nominal across relevant groups,
+      worst-group coverage remains acceptable, and observed deviations
+      are consistent with sampling uncertainty.
+
+  RQ2:
+    research_question: >
+      Can condition-aware calibration methods improve worst-group RUL
+      reliability across degradation stages and operating regimes without
+      making prediction intervals excessively wide?
+
+    null_hypothesis: >
+      Condition-aware calibration does not meaningfully improve worst-group
+      RUL reliability compared with global calibration, or any apparent
+      reliability improvement is achieved primarily through excessively
+      wider prediction intervals.
+
+    alternative_hypothesis: >
+      Condition-aware calibration improves worst-group RUL reliability and
+      reduces conditional calibration error compared with global calibration
+      while maintaining practically useful prediction-interval sharpness.
+
+    experiment: "Experiment B"
+
+    status: "locked_v1"
+
+    practical_thresholds:
+      minimum_worst_group_coverage_improvement_percentage_points: 5
+      maximum_acceptable_mpiw_increase_percent: 15
+
+    primary_metrics:
+      - worst_group_coverage
+      - conditional_coverage_error
+      - maximum_conditional_calibration_gap
+      - marginal_picp
+      - mpiw
+      - interval_score
+
+    decision_rule: >
+      H1_2 is supported if condition-aware calibration improves worst-group
+      coverage by at least 5 percentage points over global calibration while
+      limiting the mean prediction interval width (MPIW) expansion to no more
+      than 15 percent.
+
+    falsification_rule: >
+      H1_2 receives weak or no support if worst-group coverage improvement
+      is below 5 percentage points or if achieving coverage improvement requires
+      an MPIW increase exceeding 15 percent.
+
+  RQ3:
+    research_question: >
+      Do improvements in conditional RUL calibration lead to better
+      maintenance decisions than point-estimate and globally calibrated
+      maintenance policies?
+
+    null_hypothesis: >
+      Improvements in conditional RUL calibration do not produce practically
+      meaningful improvements in downstream maintenance outcomes compared
+      with point-estimate or globally calibrated policies.
+
+    alternative_hypothesis: >
+      Improved conditional RUL calibration produces better downstream
+      maintenance outcomes by reducing late interventions and failure risk
+      while limiting premature maintenance, wasted useful life, and total
+      maintenance cost.
+
+    experiment: "Experiment C"
+
+    status: "locked_v1"
+
+    practical_thresholds:
+      minimum_relative_reduction_late_or_failure_outcomes_percent: 10
+      maximum_allowed_deterioration_premature_or_wasted_life_percent: 10
+      require_lower_total_cost: true
+
+    primary_metrics:
+      - late_interventions
+      - failure_events
+      - premature_interventions
+      - wasted_rul
+      - intervention_lead_time
+      - preventive_maintenance_frequency
+      - total_simulated_maintenance_cost
+      - failure_related_cost
+      - premature_replacement_cost
+
+    decision_rule: >
+      H1_3 is supported if the conditionally calibrated maintenance policy
+      achieves at least a 10 percent relative reduction in late interventions
+      or failure events compared with point-estimate and globally calibrated
+      policies, without increasing premature maintenance or wasted life by more
+      than 10 percent, resulting in a lower total simulated maintenance cost.
+
+    falsification_rule: >
+      H1_3 receives weak or no support if late intervention or failure reductions
+      are below 10 percent, or if operational cost increases due to excessive
+      premature replacements.
+
+  RQ4:
+    research_question: >
+      Are the observed conditional calibration failures and their
+      maintenance-decision consequences consistent across different operating
+      conditions, fault modes, base RUL models, and random seeds?
+
+    null_hypothesis: >
+      The observed conditional calibration and maintenance-decision effects
+      are not robust and depend strongly on a particular dataset, model
+      architecture, operating condition, fault mode, or random seed.
+
+    alternative_hypothesis: >
+      The principal conditional calibration and maintenance-decision findings
+      persist across multiple operating conditions, fault modes, base RUL
+      models, and repeated experimental runs.
+
+    experiment: "Experiment D"
+
+    status: "locked_v1"
+
+    practical_thresholds:
+      minimum_configuration_consistency_fraction: 0.75
+      require_consistency_across_base_model_families: true
+
+    primary_metrics:
+      - configuration_consistency_fraction
+      - effect_size
+      - engine_level_bootstrap_ci
+
+    decision_rule: >
+      H1_4 is supported if the primary conditional calibration failure and
+      decision improvements persist in at least 75 percent (3 of 4) of tested
+      experimental configurations (e.g., across C-MAPSS subsets FD001–FD004)
+      and hold across both GBR and LSTM base model families.
+
+    falsification_rule: >
+      H1_4 receives weak or no support if findings hold in fewer than 75 percent
+      of evaluated configurations or fail completely on one of the primary model
+      families.

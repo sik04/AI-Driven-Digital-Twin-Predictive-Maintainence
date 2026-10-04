@@ -4,7 +4,7 @@ This log documents formal architectural, methodological, and research governance
 
 ---
 
-## Decision Record Template
+	## Decision Record Template
 
 ```markdown
 ### ADR-XXX: [Title of Decision]
@@ -32,6 +32,7 @@ This log documents formal architectural, methodological, and research governance
 ## Logged Decisions
 
 ### ADR-001: Clean Repository Reset to Establish Research-First Foundation
+
 - **Date**: 2026-10-04
 - **Status**: Accepted
 - **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
@@ -55,6 +56,7 @@ This log documents formal architectural, methodological, and research governance
 ---
 
 ### ADR-002: Adoption of Conditional RUL Reliability and Downstream Decision Consequences as Primary Research Direction
+
 - **Date**: 2026-10-04
 - **Status**: Accepted
 - **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
@@ -80,6 +82,7 @@ This log documents formal architectural, methodological, and research governance
 ---
 
 ### ADR-003: Experiment A Protocol Specification — Datasets, Model Families, and High-Level Calibration Strategy
+
 - **Date**: 2026-10-04
 - **Status**: Accepted
 - **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
@@ -109,4 +112,32 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Upon completion of Phase 3 (Dataset Study & Data Protocol Formulation) prior to model training in Phase 5.
 
+---
 
+### ADR-004: Separate Research Design from Hypothesis Registry and Adopt Machine-Readable Hypothesis Specification
+
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - The previous directory structure stored Phase 2 artifacts under a roadmap-indexed folder `research/phase-2/` and mixed research gap narratives, questions, metrics, and hypotheses within a single Markdown document (`research_gap_rq1_hypothesis.md`).
+  - Research artifacts should be organized by content purpose rather than ephemeral phase numbers.
+  - Storing formal hypotheses in unstructured Markdown created risks of synchronization drift and post-hoc hypothesis redefinition.
+- **Alternatives Considered**:
+  1. *Maintain roadmap-indexed folder `research/phase-2/`*: Rejected. Couples filesystem structure to temporary project phase numbers.
+  2. *Monolithic Markdown file for gap and hypotheses*: Rejected. Difficult to parse programmatically and mixes narrative reasoning with formal testable thresholds.
+  3. *Decoupled Research Design and Machine-Readable YAML Registry (Selected Approach)*: Adopted. Restructured research artifacts into `research/research_design/` (containing `research_gap.md`, `experiment_map.md`, `experiment_a_design.md`) and created `research/hypotheses/hypothesis_framework.yaml` as the authoritative hypothesis registry.
+- **Decisions & Pre-specified Practical Thresholds (v1)**:
+  - **RQ1**: Pre-specified practical undercoverage gap: **5 percentage points** (at 90% nominal coverage, subgroup coverage < 85% is a meaningful undercoverage signal).
+  - **RQ2**: Minimum worst-group coverage improvement: **5 percentage points**; maximum acceptable MPIW expansion: **15%**.
+  - **RQ3**: Minimum relative reduction in late/failure outcomes: **10%**; maximum allowed deterioration in premature/wasted life: **10%**; requirement for lower total simulated maintenance cost.
+  - **RQ4**: Minimum configuration consistency fraction: **75%** (3 of 4 configurations) required across both GBR and LSTM model families.
+  - All thresholds fixed prior to final outcome analysis.
+- **Decision Rationale**:
+  - YAML provides a clean, machine-readable format that can later be parsed directly by automated evaluation and reporting scripts.
+  - Markdown remains appropriate for narrative research reasoning (`research_gap.md`, `experiment_map.md`, `experiment_a_design.md`).
+- **Expected Implications**:
+  - Eliminates `research/phase-2/` from repository filesystem.
+  - Establishes `research/hypotheses/hypothesis_framework.yaml` as the single source of truth for formal hypothesis testing.
+- **Follow-up Review Date / Trigger**:
+  - Prior to executing final statistical evaluation in Phase 7 and Phase 8.
