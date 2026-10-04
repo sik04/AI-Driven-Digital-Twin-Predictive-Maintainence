@@ -56,7 +56,7 @@ Confirmatory results must **NEVER** be used to:
 ## 3. Threshold-Governance Status
 
 - **Non-Restoration of Default Thresholds**: The previously used 5%, 10%, 15%, and 75% values are not part of the final active evaluation criteria and must not be restored as default success thresholds.
-- **Simulator Validation Prerequisite**: Exact numerical practical-effect thresholds remain intentionally deferred until the maintenance simulator has been implemented and validated.
+- **Simulator Validation Prerequisite**: Exact numerical practical-effect thresholds remain intentionally deferred until after maintenance-simulator implementation and validation in the later simulator stage of the governing research workflow (Step 6).
 - **Role of Bounded Pilots**: If necessary, bounded pilot evidence may then be used to estimate realistic operational effect and variability scales.
 - **Pre-Test Freezing**: After simulator validation and any bounded pilot assessment, the final thresholds must be scientifically and operationally justified and frozen before confirmatory testing.
 - **No Post-Hoc Threshold Tuning**: Confirmatory results cannot be used to select, tune, relax, or redefine these thresholds.

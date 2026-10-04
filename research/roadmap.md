@@ -94,11 +94,11 @@ This document outlines the master research and development roadmap for the Intel
   - Exploratory data analysis notebook/script and summary report.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
-  - Protocol definition for maintenance simulator validation and pre-test threshold freezing.
+  - Document the deferred-threshold dependency and the protocol requirements that the later maintenance-simulator stage (Step 6) must satisfy before thresholds can be frozen.
 - **Acceptance Criteria**:
   - Strict train/validation/test engine isolation verified with automated assertions.
   - Preprocessing scalers fit only on training sets.
-  - Primary metrics and comparators remain locked; numerical practical-effect thresholds are finalized and frozen after maintenance simulator validation (and bounded pilot assessment if needed) prior to confirmatory testing.
+  - Primary metrics, comparators, and statistical governance remain locked. Exact numerical practical-effect thresholds remain deferred to the later maintenance-simulator validation stage (Step 6) and must be frozen before confirmatory testing.
 - **Dependencies**: Phase 2.
 - **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds.
 
@@ -166,14 +166,14 @@ This document outlines the master research and development roadmap for the Intel
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
 - **Status**: Planned
-- **Objective**: Perform component ablations, sensor noise injection, operating condition perturbations, and formal statistical significance tests (e.g., Wilcoxon signed-rank tests).
+- **Objective**: Perform component ablations, sensor noise injection, operating condition perturbations, and statistical evaluation (e.g., engine-level confidence intervals and optional secondary paired tests).
 - **Expected Deliverables**:
   - Systematic ablation experiment records.
   - Noise robustness stress-testing report.
-  - Statistical hypothesis testing results with p-values and confidence intervals.
+  - Effect sizes and engine-level confidence intervals, with statistical hypothesis tests and p-values used only as secondary supporting evidence where appropriate.
 - **Acceptance Criteria**:
   - Every proposed architectural component empirically justified by ablation.
-  - Statistical significance confirmed across multiple random seeds.
+  - Primary effects are reported with effect sizes and engine-level confidence intervals and interpreted using the pre-specified Supported / Unsupported / Inconclusive decision rules across the planned robustness evaluation.
 - **Dependencies**: Phase 7.
 - **Research Observations to Record**: Sensitivity to sensor dropout, noise tolerance boundaries.
 
