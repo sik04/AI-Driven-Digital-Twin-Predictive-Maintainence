@@ -267,6 +267,31 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Completion of maintenance simulator validation in Step 6 prior to confirmatory model training.
 
+---
+
+### ADR-011: Step 4 Dataset Qualification, Dataset Roles, Input Leakage Rules, and Engine-Level Split Governance
+- **Date**: 2026-10-05
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the locking of evaluation criteria in Step 3, Step 4 requires formal qualification of the benchmark datasets, definition of dataset roles, strict input and target leakage governance, and establishment of a reproducible engine-level partition split.
+- **Decisions**:
+  - **Dataset Roles Locked**:
+    - **FD002**: Primary dataset (6 operating regimes, 1 fault mode; multi-regime condition adaptation testbed).
+    - **FD001**: Control dataset (1 operating condition, 1 fault mode; single-condition baseline).
+    - **FD004**: Robustness dataset (6 operating regimes, 2 fault modes; reserved for RQ4 multi-condition/multi-fault robustness evaluation).
+    - **FD003**: Optional extension (1 operating condition, 2 fault modes; secondary control/robustness dataset).
+  - **Dataset Feasibility**: FD002 feasibility evaluated as **PASS** (260 run-to-failure engines, 53,759 cycles, lifetimes 128–378 cycles, 6 distinct regimes with ~8,000–13,500 observations each, 100% engine regime exposure). NASA test set trajectories are truncated prior to failure; final sequential maintenance evaluation will use a held-out run-to-failure subset of 52 engines from FD002 training data.
+  - **Input & Target Leakage Rules**: Predictive features restricted to operating settings (`setting1`–`setting3`) and sensors (`s1`–`s21`). `unit` (engine ID) is an identifier only. Preprocessing parameters must be fit on train engines ONLY. Regimes must be derived ONLY from operating settings. Ground-truth RUL is strictly prohibited as an inference feature, calibrator condition variable, or maintenance policy input.
+  - **Engine-Level Partition Breakdown**: The unit of independence is the **ENGINE**. 260 FD002 engines split 50%/20%/10%/20%: Train = 130 engines, Calibration = 52 engines, Validation = 26 engines, Held-out Test = 52 engines.
+  - **Reproducible Split**: Generated using seed `2026` via engine-lifetime quartile stratification to prevent lifetime bias. 100% disjoint engine isolation and 6/6 regime representation verified across all partitions. Split manifest saved to `data/splits/fd002_engine_split_seed_2026.json`.
+- **Expected Implications**:
+  - All subsequent data pipelines, model training, and conformal calibration will consume the reproducible manifest `data/splits/fd002_engine_split_seed_2026.json`.
+  - Detailed dataset specification documented in `research/research_design/dataset_qualification.md`.
+- **Follow-up Review Date / Trigger**:
+  - Phase 5 baseline model development.
+
+
 
 
 

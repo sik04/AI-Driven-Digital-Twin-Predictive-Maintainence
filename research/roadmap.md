@@ -88,19 +88,21 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: Planned
+- **Status**: Planned (Step 4 dataset qualification completed)
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
-  - Exploratory data analysis notebook/script and summary report.
+  - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
+  - Machine-readable reproducible engine split manifest in `data/splits/fd002_engine_split_seed_2026.json`.
+  - Canonical dataset organization in `data/raw/cmapss/`.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
   - Document the deferred-threshold dependency and the protocol requirements that the later maintenance-simulator stage (Step 6) must satisfy before thresholds can be frozen.
 - **Acceptance Criteria**:
-  - Strict train/validation/test engine isolation verified with automated assertions.
+  - Strict train/calibration/validation/test engine isolation verified with automated assertions (130 / 52 / 26 / 52 engines).
   - Preprocessing scalers fit only on training sets.
   - Primary metrics, comparators, and statistical governance remain locked. Exact numerical practical-effect thresholds remain deferred to the later maintenance-simulator validation stage (Step 6) and must be frozen before confirmatory testing.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest.
 
 ---
 
