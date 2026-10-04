@@ -2,20 +2,20 @@
 
 **Authors**: Mayank Singh, Shiksha Pandey, Ruchi Gupta  
 **Project**: IntelliTwin Research Initiative  
-**Phase**: Phase 1 (Systematic Literature Review — In Progress)  
+**Phase**: Phase 1 (Systematic Literature Review)  
 **Status**: Formal Literature Evidence Synthesis  
 
 ---
 
 ## 1. Executive Summary and Methodological Boundary
 
-This document synthesizes scholarly evidence across the 15 research works inventoried in the local repository alongside verified external closest-work literature. The objective is to rigorously position the IntelliTwin research framework against published prior art, expose threats to potential novelty claims, and delineate an evidence-grounded candidate research gap for formal evaluation in Phase 2.
+This document synthesizes scholarly evidence across the 15 research works inventoried in the local repository alongside verified external closest-work literature and software artifacts. The objective is to position the IntelliTwin research framework against published prior art, expose threats to potential novelty claims, and delineate an evidence-grounded research baseline.
 
 In accordance with strict academic integrity standards:
-- Broad claims (e.g., combining AI with Digital Twins for predictive maintenance, or generating prediction intervals for turbofan RUL) are explicitly acknowledged as **mature prior art**, not novel contributions.
+- Broad claims (e.g., combining AI with Digital Twins for predictive maintenance, or generating prediction intervals for RUL) are acknowledged as mature prior art or documented research directions, not novel contributions.
 - All literature assertions cite verified bibliographic records indexed in [`paper/references.bib`](../../paper/references.bib) and mapped in [`research/literature/citation_map.csv`](citation_map.csv).
-- Unverified leads (e.g., the 2026 thesis attributed to Osama Taha on Scribd, or the missing Zenodo artifact attributed to Hong Yan) are audited and excluded from peer-reviewed benchmarking.
-- The identified research gap is treated as a **provisional candidate gap**, subject to formal hypothesis definition and empirical falsification in Phase 2 and subsequent phases.
+- Unverified leads (e.g., the 2026 thesis attributed to Osama Taha) are tracked separately as unresolved leads and excluded from verified peer-reviewed benchmarking.
+- The identified research gap is under reassessment following corrections to the closest-work comparison.
 
 ---
 
@@ -24,160 +24,116 @@ In accordance with strict academic integrity standards:
 ### Theme 1: Digital Twins and Predictive Maintenance
 The integration of Digital Twins (DTs) with predictive maintenance (PdM) is well established across industrial manufacturing, civil infrastructure, and energy systems. Comprehensive surveys by Huang et al. (2021) [@huang2021survey], Hasan & Crawford (2025) [@hasan2025new], and Pathri & Ganduri (2025) [@pathri2025smart] document the evolution of multi-scale cyber-physical DTs from conceptual 3D representations into dynamic data-synchronized monitoring systems. 
 
-In civil infrastructure, Diana et al. (2025) [@diana2025ai], Mazzetto (2024) [@mazzetto2024review], Mousavi et al. (2024) [@mousavi2024evolution], and Mahmud et al. (2025) [@mahmud2025ai] outline multi-tier architectures linking Internet-of-Things (IoT) sensor streams with Building Information Modeling (BIM) and predictive asset maintenance. Similarly, Wei (2024) [@wei2024digital] provides a complete engineering realization of an AI-driven digital twin for chiller plant predictive maintenance in an academic doctoral dissertation at Nanyang Technological University. Bello et al. (2024) [@bello2024ai] demonstrate the operational rationale for proactive DT-enabled maintenance in renewable energy platforms. 
+In civil infrastructure, Diana et al. (2025) [@diana2025ai], Mazzetto (2024) [@mazzetto2024review], Mousavi et al. (2024) [@mousavi2024evolution], and Mahmud et al. (2025) [@mahmud2025ai] outline multi-tier architectures linking Internet-of-Things (IoT) sensor streams with Building Information Modeling (BIM) and predictive asset maintenance. Similarly, Wei (2024) [@wei2024digital] provides an engineering realization of an AI-driven digital twin for chiller plant predictive maintenance in an academic doctoral dissertation at Nanyang Technological University. Bello et al. (2024) [@bello2024ai] demonstrate the operational rationale for proactive DT-enabled maintenance in renewable energy platforms. 
 
-**Synthesis Finding**: *Developing a Digital Twin for predictive maintenance is not novel.* The literature firmly establishes the multi-tier architectural paradigm (Perception, Twin Modeling, Computational Analytics, Application Services). What remains missing in contemporary DT implementations is domain-grounded statistical verification of predictive uncertainty within the operational synchronization loop [@huang2021survey, @hasan2025new].
+**Synthesis Finding**: *Developing a Digital Twin for predictive maintenance is not novel.* The literature firmly establishes multi-tier architectural paradigms (Perception, Twin Modeling, Computational Analytics, Application Services).
 
 ---
 
 ### Theme 2: Remaining Useful Life (RUL) Point Prediction
-Data-driven point prediction of Remaining Useful Life using benchmark degradation telemetry—most notably the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset formulated by Saxena et al. (2008) [@saxena2008damage]—is mature. Hundreds of studies have benchmarked classical regression models (Support Vector Regression, Random Forests, Multi-Layer Perceptrons) against deep temporal neural architectures (CNN, LSTM, GRU, Transformers) on C-MAPSS subsets FD001 through FD004.
+Data-driven point prediction of Remaining Useful Life using benchmark degradation telemetry—most notably the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset formulated by Saxena et al. (2008) [@saxena2008damage]—is mature. Hundreds of studies have benchmarked classical regression models against deep temporal neural architectures.
 
-In the local repository corpus, Hosseinzadeh et al. (2023) [@hosseinzadeh2023predictive] benchmarked Random Forest, SVM, MLP, and CNN-LSTM models for early failure detection on sensor telemetry. Most critically, Wu et al. (2026) [@wu2026research] directly integrated a 4-tier Digital Twin framework with a Genetic Algorithm-optimized stacking ensemble (combining Random Forest, SVR, MLP, and KNN) for online RUL prediction on C-MAPSS FD001, reporting a test RMSE of 13.82 cycles and a NASA Score of 421.
+In the local repository corpus, Hosseinzadeh et al. (2023) [@hosseinzadeh2023predictive] benchmarked ML models for failure detection on sensor telemetry. Most critically, Wu et al. (2026) [@wu2026research] implemented a Digital Twin maintenance-support platform combining RVM, Random Forest, Elastic Net, autoregression, and LSTM with genetic-algorithm weight optimization, evaluated on CS2_35 lithium-ion battery laboratory data, identifying uncertainty limits as future work.
 
-**Synthesis Finding**: *Proposing AI-driven RUL point prediction, even when coupled with a Digital Twin, possesses zero scientific novelty.* Point predictors have saturated benchmark performance on idealized single-condition datasets like FD001. Point estimators provide no confidence boundaries, treating all predictions with equal epistemic certainty regardless of operational noise or wear stage.
+**Synthesis Finding**: *Proposing AI-driven RUL point prediction, even when coupled with a Digital Twin, possesses zero scientific novelty.* Point estimators provide no confidence boundaries, treating all predictions with equal epistemic certainty regardless of operational noise or wear stage.
 
 ---
 
 ### Theme 3: Probabilistic and Uncertainty-Aware RUL Prediction
-Recognizing that deterministic point estimates create severe operational hazards in aviation and power systems, researchers have developed probabilistic and uncertainty-aware prognostic frameworks. Chen et al. (2022) [@chen2022data] modeled RUL prediction uncertainty on C-MAPSS FD001 and FD002 using CNN-LSTM feature extractors paired with Gaussian Process Regression (GPR). Walia & Kumar (2026) [@walia2026uncertainty] applied Bayesian Bidirectional LSTMs with Monte Carlo Dropout (MC Dropout) across 50 stochastic forward passes to capture epistemic and aleatoric degradation uncertainty on C-MAPSS and PRONOSTIA bearing benchmarks.
+Recognizing that deterministic point estimates create severe operational hazards, researchers have developed probabilistic and uncertainty-aware prognostic frameworks. Chen et al. (2022) [@chen2022data] investigated predictive maintenance strategies considering the uncertainty in RUL prediction. Walia & Kumar (2026) [@walia2026uncertainty] evaluated quantile regression with CNN/GRU and PPO optimal maintenance scheduling on NASA turbofan engine data.
 
-**Synthesis Finding**: *Uncertainty-aware RUL prediction is well established in the reliability literature.* However, conventional methods rely predominantly on parametric distribution assumptions (e.g., Gaussian, Weibull, or log-normal error residuals) or heuristic Bayesian approximations (e.g., MC Dropout). As demonstrated in statistical literature, these assumptions routinely break down when physical degradation exhibits non-Gaussian heteroscedasticity or multimodal sensor noise.
+**Synthesis Finding**: *Uncertainty-aware RUL prediction is documented in the reliability literature.* Full primary methodology for Chen et al. (2022) remains unverified in the current audit, while Walia & Kumar (2026) use quantile regression and PPO scheduling.
 
 ---
 
 ### Theme 4: Prediction Interval Calibration
-Estimating prediction intervals $[L, U]$ is insufficient if the intervals are not statistically calibrated. A prediction interval nominal level of $1 - \alpha$ (e.g., 90% or 95%) is calibrated if the empirical Prediction Interval Coverage Probability (PICP) matches or exceeds the nominal level on unseen test units:
-$$\text{PICP} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(y_i \in [\hat{L}_i, \hat{U}_i]) \ge 1 - \alpha$$
-Xu et al. (2026) [@xu2026novel] conducted a systematic audit of deep ensemble models on C-MAPSS FD001–FD004 and XJTU-SY bearing datasets, showing that raw deep ensembles suffer from severe empirical overconfidence: on multi-regime datasets (FD002 and FD004), raw ensemble intervals designed for 90% nominal confidence achieved empirical coverage as low as 76.4%. Xu et al. (2026) demonstrated that post-hoc isotonic calibration and temperature scaling could restore marginal coverage to nominal levels.
+Estimating prediction intervals $[L, U]$ requires statistical calibration so that empirical Prediction Interval Coverage Probability (PICP) aligns with target nominal levels. Xu et al. (2026) [@xu2026novel] proposed an uncertainty-aware framework for remaining useful life prediction integrating uncertainty quantification and calibration (primary methodology remains unverified in this audit).
 
-**Synthesis Finding**: *The necessity of calibrating prognostic prediction intervals is recognized.* Raw machine learning quantiles and ensemble variances systematically fail empirical coverage tests on complex telemetry without formal post-hoc calibration.
+**Synthesis Finding**: *Uncertainty quantification and post-hoc calibration are recognized requirements in prognostic literature.*
 
 ---
 
 ### Theme 5: Conformal Prediction for Prognostics
-To overcome the limitations of parametric assumptions and heuristic scaling, **Inductive Conformal Prediction (ICP)** has emerged as a mathematically grounded, distribution-free framework providing finite-sample marginal coverage guarantees under exchangeability.
+To overcome limitations of parametric assumptions, Inductive Conformal Prediction (ICP) has been applied to prognostic regression problems.
 
-Javanmardi & Hüllermeier (2023) [@javanmardi2023conformal] published a foundational study applying Split Conformal Prediction and normalized non-conformity measures to CNNs, LSTMs, and Gradient Boosted Decision Trees across all four NASA C-MAPSS subsets, proving that conformal calibration guarantees marginal coverage at 80%, 90%, and 95% nominal levels. More recently, Diao et al. (2026) [@diao2026turbofan] applied Conformalized Quantile Regression (CQR) to an LSTM base model on C-MAPSS FD001 and FD003, demonstrating that conformal calibration corrects the chronic undercoverage of raw quantile regression (elevating coverage from 84.3% to guaranteed 95.2%) while maintaining tight prediction interval widths (MPIW).
+Javanmardi & Hüllermeier (2023) [@javanmardi2023conformal] evaluated conformal prediction intervals for remaining useful lifetime estimation on C-MAPSS using convolutional neural network and gradient boosting predictors under exchangeability assumptions. Diao et al. (2026) [@diao2026turbofan] applied LSTM quantile regression with conformal calibration/CQR to C-MAPSS FD001 and FD002, including life-stage analysis and cross-condition evaluation with labeled target adaptation. Robinson (2026) [@robinson2026riskaware] evaluated gradient boosting and asymmetric CQR across all four C-MAPSS subsets for risk-aware prediction intervals.
 
-**Synthesis Finding**: *Applying split conformal prediction to turbofan RUL on NASA C-MAPSS is not novel.* It has been established by Javanmardi & Hüllermeier (2023) and reaffirmed by Diao et al. (2026). Any claim that IntelliTwin is the "first" to apply conformal prediction to C-MAPSS is factually false and academically unacceptable.
-
----
-
-### Theme 6: Conditional Reliability Across Degradation Stages
-A critical theoretical limitation of standard conformal prediction is that its coverage guarantee is **marginal**—it averages over the entire joint data distribution $(X, Y)$. It does **not** guarantee conditional coverage for specific sub-populations or feature partitions:
-$$P(Y \in \hat{C}(X) \mid X \in \mathcal{X}_k) \neq 1 - \alpha$$
-In asset prognostics, degradation progresses through distinct physical stages:
-1. *Early Healthy Stage* (plateau phase, little observable degradation, high intrinsic target ambiguity).
-2. *Incipient Degradation Stage* (detectable sensor deviations, intermediate wear).
-3. *Critical End-of-Life Stage* (accelerating exponential failure trajectory, low remaining cycles).
-
-Both Javanmardi & Hüllermeier (2023) [@javanmardi2023conformal] and Diao et al. (2026) [@diao2026turbofan] observed that prediction interval width naturally narrows as engines approach failure. However, **neither study formally audited conditional coverage probabilities (PICP) stratified across discrete degradation wear stages**. When an interval narrows near end-of-life, does empirical coverage collapse precisely when failure avoidance is most urgent? Prior literature leaves this question empirically unanswered.
+**Synthesis Finding**: *Applying conformal prediction to RUL estimation on C-MAPSS is established in prior art (Javanmardi & Hüllermeier 2023; Diao et al. 2026; Robinson 2026).*
 
 ---
 
-### Theme 7: Reliability Across Operating Conditions and Regime Shifts
-In real-world aviation operations, engines operate across multiple flight altitudes, Mach numbers, and throttle resolver angles (as simulated in C-MAPSS FD002 and FD004, which feature 6 distinct operating conditions).
+### Theme 6: Conditional Reliability and Stage-Wise Analysis
+Evaluating coverage guarantees across discrete degradation stages and operating regimes is essential for reliability diagnostics.
 
-In rotating machinery, Yang, Wang, and Wang (2026) [@yang2026empirical] diagnosed that standard conformal prediction on bearing testbeds suffered catastrophic conditional miscalibration under operating regime shifts: while marginal coverage across the entire test fleet was 91.2%, empirical coverage inside the most demanding operating cluster dropped to **64.1%**, exposing the asset to severe unquantified risk. Yang et al. proposed group-conditional conformal calibration for bearing benchmarks. 
-
-However, in turbofan prognostics, Diao et al. (2026) [@diao2026turbofan] restricted their conformal study strictly to single-condition datasets (FD001 and FD003), while Javanmardi & Hüllermeier (2023) [@javanmardi2023conformal] calibrated FD002 and FD004 only in the aggregate. 
-
-**Synthesis Finding**: *Conditional reliability under operating-regime shift has been diagnosed for bearings, but remains unaddressed in turbofan conformal prognostics.* Evaluating whether multi-regime flight shifts induce localized coverage collapse on C-MAPSS FD002/FD004 is a viable scientific inquiry.
+Diao et al. (2026) [@diao2026turbofan] conducted life-stage analysis and cross-condition evaluation with labeled target adaptation on C-MAPSS FD001 and FD002. BenAbdennour (2026) [@benabdennour2026grouped] presented leakage-controlled grouped validation and urgent/critical interval-safety diagnostics across engine, battery, and bearing degradation datasets. Yan (2026) [@yan2026audit] provided a software reproducibility artifact inspecting C-MAPSS conformal comparisons, operating-regime/conditional auditing, and maintenance-cost evaluation.
 
 ---
 
-### Theme 8: RUL-Informed Maintenance Decision Support
-Predictive maintenance literature is bifurcated: computer science papers stop at statistical error metrics (RMSE, Score, PICP), while industrial engineering papers evaluate operational decision models.
-
-Bridging this gap, Brighenti et al. (2024) [@brighenti2024forecasting] developed a Decision Support System (DSS) integrating Markov Chain deterioration projections with structural reliability indices to compute automated maintenance Priority Indices (PI) for aging bridges. Mousavi et al. (2024) [@mousavi2024evolution] reviewed 480+ bridge DT papers and concluded that intelligent decision-support models are missing from more than 85% of deployed digital twins. Shehadeh (2024) [@shehadeh2024evaluating] demonstrated in power plant field operations that transitioning from reactive to proactive maintenance schedules reduces overall maintenance expenditure by 20% and breakdowns by 35%.
-
-In the turbofan domain, Zhu et al. (2025) [@zhu2025predictive] directly used lower prediction intervals $[\hat{L}]$ to schedule aero-engine depot visits, demonstrating that risk-bounded thresholds prevent in-flight engine shutdowns. Walia & Kumar (2026) [@walia2026uncertainty] fed predictive RUL uncertainty into a Proximal Policy Optimization (PPO) reinforcement learning scheduler, demonstrating that uncertainty awareness reduced total lifecycle maintenance cost by 18.4% over deterministic baselines.
-
-**Synthesis Finding**: *Using RUL uncertainty or prediction intervals to schedule maintenance is not novel.* Zhu et al. (2025), Chen et al. (2022), and Walia & Kumar (2026) have already demonstrated this principle on turbofan benchmarks.
+### Theme 7: Operating-Regime Shifts and Conditional Diagnostics
+Yang et al. (2026) [@yang2026empirical] evaluated operating-regime conditional-reliability diagnostics on a ten-bearing PHME subset using a predictive-representation model, empirical residual calibration, a post-hoc regime-conditioned calibration diagnostic, and retrospective maintenance-trigger comparisons.
 
 ---
 
-### Theme 9: Maintenance Cost and Risk Optimization
-A credible maintenance decision framework requires an asymmetric loss function reflecting operational reality. As established by Saxena et al. (2008) [@saxena2008damage], late maintenance predictions ($d = \hat{y} - y < 0$) in aviation carry severe risk of catastrophic in-flight failure, whereas early predictions ($d > 0$) incur only premature replacement overhead (wasted residual life).
+### Theme 8: Maintenance Decision Support and Risk Optimization
+Predictive maintenance literature connects probabilistic forecasts with operational decision engines.
 
-Chen et al. (2022) [@chen2022data] formalized this trade-off into a cost-rate renewal model:
-$$C_{\text{rate}} = \frac{C_p \cdot P(\text{early replacement}) + C_f \cdot P(\text{catastrophic failure}) + C_d \cdot T_{\text{downtime}}}{\mathbb{E}[\text{Operational Lifetime}]}$$
-where $C_f \gg C_p$. Chen et al. showed that when RUL uncertainty is uncalibrated, optimal maintenance scheduling thresholds computed under parametric assumptions systematically drift, resulting in either excessive premature component replacement or elevated catastrophic failure risk.
+Zhu et al. (2025) [@zhu2025predictive] evaluated deep-learning/Monte Carlo dropout prediction intervals and maintenance-cost optimization using aero-engine data. Walia & Kumar (2026) [@walia2026uncertainty] applied PPO reinforcement learning maintenance scheduling. Shehadeh (2024) [@shehadeh2024evaluating] demonstrated empirical KPI improvements when transitioning from reactive to proactive maintenance in power plants. Brighenti et al. (2024) [@brighenti2024forecasting] integrated reliability indices into bridge maintenance prioritization.
 
 ---
 
-### Theme 10: Closest Work Comparison and Methodological Intersection
-
-To rigorously locate the remaining methodological intersection, Table 1 compares the closest published works across all key dimensions:
-
-| Study | Benchmark | Model Architecture | UQ Mechanism | Calibration Type | Conditional Analysis | Maintenance Decision Layer | Cost/Risk Evaluated | DT Interface |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Wu et al. (2026)** [@wu2026research] | C-MAPSS FD001 | GA-Stacking Ensemble | None | None | None | Conceptual | No | **Yes (4-tier)** |
-| **Chen et al. (2022)** [@chen2022data] | C-MAPSS FD001/002 | CNN-LSTM | GPR / Normal Error | Parametric | Qualitative | Renewal Policy | **Yes (Cost-rate)** | No |
-| **Zhu et al. (2025)** [@zhu2025predictive] | C-MAPSS FD001 | QRNN | Quantile Loss | None (Raw) | Partial (Late life) | Threshold Policy | **Yes (Depot cost)** | No |
-| **Diao et al. (2026)** [@diao2026turbofan] | C-MAPSS FD001/003 | LSTM-QR | Conformal (CQR) | Split Conformal | None (Marginal only) | None | No | No |
-| **Walia & Kumar (2026)** [@walia2026uncertainty] | C-MAPSS FD001 | Bayesian Bi-LSTM | MC Dropout | None (Heuristic) | Qualitative | PPO RL Scheduler | **Yes (RL Reward)** | Partial (Gym) |
-| **Xu et al. (2026)** [@xu2026novel] | C-MAPSS FD001-004 | TCN Ensemble | Ensemble Variance | Isotonic Scaling | Brief (3 stages) | None | No | No |
-| **Yang et al. (2026)** [@yang2026empirical] | Bearing data | Bayesian NN | Group Conformal | Group Conformal | **Yes (Regimes)** | None | No | No |
-| **Javanmardi & Hüllermeier (2023)** [@javanmardi2023conformal] | C-MAPSS FD001-004 | CNN/LSTM/GBDT | Split Conformal | Standard ICP | Trajectory plot | None | No | No |
-
-#### The Missing Methodological Intersection
-Cross-referencing the closest literature reveals a clear structural bifurcation:
-1. **The Prognostic Calibration Camp** (Javanmardi & Hüllermeier 2023; Diao et al. 2026; Xu et al. 2026): Focuses exclusively on algorithmic statistical coverage (PICP, MPIW, ECE) on C-MAPSS. They validate marginal coverage, but do not evaluate conditional coverage across wear stages or regime shifts, and **completely omit downstream maintenance decision models**.
-2. **The Maintenance Decision Camp** (Chen et al. 2022; Zhu et al. 2025; Walia & Kumar 2026): Formulates sophisticated cost-rate optimization, lower-bound replacement rules, or reinforcement learning schedulers. However, they rely on **uncalibrated or heuristic uncertainty** (parametric Gaussian GPR, raw uncalibrated quantiles, or uncalibrated MC Dropout variance).
-3. **The Digital Twin Camp** (Wu et al. 2026; Hasan & Crawford 2025; Wei 2024): Builds telemetry synchronization and visualization twins, but relies strictly on **point predictions** without prediction intervals or calibrated risk bounds.
+### Theme 9: Maintenance Cost and Asymmetric Loss Interpretation
+Asymmetric evaluation of RUL prediction error $d = \text{predicted RUL} - \text{true RUL}$ reflects operational maintenance reality:
+- For $d = \text{predicted RUL} - \text{true RUL}$: $d < 0$ means underestimating remaining life, producing an early/conservative prediction; $d > 0$ means overestimating remaining life, producing an optimistic prediction that risks late intervention; $d = 0$ is exact.
 
 ---
 
-### Theme 11: Threats to Novelty and Candidate Research Gap
+### Theme 10: Closest Work Comparison Matrix
 
-#### Defeated Novelty Claims (What IntelliTwin CANNOT Claim)
-The literature review decisively disproves that any of the following claims are novel:
-- ❌ *"First framework to combine AI with Digital Twins for predictive maintenance"* — Disproved by Huang et al. (2021), Hasan & Crawford (2025), and Wei (2024).
-- ❌ *"First to predict Remaining Useful Life on C-MAPSS inside a Digital Twin"* — Disproved by Wu et al. (2026).
-- ❌ *"First to apply conformal prediction intervals to C-MAPSS turbofans"* — Disproved by Javanmardi & Hüllermeier (2023) and Diao et al. (2026).
-- ❌ *"First to use RUL prediction intervals for aero-engine maintenance scheduling"* — Disproved by Zhu et al. (2025) and Chen et al. (2022).
-- ❌ *"First to optimize predictive maintenance costs under uncertainty"* — Disproved by Chen et al. (2022) and Walia & Kumar (2026).
+Table 1 summarizes the primary characteristics of verified closest works:
 
-#### The Defensible Candidate Research Gap
-In light of the synthesized evidence, our candidate research gap is formulated with scientific precision:
+| Study | Benchmark / Dataset | Primary Method / Model | UQ / Calibration | Maintenance / Decision Evaluation | Peer Review / Access Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Wu et al. (2026)** [@wu2026research] | CS2_35 battery lab data | Ensemble (RVM, RF, ElasticNet, AR, LSTM) | Future work | Digital Twin platform | Peer-reviewed (Sensors) |
+| **Chen et al. (2022)** [@chen2022data] | Not verified in current audit | Not verified in current audit | Not verified in current audit | Predictive maintenance under uncertainty | Peer-reviewed (Neurocomputing) |
+| **Zhu et al. (2025)** [@zhu2025predictive] | Aero-engine data (C-MAPSS identified) | Deep learning prediction intervals | Monte Carlo dropout intervals | Maintenance-cost optimization | Peer-reviewed (QREI) |
+| **Diao et al. (2026)** [@diao2026turbofan] | C-MAPSS FD001, FD002 | LSTM Quantile Regression + CQR | Conformal calibration (CQR) | Upstream of full prescriptive optimization | Peer-reviewed (Sensors) |
+| **Walia & Kumar (2026)** [@walia2026uncertainty] | NASA turbofan engine data | Quantile regression with CNN/GRU | Quantile regression | PPO maintenance scheduling | Peer-reviewed (RESS) |
+| **Xu et al. (2026)** [@xu2026novel] | Not verified in current audit | Not verified in current audit | Not verified in current audit | Not verified in current audit | Peer-reviewed (RESS) |
+| **Yang et al. (2026)** [@yang2026empirical] | Ten-bearing PHME subset | Predictive representation & empirical calibration | Post-hoc regime-conditioned diagnostic | Retrospective maintenance triggers | Preprint (arXiv:2607.08273) |
+| **Javanmardi & Hüllermeier (2023)** [@javanmardi2023conformal] | NASA C-MAPSS | CNN and Gradient Boosting | Split conformal prediction | None | Peer-reviewed (IJPHM) |
+| **Yan (2026)** [@yan2026audit] | NASA C-MAPSS | Conformal prediction intervals | Conformal calibration | Maintenance-cost evaluation | Zenodo Software Artifact |
+| **Robinson (2026)** [@robinson2026riskaware] | C-MAPSS FD001-FD004 | Gradient boosting & asymmetric CQR | Asymmetric CQR conformal calibration | Risk-aware prediction intervals | Peer-reviewed (IJPHM) |
+| **BenAbdennour (2026)** [@benabdennour2026grouped] | Engine, battery & bearing data | Grouped validation | Interval-safety calibration | Urgent/critical safety diagnostics | Peer-reviewed (Machines) |
 
-> **Candidate Research Gap Statement**:  
-> *"Existing prognostic frameworks either validate distribution-free prediction interval calibration purely through aggregate statistical metrics without measuring downstream decision impacts, or they optimize maintenance decision policies under uncalibrated, parametric uncertainty assumptions that fail under operating regime shifts.  
-> An underexplored intersection is the empirical relationship between conditional RUL calibration failures (specifically across discrete degradation stages and operating regimes) and their measurable downstream maintenance-decision consequences (quantified via catastrophic late-intervention penalties and premature replacement waste) within an operational Digital Twin synchronization framework."*
+---
+
+### Theme 11: Reassessment of Research Gap
+
+Prior work already includes conformal RUL prediction, life-stage and operating-regime diagnostics, and maintenance-related evaluation. The present evidence does not establish conditional calibration plus maintenance decisions as a novel contribution. IntelliTwin’s research gap is under reassessment following corrections to the closest-work comparison. A possible next direction is a controlled replication and extension examining sequential decisions, information availability, and replacement conservatism; its originality is not yet established.
 
 ---
 
 ## 3. Audit of Unverified Leads and Exclusions
 
-In accordance with Tasks 4 and 5:
-
 1. **Osama Taha (2026 Thesis Lead)**:
    - *Title*: "Decision-Oriented Predictive Maintenance: Calibrated RUL Uncertainty and Cost-Based Maintenance Policy Simulation"
-   - *Attributed Institution*: Egypt-Japan University of Science and Technology (E-JUST)
-   - *Audit Findings*: The document is found exclusively on commercial document-reposting websites (Scribd). Searches of the official E-JUST institutional repository (`ejust.edu.eg`), academic library catalogs, and indexed thesis databases yielded zero records.
-   - *Governance Action*: Documented strictly as an **unverified research lead**. It is excluded from `paper/references.bib` and not treated as validated scholarly evidence. Novelty claims are never built upon or contrasted against unverified internet documents.
+   - *Audit Findings*: Kept as an unresolved lead. Document exists on Scribd; no record found in E-JUST institutional repository or indexed scholarly sources. Do not call nonexistent or fabricated.
 
-2. **Hong Yan (2026 Software / Paper Lead)**:
-   - *Title*: "Conformal prediction intervals for turbofan remaining useful life: an audit across operating regimes"
-   - *Attributed Identifier*: DOI `10.5281/zenodo.21330745`
-   - *Audit Findings*: Direct programmatic query to `https://doi.org/10.5281/zenodo.21330745` returns HTTP 404 (Not Found). Crossref, Zenodo search APIs, and scholarly indexes locate no corresponding paper or code repository.
-   - *Governance Action*: Documented in `research/literature/screening_log.csv` as **Excluded (Artifact Not Found)**. Excluded from master bibliography.
+2. **Hong Yan (2026 Software Artifact)**:
+   - *Title*: "Conformal prediction intervals for turbofan remaining useful life: an audit across operating regimes (code and run artifacts)"
+   - *Audit Findings*: Included—software artifact; deposit and selected archive files inspected in the supplied audit (Zenodo DOI 10.5281/zenodo.21330745). Corresponding peer-reviewed publication not verified.
 
 ---
 
 ## 4. Methodological Implications for Subsequent Phases
 
-This literature synthesis directly dictates the design of subsequent research phases:
-
 1. **Phase 2 (Gap, Questions, and Hypotheses Formalization)**:
-   - Refine provisional RQ1–RQ4 to test the specific candidate gap: quantifying conditional miscalibration across C-MAPSS wear stages (FD001–FD004) and proving whether conformal calibration prevents downstream maintenance cost inflation.
-2. **Phase 3 (Dataset Study & Leak-Free Protocol)**:
-   - Mandate strict engine-level isolation during calibration holdout. Conformal calibration splits must preserve complete engine trajectories to prevent temporal leakage.
+   - Existing v1 research questions and hypothesis framework thresholds are preserved, but their novelty justification requires revision after the corrected literature comparison.
+2. **Phase 3 (Dataset Study & Protocol)**:
+   - Enforce strict engine-isolated cross-validation and calibration splits.
 3. **Phase 5 & 6 (Baseline Benchmarks & Proposed Model)**:
-   - Implement point baselines (Wu et al., 2026 stack) and raw quantile baselines (Diao et al., 2026; Zhu et al., 2025) as direct experimental comparators.
+   - Benchmark point predictors, quantile regression baselines, and conformalized models against verified comparators.
 4. **Phase 7 (Uncertainty & Decision Experiments)**:
-   - Evaluate both aggregate marginal coverage and stage-stratified conditional coverage. Map prediction lower bounds into an asymmetric maintenance cost model following Chen et al. (2022) and Saxena et al. (2008).
+   - Evaluate marginal and conditional coverage metrics alongside maintenance cost functions using Saxena et al. (2008) asymmetric error score interpretations.
 5. **Phase 9 (Digital Twin Software Layer)**:
-   - Embed calibrated prediction intervals and maintenance alert states into the bi-directional digital twin telemetry stream, fulfilling the open challenge identified by Huang et al. (2021) and Mousavi et al. (2024).
+   - Connect calibrated prediction intervals and risk states into the Digital Twin streaming framework.

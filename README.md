@@ -24,6 +24,8 @@ The project prioritizes **scientific rigor, statistical validity, and reproducib
 
 ## 2. Research Questions and Direction (Version 1)
 
+> **Evidence status**: Under reassessment. Existing v1 research questions are preserved, but their novelty justification requires revision after the corrected literature comparison.
+
 Following the Phase 1 Systematic Literature Review, the core research gap and RQ1 have been formally formulated and locked for the current research iteration:
 
 - **Research Gap v1**: Although recent turbofan prognostic studies provide well-calibrated prediction intervals, evaluation remains dominated by aggregate marginal metrics, concealing potential conditional miscalibration across degradation stages and operating regimes.

@@ -17,6 +17,8 @@ In industrial prognostic health management (PHM) and digital twin frameworks for
 
 ### 1.2 Approved Research Gap Statement (Version 1)
 
+> **Evidence status**: Under reassessment. Existing v1 research questions are preserved, but their novelty justification requires revision after the corrected literature comparison.
+
 > **Although recent turbofan prognostic studies provide well-calibrated and increasingly risk-aware RUL prediction intervals, their evaluation remains dominated by aggregate or marginal reliability metrics. Related prognostic research demonstrates that such aggregate calibration can conceal severe conditional undercoverage under changing degradation states or operating regimes. The operational significance of this conditional miscalibration—particularly its effect on late maintenance, premature intervention, wasted useful life, failure risk, and maintenance cost—remains insufficiently characterized for turbofan RUL decision support.**
 
 ---

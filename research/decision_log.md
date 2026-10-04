@@ -106,7 +106,28 @@ This log documents formal architectural, methodological, and research governance
   - Exact degradation-stage boundary cutoffs
   - Exact operating-regime identification algorithm
   - Exact statistical test package
+---
+
+### ADR-005: Systematic Reassessment of Research Gap and Literature Evidence Base Following Source Audit
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - A thorough source audit of external literature entries revealed inaccuracies in bibliographic metadata, unverified methodological details, and omitted closest-work comparators in earlier tracking files.
+  - Correcting these entries against verified publisher records, arXiv, Zenodo, IJPHM, and MDPI established that prior literature already includes conformal RUL prediction, life-stage and operating-regime diagnostics, and maintenance-related evaluation.
+- **Alternatives Considered**:
+  1. *Proceeding with pre-specified gap and novelty claims unchanged*: Rejected. Maintaining claims of novelty after discovering prior art would violate scientific integrity.
+  2. *Reassessing evidence status while preserving locked v1 research questions*: Accepted. Setting evidence status to "Under reassessment", updating source verification registers, and preserving v1 hypothesis structures ensures systematic, honest evaluation without prematurely jumping to v2 before experiment execution.
+- **Evidence Reviewed**:
+  - Verified source audit of 26 bibliographic references in `paper/references.bib`, `research/literature/source_verification.csv`, `research/literature/evidence_corrections.md`, and updated `closest_work_matrix.csv`.
+- **Decision Rationale**:
+  - Source corrections invalidate the prior claim that conditional calibration plus maintenance decisions is a novel, unstudied gap. Reassessing the gap before conducting experiments preserves scientific integrity.
+- **Expected Implications**:
+  - `CLM-05` status changed to "Under reassessment" in `paper/claims_evidence_matrix.csv`.
+  - Evidence status note added to `README.md`, `research/phase-2/research_gap_rq1_hypothesis.md`, and `research/research_questions.md`.
+  - Literature tracking files, metric interpretations, and source verification registers updated to exact verified facts.
 - **Follow-up Review Date / Trigger**:
-  - Upon completion of Phase 3 (Dataset Study & Data Protocol Formulation) prior to model training in Phase 5.
+  - Prior to initiating Phase 5/6 model development or Phase 7 experiments.
+
 
 

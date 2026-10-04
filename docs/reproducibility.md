@@ -37,8 +37,8 @@ To prevent ambiguity, the following canonical metrics are mandated across all co
 1. **Root Mean Squared Error (RMSE)**:
    $$\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2}$$
 2. **PHM 2008 Asymmetric Scoring Function**:
-   $$S = \sum_{i=1}^{N} s_i, \quad s_i = \begin{cases} e^{-\frac{d_i}{13}} - 1 & \text{for } d_i < 0 \text{ (late prediction)} \\ e^{\frac{d_i}{10}} - 1 & \text{for } d_i \ge 0 \text{ (early prediction)} \end{cases}$$
-   where $d_i = \hat{y}_i - y_i$. Late predictions are penalized more severely than early warnings.
+   $$S = \sum_{i=1}^{N} s_i, \quad s_i = \begin{cases} e^{-\frac{d_i}{13}} - 1 & \text{for } d_i < 0 \\ e^{\frac{d_i}{10}} - 1 & \text{for } d_i \ge 0 \end{cases}$$
+   where $d_i = \text{predicted RUL} - \text{true RUL}$. For $d = \text{predicted RUL} - \text{true RUL}$: $d < 0$ means underestimating remaining life, producing an early/conservative prediction; $d > 0$ means overestimating remaining life, producing an optimistic prediction that risks late intervention; $d = 0$ is exact. Optimistic predictions ($d > 0$) that risk late intervention are penalized more severely ($e^{d/10} - 1$) than conservative early predictions ($d < 0$, $e^{-d/13} - 1$).
 3. **Prediction Interval Coverage Probability (PICP)**:
    $$\text{PICP} = \frac{1}{N} \sum_{i=1}^{N} \mathbb{I}(y_i \in [\hat{L}_i, \hat{U}_i])$$
 4. **Mean Prediction Interval Width (MPIW)**:
