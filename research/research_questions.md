@@ -1,86 +1,74 @@
-# Phase 2 Formal Research Questions and Hypotheses (Version 1)
+# Formal Research Questions and Hypotheses
 
 > **Important Notice on Scientific Status**:
-> Following the Phase 1 Literature Review, Research Gap v1 and RQ1–RQ4 have been formally formulated and locked for the current research iteration.
+> Research Gap and RQ1–RQ4 have been formally formulated and locked for the research project.
 > 
 > **Governance Status Policy**: **Locked for the current research iteration, but subject to revision if later evidence or methodological constraints invalidate the formulation.**
 > 
-> "Locked" indicates pre-specification prior to experimental testing to prevent post-hoc hypothesis redefinition based on favorable results. It does NOT mean research questions can never be revised if foundational assumptions are invalidated.
+> "Locked" indicates pre-specification prior to experimental testing to prevent post-hoc hypothesis redefinition based on favorable results.
 > 
-> Detailed Phase 2 formulation, metrics, target leakage constraints, and falsification criteria are recorded in [`research/phase-2/research_gap_rq1_hypothesis.md`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/research/phase-2/research_gap_rq1_hypothesis.md) and [`research/phase-2/experiment_map.md`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/research/phase-2/experiment_map.md).
+> Detailed research formulation, metrics, target leakage constraints, and falsification criteria are recorded in [`research/research_design/research_gap.md`](research_design/research_gap.md), [`research/hypotheses/hypothesis_framework.yaml`](hypotheses/hypothesis_framework.yaml), and [`research/research_design/experiment_map.md`](research_design/experiment_map.md).
 
 ---
 
-## Approved Research Gap (Version 1)
+## Final Research Problem Statement
 
-> **Evidence status**: Under reassessment. Existing v1 research questions are preserved, but their novelty justification requires revision after the corrected literature comparison.
-
-> **Although recent turbofan prognostic studies provide well-calibrated and increasingly risk-aware RUL prediction intervals, their evaluation remains dominated by aggregate or marginal reliability metrics. Related prognostic research demonstrates that such aggregate calibration can conceal severe conditional undercoverage under changing degradation states or operating regimes. The operational significance of this conditional miscalibration—particularly its effect on late maintenance, premature intervention, wasted useful life, failure risk, and maintenance cost—remains insufficiently characterized for turbofan RUL decision support.**
+> **Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.**
 
 ---
 
 ## Formal Research Questions and Hypotheses
 
-### Research Question 1 (RQ1: Conditional RUL Interval Reliability)
+### Research Question 1 (RQ1)
 
-- **Status**: **Locked / Provisional v1** (Pre-specified prior to experiments)
-- **Question**: *To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?*
-- **Theoretical Basis**:
-  - *Marginal Calibration*: $P(Y \in C(X)) \approx 1-\alpha$ evaluated across the entire fleet dataset.
-  - *Conditional Reliability*: $P(Y \in C(X) \mid G=g) \approx 1-\alpha$ evaluated for specific subgroups $G=g$ (e.g., degradation stages or operating regimes).
-  - Satisfactory marginal coverage over an entire test fleet does not imply reliable subgroup coverage.
+- **Status**: **Locked**
+- **Question**: *Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?*
 - **Null Hypothesis ($H_{0,1}$)**:
-  > Once nominal marginal calibration has been achieved, RUL prediction-interval coverage does not exhibit practically or statistically meaningful differences across degradation stages or operating regimes.
-  $$\forall g \in \mathcal{G}, \quad P(Y \in C(X) \mid G=g) \approx 1-\alpha$$
+  > The proposed method does not significantly improve maintenance utility over standard global or condition-aware calibration while maintaining comparable coverage.
 - **Alternative Hypothesis ($H_{1,1}$)**:
-  > RUL prediction intervals that satisfy nominal marginal coverage exhibit systematic conditional coverage deviations across one or more degradation stages or operating regimes.
-  $$\exists g \in \mathcal{G} : \left| P(Y \in C(X) \mid G=g) - (1-\alpha) \right| > \delta$$
-  *(Note: $\delta > 0$ represents a pre-specified practical calibration tolerance to be fixed prior to final hypothesis testing).*
-- **Primary Experimental Evaluation**: RQ1 will initially be evaluated through **Experiment A — Conditional Reliability Audit** (detailed protocol defined in [`research/phase-2/experiment_a_design.md`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/research/phase-2/experiment_a_design.md)).
+  > The proposed method improves maintenance utility over standard global and condition-aware calibration while maintaining the required coverage reliability.
+- **Primary Experimental Evaluation**: **Experiment A** — Evaluate the proposed decision-aware, condition-adaptive conformal RUL calibration method against global conformal calibration and standard condition-aware calibration baselines.
 
 ---
 
-### Research Question 2 (RQ2: Condition-Aware Calibration Efficacy)
+### Research Question 2 (RQ2)
 
-- **Status**: **Locked / Provisional v1** (Pre-specified prior to experiments)
-- **Question**: *Can condition-aware calibration methods improve worst-group RUL reliability across degradation stages and operating regimes without making prediction intervals excessively wide?*
+- **Status**: **Locked**
+- **Question**: *Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?*
 - **Null Hypothesis ($H_{0,2}$)**:
-  > Condition-aware calibration does not meaningfully improve worst-group RUL reliability compared with global calibration, or any apparent reliability improvement is achieved primarily through excessively wider prediction intervals.
+  > The proposed method does not improve worst-group or conditional coverage, or any improvement is primarily obtained through substantially wider intervals.
 - **Alternative Hypothesis ($H_{1,2}$)**:
-  > Condition-aware calibration improves worst-group RUL reliability and reduces conditional calibration error compared with global calibration while maintaining practically useful prediction-interval sharpness.
-- **Candidate Metrics**: Worst-Group Coverage ($WGC$), Conditional Coverage Error ($CE_g$), Maximum Conditional Calibration Gap ($MCG$), $PICP$, $MPIW$, normalized interval width (if justified later), Interval Score.
+  > The proposed method improves worst-group or conditional coverage while maintaining practically useful interval sharpness.
+- **Primary Experimental Evaluation**: **Experiment B** — Evaluate whether the proposed method improves conditional coverage and worst-group reliability without making prediction intervals excessively wide.
 
 ---
 
-### Research Question 3 (RQ3: Maintenance Decision Utility)
+### Research Question 3 (RQ3)
 
-- **Status**: **Locked / Provisional v1** (Pre-specified prior to experiments)
-- **Question**: *Do improvements in conditional RUL calibration lead to better maintenance decisions than point-estimate and globally calibrated maintenance policies?*
+- **Status**: **Locked**
+- **Question**: *Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?*
 - **Null Hypothesis ($H_{0,3}$)**:
-  > Improvements in conditional RUL calibration do not produce practically meaningful improvements in downstream maintenance outcomes compared with point-estimate or globally calibrated policies.
+  > Any maintenance improvement can be matched by simpler conservative baselines such as widened intervals or safety margins.
 - **Alternative Hypothesis ($H_{1,3}$)**:
-  > Improved conditional RUL calibration produces better downstream maintenance outcomes by reducing late interventions and failure risk while limiting premature maintenance, wasted useful life, and total maintenance cost.
-- **Candidate Decision Metrics**: Late interventions, failure events / missed safe-intervention opportunities, premature maintenance, wasted Remaining Useful Life, intervention lead time, preventive maintenance frequency, total simulated maintenance cost, failure-related cost, premature-replacement cost, decision utility / risk-adjusted cost (if later justified).
+  > The proposed method provides maintenance improvements beyond those achievable through matched-conservatism baselines, demonstrating useful decision information rather than simple over-conservatism.
+- **Primary Experimental Evaluation**: **Experiment C** — Evaluate decision-value attribution by comparing the proposed method against matched-conservatism baselines, widened intervals, point-prediction safety margins, and earlier-intervention conservative policies.
 
 ---
 
-### Research Question 4 (RQ4: Robustness and Generalization)
+### Research Question 4 (RQ4)
 
-- **Status**: **Locked / Provisional v1** (Pre-specified prior to experiments)
-- **Question**: *Are the observed conditional calibration failures and their maintenance-decision consequences consistent across different operating conditions, fault modes, base RUL models, and random seeds?*
+- **Status**: **Locked**
+- **Question**: *Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?*
 - **Null Hypothesis ($H_{0,4}$)**:
-  > The observed conditional calibration and maintenance-decision effects are not robust and depend strongly on a particular dataset, model architecture, operating condition, fault mode, or random seed.
+  > The observed benefits are specific to particular datasets, operating conditions, model families, or random seeds.
 - **Alternative Hypothesis ($H_{1,4}$)**:
-  > The principal conditional calibration and maintenance-decision findings persist across multiple operating conditions, fault modes, base RUL models, and repeated experimental runs.
-- **Potential Robustness Dimensions**: C-MAPSS subsets, single-condition vs multi-condition datasets, different fault-mode complexity, multiple base RUL predictors, multiple random seeds, potentially different calibration constructions.
+  > The principal reliability and maintenance-utility improvements persist across multiple operating conditions, model families, datasets, and repeated experimental runs.
+- **Primary Experimental Evaluation**: **Experiment D** — Evaluate whether the main calibration and maintenance decision benefits remain robust across operating conditions, base RUL model families, datasets, and repeated random seeds/runs.
 
 ---
 
-## Revision Protocol
+## Authoritative Registry & Reference
 
-1. All research questions (RQ1–RQ4) and hypotheses ($H_{0,1}$–$H_{0,4}$ / $H_{1,1}$–$H_{1,4}$) are pre-specified and locked prior to model development and experiments.
-2. Every hypothesis maps strictly to pre-specified statistical metrics, unit-of-independence constraints, and falsification criteria.
-3. If empirical evaluation in Experiment A does not reveal meaningful conditional reliability failure, Experiments B and C will be formally reconsidered rather than executed unchanged.
-4. All architectural and methodological decisions are logged in [`research/decision_log.md`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/research/decision_log.md).
-
-
+The authoritative source of truth for all hypotheses, planned comparisons, and experimental mappings is:
+- [`research/hypotheses/hypothesis_framework.yaml`](hypotheses/hypothesis_framework.yaml)
+- [`research/hypotheses/hypothesis_framework.tex`](hypotheses/hypothesis_framework.tex)

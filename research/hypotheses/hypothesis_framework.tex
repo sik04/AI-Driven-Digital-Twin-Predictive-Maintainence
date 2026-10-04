@@ -1,0 +1,98 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\title{IntelliTwin Authoritative Hypothesis Registry}
+\author{Mayank Singh \and Shiksha Pandey \and Ruchi Gupta}
+\date{October 4, 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This document presents the formal academic rendering of the IntelliTwin hypothesis framework. 
+\textbf{Note:} The structured YAML specification in \texttt{research/hypotheses/hypothesis\_framework.yaml} serves as the canonical, authoritative source of truth for all hypothesis definitions, metrics, and experimental mappings.
+\end{abstract}
+
+\section*{Governance Rule on Success Criteria}
+
+\begin{quote}
+We will discard the old 5\%, 10\%, 15\%, and 75\% thresholds unless independently justified, and define for each RQ a pre-specified primary metric, comparator, practical effect threshold, and statistical uncertainty rule that classifies results as supported, unsupported, or inconclusive before confirmatory testing.
+\end{quote}
+
+\section*{Research Problem Statement}
+
+\begin{quote}
+Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.
+\end{quote}
+
+\section*{Formal Research Questions and Hypotheses}
+
+\subsection*{Research Question 1: Sequential Maintenance Utility and Coverage Reliability}
+\begin{description}[style=multiline,leftmargin=3.5cm]
+  \item[Status:] Locked
+  \item[Experiment:] \textbf{Experiment A}
+  \item[Question:] Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?
+  \item[Null ($H_{0,1}$):] The proposed method does not significantly improve maintenance utility over standard global or condition-aware calibration while maintaining comparable coverage.
+  \item[Alt ($H_{1,1}$):] The proposed method improves maintenance utility over standard global and condition-aware calibration while maintaining the required coverage reliability.
+  \item[Purpose:] Evaluate whether decision-aware, condition-adaptive conformal calibration improves downstream sequential maintenance outcomes while maintaining target interval coverage.
+  \item[Comparison:] Proposed method vs. standard global conformal calibration and standard condition-aware conformal calibration.
+\end{description}
+
+\subsection*{Research Question 2: Conditional Reliability and Interval Sharpness}
+\begin{description}[style=multiline,leftmargin=3.5cm]
+  \item[Status:] Locked
+  \item[Experiment:] \textbf{Experiment B}
+  \item[Question:] Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?
+  \item[Null ($H_{0,2}$):] The proposed method does not improve worst-group or conditional coverage, or any improvement is primarily obtained through substantially wider intervals.
+  \item[Alt ($H_{1,2}$):] The proposed method improves worst-group or conditional coverage while maintaining practically useful interval sharpness.
+  \item[Purpose:] Audit subgroup reliability across operating regimes and wear stages to verify coverage safety without sacrificing interval efficiency.
+  \item[Comparison:] Reliability and sharpness of proposed method vs. relevant global and condition-aware calibration baselines.
+\end{description}
+
+\subsection*{Research Question 3: Decision-Value Attribution vs. Matched-Conservatism Baselines}
+\begin{description}[style=multiline,leftmargin=3.5cm]
+  \item[Status:] Locked
+  \item[Experiment:] \textbf{Experiment C}
+  \item[Question:] Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?
+  \item[Null ($H_{0,3}$):] Any maintenance improvement can be matched by simpler conservative baselines such as widened intervals or safety margins.
+  \item[Alt ($H_{1,3}$):] The proposed method provides maintenance improvements beyond those achievable through matched-conservatism baselines, demonstrating useful decision information rather than simple over-conservatism.
+  \item[Purpose:] Disambiguate true decision-aware calibration utility from trivial interval expansion or naive early intervention.
+  \item[Comparison:] Proposed method vs. matched-width widened global intervals, fixed safety-margin heuristic policies, and conservative point-prediction rules.
+\end{description}
+
+\subsection*{Research Question 4: Robustness and Generalization}
+\begin{description}[style=multiline,leftmargin=3.5cm]
+  \item[Status:] Locked
+  \item[Experiment:] \textbf{Experiment D}
+  \item[Question:] Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?
+  \item[Null ($H_{0,4}$):] The observed benefits are specific to particular datasets, operating conditions, model families, or random seeds.
+  \item[Alt ($H_{1,4}$):] The principal reliability and maintenance-utility improvements persist across multiple operating conditions, model families, datasets, and repeated experimental runs.
+  \item[Purpose:] Verify that calibration and maintenance utility improvements generalize across varied architectures, datasets, and stochastic runs.
+  \item[Comparison:] Evaluation across C-MAPSS subsets, distinct base predictors (recurrent, gradient boosted), and multiple random seeds.
+\end{description}
+
+\section*{Summary Matrix}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{p{1.2cm} p{2.2cm} p{4.8cm} p{4.8cm} p{1.2cm}}
+\toprule
+\textbf{ID} & \textbf{Experiment} & \textbf{Core Question} & \textbf{Key Evaluation Focus} & \textbf{Status} \\
+\midrule
+\textbf{RQ1} & Experiment A & Decision-aware calibration utility & Maintenance cost/utility under coverage validity & Locked \\
+\textbf{RQ2} & Experiment B & Subgroup reliability \& sharpness & Worst-group coverage ($WGC$) \& width ($MPIW$) & Locked \\
+\textbf{RQ3} & Experiment C & Decision-value attribution & Matched-conservatism baseline comparisons & Locked \\
+\textbf{RQ4} & Experiment D & Robustness \& generalization & Multi-dataset, multi-architecture, multi-seed & Locked \\
+\bottomrule
+\end{tabular}
+\caption{Overview of IntelliTwin Formal Research Questions, Experiment Mapping, and Evaluation Focus.}
+\end{table}
+
+\end{document}

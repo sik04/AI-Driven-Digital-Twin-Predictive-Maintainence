@@ -129,5 +129,88 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Prior to initiating Phase 5/6 model development or Phase 7 experiments.
 
+---
+
+### ADR-006: Final Research Problem Formulation — Measuring Decision Value of Condition-Aware Calibration
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the literature source corrections and closest-work audit, the research direction was refined to focus on evaluating whether condition-aware calibration provides measurable maintenance-decision value beyond global calibration and simple conservative point-prediction policies under identical experimental controls.
+- **Alternatives Considered**:
+  1. *Framing novelty on detecting conditional miscalibration alone*: Rejected. Literature shows conditional calibration has been audited in bearings and turbofans.
+  2. *Refining research problem to decision-value comparison*: Adopted. Centers the research problem on whether condition-aware calibration provides measurable maintenance-decision value beyond global calibration and simple conservative point-prediction policies, when compared under the same predictor, data protocol, and sequential maintenance setting.
+- **Evidence Reviewed**:
+  - Synthesized evidence across closest works in `research/literature/closest_work_matrix.csv` and `research/literature/literature_synthesis.md`.
+- **Decision Rationale**:
+  - Establishes a clear, controlled comparative scientific framework evaluating decision utility across point, global, and condition-aware calibration baselines under identical predictor and data protocol controls.
+- **Expected Implications**:
+  - Research problem statement updated consistently across `research/research_design/research_gap.md`, `research/research_questions.md`, `README.md`, and `paper/claims_evidence_matrix.csv`.
+  - Hypotheses, RQs, and experimental protocols remain locked.
+- **Follow-up Review Date / Trigger**:
+  - At the conclusion of Phase 2 final synthesis.
+
+---
+
+### ADR-007: Shift of Primary Contribution to Decision-Aware Condition-Adaptive Conformal Calibration Method
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - A systematic audit of closest-work literature demonstrated that conditional RUL reliability analysis, regime/condition-aware conformal calibration, and uncertainty-aware maintenance decision support already exist separately or in partial combinations.
+  - Asserting novelty solely on detecting conditional miscalibration or showing marginal coverage masks subgroup failure is scientifically unsupportable.
+  - The strongest remaining research opportunity is the controlled method-level integration of condition-aware conformal calibration with downstream sequential maintenance utility while preserving subgroup coverage reliability.
+- **Alternatives Considered**:
+  1. *Claiming novelty on conditional-miscalibration detection alone*: Rejected. Subgroup coverage diagnostics have been studied in bearing prognostics (Yang et al. 2026) and turbofan life stages (Diao et al. 2026).
+  2. *Shifting primary contribution to method-level integration (Selected Approach)*: Adopted. Target a decision-aware, condition-adaptive conformal calibration method for RUL prediction that explicitly incorporates sequential maintenance utility while preserving reliable conditional uncertainty coverage.
+- **Evidence Reviewed**:
+  - Closest-work comparison matrix (`research/literature/closest_work_matrix.csv`), contribution statement (`research/research_design/contribution_statement.md`), and updated literature synthesis.
+- **Governance Declarations**:
+  - Previous research questions and hypotheses were revised prior to confirmatory model development, training, or experiments.
+  - No final experimental results were used to choose the new research direction.
+  - The change resulted strictly from systematic closest-work and literature reassessment.
+  - Novelty is treated as a cautious, evidence-based claim dependent on closest-work audit completeness, rather than an absolute fact.
+- **Expected Implications**:
+  - Research questions RQ1–RQ4 and hypotheses $H_{0,1}$–$H_{1,4}$ updated to reflect proposed method evaluation, subgroup reliability, decision-value attribution against matched-conservatism baselines, and multi-setting robustness.
+  - Hypothesis framework registry updated in `research/hypotheses/hypothesis_framework.yaml` and `research/hypotheses/hypothesis_framework.tex`.
+  - Contribution statement created in `research/research_design/contribution_statement.md`.
+- **Follow-up Review Date / Trigger**:
+  - At Phase 2 completion milestone.
+
+---
+
+### ADR-008: Establishment of Governance Rule for Hypothesis Success Criteria and Removal of Arbitrary Fixed Thresholds
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Earlier provisional hypothesis formulations included fixed numerical thresholds (e.g., 5%, 10%, 15%, 75%) as practical effect criteria.
+  - Pre-specification alone does not make an arbitrary threshold scientifically valid. Fixed numerical thresholds without empirical or operational grounding introduce arbitrary bias into hypothesis evaluation.
+- **Alternatives Considered**:
+  1. *Retaining fixed numerical thresholds (5%, 10%, 15%, 75%)*: Rejected. Lacks engineering, operational, or statistical justification for turbofan sequential maintenance utility.
+  2. *Establishing a Success-Criteria Governance Rule (Selected Approach)*: Adopted. Discard fixed numerical thresholds until independently justified, and establish a governance rule requiring pre-specified primary metrics, comparators, practical effect thresholds, and statistical uncertainty rules for each RQ prior to confirmatory testing.
+- **Evidence Reviewed**:
+  - Governance standards on pre-specified hypothesis testing, effect-size justification in industrial PHM, and statistical decision theory.
+- **Decision Rationale**:
+  - Pre-specifying a rule structure (primary metric, comparator, practical effect threshold, statistical uncertainty rule, supported/unsupported/inconclusive outcomes) ensures scientific rigor while preventing arbitrary threshold selection.
+- **Governance Declarations**:
+  - No final experimental results have been inspected.
+  - Replacement criteria and numerical thresholds will be fixed prior to confirmatory experiments during Phase 3–4 protocol definition.
+  - Each RQ must ultimately have:
+    1. Primary metric
+    2. Comparator
+    3. Practical effect threshold
+    4. Uncertainty / statistical rule
+    5. Supported outcome rule
+    6. Unsupported outcome rule
+    7. Inconclusive outcome rule
+- **Expected Implications**:
+  - Obsolete fixed thresholds removed from active research documentation (`hypothesis_framework.yaml`, `hypothesis_framework.tex`, `research_questions.md`, `experiment_map.md`, `experiment_a_design.md`).
+  - Success criteria sections created in `hypothesis_framework.yaml` with TBD placeholders to be populated in Phase 3–4.
+- **Follow-up Review Date / Trigger**:
+  - Phase 3–4 experimental protocol finalization prior to model training.
+
+
+
 
 

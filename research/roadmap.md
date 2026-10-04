@@ -67,18 +67,22 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 2: Research Gap, Questions, Hypotheses, and Contributions
-- **Status**: In Progress (Research Gap v1, RQ1 v1, H0_1/H1_1 locked)
-- **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, and state expected scientific contributions.
+- **Status**: In Progress
+- **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, state expected scientific contributions, and establish hypothesis governance rules.
 - **Expected Deliverables**:
-  - Detailed Phase 2 formulation in `research/phase-2/research_gap_rq1_hypothesis.md`.
-  - Updated `research_questions.md` with locked RQ1 v1 and pre-specified hypotheses ($H_{0,1}$ / $H_{1,1}$).
-  - Documented ADR-002 in `research/decision_log.md`.
-  - Author-aligned contributions matrix and claims evidence mapping (`paper/claims_evidence_matrix.csv`).
+  - Finalized central research problem / gap statement in `research/research_design/research_gap.md`.
+  - Finalized RQ1–RQ4 and pre-specified hypotheses ($H_{0,1}$–$H_{1,4}$) in `research/research_questions.md` and authoritative `research/hypotheses/hypothesis_framework.yaml` / `hypothesis_framework.tex`.
+  - Targeted contribution and novelty statement document in `research/research_design/contribution_statement.md` detailing targeted novelty, closest-work boundary, and explicitly rejected novelty claims.
+  - Final Experiment A–D mapping across RQ1–RQ4 in `research/research_design/experiment_map.md`.
+  - Success-criteria governance rule discarding arbitrary fixed thresholds (5%, 10%, 15%, 75%) until independently justified, requiring pre-specified metric, comparator, effect threshold, and statistical uncertainty rules before confirmatory testing.
+  - Documented decisions in `research/decision_log.md` (ADR-006, ADR-007, ADR-008).
+  - Updated claims-evidence matrix (`paper/claims_evidence_matrix.csv`).
 - **Acceptance Criteria**:
-  - Every research question maps to specific, measurable experiments and target leakage constraints.
+  - Every research question maps to specific, measurable experiments (Experiment A → RQ1, Experiment B → RQ2, Experiment C → RQ3, Experiment D → RQ4) and target leakage constraints.
   - Gaps reflect genuine scholarly deficiencies identified in Phase 1 without unsupportable novelty claims.
+  - Obsolete fixed numerical thresholds are removed from active research documentation; exact justified thresholds and statistical decision rules will be finalized before confirmatory testing.
 - **Dependencies**: Phase 1.
-- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), unit-of-independence constraints, and falsification criteria.
+- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics, unit-of-independence constraints, and success-criteria governance rules.
 
 ---
 

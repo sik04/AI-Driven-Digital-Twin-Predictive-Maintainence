@@ -22,30 +22,33 @@ The project prioritizes **scientific rigor, statistical validity, and reproducib
 
 ---
 
-## 2. Research Questions and Direction (Version 1)
+## 2. Research Questions and Direction
 
-> **Evidence status**: Under reassessment. Existing v1 research questions are preserved, but their novelty justification requires revision after the corrected literature comparison.
+The core research problem and questions guide the IntelliTwin evaluation framework:
 
-Following the Phase 1 Systematic Literature Review, the core research gap and RQ1 have been formally formulated and locked for the current research iteration:
+- **Research Direction**: The project investigates decision-aware, condition-adaptive conformal calibration for RUL prediction, designed to connect conditional uncertainty reliability with downstream sequential maintenance utility.
+- **RQ1**: *Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?*
+- **RQ2**: *Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?*
+- **RQ3**: *Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?*
+- **RQ4**: *Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?*
 
-- **Research Gap v1**: Although recent turbofan prognostic studies provide well-calibrated prediction intervals, evaluation remains dominated by aggregate marginal metrics, concealing potential conditional miscalibration across degradation stages and operating regimes.
-- **RQ1 (Locked / Provisional v1)**: *To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?*
-  - **$H_{0,1}$**: RUL interval coverage does not exhibit practically or statistically meaningful differences across degradation stages or operating regimes once nominal marginal calibration is achieved.
-  - **$H_{1,1}$**: RUL intervals satisfying nominal marginal coverage exhibit systematic conditional coverage deviations across degradation stages or operating regimes.
-- **RQ2–RQ4**: *TBD / Formulated in subsequent Phase 2 iterations.*
-
-> *Detailed metrics, target leakage constraints, and falsification criteria are documented in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).*
+> *For detailed research design, scientific positioning, hypothesis framework, and experiment mapping, see:*
+> - [`research/research_design/contribution_statement.md`](research/research_design/contribution_statement.md)
+> - [`research/research_design/research_gap.md`](research/research_design/research_gap.md)
+> - [`research/research_questions.md`](research/research_questions.md)
+> - [`research/hypotheses/hypothesis_framework.yaml`](research/hypotheses/hypothesis_framework.yaml)
+> - [`research/research_design/experiment_map.md`](research/research_design/experiment_map.md)
 
 ---
 
 ## 3. Current Project Status
 
 - **Phase 0: Research Project Setup and Governance**: **Completed** (Repository reset, baseline backup, CI workflow, packaging, and governance framework verified).
-- **Phase 1: Systematic Literature Review**: **In Progress** (Surveillance ongoing; 23 verified scholarly works synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md) and [`paper/references.bib`](paper/references.bib)).
+- **Phase 1: Systematic Literature Review**: **Completed** (26 verified scholarly works synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md), [`paper/references.bib`](paper/references.bib), and [`research/literature/source_verification.csv`](research/literature/source_verification.csv)).
 - **Active Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (**In Progress**):
-  - Research Gap v1 and RQ1 v1 locked in [`research/research_questions.md`](research/research_questions.md).
-  - Detailed Phase 2 formulation, candidate metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), target leakage constraints, and falsification criteria completed in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).
-  - Architectural decision log updated with ADR-002 in [`research/decision_log.md`](research/decision_log.md).
+  - Final Research Problem and RQ1–RQ4 locked in [`research/research_questions.md`](research/research_questions.md).
+  - Detailed Phase 2 formulation completed in [`research/research_design/research_gap.md`](research/research_design/research_gap.md).
+  - Architectural decision log updated in [`research/decision_log.md`](research/decision_log.md).
   - Claims evidence matrix updated in [`paper/claims_evidence_matrix.csv`](paper/claims_evidence_matrix.csv).
 
 
@@ -75,7 +78,7 @@ IntelliTwin/
 │   └── reproducibility.md             # Reproducibility charter and protocols
 ├── research/
 │   ├── roadmap.md                     # Phases 0 through 12 master roadmap
-│   ├── research_questions.md          # Provisional candidate RQs and hypotheses
+│   ├── research_questions.md          # Finalized research questions and hypotheses
 │   ├── decision_log.md                # Architecture Decision Records (ADRs)
 │   ├── risk_register.md               # Scientific and project risk register
 │   ├── author_contributions.md        # CRediT authorship tracking
