@@ -124,7 +124,7 @@ This log documents formal architectural, methodological, and research governance
   - Source corrections invalidate the prior claim that conditional calibration plus maintenance decisions is a novel, unstudied gap. Reassessing the gap before conducting experiments preserves scientific integrity.
 - **Expected Implications**:
   - `CLM-05` status changed to "Under reassessment" in `paper/claims_evidence_matrix.csv`.
-  - Evidence status note added to `README.md`, `research/phase-2/research_gap_rq1_hypothesis.md`, and `research/research_questions.md`.
+  - Evidence status note added to `README.md`, `research/research_design/research_gap.md`, and `research/research_questions.md`.
   - Literature tracking files, metric interpretations, and source verification registers updated to exact verified facts.
 - **Follow-up Review Date / Trigger**:
   - Prior to initiating Phase 5/6 model development or Phase 7 experiments.
