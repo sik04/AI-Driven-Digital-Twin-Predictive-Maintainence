@@ -54,7 +54,7 @@ This document establishes the high-level mapping between the formal research que
 - **Purpose**: Evaluate whether the principal reliability and maintenance-utility benefits persist across diverse operating conditions, model families, datasets, and repeated stochastic runs.
 - **High-Level Comparison**:
   - Proposed method performance consistency across multiple configurations vs. baseline models across datasets and random seeds.
-  - **Primary Type of Evidence Expected**: Multi-dataset reliability scores, cross-architecture maintenance utility distributions, and statistical hypothesis test results across repeated runs.
+- **Primary Type of Evidence Expected**: Multi-dataset reliability scores, cross-architecture maintenance utility distributions, and statistical hypothesis test results across repeated runs.
 - **Decisions Deferred**: Exact benchmark datasets, base model architectures, random seed counts, and statistical testing packages.
 
 ---
