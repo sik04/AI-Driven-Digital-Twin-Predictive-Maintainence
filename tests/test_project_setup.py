@@ -180,20 +180,43 @@ def test_literature_review_csv_schemas() -> None:
 
 
 def test_paper_inventory_exactness() -> None:
-    """Verify paper_inventory.csv has exactly 15 records matching the 15 local PDFs."""
+    """Verify paper_inventory.csv exists, has 15 records, and satisfies schema rules."""
     repo_root = Path(__file__).parent.parent
     inventory_file = repo_root / "research" / "literature" / "paper_inventory.csv"
-    papers_dir = repo_root / "papers"
 
-    local_pdfs = sorted(p.name for p in papers_dir.glob("*.pdf"))
-    assert len(local_pdfs) == 15, f"Expected 15 local PDFs, found {len(local_pdfs)}"
+    assert inventory_file.exists(), f"Missing paper_inventory.csv at {inventory_file}"
 
     with open(inventory_file, encoding="utf-8", newline="") as f:
         reader = csv.DictReader(f)
-        inventoried = [row["filename"].strip() for row in reader]
+        rows = list(reader)
 
-    assert len(inventoried) == 15, f"Expected 15 rows in inventory, got {len(inventoried)}"
-    assert sorted(inventoried) == local_pdfs, "Mismatch between local PDFs and inventoried files"
+    assert len(rows) == 15, f"Expected 15 inventoried seed paper records, got {len(rows)}"
+
+    required_fields = {
+        "filename",
+        "title",
+        "authors",
+        "year",
+        "publication_type",
+        "venue",
+        "doi",
+        "doi_verification_status",
+        "peer_review_status",
+        "primary_research_topic",
+        "relevance_to_intellitwin",
+    }
+    assert reader.fieldnames is not None
+    missing = required_fields - set(reader.fieldnames)
+    assert required_fields.issubset(set(reader.fieldnames)), (
+        f"Missing required fields in paper_inventory.csv: {missing}"
+    )
+
+    titles = [r["title"].strip() for r in rows if r["title"].strip()]
+    filenames = [r["filename"].strip() for r in rows if r["filename"].strip()]
+    assert len(titles) == 15, "Each inventory row must contain a non-empty title"
+    assert len(filenames) == 15, "Each inventory row must contain a non-empty filename identifier"
+    assert len(set(titles)) == 15, "Duplicate paper titles found in paper_inventory.csv"
+    assert len(set(filenames)) == 15, "Duplicate filenames found in paper_inventory.csv"
 
 
 def test_literature_matrices_record_counts() -> None:

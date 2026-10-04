@@ -47,7 +47,9 @@ coverage.xml
 htmlcov/
 
 # Local datasets, weights, and temporary artifacts
-data/
+data/*
+!data/splits/
+!data/README.md
 datasets/
 models/checkpoints/
 checkpoints/
