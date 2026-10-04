@@ -1,0 +1,225 @@
+# IntelliTwin Research Roadmap
+
+This document outlines the master research and development roadmap for the IntelliTwin project, conducted jointly by Mayank Singh, Shiksha Pandey, and Ruchi Gupta. Every phase defines clear objectives, deliverables, acceptance criteria, dependencies, and research observations to log.
+
+---
+
+## Roadmap Overview
+
+| Phase | Title | Status | Primary Focus |
+| :--- | :--- | :--- | :--- |
+| **Phase 0** | Research Project Setup and Governance | In Progress | Repository reset, governance framework, tooling, CI |
+| **Phase 1** | Systematic Literature Review | Planned | Comprehensive PRISMA review of RUL & UQ literature |
+| **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Planned | Formalize gaps, testable hypotheses, contribution matrix |
+| **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
+| **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
+| **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
+| **Phase 6** | Proposed Model Development | Planned | Novel prognostic architecture formulation and training |
+| **Phase 7** | Uncertainty and Maintenance Decision Experiments | Planned | Conformal prediction, interval calibration, DSS validation |
+| **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
+| **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
+| **Phase 10** | Final Validation and Reproducibility Release | Planned | End-to-end audit, artifact release, environment pinning |
+| **Phase 11** | Complete Research Paper and Thesis | Planned | Final manuscript synthesis, camera-ready preparation |
+| **Phase 12** | Defense, Release, and Research Portfolio | Planned | Public dissemination, oral defense, portfolio release |
+
+---
+
+## Detailed Phase Specifications
+
+### Phase 0: Research Project Setup and Governance
+- **Status**: In Progress (Step 1 implementation)
+- **Objective**: Establish a clean, reproducible, research-first repository foundation with automated testing, CI, and governance documentation.
+- **Expected Deliverables**:
+  - `pyproject.toml` with modern packaging, formatting (`ruff`), typing (`mypy`), and testing (`pytest`).
+  - Governance protocols: `roadmap.md`, `research_questions.md`, `decision_log.md`, `risk_register.md`, `author_contributions.md`.
+  - Literature review templates: `search_protocol.md`, `literature_matrix.csv`, `screening_log.csv`.
+  - Experiment logging templates: `experiment_record.md`.
+  - Paper outline and claims-evidence matrix: `outline.md`, `claims_evidence_matrix.csv`, `references.bib`.
+  - GitHub Actions CI workflow verifying lint, types, and tests.
+- **Acceptance Criteria**:
+  - All automated checks pass cleanly.
+  - Branch workflow strictly followed; PR merged without blocking issues.
+  - Clean environment installation verified.
+- **Dependencies**: None.
+- **Research Observations to Record**: Repository baseline state, backup integrity, toolchain compatibility.
+
+---
+
+### Phase 1: Systematic Literature Review
+- **Status**: Planned
+- **Objective**: Conduct a thorough, evidence-based literature review of deep learning for RUL estimation, uncertainty quantification, and predictive maintenance digital twins.
+- **Expected Deliverables**:
+  - Fully populated `screening_log.csv` and `literature_matrix.csv`.
+  - Narrative literature synthesis document.
+  - Curated and validated BibTeX entries in `paper/references.bib`.
+- **Acceptance Criteria**:
+  - All cited papers verified via genuine scholarly DOIs and venues.
+  - Inclusion/exclusion criteria rigorously applied and documented.
+  - Zero fabricated citations or hallucinated findings.
+- **Dependencies**: Phase 0.
+- **Research Observations to Record**: Methodological patterns, prevailing benchmark splits, common evaluation pitfalls in literature.
+
+---
+
+### Phase 2: Research Gap, Questions, Hypotheses, and Contributions
+- **Status**: Planned
+- **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, and state expected scientific contributions.
+- **Expected Deliverables**:
+  - Updated `research_questions.md` with formalized null and alternative hypotheses.
+  - Verified research gap synthesis document.
+  - Author-aligned contributions matrix.
+- **Acceptance Criteria**:
+  - Every research question maps to specific, measurable experiments.
+  - Gaps reflect genuine scholarly deficiencies identified in Phase 1.
+- **Dependencies**: Phase 1.
+- **Research Observations to Record**: Justifications for chosen hypotheses and experimental scopes.
+
+---
+
+### Phase 3: Dataset Study and Experimental Protocol
+- **Status**: Planned
+- **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
+- **Expected Deliverables**:
+  - Exploratory data analysis notebook/script and summary report.
+  - Strict engine-level data splitting protocol document.
+  - Canonical feature preconditioning and sequence windowing pipeline.
+- **Acceptance Criteria**:
+  - Strict train/validation/test engine isolation verified with automated assertions.
+  - Preprocessing scalers fit only on training sets.
+- **Dependencies**: Phase 2.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points.
+
+---
+
+### Phase 4: Research Proposal and Paper Foundations
+- **Status**: Planned
+- **Objective**: Draft the research proposal, problem formulation, mathematical notations, and paper introductory sections.
+- **Expected Deliverables**:
+  - Formulated problem definition in `paper/outline.md` / LaTeX draft.
+  - Background, notation, and system model mathematical formalisms.
+- **Acceptance Criteria**:
+  - Notation is consistent and mathematically rigorous.
+  - Methodology directly addresses formalized research questions.
+- **Dependencies**: Phase 3.
+- **Research Observations to Record**: Mathematical formulation edge cases and notation trade-offs.
+
+---
+
+### Phase 5: Reproducible Baseline Experiments
+- **Status**: Planned
+- **Objective**: Implement and evaluate standard baseline models (Linear Regression, SVR, Random Forest, MLP, basic LSTM/GRU) under the identical protocol established in Phase 3.
+- **Expected Deliverables**:
+  - Baseline model implementations under `src/intellitwin/models/`.
+  - Comprehensive experiment records in `experiments/`.
+  - Baseline performance benchmark table across RMSE, Score, and compute overhead.
+- **Acceptance Criteria**:
+  - All baselines evaluated under exact identical engine splits and seed sets.
+  - Full provenance logged (commit hash, environment, execution time).
+- **Dependencies**: Phase 3, Phase 4.
+- **Research Observations to Record**: Baseline convergence properties, degradation tracking limits, baseline failure modes.
+
+---
+
+### Phase 6: Proposed Model Development
+- **Status**: Planned
+- **Objective**: Design, implement, and train the proposed prognostic architecture targeting identified literature gaps.
+- **Expected Deliverables**:
+  - Proposed model source code with strict type hints and docstrings.
+  - Training scripts with convergence monitoring and checkpointing.
+  - Verified experiment records comparing proposed model with baselines.
+- **Acceptance Criteria**:
+  - Reproducible training pipeline with deterministic seed behavior.
+  - Empirically substantiated improvements over baselines under identical test sets.
+- **Dependencies**: Phase 5.
+- **Research Observations to Record**: Training dynamics, loss landscape behavior, hyperparameter sensitivity.
+
+---
+
+### Phase 7: Uncertainty and Maintenance Decision Experiments
+- **Status**: Planned
+- **Objective**: Implement uncertainty quantification (e.g., conformal prediction intervals, deep ensembles, or Bayesian approximations) and evaluate uncertainty-aware maintenance decision policies.
+- **Expected Deliverables**:
+  - UQ implementation under `src/intellitwin/uncertainty/`.
+  - Decision support module under `src/intellitwin/decision/`.
+  - Coverage (PICP) and interval width (MPIW) empirical validation.
+  - Decision policy comparative cost/risk analysis against static thresholds.
+- **Acceptance Criteria**:
+  - Conformal or Bayesian prediction intervals achieve target nominal coverage.
+  - Maintenance policies demonstrate risk-bounded operational advantages.
+- **Dependencies**: Phase 6.
+- **Research Observations to Record**: Calibration error, width-coverage trade-offs, catastrophic failure penalty reductions.
+
+---
+
+### Phase 8: Ablation, Robustness, and Statistical Analysis
+- **Status**: Planned
+- **Objective**: Perform component ablations, sensor noise injection, operating condition perturbations, and formal statistical significance tests (e.g., Wilcoxon signed-rank tests).
+- **Expected Deliverables**:
+  - Systematic ablation experiment records.
+  - Noise robustness stress-testing report.
+  - Statistical hypothesis testing results with p-values and confidence intervals.
+- **Acceptance Criteria**:
+  - Every proposed architectural component empirically justified by ablation.
+  - Statistical significance confirmed across multiple random seeds.
+- **Dependencies**: Phase 7.
+- **Research Observations to Record**: Sensitivity to sensor dropout, noise tolerance boundaries.
+
+---
+
+### Phase 9: Digital Twin Software Implementation
+- **Status**: Planned
+- **Objective**: Implement the digital twin software layer, providing bi-directional asset state simulation, calibrated prognostic displays, and decision alerts.
+- **Expected Deliverables**:
+  - Digital twin service module under `src/intellitwin/twin/`.
+  - Interactive demonstration interface and API endpoints.
+  - Real-time simulation and telemetry synchronization tests.
+- **Acceptance Criteria**:
+  - Visual and state synchronization accurately reflects underlying model outputs.
+  - Software operates independently from model training pipelines.
+- **Dependencies**: Phase 7, Phase 8.
+- **Research Observations to Record**: Real-time inference latency, synchronization fidelity, user interaction feedback.
+
+---
+
+### Phase 10: Final Validation and Reproducibility Release
+- **Status**: Planned
+- **Objective**: Conduct an independent, end-to-end reproducibility audit of all data pipelines, models, figures, and tables from clean virtual environments.
+- **Expected Deliverables**:
+  - Single-command reproducibility script or Makefile target.
+  - Pinned lockfile / exact environment specification.
+  - Full claims-evidence audit verifying all manuscript claims against experiment records.
+- **Acceptance Criteria**:
+  - Every table and figure in the manuscript regenerates identically from scratch.
+  - All items in `paper/claims_evidence_matrix.csv` marked validated.
+- **Dependencies**: Phase 9.
+- **Research Observations to Record**: Execution runtimes, cross-platform reproducibility validation.
+
+---
+
+### Phase 11: Complete Research Paper and Thesis
+- **Status**: Planned
+- **Objective**: Complete the comprehensive research manuscript and academic thesis integrating all verified findings, discussions, limitations, and literature comparisons.
+- **Expected Deliverables**:
+  - Full LaTeX manuscript package with high-resolution figures.
+  - Complete thesis document formatted according to institutional guidelines.
+  - Submission-ready supplementary material.
+- **Acceptance Criteria**:
+  - Co-author review and approval by Mayank Singh, Shiksha Pandey, and Ruchi Gupta.
+  - Complete alignment between manuscript text, code, and experiment records.
+- **Dependencies**: Phase 10.
+- **Research Observations to Record**: Reviewer feedback, revision notes, publication decisions.
+
+---
+
+### Phase 12: Defense, Release, and Research Portfolio
+- **Status**: Planned
+- **Objective**: Conduct oral thesis defense, publish camera-ready artifacts, and release public open-science research portfolio.
+- **Expected Deliverables**:
+  - Presentation slide deck and demonstration materials.
+  - Zenodo / OSF open-science release package with DOI.
+  - Public repository tag and release notes.
+- **Acceptance Criteria**:
+  - Successful academic defense.
+  - Permanent open-access archival of models, code, and benchmark protocols.
+- **Dependencies**: Phase 11.
+- **Research Observations to Record**: Defense questions, external audience reception, future research vectors.
