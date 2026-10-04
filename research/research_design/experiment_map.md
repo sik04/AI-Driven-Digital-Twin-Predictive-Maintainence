@@ -15,8 +15,11 @@ This document establishes the high-level mapping between the formal research que
   - Proposed method (decision-aware, condition-adaptive conformal calibration)
   - Global conformal calibration
   - Standard condition-aware calibration
-- **Primary Type of Evidence Expected**: Sequential maintenance utility scores, total maintenance costs, and marginal coverage probability ($PICP$).
-- **Decisions Deferred**: Exact algorithmic loss functions, nonconformity score definitions, optimization objectives, and operational cost ratios ($C_{\text{failure}} / C_{\text{preventive}}$).
+- **Primary Type of Evidence Expected**:
+  - **Primary Outcome**: Total simulated maintenance cost per engine
+  - **Secondary / Supporting Outcomes**: Late/failure intervention rate; required prediction-interval coverage
+  - **Statistical Framework**: Paired engine-level comparisons on shared splits; effect size and 95% engine-level paired/cluster bootstrap confidence intervals; required coverage constraint enforcement.
+- **Decisions Deferred**: Exact algorithmic loss functions, nonconformity score definitions, optimization objectives, and operational cost ratios ($C_{\text{failure}} / C_{\text{preventive}}$). Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
 
 ---
 
@@ -27,8 +30,11 @@ This document establishes the high-level mapping between the formal research que
 - **Purpose**: Evaluate whether the proposed method improves conditional coverage and worst-group reliability across operating regimes and wear conditions without making prediction intervals excessively wide.
 - **High-Level Comparison**:
   - Proposed method vs. relevant global and condition-aware calibration baselines.
-- **Primary Type of Evidence Expected**: Worst-Group Coverage ($WGC$), Conditional Coverage Error ($CE_g$), Maximum Conditional Gap ($MCG$), Mean Prediction Interval Width ($MPIW$), and Winkler Interval Score.
-- **Decisions Deferred**: Exact subgroup partitioning boundaries, clustering cutoffs, and numerical sharpness trade-off parameters.
+- **Primary Type of Evidence Expected**:
+  - **Primary Outcome**: Worst-group conditional coverage error
+  - **Secondary / Supporting Outcomes**: Mean Prediction Interval Width (MPIW); interval score
+  - **Statistical Framework**: Engine-level uncertainty quantification for worst-group conditional coverage error; MPIW and Winkler interval-score sharpness safeguards.
+- **Decisions Deferred**: Exact subgroup partitioning boundaries, clustering cutoffs, and numerical sharpness trade-off parameters. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
 
 ---
 
@@ -40,10 +46,13 @@ This document establishes the high-level mapping between the formal research que
 - **High-Level Comparison**:
   - Proposed method vs. simple conservative controls:
     - Matched-width / widened prediction intervals
-    - Point-prediction safety margins
+    - Tuned point-prediction safety margins
     - Earlier-intervention conservative policies
-- **Primary Type of Evidence Expected**: Comparative utility curves, lead-time distributions, wasted RUL statistics, and failure rate reductions relative to matched-conservatism baselines.
-- **Decisions Deferred**: Exact baseline implementation details, safety margin tuning steps, and policy parameterizations.
+- **Primary Type of Evidence Expected**:
+  - **Primary Outcome**: Maintenance cost/utility improvement over strongest pre-specified matched-conservatism baseline
+  - **Secondary / Supporting Outcomes**: Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); premature intervention rate
+  - **Statistical Framework**: Paired proposed-vs-matched-conservatism comparisons; effect size and 95% engine-level paired/cluster bootstrap confidence intervals.
+- **Decisions Deferred**: Exact baseline implementation details, safety margin tuning steps, and policy parameterizations. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
 
 ---
 
@@ -54,8 +63,11 @@ This document establishes the high-level mapping between the formal research que
 - **Purpose**: Evaluate whether the principal reliability and maintenance-utility benefits persist across diverse operating conditions, model families, datasets, and repeated stochastic runs.
 - **High-Level Comparison**:
   - Proposed method performance consistency across multiple configurations vs. baseline models across datasets and random seeds.
-- **Primary Type of Evidence Expected**: Multi-dataset reliability scores, cross-architecture maintenance utility distributions, and statistical hypothesis test results across repeated runs.
-- **Decisions Deferred**: Exact benchmark datasets, base model architectures, random seed counts, and statistical testing packages.
+- **Primary Type of Evidence Expected**:
+  - **Primary Outcome**: Cross-configuration consistency of the proposed method's effect
+  - **Secondary / Supporting Outcomes**: Effect size; engine-level confidence intervals
+  - **Statistical Framework**: Consistency across predefined robustness configurations; effect sizes and engine-level confidence intervals across settings. *(Note: Support does not require every single configuration to independently show positive effect, but requires no systematic reversal across configurations).*
+- **Decisions Deferred**: Exact benchmark datasets, base model architectures, random seed counts, and statistical testing packages. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
 
 ---
 

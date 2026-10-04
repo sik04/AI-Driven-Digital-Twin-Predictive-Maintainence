@@ -210,6 +210,64 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Phase 3–4 experimental protocol finalization prior to model training.
 
+---
+
+### ADR-009: Locking Primary Metrics and Comparators for RQ1–RQ4 and Formalizing Practical-Effect Threshold Deferral Policy
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - ADR-008 established a governance rule requiring pre-specified primary metrics, comparators, and effect thresholds for each RQ.
+  - Step 3 requires locking the primary decision metrics and planned comparators for RQ1–RQ4, while explicitly formalizing the governance policy for numerical practical-effect thresholds.
+- **Decision**:
+  - **Locked Primary Metrics**:
+    - **RQ1**: Total simulated maintenance cost per engine (supporting: late/failure intervention rate, required coverage).
+    - **RQ2**: Worst-group conditional coverage error (supporting: MPIW, interval score).
+    - **RQ3**: Maintenance cost/utility improvement over the matched-conservatism baseline (supporting: wasted RUL, premature intervention rate).
+    - **RQ4**: Cross-configuration consistency of the observed effect (supporting: effect size, engine-level confidence intervals).
+  - **Locked Comparators**:
+    - **RQ1**: Proposed method vs. global conformal calibration and standard condition-aware calibration under identical predictors and data protocols.
+    - **RQ2**: Proposed method vs. global conformal calibration and standard condition-aware calibration on conditional coverage, worst-group reliability, width, and quality.
+    - **RQ3**: Proposed method vs. matched-conservatism controls (widened prediction intervals, tuned point-prediction safety margins, earlier-intervention policies).
+    - **RQ4**: Proposed-vs-baseline performance consistency across predefined datasets/operating conditions, base RUL model families, and random seeds.
+  - **Threshold Deferral Policy**: Numerical practical-effect thresholds remain deliberately deferred until after maintenance simulator implementation and validation.
+- **Rationale for Threshold Deferral**:
+  - "Numerical effect thresholds cannot yet be defensibly tied to operational significance because the maintenance simulator and its cost/risk scale have not been validated. Choosing percentages now would be arbitrary."
+- **Governance Declarations**:
+  - Maintenance simulator validation must occur before numerical thresholds are finalized.
+  - Bounded pilot evidence may be used to estimate realistic variability or operational effect scales.
+  - All final numerical thresholds must be justified and frozen prior to confirmatory testing.
+  - Final confirmatory test results cannot be used post-hoc to revise thresholds.
+- **Expected Implications**:
+  - Primary metrics and comparators locked in `hypothesis_framework.yaml`, `hypothesis_framework.tex`, `research_questions.md`, `experiment_map.md`, and `evaluation_criteria.md`.
+  - Future methodology and experimental protocol phases (Phase 3–4) will validate the simulator and freeze exact numerical effect thresholds prior to confirmatory model training.
+- **Follow-up Review Date / Trigger**:
+  - Maintenance simulator validation milestone (Phase 3–4 protocol definition).
+
+---
+
+### ADR-010: Final Step 3 Evaluation Hierarchy and Confirmatory Governance
+- **Date**: 2026-10-04
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the locking of primary metrics, comparators, and threshold deferral policy (ADR-009), the remaining Step 3 evaluation governance rules must be formalized to prevent post-hoc changes and bias during confirmatory testing.
+- **Decision**:
+  - Locked the primary vs. secondary outcome hierarchy for RQ1–RQ4: primary outcome determines main RQ conclusion; supporting outcomes provide reliability/constraint evidence and trade-off characterization. A favorable secondary outcome cannot replace failure on the primary outcome.
+  - Locked the No Post-Hoc Criteria Changes rule: after protocol freezing, primary metrics, comparators, subgroup definitions, effect thresholds, decision rules, and outcome hierarchy must not be changed based on confirmatory results. Any later change must be explicitly documented as a protocol deviation and affected analyses labelled exploratory.
+  - Locked threshold-governance status: non-restoration of legacy 5%, 10%, 15%, and 75% values as default success thresholds; exact numerical practical-effect thresholds remain intentionally deferred until maintenance-simulator validation and (if needed) bounded pilot evidence, and must be frozen before confirmatory testing.
+  - Established the Final Pre-Specified Evaluation Map for RQ1–RQ4 mapping RQ $\rightarrow$ primary metric $\rightarrow$ supporting metrics $\rightarrow$ comparators $\rightarrow$ threshold status $\rightarrow$ statistical unit (`engine`) $\rightarrow$ statistical framework $\rightarrow$ Supported / Unsupported / Inconclusive decision rules.
+- **Decision Rationale**:
+  - Pre-specifying the complete evaluation hierarchy before confirmatory testing prevents outcome switching, comparator cherry-picking, subgroup redefinition, and threshold adjustment after results are observed.
+  - Numerical practical-effect thresholds remain deliberately deferred because meaningful operational scales depend on the validated maintenance simulator and, if required, bounded pilot evidence.
+  - Once those numerical values are finalized, they must be frozen before confirmatory experiments.
+- **Expected Implications**:
+  - Complete evaluation governance and final pre-specified evaluation map documented across `research/research_design/evaluation_criteria.md`, `research/hypotheses/hypothesis_framework.yaml`, `research/hypotheses/hypothesis_framework.tex`, `research/research_questions.md`, and `research/research_design/experiment_map.md`.
+  - Phase 3–4 protocol definition will implement and validate the maintenance simulator and freeze final numerical practical-effect thresholds prior to confirmatory testing.
+- **Follow-up Review Date / Trigger**:
+  - Completion of maintenance simulator validation prior to confirmatory model training.
+
+
 
 
 

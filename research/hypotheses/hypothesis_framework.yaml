@@ -5,6 +5,31 @@ status: "locked"
 
 governance_success_criteria_rule: "We will discard the old 5%, 10%, 15%, and 75% thresholds unless independently justified, and define for each RQ a pre-specified primary metric, comparator, practical effect threshold, and statistical uncertainty rule that classifies results as supported, unsupported, or inconclusive before confirmatory testing."
 
+metric_governance_rule: "These are the final primary metric choices. Supporting metrics provide scientific and operational context but do not replace the primary decision metric for each research question."
+
+outcome_hierarchy_governance_rule: "The primary outcome determines the main conclusion for each research question. Secondary/supporting outcomes are used to verify constraints, characterize trade-offs, and interpret the result, but a favorable secondary outcome cannot replace failure on the primary outcome. This hierarchy must be fixed before confirmatory testing and cannot be changed after confirmatory results are inspected."
+
+no_post_hoc_changes_rule: "After the evaluation protocol is frozen, primary metrics, comparator sets, subgroup definitions, practical-effect thresholds, statistical decision rules, and the primary/secondary outcome hierarchy must not be changed based on confirmatory results. Any later change must be explicitly documented as a protocol deviation. Analyses affected by such a change must be labelled exploratory rather than confirmatory. Confirmatory results must NOT be used to: (1) change the primary metric, (2) promote a secondary metric to primary, (3) remove an unfavorable comparator, (4) add a favorable comparator, (5) redefine subgroups, (6) change practical-effect thresholds, (7) redefine Supported / Unsupported / Inconclusive rules, (8) alter robustness configurations, (9) change the statistical unit, or (10) change the interpretation rule after seeing results."
+
+threshold_governance_policy: "The previously used 5%, 10%, 15%, and 75% values are not part of the final active evaluation criteria and must not be restored as default success thresholds. Exact numerical practical-effect thresholds remain intentionally deferred until the maintenance simulator has been implemented and validated. If necessary, bounded pilot evidence may then be used to estimate realistic operational effect and variability scales. After simulator validation and any bounded pilot assessment, the final thresholds must be scientifically and operationally justified and frozen before confirmatory testing. Confirmatory results cannot be used to select, tune, relax, or redefine these thresholds."
+
+statistical_uncertainty_framework:
+  statistical_unit: "engine"
+  comparison_structure: "Paired whenever proposed and baseline methods are evaluated on the same engines/splits."
+  confidence_level: "95%"
+  uncertainty_method: "Engine-level paired/cluster bootstrap"
+  window_independence_rule: "Individual windows/time steps must not be treated as independent statistical samples."
+  effect_reporting_rule: "Report effect size together with its confidence interval."
+  p_value_policy: "P-values or statistical significance tests, if used, are secondary evidence and cannot independently determine support for an RQ."
+  framework_statement: "The engine is the independent statistical unit. When the proposed method and a baseline are evaluated on the same engines, comparisons will be paired. For each primary metric, uncertainty will be quantified using a 95% confidence interval obtained by resampling engines while preserving all observations belonging to each engine. Effect sizes and confidence intervals will be reported together. Individual windows or time steps will not be treated as independent samples. Statistical significance or p-values, if reported, will be secondary evidence and will not by themselves determine whether an RQ is supported."
+  deferred_statistical_details:
+    - "exact bootstrap resample count"
+    - "percentile vs BCa vs another CI implementation"
+    - "exact secondary hypothesis test"
+    - "multiplicity correction procedure"
+
+global_decision_rule: "After practical-effect thresholds are finalized, an RQ will be considered supported only when the estimated effect and its uncertainty provide evidence of a practically meaningful benefit; unsupported when the evidence indicates no meaningful benefit, an adverse effect, or violation of a required reliability constraint; and inconclusive when the confidence interval or cross-comparator evidence does not allow a clear distinction between meaningful and negligible effects."
+
 research_problem: "Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative."
 
 hypotheses:
@@ -17,15 +42,31 @@ hypotheses:
     primary_scientific_purpose: "Evaluate whether decision-aware, condition-adaptive conformal calibration improves downstream sequential maintenance outcomes while maintaining target interval coverage."
     experiment_mapping: "Experiment A"
     primary_evaluation_goal: "Evaluate proposed decision-aware, condition-adaptive conformal RUL method against global conformal calibration and standard condition-aware calibration to determine whether it improves sequential maintenance utility while preserving reliable coverage."
-    planned_comparators: "Global conformal calibration and standard condition-aware calibration"
+    primary_metric: "Total simulated maintenance cost per engine"
+    supporting_metrics:
+      - "late/failure intervention rate"
+      - "required prediction-interval coverage"
+    outcome_hierarchy_meaning: "The primary outcome determines the main maintenance-utility conclusion for RQ1. Late/failure intervention rate and prediction-interval coverage serve as supporting evidence and reliability constraints. A favorable secondary metric cannot compensate for failure on the primary outcome or violation of required coverage."
+    primary_comparator: "The proposed decision-aware, condition-adaptive conformal RUL method will be compared against global conformal calibration and standard condition-aware calibration under the same predictor, data protocol, and sequential maintenance environment."
+    planned_comparators:
+      - "Global conformal calibration"
+      - "Standard condition-aware calibration"
     success_criteria:
-      primary_metric: "TBD — must be justified before confirmatory testing"
+      primary_metric: "Total simulated maintenance cost per engine"
+      supporting_metrics:
+        - "late/failure intervention rate"
+        - "required prediction-interval coverage"
       primary_comparator: "Global conformal calibration and standard condition-aware calibration"
-      practical_effect_threshold: "TBD — requires independent justification"
-      statistical_uncertainty_rule: "TBD — must be specified before confirmatory testing"
-      supported_rule: "TBD before confirmatory testing"
-      unsupported_rule: "TBD before confirmatory testing"
-      inconclusive_rule: "TBD before confirmatory testing"
+      planned_comparators:
+        - "Global conformal calibration"
+        - "Standard condition-aware calibration"
+      practical_effect_threshold: "Deferred"
+      practical_effect_threshold_policy: "Deferred until after maintenance simulator validation and before confirmatory testing."
+      statistical_unit: "engine"
+      statistical_uncertainty_rule: "Quantified using 95% engine-level paired/cluster bootstrap confidence interval."
+      supported_rule: "The proposed method achieves a practically meaningful reduction in total simulated maintenance cost per engine relative to both global conformal calibration and standard condition-aware calibration, the 95% engine-level confidence interval supports that improvement, and the required prediction-interval coverage is maintained."
+      unsupported_rule: "Evidence shows no practically meaningful maintenance-cost improvement over the strongest relevant baseline, a relevant baseline performs better, or the proposed method achieves lower maintenance cost only by violating the required coverage/reliability constraint."
+      inconclusive_rule: "The estimated maintenance improvement is favorable but its 95% confidence interval overlaps the future practical-effect threshold, or results across the primary comparators do not permit a clear conclusion."
 
   - id: "RQ2"
     title: "Conditional Reliability and Interval Sharpness"
@@ -36,15 +77,31 @@ hypotheses:
     primary_scientific_purpose: "Audit subgroup reliability across operating regimes and wear stages to verify coverage safety without sacrificing interval efficiency."
     experiment_mapping: "Experiment B"
     primary_evaluation_goal: "Evaluate whether the proposed method improves conditional coverage, worst-group reliability, and interval sharpness without making prediction intervals excessively wide."
-    planned_comparators: "Reliability and sharpness performance of the proposed method versus relevant global and condition-aware calibration baselines"
+    primary_metric: "Worst-group conditional coverage error"
+    supporting_metrics:
+      - "Mean Prediction Interval Width (MPIW)"
+      - "interval score"
+    outcome_hierarchy_meaning: "The primary outcome determines the main reliability conclusion for RQ2. MPIW and interval score are supporting measures used to determine whether any reliability improvement was obtained without materially degrading prediction-interval sharpness or quality."
+    primary_comparator: "The proposed method will be compared with the same global and standard condition-aware calibration baselines on conditional reliability, worst-group coverage, interval width, and interval quality."
+    planned_comparators:
+      - "Global conformal calibration"
+      - "Standard condition-aware calibration"
     success_criteria:
-      primary_metric: "TBD — must be justified before confirmatory testing"
+      primary_metric: "Worst-group conditional coverage error"
+      supporting_metrics:
+        - "Mean Prediction Interval Width (MPIW)"
+        - "interval score"
       primary_comparator: "Reliability/sharpness performance of the proposed method versus relevant calibration baselines"
-      practical_effect_threshold: "TBD — requires independent justification"
-      statistical_uncertainty_rule: "TBD — must be specified before confirmatory testing"
-      supported_rule: "TBD before confirmatory testing"
-      unsupported_rule: "TBD before confirmatory testing"
-      inconclusive_rule: "TBD before confirmatory testing"
+      planned_comparators:
+        - "Global conformal calibration"
+        - "Standard condition-aware calibration"
+      practical_effect_threshold: "Deferred"
+      practical_effect_threshold_policy: "Deferred until after maintenance simulator validation and before confirmatory testing."
+      statistical_unit: "engine"
+      statistical_uncertainty_rule: "Quantified using 95% engine-level paired/cluster bootstrap confidence interval."
+      supported_rule: "The proposed method produces a practically meaningful improvement in worst-group conditional coverage error, supported by its 95% engine-level confidence interval, without materially degrading prediction-interval sharpness or quality as measured by MPIW and interval score."
+      unsupported_rule: "There is no practically meaningful improvement in worst-group reliability, worst-group reliability becomes worse, or the apparent coverage improvement is achieved primarily through materially wider or poorer-quality prediction intervals."
+      inconclusive_rule: "Worst-group reliability appears to improve, but the confidence interval overlaps the future meaningful-effect boundary, or the reliability-versus-sharpness trade-off cannot clearly be classified as beneficial."
 
   - id: "RQ3"
     title: "Decision-Value Attribution vs. Matched-Conservatism Baselines"
@@ -55,15 +112,33 @@ hypotheses:
     primary_scientific_purpose: "Disambiguate true decision-aware calibration utility from trivial interval expansion or naive early intervention."
     experiment_mapping: "Experiment C"
     primary_evaluation_goal: "Evaluate whether maintenance benefits stem from genuinely useful decision-aware uncertainty information rather than simple over-conservatism by comparing against matched-conservatism controls."
-    planned_comparators: "Matched-width widened intervals, point-prediction safety margins, and earlier-intervention conservative policies"
+    primary_metric: "Maintenance cost/utility improvement over the strongest pre-specified matched-conservatism baseline"
+    supporting_metrics:
+      - "wasted RUL"
+      - "premature intervention rate"
+    outcome_hierarchy_meaning: "The primary outcome determines whether the proposed method provides genuine maintenance decision value beyond simple conservatism. Wasted RUL and premature intervention rate provide supporting interpretation but cannot substitute for failure on the primary outcome."
+    primary_comparator: "The proposed method will be compared against matched-conservatism baselines to determine whether any maintenance benefit comes from useful decision-aware uncertainty rather than simple conservatism."
+    planned_comparators:
+      - "Widened / matched-width prediction intervals"
+      - "Tuned point-prediction safety margins"
+      - "Earlier-intervention conservative policies"
     success_criteria:
-      primary_metric: "TBD — must be justified before confirmatory testing"
+      primary_metric: "Maintenance cost/utility improvement over the strongest pre-specified matched-conservatism baseline"
+      supporting_metrics:
+        - "wasted RUL"
+        - "premature intervention rate"
       primary_comparator: "Matched-conservatism / simple conservative policies"
-      practical_effect_threshold: "TBD — requires independent justification"
-      statistical_uncertainty_rule: "TBD — must be specified before confirmatory testing"
-      supported_rule: "TBD before confirmatory testing"
-      unsupported_rule: "TBD before confirmatory testing"
-      inconclusive_rule: "TBD before confirmatory testing"
+      planned_comparators:
+        - "Widened / matched-width prediction intervals"
+        - "Tuned point-prediction safety margins"
+        - "Earlier-intervention conservative policies"
+      practical_effect_threshold: "Deferred"
+      practical_effect_threshold_policy: "Deferred until after maintenance simulator validation and before confirmatory testing."
+      statistical_unit: "engine"
+      statistical_uncertainty_rule: "Quantified using 95% engine-level paired/cluster bootstrap confidence interval."
+      supported_rule: "The proposed method achieves a practically meaningful improvement in maintenance cost/utility over the strongest pre-specified matched-conservatism baseline, supported by its 95% engine-level confidence interval, demonstrating maintenance benefit beyond that obtainable by simple interval widening, point-prediction safety margins, or earlier intervention."
+      unsupported_rule: "One or more appropriately matched conservative baselines reproduce or outperform the proposed method's maintenance benefit, indicating that the observed gain does not require decision-aware calibration."
+      inconclusive_rule: "The proposed method appears better than the matched-conservatism controls, but the confidence interval overlaps the future meaningful-effect boundary or the different conservative controls provide mixed evidence."
 
   - id: "RQ4"
     title: "Robustness and Generalization"
@@ -74,12 +149,30 @@ hypotheses:
     primary_scientific_purpose: "Verify that calibration and maintenance utility improvements generalize across varied architectures, datasets, and stochastic runs."
     experiment_mapping: "Experiment D"
     primary_evaluation_goal: "Evaluate whether main reliability and maintenance-utility benefits remain robust across datasets/operating conditions, base RUL model families, and repeated random seeds/runs."
-    planned_comparators: "Consistency of performance across predefined robustness configurations"
+    primary_metric: "Cross-configuration consistency of the proposed method's effect"
+    supporting_metrics:
+      - "effect size"
+      - "engine-level confidence intervals"
+    outcome_hierarchy_meaning: "The primary outcome determines the robustness/generalization conclusion. Effect sizes and engine-level confidence intervals provide supporting statistical evidence used to interpret the consistency and uncertainty of the observed effect."
+    primary_comparator: "The same proposed-versus-baseline comparisons will be repeated across predefined datasets/operating conditions, base RUL model families, and random seeds to determine whether the observed effects are robust."
+    planned_comparators:
+      - "Consistency across predefined datasets and operating conditions"
+      - "Consistency across base RUL model families"
+      - "Consistency across repeated random seeds and runs"
     success_criteria:
-      primary_metric: "TBD — must be justified before confirmatory testing"
+      primary_metric: "Cross-configuration consistency of the proposed method's effect"
+      supporting_metrics:
+        - "effect size"
+        - "engine-level confidence intervals"
       primary_comparator: "Consistency across predefined robustness configurations"
-      practical_effect_threshold: "TBD — requires independent justification"
-      statistical_uncertainty_rule: "TBD — must be specified before confirmatory testing"
-      supported_rule: "TBD before confirmatory testing"
-      unsupported_rule: "TBD before confirmatory testing"
-      inconclusive_rule: "TBD before confirmatory testing"
+      planned_comparators:
+        - "Consistency across predefined datasets and operating conditions"
+        - "Consistency across base RUL model families"
+        - "Consistency across repeated random seeds and runs"
+      practical_effect_threshold: "Deferred"
+      practical_effect_threshold_policy: "Deferred until after maintenance simulator validation and before confirmatory testing."
+      statistical_unit: "engine"
+      statistical_uncertainty_rule: "Quantified using engine-level confidence intervals across configurations."
+      supported_rule: "The proposed method shows a consistently favorable and practically meaningful effect across the predefined robustness evaluation, with no systematic reversal across datasets, operating conditions, base RUL model families, or repeated seeds/runs. Engine-level uncertainty estimates support the conclusion that the effect is not limited to a particular experimental configuration."
+      unsupported_rule: "The proposed method's benefit disappears, systematically reverses, or is clearly restricted to particular datasets, operating conditions, model families, or stochastic runs."
+      inconclusive_rule: "Results are mixed across predefined robustness configurations or the statistical uncertainty is too large to determine whether the observed benefit is genuinely robust."
