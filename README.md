@@ -22,32 +22,30 @@ The project prioritizes **scientific rigor, statistical validity, and reproducib
 
 ---
 
-## 2. Research Questions (Provisional)
+## 2. Research Questions and Direction (Version 1)
 
-Prior to the completion of the systematic literature review (Phase 1), the following candidate research questions guide our investigation:
+Following the Phase 1 Systematic Literature Review, the core research gap and RQ1 have been formally formulated and locked for the current research iteration:
 
-- **RQ1**: *How do selected RUL prediction methods compare under a consistent, leak-free engine-level evaluation protocol?*
-- **RQ2**: *How reliably can uncertainty estimates quantify RUL prediction error across varying operating conditions and asset wear stages?*
-- **RQ3**: *Can uncertainty-aware maintenance decisions improve warning quality relative to appropriate simple baseline heuristics?*
-- **RQ4**: *Which framework components provide measurable empirical benefits, and under what operational conditions do these benefits persist?*
+- **Research Gap v1**: Although recent turbofan prognostic studies provide well-calibrated prediction intervals, evaluation remains dominated by aggregate marginal metrics, concealing potential conditional miscalibration across degradation stages and operating regimes.
+- **RQ1 (Locked / Provisional v1)**: *To what extent can nominally calibrated RUL prediction intervals conceal conditional reliability failures across degradation stages and operating regimes in turbofan prognostics?*
+  - **$H_{0,1}$**: RUL interval coverage does not exhibit practically or statistically meaningful differences across degradation stages or operating regimes once nominal marginal calibration is achieved.
+  - **$H_{1,1}$**: RUL intervals satisfying nominal marginal coverage exhibit systematic conditional coverage deviations across degradation stages or operating regimes.
+- **RQ2–RQ4**: *TBD / Formulated in subsequent Phase 2 iterations.*
 
-> *Note: These questions are provisional and will be formally refined following the Phase 1 Systematic Literature Review.*
+> *Detailed metrics, target leakage constraints, and falsification criteria are documented in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).*
 
 ---
 
 ## 3. Current Project Status
 
 - **Phase 0: Research Project Setup and Governance**: **Completed** (Repository reset, baseline backup, CI workflow, packaging, and governance framework verified).
-- **Active Milestone**: **Phase 1: Systematic Literature Review** (**In Progress**):
-  - 15 local repository papers audited in [`research/literature/paper_inventory.csv`](research/literature/paper_inventory.csv).
-  - 23 studies synthesized in expanded [`research/literature/literature_matrix.csv`](research/literature/literature_matrix.csv).
-  - 25 records screened and audited in [`research/literature/screening_log.csv`](research/literature/screening_log.csv).
-  - Closest-work competition analyzed in [`research/literature/closest_work_matrix.csv`](research/literature/closest_work_matrix.csv).
-  - Literature claims mapped to verified sources in [`research/literature/citation_map.csv`](research/literature/citation_map.csv).
-  - Thematic literature review synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md).
-  - Master bibliography expanded to 23 verified entries in [`paper/references.bib`](paper/references.bib).
-  - *Governance Note*: Phase 1 remains marked **In Progress** as ongoing literature surveillance continues, acknowledging institutional bulk-database access constraints.
-- **Next Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (Formalizing testable hypotheses for conditional calibration and maintenance decision consequences).
+- **Phase 1: Systematic Literature Review**: **In Progress** (Surveillance ongoing; 23 verified scholarly works synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md) and [`paper/references.bib`](paper/references.bib)).
+- **Active Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (**In Progress**):
+  - Research Gap v1 and RQ1 v1 locked in [`research/research_questions.md`](research/research_questions.md).
+  - Detailed Phase 2 formulation, candidate metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), target leakage constraints, and falsification criteria completed in [`research/phase-2/research_gap_rq1_hypothesis.md`](research/phase-2/research_gap_rq1_hypothesis.md).
+  - Architectural decision log updated with ADR-002 in [`research/decision_log.md`](research/decision_log.md).
+  - Claims evidence matrix updated in [`paper/claims_evidence_matrix.csv`](paper/claims_evidence_matrix.csv).
+
 
 ---
 

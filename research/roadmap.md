@@ -10,7 +10,7 @@ This document outlines the master research and development roadmap for the Intel
 | :--- | :--- | :--- | :--- |
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
-| **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Planned | Formalize gaps, testable hypotheses, contribution matrix |
+| **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | In Progress | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
@@ -67,17 +67,18 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 2: Research Gap, Questions, Hypotheses, and Contributions
-- **Status**: Planned
+- **Status**: In Progress (Research Gap v1, RQ1 v1, H0_1/H1_1 locked)
 - **Objective**: Synthesize literature review findings into precise research gaps, refine provisional research questions into testable hypotheses, and state expected scientific contributions.
 - **Expected Deliverables**:
-  - Updated `research_questions.md` with formalized null and alternative hypotheses.
-  - Verified research gap synthesis document.
-  - Author-aligned contributions matrix.
+  - Detailed Phase 2 formulation in `research/phase-2/research_gap_rq1_hypothesis.md`.
+  - Updated `research_questions.md` with locked RQ1 v1 and pre-specified hypotheses ($H_{0,1}$ / $H_{1,1}$).
+  - Documented ADR-002 in `research/decision_log.md`.
+  - Author-aligned contributions matrix and claims evidence mapping (`paper/claims_evidence_matrix.csv`).
 - **Acceptance Criteria**:
-  - Every research question maps to specific, measurable experiments.
-  - Gaps reflect genuine scholarly deficiencies identified in Phase 1.
+  - Every research question maps to specific, measurable experiments and target leakage constraints.
+  - Gaps reflect genuine scholarly deficiencies identified in Phase 1 without unsupportable novelty claims.
 - **Dependencies**: Phase 1.
-- **Research Observations to Record**: Justifications for chosen hypotheses and experimental scopes.
+- **Research Observations to Record**: Justifications for chosen hypotheses, pre-specified metrics ($PICP_g$, $CE_g$, $WGC$, $MCG$), unit-of-independence constraints, and falsification criteria.
 
 ---
 
