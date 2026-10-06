@@ -67,12 +67,43 @@ Consistent with the Step 4 leakage governance rules (ADR-011):
 
 ---
 
-## 2. Unresolved Protocol Specifications (Pending Later Step 5 Parts)
+## 2. Sensor Diagnostic — Pending Final Input Lock
+
+### 2.1 Diagnostic Scope and Strict Partition Boundaries
+
+A training-only exploratory diagnostic was executed for FD002 sensors $s1$ through $s21$ using the committed script [`scripts/audit_fd002_sensors.py`](../../scripts/audit_fd002_sensors.py).
+
+- **Data Source**: `data/raw/cmapss/train_FD002.txt`
+- **Engine Subset**: Restricted strictly to the **130 engines** defined in `partitions.train` of [`data/splits/fd002_engine_split_seed_2026.json`](../../data/splits/fd002_engine_split_seed_2026.json).
+- **Observation Rows**: 26,693 training cycles.
+- **Zero-Leakage Assurance**: No calibration (52 engines), validation (26 engines), or held-out test (52 engines) partition data was loaded or inspected for any diagnostic statistic.
+
+### 2.2 Summary of Diagnostic Findings
+
+The full output is recorded in [`research/research_design/fd002_training_sensor_diagnostic.csv`](fd002_training_sensor_diagnostic.csv).
+
+1. **Zero Within-Regime Variation (Constant within Regimes)**:
+   - Sensors **s1**, **s5**, **s18**, and **s19** exhibit exactly 0.0 standard deviation within each of the 6 operating regimes ($k=6$ K-means fit on training settings). Their overall variation is driven entirely by operating condition shifts.
+   - Sensors **s6** and **s10** exhibit near-zero within-regime standard deviation (< 0.005).
+2. **Near-Constant / Low Variation**:
+   - Sensor **s16** exhibits extremely low overall standard deviation (0.004709) and only 2 unique values across 26,693 training rows.
+3. **Sensors with Clear Within-Regime Variability**:
+   - Sensors **s2**, **s3**, **s4**, **s7**, **s8**, **s9**, **s11**, **s12**, **s13**, **s14**, **s15**, **s17**, **s20**, and **s21** exhibit non-zero within-regime variation and/or temporal degradation correlation.
+
+### 2.3 Non-Locking Governance Declaration
+
+- **Final Sensor Subset Unlocked**: This diagnostic provides descriptive empirical data ONLY. No final sensor set is chosen or locked by this section.
+- **No Automatic Removal**: No sensors have been dropped from data pipelines or model input definitions.
+- **No Feature Policy Decisions**: Decisions regarding operating setting inclusion, cycle feature retention, or sensor filtering rules are explicitly deferred to subsequent protocol steps.
+
+---
+
+## 3. Unresolved Protocol Specifications (Pending Later Step 5 Parts)
 
 The following data preprocessing, feature engineering, and evaluation specifications remain explicitly unresolved and will be defined in subsequent Step 5 sub-steps:
 
-- Sensor selection and filtering rules (Step 5.2)
-- Operating-setting input policy and scaling strategy (Step 5.2)
+- Final sensor selection and input policy lock (Step 5.2B)
+- Operating-setting input policy and scaling strategy (Step 5.2B)
 - Feature normalization and preconditioning strategy (Step 5.3)
 - Sequence length, window stride, and padding policy (Step 5.4)
 - Handling of short engine trajectories (Step 5.4)
@@ -83,4 +114,3 @@ The following data preprocessing, feature engineering, and evaluation specificat
 - Nominal conformal coverage levels ($\alpha$ levels) (Step 5.7)
 - Model architecture specifications (Step 5.8)
 
-No values or decisions for the above topics are locked by Step 5.1.
