@@ -295,6 +295,30 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 5 Data & Evaluation Protocol definition.
 
+---
+
+### ADR-012: Step 5 RUL Target Construction
+- **Date**: 2026-10-06
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the dataset qualification and engine-level split governance established in Step 4 (ADR-011), Step 5.1 requires locking the mathematical formulation and usage governance for Remaining Useful Life (RUL) prediction targets.
+  - Standardizing the RUL target is essential for supervised model training while preventing target leakage and ensuring that downstream scientific evaluation uses true, uncapped remaining operational lifetimes.
+- **Decisions**:
+  - **Capped Piecewise-Linear Training Target**: For supervised training of base RUL predictors, the target is defined as $\text{RUL}_{\text{target}}(i, t) = \min(\text{RUL}_{\text{true}}(i, t), 125)$, enforcing a fixed upper cap of 125 cycles.
+  - **Fixed Cap Rule**: The RUL cap value of 125 cycles is strictly locked. It must NOT be tuned, optimized, or made configurable based on validation or test set performance.
+  - **Uncapped Ground-Truth Retention**: The uncapped actual remaining cycles until failure, $\text{RUL}_{\text{true}}(i, t) = T_{\text{failure}}(i) - t$, is retained separately. `rul_true` must be used for final scientific evaluation, post-hoc error metrics, degradation-stage labeling, wasted RUL calculations, and downstream maintenance simulator consequence evaluation.
+  - **Target Non-Interchangeability**: `rul_target` and `rul_true` are strictly non-interchangeable. Model training consumes `rul_target`, whereas evaluation and maintenance decision consequences consume `rul_true`.
+  - **Model Output Interpretation**: Early-life predictions may saturate near the 125-cycle cap. `rul_target` must never be reported as an engine's actual remaining life, and wasted useful life must never be calculated from `rul_target`.
+  - **Inference-Time Input Leakage Restrictions**: Neither `rul_true`, `rul_target`, final failure cycle $T_{\text{failure}}(i)$, nor future-cycle data may be used as predictive model inputs, calibrator condition variables, operating condition features, or maintenance policy inputs at inference time.
+  - **Scope Limitation**: No other Step 5 preprocessing decisions (sensor selection, normalization, sequence windowing, degradation stage boundaries, subgroup eligibility thresholds, conformal coverage levels, or model architectures) are locked by this ADR; all remain unresolved for subsequent Step 5 sub-steps.
+- **Expected Implications**:
+  - Data preprocessing specifications documented in `research/research_design/data_evaluation_protocol.md`.
+  - All future RUL predictor training pipelines will generate `rul_target` as the training label while retaining `rul_true` for post-hoc evaluation.
+- **Follow-up Review Date / Trigger**:
+  - Step 5.2 Sensor and Input Policy definition.
+
+
 
 
 
