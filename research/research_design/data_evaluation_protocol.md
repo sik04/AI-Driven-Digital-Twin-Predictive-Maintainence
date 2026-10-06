@@ -76,6 +76,7 @@ A training-only exploratory diagnostic was executed for FD002 sensors $s1$ throu
 - **Data Source**: `data/raw/cmapss/train_FD002.txt`
 - **Engine Subset**: Restricted strictly to the **130 engines** defined in `partitions.train` of [`data/splits/fd002_engine_split_seed_2026.json`](../../data/splits/fd002_engine_split_seed_2026.json).
 - **Observation Rows**: 26,693 training cycles.
+- **Metrics Evaluated**: Row count, missing count, unique values, min, max, overall range, mean, std, variance, median absolute engine-cycle Pearson correlation, 6 per-regime std metrics (`regime_1_std`–`regime_6_std`), and 6 per-regime range metrics (`regime_1_range`–`regime_6_range`).
 - **Zero-Leakage Assurance**: No calibration (52 engines), validation (26 engines), or held-out test (52 engines) partition data was loaded or inspected for any diagnostic statistic.
 
 ### 2.2 Summary of Diagnostic Findings
@@ -83,18 +84,20 @@ A training-only exploratory diagnostic was executed for FD002 sensors $s1$ throu
 The full output is recorded in [`research/research_design/fd002_training_sensor_diagnostic.csv`](fd002_training_sensor_diagnostic.csv).
 
 1. **Zero Within-Regime Variation (Constant within Regimes)**:
-   - Sensors **s1**, **s5**, **s18**, and **s19** exhibit exactly 0.0 standard deviation within each of the 6 operating regimes ($k=6$ K-means fit on training settings). Their overall variation is driven entirely by operating condition shifts.
-   - Sensors **s6** and **s10** exhibit near-zero within-regime standard deviation (< 0.005).
+   - Sensors **s1**, **s5**, **s18**, and **s19** exhibit exactly 0.0 standard deviation and 0.0 range within each of the 6 operating regimes ($k=6$ K-means fit on training settings). Their overall variation is driven entirely by operating condition shifts.
+   - Sensors **s6** and **s10** exhibit near-zero within-regime standard deviation (< 0.005) and negligible within-regime range ($\le 0.02$).
 2. **Near-Constant / Low Variation**:
    - Sensor **s16** exhibits extremely low overall standard deviation (0.004709) and only 2 unique values across 26,693 training rows.
 3. **Sensors with Clear Within-Regime Variability**:
    - Sensors **s2**, **s3**, **s4**, **s7**, **s8**, **s9**, **s11**, **s12**, **s13**, **s14**, **s15**, **s17**, **s20**, and **s21** exhibit non-zero within-regime variation and/or temporal degradation correlation.
 
-### 2.3 Non-Locking Governance Declaration
+### 2.3 Diagnostic-Only Threshold Governance
 
-- **Final Sensor Subset Unlocked**: This diagnostic provides descriptive empirical data ONLY. No final sensor set is chosen or locked by this section.
-- **No Automatic Removal**: No sensors have been dropped from data pipelines or model input definitions.
-- **No Feature Policy Decisions**: Decisions regarding operating setting inclusion, cycle feature retention, or sensor filtering rules are explicitly deferred to subsequent protocol steps.
+- **Descriptive Convenience**: The descriptive label threshold (`DIAGNOSTIC_NEAR_CONSTANT_STD_THRESHOLD = 0.01`) used in `scripts/audit_fd002_sensors.py` serves strictly as an exploratory labeling convenience.
+- **Not a Locked Decision**: It is **NOT** a locked scientific research threshold and **NOT** an automated feature-selection rule.
+- **Raw Statistics Preserved**: Modifying or removing the descriptive threshold does not alter the underlying raw statistics recorded in the diagnostic CSV.
+- **Final Sensor Subset Unlocked**: Final sensor inclusion, exclusion, operating-setting retention, and cycle feature policies will be evaluated and decided separately in Step 5.2B.
+- **No Automatic Removal**: Zero sensors have been removed from data pipelines or model input definitions.
 
 ---
 
