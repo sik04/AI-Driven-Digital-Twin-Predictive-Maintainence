@@ -11,7 +11,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
-| **Phase 3** | Dataset Study and Experimental Protocol | Planned | C-MAPSS dataset exploration, split protocol, metrics |
+| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 4 complete; Step 5 Data & Evaluation Protocol active | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
 | **Phase 6** | Proposed Model Development | Planned | Novel prognostic architecture formulation and training |
@@ -88,7 +88,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: Completed (Step 4 Dataset Qualification & Feasibility verified)
+- **Status**: In Progress — Step 4 complete; Step 5 Data & Evaluation Protocol active
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
