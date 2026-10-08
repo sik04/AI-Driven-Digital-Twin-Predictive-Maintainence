@@ -12,11 +12,11 @@
 - [x] Cost scenario families locked
 - [x] Validation-only pilot complete
 - [x] Held-out test untouched
-- [ ] Numerical cost values frozen
-- [ ] Practical-effect thresholds frozen
-- [ ] Final cost-scenario YAML contains no null values
-- [ ] maintenance_simulator.md matches implementation
-- [ ] ADR updated with final numerical freeze
-- [ ] Step 6 marked COMPLETE
-- [ ] PR reviewed
-- [ ] PR ready for merge
+- [x] Numerical cost values frozen
+- [x] Practical-effect thresholds frozen
+- [x] Final cost-scenario YAML contains no null values
+- [x] maintenance_simulator.md matches implementation
+- [x] ADR updated with final numerical freeze
+- [x] Step 6 marked COMPLETE
+- [x] PR reviewed
+- [x] PR ready for merge

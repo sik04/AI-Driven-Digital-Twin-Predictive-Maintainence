@@ -10,34 +10,34 @@ scenarios:
     role: "primary_confirmatory"
     name: "Primary Balanced Cost Scenario"
     description: "Primary confirmatory maintenance scenario balancing failure avoidance and unnecessary early replacement."
-    status: "pending_validation_freeze"
-    preventive_cost: null
-    failure_cost: null
-    wasted_rul_cost_per_cycle: null
+    status: "frozen"
+    preventive_cost: 10.0
+    failure_cost: 100.0
+    wasted_rul_cost_per_cycle: 1.0
 
   failure_sensitive:
     id: "failure_sensitive"
     role: "sensitivity_analysis"
     name: "Failure Sensitive Cost Scenario"
     description: "Sensitivity scenario assigning greater relative importance to reaching failure."
-    status: "pending_validation_freeze"
-    preventive_cost: null
-    failure_cost: null
-    wasted_rul_cost_per_cycle: null
+    status: "frozen"
+    preventive_cost: 10.0
+    failure_cost: 500.0
+    wasted_rul_cost_per_cycle: 1.0
 
   waste_sensitive:
     id: "waste_sensitive"
     role: "sensitivity_analysis"
     name: "Waste Sensitive Cost Scenario"
     description: "Sensitivity scenario assigning greater relative importance to discarding usable remaining life."
-    status: "pending_validation_freeze"
-    preventive_cost: null
-    failure_cost: null
-    wasted_rul_cost_per_cycle: null
+    status: "frozen"
+    preventive_cost: 10.0
+    failure_cost: 100.0
+    wasted_rul_cost_per_cycle: 5.0
 
 governance:
   - "Exactly one primary scenario (primary_balanced) and two sensitivity scenarios (failure_sensitive, waste_sensitive) are defined."
-  - "Numerical cost values must be frozen prior to confirmatory testing during Step 6.7 numerical decision freeze."
+  - "Numerical cost values are frozen prior to confirmatory testing during Step 6.7 numerical decision freeze."
   - "The identical frozen cost scenario parameters must apply to every comparative method in an evaluation."
   - "Held-out test results must NEVER be inspected or used to tune cost scenario parameters."
   - "No scenario may be removed or modified post-hoc because comparative results are unfavorable."

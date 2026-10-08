@@ -261,6 +261,6 @@ The cost infrastructure defines three scenario families in `research/research_de
 - **`waste_sensitive`**: Sensitivity scenario assigning greater relative importance to discarding usable remaining life ($C_{\text{WASTE}}$ weighted higher).
 
 > **Governance Notice**:
-> The scenario **FAMILY definitions** are locked.
-> The **NUMERICAL VALUES** ($C_{\text{PM}}, C_{\text{FAIL}}, C_{\text{WASTE}}$) are intentionally **DEFERRED / UNLOCKED** pending researcher review of the Step 6.7 validation-only decision pilot (`step06_numerical_freeze_decision.md`). Held-out test evaluation results MUST NOT be used to tune or select these numerical parameters.
+> The scenario **FAMILY definitions** and **NUMERICAL VALUES** ($C_{\text{PM}}=10, C_{\text{FAIL}}=100, C_{\text{WASTE}}=1$ for primary balanced; sensitivity scenarios defined in `maintenance_cost_scenarios.yaml`) are **OFFICIALLY FROZEN** following researcher approval in `step06_numerical_freeze_decision.md`. Held-out test evaluation results MUST NOT be used to tune or select these numerical parameters.
+
 

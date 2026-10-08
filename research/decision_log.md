@@ -397,14 +397,15 @@ This log documents formal architectural, methodological, and research governance
   2. **Common Policy Interface**: `MaintenancePolicy` protocol defined in `types.py`. Any policy receives only `PredictionState` containing `engine_id`, `cycle`, `point_rul`, `lower_rul`, `upper_rul`, and optional `regime`. Ground-truth RUL, failure cycles, and future records are strictly prohibited.
   3. **Deterministic Validation Suite**: 11 unit tests locked in `tests/test_maintenance_simulator.py` validating perfect timing, never maintain, early maintenance, final opportunity, continue at final opportunity, optimistic prediction stream, pessimistic prediction stream, cost arithmetic, policy information isolation, invalid input handling, and fleet aggregation.
   4. **Cost Scenario Families**: Locked three scenario family structures in `research_design/maintenance_cost_scenarios.yaml`: `primary_balanced`, `failure_sensitive`, and `waste_sensitive`.
-  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}, C_{\text{FAIL}}, C_{\text{WASTE}}$) and practical-effect thresholds remain intentionally deferred/unlocked pending researcher review of the validation pilot decision packet (`step06_numerical_freeze_decision.md`).
+  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}=10.0, C_{\text{FAIL}}=100.0, C_{\text{WASTE}}=1.0$ for `primary_balanced`) and practical-effect thresholds (5% cost reduction, 5% max worst-group coverage error) are officially frozen following researcher approval of the decision packet (`step06_numerical_freeze_decision.md`).
   6. **Strict Leakage Prohibition**: Held-out test set evaluation results must NEVER be used to choose, tune, or optimize cost scenario values or practical-effect thresholds.
-  7. **Unresolved Status**: Numerical cost values and practical-effect thresholds remain researcher-controlled and unresolved. No default numerical values or fallback parameters are assigned in code or configuration.
+  7. **Step 6 Status**: Step 6 Sequential Maintenance Simulator is officially marked **COMPLETE** and frozen for downstream confirmatory model development in Step 7.
 - **Expected Implications**:
-  - The simulator software stack and deterministic validation protocol are locked.
-  - Final Step 6 freeze awaits researcher-approved numerical cost values and practical-effect thresholds.
+  - The simulator software stack, deterministic validation protocol, cost scenario parameters, and practical-effect thresholds are frozen.
+  - Step 7 model development can proceed under locked evaluation controls.
 - **Follow-up Review Date / Trigger**:
-  - Researcher review and approval of `step06_numerical_freeze_decision.md`.
+  - Step 7 baseline model training.
+
 
 
 
