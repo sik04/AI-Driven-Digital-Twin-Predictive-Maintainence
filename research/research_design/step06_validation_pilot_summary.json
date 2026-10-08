@@ -1,0 +1,84 @@
+{
+  "title": "Step 6 Validation-Only Numerical Decision Pilot Summary",
+  "notice": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE OR RESEARCH RESULTS",
+  "validation_engine_count": 26,
+  "validation_engine_ids": [
+    9,
+    16,
+    21,
+    25,
+    30,
+    51,
+    54,
+    75,
+    94,
+    95,
+    96,
+    98,
+    128,
+    133,
+    157,
+    169,
+    191,
+    205,
+    219,
+    224,
+    236,
+    237,
+    243,
+    248,
+    249,
+    256
+  ],
+  "held_out_test_engines_inspected": 0,
+  "stream_results": {
+    "PERFECT": {
+      "label": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE",
+      "engine_count": 26,
+      "preventive_maintenance_count": 26,
+      "failure_count": 0,
+      "preventive_maintenance_rate": 1.0,
+      "failure_rate": 0.0,
+      "mean_wasted_rul_all_engines": 5.0,
+      "mean_wasted_rul_preventive_only": 5.0,
+      "median_wasted_rul_preventive_only": 5.0,
+      "intervention_cycle_summary": {
+        "min": 149,
+        "mean": 203.58,
+        "max": 301
+      }
+    },
+    "OPTIMISTIC": {
+      "label": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE",
+      "engine_count": 26,
+      "preventive_maintenance_count": 0,
+      "failure_count": 26,
+      "preventive_maintenance_rate": 0.0,
+      "failure_rate": 1.0,
+      "mean_wasted_rul_all_engines": 0.0,
+      "mean_wasted_rul_preventive_only": 0.0,
+      "median_wasted_rul_preventive_only": 0.0,
+      "intervention_cycle_summary": {
+        "min": null,
+        "mean": null,
+        "max": null
+      }
+    },
+    "PESSIMISTIC": {
+      "label": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE",
+      "engine_count": 26,
+      "preventive_maintenance_count": 26,
+      "failure_count": 0,
+      "preventive_maintenance_rate": 1.0,
+      "failure_rate": 0.0,
+      "mean_wasted_rul_all_engines": 30.0,
+      "mean_wasted_rul_preventive_only": 30.0,
+      "median_wasted_rul_preventive_only": 30.0,
+      "intervention_cycle_summary": {
+        "min": 124,
+        "mean": 178.58,
+        "max": 276
+      }
+    }
+  }
+}

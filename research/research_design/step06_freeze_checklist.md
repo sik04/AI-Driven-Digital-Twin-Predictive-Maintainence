@@ -1,0 +1,22 @@
+# Step 6 Freeze Checklist
+
+- [x] Step 5 protocol frozen
+- [x] Simulator event ordering locked
+- [x] Action space locked
+- [x] Policy information boundary locked
+- [x] Simulator implementation complete
+- [x] Deterministic simulator tests pass
+- [x] Post-maintenance trajectory prohibited
+- [x] Per-engine output schema locked
+- [x] Cost equations locked
+- [x] Cost scenario families locked
+- [x] Validation-only pilot complete
+- [x] Held-out test untouched
+- [x] Numerical cost values frozen
+- [x] Practical-effect thresholds frozen
+- [x] Final cost-scenario YAML contains no null values
+- [x] maintenance_simulator.md matches implementation
+- [x] ADR updated with final numerical freeze
+- [x] Step 6 marked COMPLETE
+- [x] PR reviewed
+- [x] PR ready for merge

@@ -11,7 +11,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
-| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 4 complete; Step 5 Data & Evaluation Protocol active | C-MAPSS dataset exploration, split protocol, metrics |
+| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 Maintenance Simulator active | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
 | **Phase 6** | Proposed Model Development | Planned | Novel prognostic architecture formulation and training |
@@ -88,10 +88,12 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: In Progress — Step 4 complete; Step 5 Data & Evaluation Protocol active
+- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator COMPLETE and frozen
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
+  - Data & Evaluation Protocol specification in `research/research_design/data_evaluation_protocol.md`.
+  - Sequential Maintenance Simulator specification in `research/research_design/maintenance_simulator.md`.
   - Machine-readable reproducible engine split manifest in `data/splits/fd002_engine_split_seed_2026.json`.
   - Canonical dataset organization in `data/raw/cmapss/`.
   - Strict engine-level data splitting protocol document.
@@ -100,9 +102,11 @@ This document outlines the master research and development roadmap for the Intel
 - **Acceptance Criteria**:
   - Strict train/calibration/validation/test engine isolation verified with automated assertions (130 / 52 / 26 / 52 engines).
   - Preprocessing scalers fit only on training sets.
-  - Primary metrics, comparators, and statistical governance remain locked. Exact numerical practical-effect thresholds remain deferred to the later maintenance-simulator validation stage (Step 6) and must be frozen before confirmatory testing.
+  - Primary metrics, comparators, and statistical governance remain locked. Numerical cost parameters ($C_{\text{PM}}=10, C_{\text{FAIL}}=100, C_{\text{WASTE}}=1$) and practical-effect thresholds frozen.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (Simulator contract, core replay engine, 11-case deterministic validation suite, cost scenario families, validation-only decision pilot, and numerical cost freeze complete).
+
+
 
 ---
 

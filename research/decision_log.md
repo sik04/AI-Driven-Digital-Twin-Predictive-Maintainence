@@ -352,6 +352,63 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 5.4 Sequence / Window Construction definition.
 
+---
+
+### ADR-014: Sequential Maintenance Simulator Contract and Cost Structure
+- **Date**: 2026-10-08
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the finalization of the Step 5 Data & Evaluation Protocol (ADR-012, ADR-013), Step 6 requires formalizing the sequential maintenance simulator contract, event ordering, action space, information boundaries, and cost model structure.
+  - Standardizing the simulator contract prior to policy development and model training is necessary to prevent lookahead leakage, target contamination, custom cost functions, or unequal comparison conditions.
+- **Decisions**:
+  1. **Chronological Replay**: Engine trajectories are replayed independently in strict chronological order ($t = 1, 2, \dots$).
+  2. **Strict Information Boundary**: Only observations available through decision cycle $t$ ($\mathcal{H}(i, t)$) may influence the policy decision at cycle $t$.
+  3. **Action Space**: Restrict the action space strictly to two discrete choices: $\mathcal{A} = \{\text{CONTINUE}, \text{MAINTAIN\_NOW}\}$. No inspection, partial repair, or fleet optimization actions are approved.
+  4. **Episode Termination**: Selecting $\text{MAINTAIN\_NOW}$ terminates the engine episode immediately and permanently.
+  5. **No Post-Maintenance Trajectory**: Post-maintenance trajectories, sensor resets, or engine overhauls are NOT simulated on C-MAPSS data.
+  6. **Final Preventive Opportunity**: The final preventive decision opportunity occurs at cycle $t = T_{\text{failure}}(i) - 1$ ($\text{RUL}_{\text{true}} = 1$).
+  7. **Failure Event Boundary**: Selecting $\text{CONTINUE}$ at cycle $T_{\text{failure}}(i) - 1$ transitions the engine to functional failure at $T_{\text{failure}}(i)$ ($\text{RUL}_{\text{true}} = 0$) and terminates the replay without further decision opportunities.
+  8. **Hidden Ground Truth**: True remaining life $\text{RUL}_{\text{true}}$, target $\text{RUL}_{\text{target}}$, failure cycle $T_{\text{failure}}$, and future telemetry are strictly hidden from the online decision policy.
+  9. **Uniform Interface**: All baselines (point-prediction, global conformal, condition-aware conformal, proposed decision-aware, matched-conservatism controls) interact with the exact same simulator interface, event ordering, and cost function.
+  10. **Cost Structure**: Maintenance cost contains exactly three components: $C_{\text{PM}}$ (fixed PM cost), $C_{\text{FAIL}}$ (unmitigated failure cost), and $C_{\text{WASTE}}$ (cost per wasted RUL cycle).
+  11. **Preventive Cost**: Preventive maintenance cost at cycle $\tau_i$ is $C_i = C_{\text{PM}} + C_{\text{WASTE}} \cdot W_i$, where $W_i = T_{\text{failure}}(i) - \tau_i = \text{RUL}_{\text{true}}(i, \tau_i)$.
+  12. **Failure Cost**: Failure cost is $C_i = C_{\text{FAIL}}$.
+  13. **Deferred Parameter Values**: Numerical parameter values for $C_{\text{PM}}$, $C_{\text{FAIL}}$, and $C_{\text{WASTE}}$ remain intentionally deferred to pre-specified validation scenarios in Step 6.
+  14. **Simulated Cost Units**: All costs are expressed in Simulated Cost Units under the constraint $C_{\text{PM}} > 0, C_{\text{FAIL}} > C_{\text{PM}}, C_{\text{WASTE}} \ge 0$.
+  15. **Independent Unit**: The engine ($N$) is the fundamental independent unit of evaluation and statistical analysis.
+  16. **Primary Outcome**: Mean simulated maintenance cost per engine ($\bar{C} = \frac{1}{N} \sum_{i=1}^N C_i$) remains the primary outcome for RQ1.
+- **Expected Implications**:
+  - Detailed simulator contract documented in `research/research_design/maintenance_simulator.md`.
+  - Future simulator software implementation will strictly execute this chronological contract.
+- **Follow-up Review Date / Trigger**:
+  - Step 6 simulator implementation and validation scenario freezing.
+
+---
+
+### ADR-015: Step 6 Simulator Core Implementation, Deterministic Validation, and Cost-Scenario Infrastructure
+- **Date**: 2026-10-08
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the locked sequential maintenance simulator contract (ADR-014), Step 6 requires implementing the core Python replay engine (`src/intellitwin/simulator/`), establishing a deterministic validation suite (`tests/test_maintenance_simulator.py`), defining cost-scenario family structures (`research_design/maintenance_cost_scenarios.yaml`), and executing a validation-only decision pilot (`scripts/run_step06_simulator_validation.py`).
+- **Decisions**:
+  1. **Simulator Implementation Semantics**: Simulator codebase implemented in `src/intellitwin/simulator/` (`types.py`, `costs.py`, `engine.py`). Replay is strictly chronological, enforcing $t < T_{\text{failure}}$ and isolating policy execution from ground-truth failure cycles and true RUL.
+  2. **Common Policy Interface**: `MaintenancePolicy` protocol defined in `types.py`. Any policy receives only `PredictionState` containing `engine_id`, `cycle`, `point_rul`, `lower_rul`, `upper_rul`, and optional `regime`. Ground-truth RUL, failure cycles, and future records are strictly prohibited.
+  3. **Deterministic Validation Suite**: 11 unit tests locked in `tests/test_maintenance_simulator.py` validating perfect timing, never maintain, early maintenance, final opportunity, continue at final opportunity, optimistic prediction stream, pessimistic prediction stream, cost arithmetic, policy information isolation, invalid input handling, and fleet aggregation.
+  4. **Cost Scenario Families**: Locked three scenario family structures in `research_design/maintenance_cost_scenarios.yaml`: `primary_balanced`, `failure_sensitive`, and `waste_sensitive`.
+  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}=10.0, C_{\text{FAIL}}=100.0, C_{\text{WASTE}}=1.0$ for `primary_balanced`) and practical-effect thresholds (5% cost reduction, 5% max worst-group coverage error) are officially frozen following researcher approval of the decision packet (`step06_numerical_freeze_decision.md`).
+  6. **Strict Leakage Prohibition**: Held-out test set evaluation results must NEVER be used to choose, tune, or optimize cost scenario values or practical-effect thresholds.
+  7. **Step 6 Status**: Step 6 Sequential Maintenance Simulator is officially marked **COMPLETE** and frozen for downstream confirmatory model development in Step 7.
+- **Expected Implications**:
+  - The simulator software stack, deterministic validation protocol, cost scenario parameters, and practical-effect thresholds are frozen.
+  - Step 7 model development can proceed under locked evaluation controls.
+- **Follow-up Review Date / Trigger**:
+  - Step 7 baseline model training.
+
+
+
+
 
 
 
