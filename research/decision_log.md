@@ -318,6 +318,41 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 5.2 Sensor and Input Policy definition.
 
+---
+
+### ADR-013: Final Predictive Input Schema and Training-Only Normalization Protocol
+- **Date**: 2026-10-06
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the locked RUL target construction (ADR-012) and the training-only FD002 sensor diagnostic (`research/research_design/fd002_training_sensor_diagnostic.csv`), Step 5.2B and Step 5.3 require locking the final predictive input feature schema, sensor exclusion policies, and strict training-only feature normalization rules across all benchmark datasets.
+  - Locking feature definitions and normalization protocols prior to sequence windowing and model training is essential to prevent feature cherry-picking, target leakage, and test-set data contamination.
+- **Decisions**:
+  1. **Engine ID Excluded**: `unit` is an identifier for partition assignment, trajectory grouping, and unit-of-independence statistical evaluation; it is strictly excluded from predictive model inputs.
+  2. **Cycle Excluded**: `cycle` is used for temporal ordering, window construction, label calculation, and trajectory indexing; it is strictly excluded from predictive model inputs to force predictors to learn health status from sensor telemetry rather than operational age shortcuts.
+  3. **Operating Settings Retained**: All three operating settings (`setting1`, `setting2`, `setting3`) are retained as predictive model inputs and remain the ONLY variables used for operating regime identification.
+  4. **Final Retained Sensor Set**: Exactly 14 sensors are locked as predictive inputs: `s2`, `s3`, `s4`, `s7`, `s8`, `s9`, `s11`, `s12`, `s13`, `s14`, `s15`, `s17`, `s20`, `s21`.
+  5. **Final Excluded Sensor Set**: Exactly 7 sensors are locked as excluded: `s1`, `s5`, `s6`, `s10`, `s16`, `s18`, `s19`. Exclusion is supported by empirical evidence in `fd002_training_sensor_diagnostic.csv` showing zero (`s1`, `s5`, `s18`, `s19`), near-zero (`s6`, `s10`), or near-constant (`s16`) within-regime variation.
+  6. **Common Sensor Schema**: The identical 14-sensor schema is enforced across FD001 (control), FD002 (primary), and FD004 (robustness) to prevent dataset-specific feature selection bias.
+  7. **Canonical Per-Cycle Predictive Vector**: Each operational cycle is represented by a 17-dimensional feature vector ($3 \text{ settings} + 14 \text{ sensors}$) in canonical order: `["setting1", "setting2", "setting3", "s2", "s3", "s4", "s7", "s8", "s9", "s11", "s12", "s13", "s14", "s15", "s17", "s20", "s21"]`.
+  8. **FD002 Setting Normalization**: `setting1`–`setting3` are globally standardized using a single `StandardScaler` fit on the 130 FD002 training engines only.
+  9. **Unified Setting Scaler**: The same frozen training-derived setting scaler is used for both K-means operating regime identification ($k=6$) and predictor setting inputs.
+  10. **FD002 Sensor Normalization**: Retained sensors are normalized using regime-aware z-score normalization ($x_{\text{normalized}} = (x - \mu_{\text{train}}[g, j]) / \sigma_{\text{train}}[g, j]$) using means and standard deviations computed strictly from the 130 FD002 training engines within each of the 6 frozen regimes.
+  11. **FD001 Normalization Protocol**: FD001 uses global training-only z-score normalization for settings and retained sensors without regime clustering because it is the single-condition control dataset.
+  12. **FD004 Normalization Protocol**: FD004 will use dataset-specific training-only regime-aware normalization after its engine split is frozen in later Step 5 sub-steps.
+  13. **Missing-Value Policy**: Silent imputation (mean, median, forward/backward fill, interpolation) is strictly prohibited. Missing values must trigger an explicit data validation error.
+  14. **Zero Standard Deviation Rule**: If a training-derived standard deviation is zero, pipelines must trigger a validation failure rather than silently replacing std with 1.0 or adding epsilon.
+  15. **Prohibited Transformations**: PCA, ICA, polynomial expansion, temporal smoothing (moving average, Savitzky-Golay), clipping, winsorization, learned feature selection, and target encoding are explicitly prohibited.
+  16. **Training-Only Learning Rule**: All preprocessing parameters MUST be fit strictly on training engines. Calibration, validation, and test partitions MUST be transformed using frozen parameters and must never influence parameter fitting.
+- **Evidence Reviewed**:
+  - Training-only sensor diagnostic results in `research/research_design/fd002_training_sensor_diagnostic.csv` and executable script `scripts/audit_fd002_sensors.py`.
+- **Expected Implications**:
+  - Input schema and preprocessing specifications documented in `research/research_design/data_evaluation_protocol.md`.
+  - Future data pipeline modules will implement the 17-feature input vector and training-only normalization rules.
+- **Follow-up Review Date / Trigger**:
+  - Step 5.4 Sequence / Window Construction definition.
+
+
 
 
 
