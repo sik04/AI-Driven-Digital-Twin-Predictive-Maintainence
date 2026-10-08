@@ -417,6 +417,73 @@ def test_fleet_simulation_and_metrics() -> None:
     assert metrics["mean_wasted_rul_preventive_only"] == 2.0
 
 
+def test_incomplete_trajectory_rejection() -> None:
+    """Defect A Regression: Reject incomplete trajectories missing interior cycles."""
+
+    cost_cfg = TEST_COST_CONFIG
+
+    # Missing interior cycle 2 (cycles 1, 3..9 for failure_cycle=10)
+    gapped_states = [PredictionState(1, t, 10.0 - t, 5.0, 15.0) for t in [1, 3, 4, 5, 6, 7, 8, 9]]
+    _assert_raises_value_error(
+        lambda: simulate_engine_trajectory(
+            1, 10, gapped_states, lambda s: MaintenanceAction.CONTINUE, cost_cfg
+        )
+    )
+
+    # Premature sequence termination (ends at cycle 5 instead of 9 for failure_cycle=10)
+    truncated_states = [PredictionState(1, t, 10.0 - t, 5.0, 15.0) for t in range(1, 6)]
+    _assert_raises_value_error(
+        lambda: simulate_engine_trajectory(
+            1, 10, truncated_states, lambda s: MaintenanceAction.CONTINUE, cost_cfg
+        )
+    )
+
+
+def test_undefined_conditional_metrics() -> None:
+    """Defect B Regression: Return None for PM-only metrics when PM count is 0."""
+    traj = (
+        1,
+        10,
+        [PredictionState(1, t, float(10 - t), float(8 - t), float(12 - t)) for t in range(1, 10)],
+    )
+
+    # Policy always continues -> 0 PM interventions
+    results = simulate_fleet([traj], lambda s: MaintenanceAction.CONTINUE, TEST_COST_CONFIG)
+    metrics = compute_fleet_metrics(results)
+
+    assert metrics["n_engines"] == 1
+    assert metrics["preventive_maintenance_rate"] == 0.0
+    assert metrics["failure_rate"] == 1.0
+    assert metrics["mean_wasted_rul_all_engines"] == 0.0
+    assert metrics["mean_wasted_rul_preventive_only"] is None
+    assert metrics["median_wasted_rul_preventive_only"] is None
+    assert metrics["mean_intervention_cycle"] is None
+    assert metrics["median_intervention_cycle"] is None
+
+
+def test_non_finite_cost_rejection() -> None:
+    """Defect C Regression: Reject NaN and infinity in cost parameters and wasted_rul."""
+    # Non-finite preventive_cost
+    _assert_raises_value_error(
+        lambda: MaintenanceCostConfig(
+            preventive_cost=float("nan"), failure_cost=100.0, wasted_rul_cost_per_cycle=1.0
+        )
+    )
+    _assert_raises_value_error(
+        lambda: MaintenanceCostConfig(
+            preventive_cost=float("inf"), failure_cost=100.0, wasted_rul_cost_per_cycle=1.0
+        )
+    )
+
+    # Non-finite wasted_rul in preventive_maintenance_cost
+    _assert_raises_value_error(
+        lambda: preventive_maintenance_cost(TEST_COST_CONFIG, wasted_rul=float("nan"))
+    )
+    _assert_raises_value_error(
+        lambda: preventive_maintenance_cost(TEST_COST_CONFIG, wasted_rul=float("inf"))
+    )
+
+
 if __name__ == "__main__":
     test_funcs = [
         test_case_1_perfect_timing_path,
@@ -430,6 +497,9 @@ if __name__ == "__main__":
         test_case_9_policy_information_isolation,
         test_case_10_invalid_input_validation,
         test_fleet_simulation_and_metrics,
+        test_incomplete_trajectory_rejection,
+        test_undefined_conditional_metrics,
+        test_non_finite_cost_rejection,
     ]
     for func in test_funcs:
         print(f"Running {func.__name__}...", end=" ")

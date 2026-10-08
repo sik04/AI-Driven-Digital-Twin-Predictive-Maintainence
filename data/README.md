@@ -45,17 +45,15 @@ To set up the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS
 
 ---
 
-## 3. Reproducible Engine Split Manifest
+## 3. Reproducible Engine Split Manifests
 
-The pre-specified, engine-level stratified partition manifest for FD002 (Seed 2026, lifetime quartile stratification) is committed and tracked at:
+Pre-specified, engine-level stratified partition manifests (Seed 2026, lifetime quartile stratification) are committed and tracked at:
 
-```text
-data/splits/fd002_engine_split_seed_2026.json
-```
+- **FD001**: `data/splits/fd001_engine_split_seed_2026.json` (50 / 20 / 10 / 20 engines; Total: 100)
+- **FD002**: `data/splits/fd002_engine_split_seed_2026.json` (130 / 52 / 26 / 52 engines; Total: 260)
+- **FD004**: `data/splits/fd004_engine_split_seed_2026.json` (124 / 50 / 25 / 50 engines; Total: 249)
 
-### Partition Summary (FD002 Primary Dataset)
-- **Train Partition**: 130 engines (50%)
-- **Calibration Partition**: 52 engines (20%)
-- **Validation Partition**: 26 engines (10%)
-- **Held-out Test Partition**: 52 engines (20%)
-- **Total Unique Engines**: 260 engines (100% disjoint isolation)
+### Partition Ratios (50% Train / 20% Calibration / 10% Validation / 20% Test)
+- All partitions enforce 100% engine-level disjoint isolation.
+- Preprocessing scalers, K-means operating-regime models, and feature normalization parameters are fit on training partition engines ONLY.
+

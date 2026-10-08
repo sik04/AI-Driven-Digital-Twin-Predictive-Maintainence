@@ -45,11 +45,12 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
 
 - **Phase 0: Research Project Setup and Governance**: **Completed** (Repository reset, baseline backup, CI workflow, packaging, and governance framework verified).
 - **Phase 1: Systematic Literature Review**: **Completed** (26 verified scholarly works synthesized in [`research/literature/literature_synthesis.md`](research/literature/literature_synthesis.md), [`paper/references.bib`](paper/references.bib), and [`research/literature/source_verification.csv`](research/literature/source_verification.csv)).
-- **Active Milestone**: **Phase 2: Research Gap, Questions, Hypotheses & Contributions** (**In Progress**):
-  - Final Research Problem and RQ1–RQ4 locked in [`research/research_questions.md`](research/research_questions.md).
-  - Detailed Phase 2 formulation completed in [`research/research_design/research_gap.md`](research/research_design/research_gap.md).
-  - Architectural decision log updated in [`research/decision_log.md`](research/decision_log.md).
-  - Claims evidence matrix updated in [`paper/claims_evidence_matrix.csv`](paper/claims_evidence_matrix.csv).
+- **Phase 2: Research Gap, Questions, Hypotheses & Contributions**: **Completed** (Final Research Problem, RQ1–RQ4, and pre-specified hypotheses locked in [`research/research_questions.md`](research/research_questions.md)).
+- **Phase 3: Dataset Study and Experimental Protocol**: **In Progress**:
+  - Step 4 Dataset Qualification: **Completed** (FD002 primary, FD001 control, FD004 robustness).
+  - Step 5 Data & Evaluation Protocol: **Completed** (Locked 17-feature schema, zero-variance scaling rule, 30-cycle windowing, retrospective stages, and split manifests in `data/splits/`).
+  - Step 6 Sequential Maintenance Simulator: **In Progress** (Simulator contract, Python replay engine, 14-case deterministic validation suite, cost scenario infrastructure, and validation pilot complete. Numerical cost approval pending researcher decision).
+
 
 
 ---

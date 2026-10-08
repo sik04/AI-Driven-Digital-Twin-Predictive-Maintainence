@@ -48,9 +48,17 @@ To prevent ambiguity, the following canonical metrics are mandated across all co
 
 ## 5. Experiment Provenance and Artifact Logging
 
-Every formal experiment must generate an entry following `experiments/templates/experiment_record.md` recording:
-- Experiment ID and date
-- Exact Git commit SHA
-- Hardware and operating environment (OS, CPU, GPU, Python version, library versions)
-- Hyperparameter dictionary
-- Raw metric outputs and artifact paths
+Every formal experiment must generate an entry following `experiments/templates/experiment_record.md` recording all 11 mandatory provenance fields:
+
+1. **Dataset / Source Hashes**: Raw file SHA-256 (e.g. `train_FD002.txt`).
+2. **Split Manifest Hash**: JSON split manifest SHA-256 (e.g. `fd002_engine_split_seed_2026.json`).
+3. **Protocol Version**: Data & Evaluation Protocol version (e.g. Step 5 v1.0).
+4. **Feature Order & Window Configuration**: Canonical 17-feature order and 30-cycle lookahead parameters.
+5. **Preprocessing Artifact Hashes**: SHA-256 of setting scalers, K-means centroids, and sensor normalization statistics.
+6. **Model Seed & Full Configuration**: Model run seed (`2026`–`2030`) and complete hyperparameter dict.
+7. **Calibration Configuration**: Conformal calibration method, nonconformity score, and calibrator parameters.
+8. **Nominal Coverage**: Target coverage level $1 - \alpha$ (90%, $\alpha=0.10$).
+9. **Git SHA & Dirty Status**: Exact commit SHA and dirty worktree status (`git status --porcelain`).
+10. **Python & Package Versions**: Executable version, PyTorch, NumPy, SciPy, scikit-learn versions.
+11. **Output Artifact Locations**: File paths for model checkpoints, prediction logs, and summary JSON artifacts.
+

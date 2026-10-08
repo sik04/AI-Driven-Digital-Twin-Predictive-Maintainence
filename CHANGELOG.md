@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Complete Step 5 Data & Evaluation Protocol specifications in `research/research_design/data_evaluation_protocol.md` (17-feature schema, zero-variance ddof=0 scaling rule, 30-cycle windowing, retrospective lifecycle stages, engine-weighted worst-group coverage metrics, and 5-seed model run protocol).
+- Engine split manifests `data/splits/fd001_engine_split_seed_2026.json` (50/20/10/20) and `data/splits/fd004_engine_split_seed_2026.json` (124/50/25/50) generated deterministically via `scripts/generate_engine_splits.py`. Preserved `fd002_engine_split_seed_2026.json` byte-for-byte.
+- Split generator unit tests in `tests/test_split_generator.py`.
+- Sequential maintenance simulator core in `src/intellitwin/simulator/` (`types.py`, `costs.py`, `engine.py`) and 14 deterministic validation unit tests in `tests/test_maintenance_simulator.py`.
+- Step 6 numerical decision pilot script `scripts/run_step06_simulator_validation.py` and regenerated validation pilot summary `research/research_design/step06_validation_pilot_summary.json`.
+- Architectural decision record ADR-016 in `research/decision_log.md` reconciling Step 5 protocol and correcting Step 6 governance status.
+
+### Changed
+- Reconciled Step 6 governance status across `maintenance_cost_scenarios.yaml`, `step06_numerical_freeze_decision.md`, `step06_freeze_checklist.md`, `maintenance_simulator.md`, `roadmap.md`, and `README.md` (marking simulator implementation complete while keeping numerical cost approval pending researcher decision).
+
 - Literature source verification register (`research/literature/source_verification.csv`) tracking metadata verification, methodology status, reproduction status, and verification basis for 26 bibliographic references.
 - Literature evidence corrections log (`research/literature/evidence_corrections.md`) recording exact previous assertions, replacements, supplied sources, and remaining uncertainties.
 - Reinstated `yan2026audit` software artifact (Zenodo v1 deposit) and added comparators `robinson2026riskaware` (IJPHM 2026) and `benabdennour2026grouped` (Machines 2026) across bibliography and literature matrices.

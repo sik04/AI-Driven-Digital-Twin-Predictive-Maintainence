@@ -88,23 +88,24 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator COMPLETE and frozen
+- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator active (implementation and validation complete; numerical cost freeze pending researcher approval)
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
   - Data & Evaluation Protocol specification in `research/research_design/data_evaluation_protocol.md`.
   - Sequential Maintenance Simulator specification in `research/research_design/maintenance_simulator.md`.
-  - Machine-readable reproducible engine split manifest in `data/splits/fd002_engine_split_seed_2026.json`.
+  - Machine-readable reproducible engine split manifests in `data/splits/fd001_engine_split_seed_2026.json`, `fd002_engine_split_seed_2026.json`, `fd004_engine_split_seed_2026.json`.
   - Canonical dataset organization in `data/raw/cmapss/`.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
   - Document the deferred-threshold dependency and the protocol requirements that the later maintenance-simulator stage (Step 6) must satisfy before thresholds can be frozen.
 - **Acceptance Criteria**:
-  - Strict train/calibration/validation/test engine isolation verified with automated assertions (130 / 52 / 26 / 52 engines).
+  - Strict train/calibration/validation/test engine isolation verified with automated assertions (130 / 52 / 26 / 52 for FD002; 50 / 20 / 10 / 20 for FD001; 124 / 50 / 25 / 50 for FD004).
   - Preprocessing scalers fit only on training sets.
-  - Primary metrics, comparators, and statistical governance remain locked. Numerical cost parameters ($C_{\text{PM}}=10, C_{\text{FAIL}}=100, C_{\text{WASTE}}=1$) and practical-effect thresholds frozen.
+  - Primary metrics, comparators, and statistical governance remain locked. Simulator Python implementation complete and verified by 14 unit tests; numerical cost approval remains pending researcher decision.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (Simulator contract, core replay engine, 11-case deterministic validation suite, cost scenario families, validation-only decision pilot, and numerical cost freeze complete).
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator active (Simulator contract, core replay engine, 14-case deterministic validation suite, cost scenario families, and validation-only decision pilot complete. Numerical cost approval pending researcher decision).
+
 
 
 

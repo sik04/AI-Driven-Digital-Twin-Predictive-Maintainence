@@ -1,6 +1,28 @@
 {
   "title": "Step 6 Validation-Only Numerical Decision Pilot Summary",
   "notice": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE OR RESEARCH RESULTS",
+  "provenance": {
+    "dataset": "FD002",
+    "dataset_sha256": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+    "split_manifest_sha256": "5d7b27372d45b762921c5e952c87feaf90412cce14009d8031ad726289d30545",
+    "script_sha256": "a7fa89595a19591d9fb5718e9bc1241901e7921b9b744c122cd5eed422d0362e",
+    "git_commit_sha": "1437642d97fb17b74cbc39343491b1ee5ffd182f",
+    "git_dirty": true,
+    "start_cycle": 30,
+    "software_versions": {
+      "python": "3.14.0",
+      "numpy": "2.5.3",
+      "pandas": "3.0.6"
+    },
+    "fixtures": {
+      "policy": "MAINTAIN_NOW when lower_rul <= 5.0 else CONTINUE",
+      "cost_fixture": {
+        "preventive_cost": 100.0,
+        "failure_cost": 500.0,
+        "wasted_rul_cost_per_cycle": 10.0
+      }
+    }
+  },
   "validation_engine_count": 26,
   "validation_engine_ids": [
     9,
@@ -45,6 +67,7 @@
       "intervention_cycle_summary": {
         "min": 149,
         "mean": 203.58,
+        "median": 195.5,
         "max": 301
       }
     },
@@ -56,13 +79,9 @@
       "preventive_maintenance_rate": 0.0,
       "failure_rate": 1.0,
       "mean_wasted_rul_all_engines": 0.0,
-      "mean_wasted_rul_preventive_only": 0.0,
-      "median_wasted_rul_preventive_only": 0.0,
-      "intervention_cycle_summary": {
-        "min": null,
-        "mean": null,
-        "max": null
-      }
+      "mean_wasted_rul_preventive_only": null,
+      "median_wasted_rul_preventive_only": null,
+      "intervention_cycle_summary": null
     },
     "PESSIMISTIC": {
       "label": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE",
@@ -77,6 +96,7 @@
       "intervention_cycle_summary": {
         "min": 124,
         "mean": 178.58,
+        "median": 170.5,
         "max": 276
       }
     }
