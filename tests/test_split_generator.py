@@ -15,7 +15,7 @@ if str(REPO_ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 
-from generate_engine_splits import (
+from generate_engine_splits import (  # type: ignore[import-not-found]
     FD001_ALLOCATIONS,
     FD004_ALLOCATIONS,
     generate_split_manifest,

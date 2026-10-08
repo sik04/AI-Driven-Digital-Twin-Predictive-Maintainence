@@ -24,14 +24,14 @@
   - `scipy`: `{{SCIPY_VERSION}}`
   - `scikit-learn`: `{{SKLEARN_VERSION}}`
 - **Hardware Platform**: [OS, CPU Model, GPU Model, CUDA Driver]
-- **Model Run Seed**: `[2026, 2027, 2028, 2029, 2030]`
+- **Random Seeds**: [2026, 2027, 2028, 2029, 2030] (Model Run Seed)
 
 ---
 
 ## 3. Dataset, Split Manifest & Preprocessing Hashes
 - **Dataset Source**: [e.g., NASA C-MAPSS FD002]
+- **Engine Split Protocol**: `data/splits/{{SPLIT_FILE}}.json` (Stratified lifetime quartile)
 - **Raw Data SHA-256**: `{{DATASET_SHA256}}`
-- **Split Manifest File**: `data/splits/{{SPLIT_FILE}}.json`
 - **Split Manifest SHA-256**: `{{SPLIT_MANIFEST_SHA256}}`
 - **Preprocessing Artifact Hashes**:
   - Setting Scaler SHA-256: `{{SETTING_SCALER_SHA256}}`
@@ -65,11 +65,12 @@
 - **Performance Summary**:
   | Metric | Validation | Test Mean +/- Std | Baseline Comparison |
   | :--- | :---: | :---: | :---: |
-  | MAE (cycles) | | | |
-  | RMSE (cycles) | | | |
-  | PICP (%) | | | |
-  | MPIW (cycles) | | | |
+  | Mean Absolute Error (MAE) | | | |
+  | Root Mean Squared Error (RMSE) | | | |
+  | Prediction Interval Coverage Probability (PICP) | | | |
+  | Mean Prediction Interval Width (MPIW) | | | |
   | Mean Simulated Cost ($\bar{C}$) | | | |
+
 - **Output Artifact Locations**:
   - Model Checkpoint: `experiments/checkpoints/exp_{{ID}}/`
   - Predictions / Calibration Logs: `experiments/runs/exp_{{ID}}/`
