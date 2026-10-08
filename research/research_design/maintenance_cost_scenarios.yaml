@@ -7,37 +7,47 @@ units: "simulated_cost_units"
 scenarios:
   primary_balanced:
     id: "primary_balanced"
-    role: "primary_confirmatory"
-    name: "Primary Balanced Cost Scenario"
-    description: "Primary confirmatory maintenance scenario balancing failure avoidance and unnecessary early replacement."
-    status: "frozen"
+    role: "validation_only"
+    intended_role: "primary_confirmatory"
+    name: "Provisional Primary Balanced Cost Proposal"
+    description: "Provisional maintenance cost proposal for simulator validation only. Not approved for confirmatory testing."
+    status: "provisional_validation_only"
+    approved_for_confirmatory: false
+    approval_reference: null
     preventive_cost: 10.0
     failure_cost: 100.0
     wasted_rul_cost_per_cycle: 1.0
 
   failure_sensitive:
     id: "failure_sensitive"
-    role: "sensitivity_analysis"
-    name: "Failure Sensitive Cost Scenario"
-    description: "Sensitivity scenario assigning greater relative importance to reaching failure."
-    status: "frozen"
+    role: "validation_only"
+    intended_role: "sensitivity_analysis"
+    name: "Provisional Failure Sensitive Cost Proposal"
+    description: "Provisional sensitivity scenario assigning greater relative weight to failure. Validation only."
+    status: "provisional_validation_only"
+    approved_for_confirmatory: false
+    approval_reference: null
     preventive_cost: 10.0
     failure_cost: 500.0
     wasted_rul_cost_per_cycle: 1.0
 
   waste_sensitive:
     id: "waste_sensitive"
-    role: "sensitivity_analysis"
-    name: "Waste Sensitive Cost Scenario"
-    description: "Sensitivity scenario assigning greater relative importance to discarding usable remaining life."
-    status: "frozen"
+    role: "validation_only"
+    intended_role: "sensitivity_analysis"
+    name: "Provisional Waste Sensitive Cost Proposal"
+    description: "Provisional sensitivity scenario assigning greater relative weight to wasted RUL. Validation only."
+    status: "provisional_validation_only"
+    approved_for_confirmatory: false
+    approval_reference: null
     preventive_cost: 10.0
     failure_cost: 100.0
     wasted_rul_cost_per_cycle: 5.0
 
 governance:
-  - "Exactly one primary scenario (primary_balanced) and two sensitivity scenarios (failure_sensitive, waste_sensitive) are defined."
-  - "Numerical cost values are frozen prior to confirmatory testing during Step 6.7 numerical decision freeze."
-  - "The identical frozen cost scenario parameters must apply to every comparative method in an evaluation."
+  - "Simulator implementation exists. Numerical cost proposals and practical-effect criteria are not approved for confirmatory use. A traceable researcher decision and justification remain required."
+  - "Exactly one primary intended scenario (primary_balanced) and two sensitivity scenarios (failure_sensitive, waste_sensitive) are defined as provisional proposals."
+  - "The numerical cost values in this file are validation-only proposals (approved_for_confirmatory: false) and must not be treated as approved confirmatory parameters."
+  - "The identical frozen cost scenario parameters must apply to every comparative method in an evaluation once approved."
   - "Held-out test results must NEVER be inspected or used to tune cost scenario parameters."
   - "No scenario may be removed or modified post-hoc because comparative results are unfavorable."

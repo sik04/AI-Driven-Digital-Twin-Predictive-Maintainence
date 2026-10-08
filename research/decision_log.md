@@ -397,14 +397,35 @@ This log documents formal architectural, methodological, and research governance
   2. **Common Policy Interface**: `MaintenancePolicy` protocol defined in `types.py`. Any policy receives only `PredictionState` containing `engine_id`, `cycle`, `point_rul`, `lower_rul`, `upper_rul`, and optional `regime`. Ground-truth RUL, failure cycles, and future records are strictly prohibited.
   3. **Deterministic Validation Suite**: 11 unit tests locked in `tests/test_maintenance_simulator.py` validating perfect timing, never maintain, early maintenance, final opportunity, continue at final opportunity, optimistic prediction stream, pessimistic prediction stream, cost arithmetic, policy information isolation, invalid input handling, and fleet aggregation.
   4. **Cost Scenario Families**: Locked three scenario family structures in `research_design/maintenance_cost_scenarios.yaml`: `primary_balanced`, `failure_sensitive`, and `waste_sensitive`.
-  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}=10.0, C_{\text{FAIL}}=100.0, C_{\text{WASTE}}=1.0$ for `primary_balanced`) and practical-effect thresholds (5% cost reduction, 5% max worst-group coverage error) are officially frozen following researcher approval of the decision packet (`step06_numerical_freeze_decision.md`).
+  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}=10.0, C_{\text{FAIL}}=100.0, C_{\text{WASTE}}=1.0$ for `primary_balanced`) were proposed as validation fixtures (`step06_numerical_freeze_decision.md`).
   6. **Strict Leakage Prohibition**: Held-out test set evaluation results must NEVER be used to choose, tune, or optimize cost scenario values or practical-effect thresholds.
-  7. **Step 6 Status**: Step 6 Sequential Maintenance Simulator is officially marked **COMPLETE** and frozen for downstream confirmatory model development in Step 7.
+  7. **Step 6 Status**: Simulator implementation is complete and verified by deterministic unit tests; numerical cost approval remains pending researcher freeze.
 - **Expected Implications**:
-  - The simulator software stack, deterministic validation protocol, cost scenario parameters, and practical-effect thresholds are frozen.
-  - Step 7 model development can proceed under locked evaluation controls.
+  - The simulator software stack and deterministic validation protocol are locked.
 - **Follow-up Review Date / Trigger**:
-  - Step 7 baseline model training.
+  - Step 6 numerical freeze decision packet review (ADR-016).
+
+---
+
+### ADR-016: Reconciliation of Step 5 Data Protocol and Correction of Step 6 Governance Status
+- **Date**: 2026-10-09
+- **Status**: Accepted (Amends ADR-013; Supersedes premature numerical freeze claims in ADR-015)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Audit identified missing Step 5 protocol specifications (windowing, stage definitions, engine splits for FD001/FD004) and premature claims of "official numerical cost freeze" in ADR-015.
+  - This ADR formalizes complete Step 5 data contracts and corrects Step 6 governance status.
+- **Decisions**:
+  1. **Zero-Variance Normalization Rule**: Amends ADR-013. Normalization fits training-only means and population variances (`ddof=0`). For features with zero training variance, an effective scale of 1.0 is used, centering training values to 0. All 17 features are preserved without feature removal, clipping, or epsilon scaling.
+  2. **Sequence Windowing Protocol (Step 5.4)**: Locked 30-cycle lookback, stride 1, no padding. Endpoint $t$ uses normalized cycles $t-29 \dots t$. LSTM input: $30 \times 17$; GBR input: 510 flattened features. Cycles 1–29 are warm-up. Offline evaluation uses endpoints 30 through $T$; maintenance decisions use 30 through $T-1$. Primary full-trajectory engines with $T \le 30$ trigger qualification failure.
+  3. **Stage & Subgroup Protocol (Step 5.5)**: Lifecycle stages defined retrospectively via endpoint cycle $t$ and trajectory length $T$ ($3t \le T$ Early, $T < 3t \le 2T$ Mid, $2T < 3t \le 3T$ Late). Primary subgroup families (operating regimes, lifecycle stages) are evaluated separately. Subgroup eligibility requires $\ge 10$ distinct engines with $\ge 1$ endpoint. Subgroup coverage error is engine-weighted.
+  4. **Dataset Split Manifests (Step 5.6)**: `fd002_engine_split_seed_2026.json` is preserved byte-for-byte. `fd001_engine_split_seed_2026.json` (50/20/10/20) and `fd004_engine_split_seed_2026.json` (124/50/25/50) generated deterministically using PCG64 PRNG lifetime quartile stratification (`scripts/generate_engine_splits.py`).
+  5. **Step 6 Governance Status Correction**: Supersedes premature freeze claims in ADR-015. Simulator Python implementation exists and 14 unit tests pass cleanly. However, numerical cost values ($C_{\text{PM}}, C_{\text{FAIL}}, C_{\text{WASTE}}$) and practical-effect thresholds remain `provisional_validation_only` (`approved_for_confirmatory: false`). Step 6 numerical approval remains PENDING researcher decision.
+- **Expected Implications**:
+  - Data protocol and split manifests are fully locked for all datasets.
+  - Step 6 numerical freeze decision packet awaits researcher approval before confirmatory Step 7 testing.
+- **Follow-up Review Date / Trigger**:
+  - Researcher review and approval of numerical cost scenario parameters.
+
 
 
 

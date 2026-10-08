@@ -65,29 +65,26 @@ def simulate_engine_trajectory(
     if not states:
         raise ValueError(f"Empty prediction state sequence for engine {engine_id}")
 
-    # Verify chronological ordering and state validity
-    cycles = [s.cycle for s in states]
-    if len(cycles) != len(set(cycles)):
-        raise ValueError(f"Duplicate decision cycles found for engine {engine_id}: {cycles}")
-    if cycles != sorted(cycles):
+    if failure_cycle <= 0:
+        raise ValueError(f"failure_cycle must be positive, got {failure_cycle}")
+
+    first_cycle = states[0].cycle
+    if first_cycle <= 0:
+        raise ValueError(f"Cycle numbers must be positive, got {first_cycle}")
+
+    expected_cycles = list(range(first_cycle, failure_cycle))
+    actual_cycles = [s.cycle for s in states]
+
+    if actual_cycles != expected_cycles:
         raise ValueError(
-            f"Prediction states are not ordered chronologically for engine {engine_id}"
+            f"Prediction states for engine {engine_id} must cover every cycle from "
+            f"{first_cycle} to failure_cycle - 1 ({failure_cycle - 1}). "
+            f"Got cycles {actual_cycles[0]}..{actual_cycles[-1]} (len {len(actual_cycles)}), "
+            f"expected {first_cycle}..{failure_cycle - 1} (len {len(expected_cycles)})."
         )
 
-    for idx, state in enumerate(states):
+    for state in states:
         _validate_prediction_state(state, engine_id)
-        if idx > 0 and state.cycle <= states[idx - 1].cycle:
-            msg = (
-                f"Non-increasing cycles detected for engine {engine_id}: "
-                f"{states[idx - 1].cycle} -> {state.cycle}"
-            )
-            raise ValueError(msg)
-        if state.cycle >= failure_cycle:
-            msg = (
-                f"Decision cycle {state.cycle} is >= failure_cycle {failure_cycle} "
-                f"for engine {engine_id}"
-            )
-            raise ValueError(msg)
 
     decision_history: list[DecisionRecord] = []
 
@@ -141,18 +138,8 @@ def simulate_engine_trajectory(
                     decision_history=decision_history,
                 )
 
-    # If all provided states were CONTINUE and final state < failure_cycle - 1,
-    # assume trajectory continued through failure_cycle - 1 to failure.
-    cost = failure_maintenance_cost(cost_config)
-    return EngineSimulationResult(
-        engine_id=engine_id,
-        terminal_event=TerminalEvent.FAILURE,
-        intervention_cycle=None,
-        failure_indicator=1,
-        preventive_maintenance_indicator=0,
-        wasted_rul=0.0,
-        total_simulated_cost=cost,
-        decision_history=decision_history,
+    raise ValueError(
+        f"Trajectory for engine {engine_id} reached end of states without terminal resolution."
     )
 
 
@@ -212,7 +199,37 @@ def compute_fleet_metrics(results: list[EngineSimulationResult]) -> dict[str, An
     mean_wasted_rul_all = sum(wasted_ruls_all) / n_engines
 
     wasted_ruls_pm = [r.wasted_rul for r in results if r.preventive_maintenance_indicator == 1]
-    mean_wasted_rul_pm = (sum(wasted_ruls_pm) / len(wasted_ruls_pm)) if wasted_ruls_pm else 0.0
+    intervention_cycles_pm = [
+        r.intervention_cycle
+        for r in results
+        if r.preventive_maintenance_indicator == 1 and r.intervention_cycle is not None
+    ]
+
+    if wasted_ruls_pm:
+        sorted_pm_wasted = sorted(wasted_ruls_pm)
+        n = len(sorted_pm_wasted)
+        mean_wasted_rul_pm = sum(sorted_pm_wasted) / n
+        if n % 2 == 1:
+            median_wasted_rul_pm = float(sorted_pm_wasted[n // 2])
+        else:
+            median_wasted_rul_pm = float(
+                (sorted_pm_wasted[n // 2 - 1] + sorted_pm_wasted[n // 2]) / 2.0
+            )
+    else:
+        mean_wasted_rul_pm = None
+        median_wasted_rul_pm = None
+
+    if intervention_cycles_pm:
+        sorted_cycles = sorted(intervention_cycles_pm)
+        n = len(sorted_cycles)
+        mean_intervention = float(sum(sorted_cycles) / n)
+        if n % 2 == 1:
+            median_intervention = float(sorted_cycles[n // 2])
+        else:
+            median_intervention = float((sorted_cycles[n // 2 - 1] + sorted_cycles[n // 2]) / 2.0)
+    else:
+        mean_intervention = None
+        median_intervention = None
 
     return {
         "n_engines": n_engines,
@@ -220,5 +237,12 @@ def compute_fleet_metrics(results: list[EngineSimulationResult]) -> dict[str, An
         "failure_rate": float(failure_rate),
         "preventive_maintenance_rate": float(pm_rate),
         "mean_wasted_rul_all_engines": float(mean_wasted_rul_all),
-        "mean_wasted_rul_preventive_only": float(mean_wasted_rul_pm),
+        "mean_wasted_rul_preventive_only": (
+            float(mean_wasted_rul_pm) if mean_wasted_rul_pm is not None else None
+        ),
+        "median_wasted_rul_preventive_only": (
+            float(median_wasted_rul_pm) if median_wasted_rul_pm is not None else None
+        ),
+        "mean_intervention_cycle": mean_intervention,
+        "median_intervention_cycle": median_intervention,
     }
