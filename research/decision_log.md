@@ -384,6 +384,29 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 6 simulator implementation and validation scenario freezing.
 
+---
+
+### ADR-015: Step 6 Simulator Core Implementation, Deterministic Validation, and Cost-Scenario Infrastructure
+- **Date**: 2026-10-08
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Following the locked sequential maintenance simulator contract (ADR-014), Step 6 requires implementing the core Python replay engine (`src/intellitwin/simulator/`), establishing a deterministic validation suite (`tests/test_maintenance_simulator.py`), defining cost-scenario family structures (`research_design/maintenance_cost_scenarios.yaml`), and executing a validation-only decision pilot (`scripts/run_step06_simulator_validation.py`).
+- **Decisions**:
+  1. **Simulator Implementation Semantics**: Simulator codebase implemented in `src/intellitwin/simulator/` (`types.py`, `costs.py`, `engine.py`). Replay is strictly chronological, enforcing $t < T_{\text{failure}}$ and isolating policy execution from ground-truth failure cycles and true RUL.
+  2. **Common Policy Interface**: `MaintenancePolicy` protocol defined in `types.py`. Any policy receives only `PredictionState` containing `engine_id`, `cycle`, `point_rul`, `lower_rul`, `upper_rul`, and optional `regime`. Ground-truth RUL, failure cycles, and future records are strictly prohibited.
+  3. **Deterministic Validation Suite**: 11 unit tests locked in `tests/test_maintenance_simulator.py` validating perfect timing, never maintain, early maintenance, final opportunity, continue at final opportunity, optimistic prediction stream, pessimistic prediction stream, cost arithmetic, policy information isolation, invalid input handling, and fleet aggregation.
+  4. **Cost Scenario Families**: Locked three scenario family structures in `research_design/maintenance_cost_scenarios.yaml`: `primary_balanced`, `failure_sensitive`, and `waste_sensitive`.
+  5. **Validation-Only Numerical Freeze Procedure**: Numerical cost parameters ($C_{\text{PM}}, C_{\text{FAIL}}, C_{\text{WASTE}}$) and practical-effect thresholds remain intentionally deferred/unlocked pending researcher review of the validation pilot decision packet (`step06_numerical_freeze_decision.md`).
+  6. **Strict Leakage Prohibition**: Held-out test set evaluation results must NEVER be used to choose, tune, or optimize cost scenario values or practical-effect thresholds.
+  7. **Unresolved Status**: Numerical cost values and practical-effect thresholds remain researcher-controlled and unresolved. No default numerical values or fallback parameters are assigned in code or configuration.
+- **Expected Implications**:
+  - The simulator software stack and deterministic validation protocol are locked.
+  - Final Step 6 freeze awaits researcher-approved numerical cost values and practical-effect thresholds.
+- **Follow-up Review Date / Trigger**:
+  - Researcher review and approval of `step06_numerical_freeze_decision.md`.
+
+
 
 
 

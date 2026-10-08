@@ -88,7 +88,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator active (Step 6 contract locked)
+- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator active (implementation, validation, and decision pilot complete; numerical freeze pending)
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
@@ -104,7 +104,8 @@ This document outlines the master research and development roadmap for the Intel
   - Preprocessing scalers fit only on training sets.
   - Primary metrics, comparators, and statistical governance remain locked. Exact numerical practical-effect thresholds remain deferred to the later maintenance-simulator validation stage (Step 6) and must be frozen before confirmatory testing.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator IN PROGRESS (Current locked Step 6 work: chronological replay contract, action space, information boundary, cost-function structure, per-engine outcome contract).
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifest. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator IN PROGRESS (Completed components: simulator contract, core replay engine, 11-case deterministic validation suite, cost scenario families, validation-only decision pilot. Pending: researcher numerical cost freeze, practical-effect threshold freeze, final Step 6 audit, merge).
+
 
 ---
 

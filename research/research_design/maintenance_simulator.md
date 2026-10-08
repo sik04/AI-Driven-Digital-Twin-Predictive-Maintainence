@@ -223,3 +223,44 @@ C-MAPSS supplies unmaintained run-to-failure degradation trajectories.
 - When preventive maintenance occurs at $\tau_i$, the simulator stops reading engine $i$'s trajectory immediately.
 - Telemetry rows after $\tau_i$ in the raw benchmark file MUST NOT be interpreted as data from a repaired or overhauled engine.
 - The simulator does NOT model post-maintenance state restoration, sensor reset, or subsequent degradation cycles.
+
+---
+
+## 13. Simulator Implementation Contract
+
+The Python implementation of the sequential maintenance simulator resides in `src/intellitwin/simulator/` and is strictly structured as follows:
+
+- **`types.py`**: Defines immutable enums `MaintenanceAction` (`CONTINUE`, `MAINTAIN_NOW`) and `TerminalEvent` (`PREVENTIVE_MAINTENANCE`, `FAILURE`), dataclasses `PredictionState`, `MaintenanceDecision`, `DecisionRecord`, `EngineSimulationResult`, and protocol `MaintenancePolicy`. `PredictionState` strictly isolates ground-truth metrics (such as true RUL or failure cycle) from the policy.
+- **`costs.py`**: Defines `MaintenanceCostConfig` and cost evaluation routines `preventive_maintenance_cost` and `failure_maintenance_cost`. Config parameters enforce $C_{\text{PM}} > 0$, $C_{\text{FAIL}} > C_{\text{PM}}$, and $C_{\text{WASTE}} \ge 0$.
+- **`engine.py`**: Implements deterministic single-engine replay `simulate_engine_trajectory`, fleet simulation `simulate_fleet`, and outcome aggregation `compute_fleet_metrics`. Trajectories are validated for strict monotonicity and non-empty sequences. Decisions occur strictly for $t < T_{\text{failure}}$.
+
+---
+
+## 14. Deterministic Validation Protocol
+
+The simulator core is validated by an automated, deterministic test suite in `tests/test_maintenance_simulator.py`. The suite validates:
+1. **Perfect / Correct Timing**: Engine replayed until $t = T_{\text{failure}} - 1$, preventive maintenance triggers $W_i = 1$.
+2. **Never Maintain**: Policy always chooses `CONTINUE`, resulting in `FAILURE` at $T_{\text{failure}}$ with zero decision evaluated at $T_{\text{failure}}$.
+3. **Early Maintenance**: Policy chooses `MAINTAIN_NOW` at $t \ll T_{\text{failure}}$, engine terminates immediately with $W_i = T_{\text{failure}} - t$.
+4. **Final Opportunity**: Policy maintains at $T_{\text{failure}} - 1$, yielding `PREVENTIVE_MAINTENANCE`.
+5. **Continue at Final Opportunity**: Policy chooses `CONTINUE` at $T_{\text{failure}} - 1$, leading directly to `FAILURE`.
+6. **Optimistic Prediction Stream**: Overestimating RUL leads to `CONTINUE` at final opportunity and `FAILURE`.
+7. **Pessimistic Prediction Stream**: Underestimating RUL causes premature `MAINTAIN_NOW` and positive wasted RUL.
+8. **Cost Arithmetic**: Cost functions accurately compute $C_{\text{PM}} + C_{\text{WASTE}} \cdot W_i$ and $C_{\text{FAIL}}$.
+9. **Policy Information Isolation**: Policy receives only `PredictionState` without access to ground truth.
+10. **Invalid Input Enforcement**: Duplicate cycles, non-monotonic timestamps, or invalid bounds raise explicit exceptions.
+11. **Fleet Aggregation**: Correct calculation of per-engine mean cost, failure rate, PM rate, and wasted RUL metrics.
+
+---
+
+## 15. Maintenance Cost Scenario Families
+
+The cost infrastructure defines three scenario families in `research/research_design/maintenance_cost_scenarios.yaml`:
+- **`primary_balanced`**: Primary confirmatory maintenance scenario balancing failure avoidance and unnecessary early replacement.
+- **`failure_sensitive`**: Sensitivity scenario assigning greater relative importance to avoiding failure events ($C_{\text{FAIL}} \gg C_{\text{PM}}$).
+- **`waste_sensitive`**: Sensitivity scenario assigning greater relative importance to discarding usable remaining life ($C_{\text{WASTE}}$ weighted higher).
+
+> **Governance Notice**:
+> The scenario **FAMILY definitions** are locked.
+> The **NUMERICAL VALUES** ($C_{\text{PM}}, C_{\text{FAIL}}, C_{\text{WASTE}}$) are intentionally **DEFERRED / UNLOCKED** pending researcher review of the Step 6.7 validation-only decision pilot (`step06_numerical_freeze_decision.md`). Held-out test evaluation results MUST NOT be used to tune or select these numerical parameters.
+
