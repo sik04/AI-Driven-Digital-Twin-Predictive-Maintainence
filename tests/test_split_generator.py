@@ -15,17 +15,25 @@ if str(REPO_ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(REPO_ROOT / "scripts"))
 
 
-from generate_engine_splits import (
+from generate_engine_splits import (  # type: ignore[import-not-found]
     FD001_ALLOCATIONS,
     FD004_ALLOCATIONS,
     generate_split_manifest,
 )
 
 SPLITS_DIR = REPO_ROOT / "data" / "splits"
+RAW_DATA_DIR = REPO_ROOT / "data" / "raw" / "cmapss"
+RAW_FD001_EXISTS = (RAW_DATA_DIR / "train_FD001.txt").exists()
+RAW_FD004_EXISTS = (RAW_DATA_DIR / "train_FD004.txt").exists()
 
 
 def test_fd001_manifest_structure_and_counts() -> None:
     """Verify FD001 split counts, ratios, disjointness, and full engine coverage."""
+    if not RAW_FD001_EXISTS:
+        if pytest is not None:
+            pytest.skip("Raw FD001 data file not present")
+        return
+
     manifest = generate_split_manifest(
         "FD001", "train_FD001.txt", 100, FD001_ALLOCATIONS, seed=2026
     )
@@ -61,6 +69,11 @@ def test_fd001_manifest_structure_and_counts() -> None:
 
 def test_fd004_manifest_structure_and_counts() -> None:
     """Verify FD004 split counts, ratios, disjointness, and full engine coverage."""
+    if not RAW_FD004_EXISTS:
+        if pytest is not None:
+            pytest.skip("Raw FD004 data file not present")
+        return
+
     manifest = generate_split_manifest(
         "FD004", "train_FD004.txt", 249, FD004_ALLOCATIONS, seed=2026
     )
@@ -96,6 +109,11 @@ def test_fd004_manifest_structure_and_counts() -> None:
 
 def test_deterministic_reproducibility() -> None:
     """Verify identical PRNG generator produces identical partition lists."""
+    if not RAW_FD001_EXISTS:
+        if pytest is not None:
+            pytest.skip("Raw FD001 data file not present")
+        return
+
     m1 = generate_split_manifest("FD001", "train_FD001.txt", 100, FD001_ALLOCATIONS, seed=2026)
     m2 = generate_split_manifest("FD001", "train_FD001.txt", 100, FD001_ALLOCATIONS, seed=2026)
     assert m1["partitions"] == m2["partitions"]
@@ -116,6 +134,11 @@ def test_fd002_manifest_preservation() -> None:
 
 def test_rejection_of_conflicting_manifest() -> None:
     """Verify script raises ValueError if existing manifest has conflicting partition IDs."""
+    if not RAW_FD001_EXISTS:
+        if pytest is not None:
+            pytest.skip("Raw FD001 data file not present")
+        return
+
     fake_manifest = {
         "partitions": {
             "train": [1, 2, 3],
@@ -132,13 +155,19 @@ if __name__ == "__main__":
     if pytest is not None:
         pytest.main([__file__])
     else:
-        test_funcs = [
-            test_fd001_manifest_structure_and_counts,
-            test_fd004_manifest_structure_and_counts,
-            test_deterministic_reproducibility,
-            test_fd002_manifest_preservation,
-            test_rejection_of_conflicting_manifest,
-        ]
+        test_funcs = []
+        if RAW_FD001_EXISTS:
+            test_funcs.extend(
+                [
+                    test_fd001_manifest_structure_and_counts,
+                    test_deterministic_reproducibility,
+                    test_rejection_of_conflicting_manifest,
+                ]
+            )
+        if RAW_FD004_EXISTS:
+            test_funcs.append(test_fd004_manifest_structure_and_counts)
+        test_funcs.append(test_fd002_manifest_preservation)
+
         for func in test_funcs:
             print(f"Running {func.__name__}...", end=" ")
             func()
