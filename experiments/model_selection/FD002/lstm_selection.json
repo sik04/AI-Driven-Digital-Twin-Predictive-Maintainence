@@ -1,0 +1,213 @@
+{
+  "schema_version": "step07-selection-v1",
+  "dataset": "FD002",
+  "model_family": "LSTM",
+  "selection_seeds": [
+    2026,
+    2027
+  ],
+  "selection_metric": "equal-engine-weighted uncapped-RUL RMSE",
+  "training_target": "min(rul_true,125)",
+  "calibration_data_used": false,
+  "test_data_used": false,
+  "preprocessing_artifact_sha256": "cef04b8dafc4c9f53aba7c6bcb0bc67fc981540abdafadc76fafa314684d856c",
+  "git_commit": "eba327dcc8eec660e06cf238e3a207d3af9826c1",
+  "selected_configuration_id": "lstm_h64_lr0010",
+  "selected_configuration": {
+    "config_id": "lstm_h64_lr0010",
+    "hidden_size": 64,
+    "learning_rate": 0.001,
+    "input_size": 17,
+    "lookback": 30,
+    "num_layers": 1,
+    "bidirectional": false,
+    "bias": true,
+    "dropout": 0.0,
+    "explicit_dropout": 0.2,
+    "weight_decay": 0.0001,
+    "betas": [
+      0.9,
+      0.999
+    ],
+    "eps": 1e-08,
+    "batch_size": 256,
+    "max_epochs": 100,
+    "gradient_clip_norm": 1.0,
+    "early_stopping_patience": 10,
+    "early_stopping_min_delta": 0.01
+  },
+  "selection_score": 35.2523236139771,
+  "selected_worst_seed_rmse": 35.31126599937067,
+  "tie_detected": false,
+  "tie_break_rule_used": null,
+  "candidate_configurations": [
+    {
+      "configuration_id": "lstm_h32_lr0003",
+      "hyperparameters": {
+        "config_id": "lstm_h32_lr0003",
+        "hidden_size": 32,
+        "learning_rate": 0.0003,
+        "input_size": 17,
+        "lookback": 30,
+        "num_layers": 1,
+        "bidirectional": false,
+        "bias": true,
+        "dropout": 0.0,
+        "explicit_dropout": 0.2,
+        "weight_decay": 0.0001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "batch_size": 256,
+        "max_epochs": 100,
+        "gradient_clip_norm": 1.0,
+        "early_stopping_patience": 10,
+        "early_stopping_min_delta": 0.01
+      },
+      "seed_2026": {
+        "uncapped_rmse": 47.926056447616624,
+        "uncapped_mae": 31.874560770492494,
+        "capped_rmse": 26.968130996131002,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "seed_2027": {
+        "uncapped_rmse": 48.06582578804545,
+        "uncapped_mae": 31.88856954071933,
+        "capped_rmse": 27.11108630113767,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "mean_selection_score": 47.99594111783104,
+      "worst_seed_rmse": 48.06582578804545
+    },
+    {
+      "configuration_id": "lstm_h32_lr0010",
+      "hyperparameters": {
+        "config_id": "lstm_h32_lr0010",
+        "hidden_size": 32,
+        "learning_rate": 0.001,
+        "input_size": 17,
+        "lookback": 30,
+        "num_layers": 1,
+        "bidirectional": false,
+        "bias": true,
+        "dropout": 0.0,
+        "explicit_dropout": 0.2,
+        "weight_decay": 0.0001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "batch_size": 256,
+        "max_epochs": 100,
+        "gradient_clip_norm": 1.0,
+        "early_stopping_patience": 10,
+        "early_stopping_min_delta": 0.01
+      },
+      "seed_2026": {
+        "uncapped_rmse": 36.141718239622236,
+        "uncapped_mae": 25.064310083673124,
+        "capped_rmse": 21.01061651146155,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "seed_2027": {
+        "uncapped_rmse": 36.44870118985479,
+        "uncapped_mae": 24.298374479872507,
+        "capped_rmse": 19.6880847005149,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "mean_selection_score": 36.29520971473851,
+      "worst_seed_rmse": 36.44870118985479
+    },
+    {
+      "configuration_id": "lstm_h64_lr0003",
+      "hyperparameters": {
+        "config_id": "lstm_h64_lr0003",
+        "hidden_size": 64,
+        "learning_rate": 0.0003,
+        "input_size": 17,
+        "lookback": 30,
+        "num_layers": 1,
+        "bidirectional": false,
+        "bias": true,
+        "dropout": 0.0,
+        "explicit_dropout": 0.2,
+        "weight_decay": 0.0001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "batch_size": 256,
+        "max_epochs": 100,
+        "gradient_clip_norm": 1.0,
+        "early_stopping_patience": 10,
+        "early_stopping_min_delta": 0.01
+      },
+      "seed_2026": {
+        "uncapped_rmse": 36.93899493875374,
+        "uncapped_mae": 24.662974293930173,
+        "capped_rmse": 18.815068055767654,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "seed_2027": {
+        "uncapped_rmse": 37.700817961636496,
+        "uncapped_mae": 25.179155435993074,
+        "capped_rmse": 19.558663891082784,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "mean_selection_score": 37.31990645019512,
+      "worst_seed_rmse": 37.700817961636496
+    },
+    {
+      "configuration_id": "lstm_h64_lr0010",
+      "hyperparameters": {
+        "config_id": "lstm_h64_lr0010",
+        "hidden_size": 64,
+        "learning_rate": 0.001,
+        "input_size": 17,
+        "lookback": 30,
+        "num_layers": 1,
+        "bidirectional": false,
+        "bias": true,
+        "dropout": 0.0,
+        "explicit_dropout": 0.2,
+        "weight_decay": 0.0001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "eps": 1e-08,
+        "batch_size": 256,
+        "max_epochs": 100,
+        "gradient_clip_norm": 1.0,
+        "early_stopping_patience": 10,
+        "early_stopping_min_delta": 0.01
+      },
+      "seed_2026": {
+        "uncapped_rmse": 35.193381228583526,
+        "uncapped_mae": 23.79698229063512,
+        "capped_rmse": 19.248869272849717,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "seed_2027": {
+        "uncapped_rmse": 35.31126599937067,
+        "uncapped_mae": 23.85655604881276,
+        "capped_rmse": 19.671412426883926,
+        "engine_count": 26,
+        "window_count": 4669
+      },
+      "mean_selection_score": 35.2523236139771,
+      "worst_seed_rmse": 35.31126599937067
+    }
+  ]
+}

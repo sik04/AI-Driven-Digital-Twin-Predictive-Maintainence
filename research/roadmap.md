@@ -124,7 +124,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 5: Reproducible Base Predictor Experiments (Step 7)
-- **Status**: Step 7.2 Complete / Step 7.3 Next Up
+- **Status**: Step 7.3 Complete / Step 7.4 Next Up (Step 7.3 FD002 validation selection complete and frozen under ADR-019; Step 7.4 multi-dataset/five-seed final base-model matrix next up)
 - **Objective**: Implement and evaluate reproducible point-RUL base predictors (GBR and LSTM only) under the frozen Step-5 protocol and locked Step 7.1 specification, to establish reliable base predictions rather than conducting a broad architectural benchmark.
 - **Expected Deliverables**:
   - Base predictor implementations under `src/intellitwin/models/` (Histogram Gradient Boosting Regressor and unidirectional LSTM only).

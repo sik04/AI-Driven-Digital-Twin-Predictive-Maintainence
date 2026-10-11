@@ -384,7 +384,7 @@ def run_model_selection() -> None:
                 "schema_version": SCHEMA_VERSION,
                 "dataset": DATASET_NAME,
                 "model_family": "LSTM",
-                "configuration_id": cfg.config_id,
+                "configuration_id": cfg_lstm.config_id,
                 "run_seed": seed,
                 "git_commit": git_commit,
                 "git_dirty": git_dirty,
