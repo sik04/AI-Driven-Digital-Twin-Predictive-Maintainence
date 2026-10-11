@@ -1,5 +1,7 @@
 """Tests for causal sequence window construction and equal-engine sample weighting."""
 
+from typing import Any
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -18,7 +20,7 @@ def _make_dummy_engine(
 ) -> pd.DataFrame:
     """Create a dummy transformed trajectory for a single engine."""
     cycles = np.arange(1, num_cycles + 1)
-    data: dict[str, np.ndarray] = {
+    data: dict[str, np.ndarray[Any, Any]] = {
         "unit": np.full(num_cycles, unit_id, dtype=int),
         "cycle": cycles,
         "regime": np.array([f"C{(c % 6) + 1}" for c in cycles]),

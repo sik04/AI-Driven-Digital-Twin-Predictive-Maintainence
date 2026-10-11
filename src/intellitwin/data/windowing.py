@@ -12,6 +12,7 @@ Implements:
 
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -29,14 +30,14 @@ from intellitwin.data.schema import (
 class WindowDataset:
     """Typed container for causal sequence windows and associated target/metadata arrays."""
 
-    X_sequence: np.ndarray  # Shape: (M, 30, 17), float32
-    engine_ids: np.ndarray  # Shape: (M,), int64
-    endpoint_cycles: np.ndarray  # Shape: (M,), int64
-    failure_cycles: np.ndarray  # Shape: (M,), int64
-    rul_true: np.ndarray  # Shape: (M,), float64
-    rul_target: np.ndarray  # Shape: (M,), float64
-    regimes: np.ndarray  # Shape: (M,), object (str)
-    lifecycle_stages: np.ndarray  # Shape: (M,), object (str)
+    X_sequence: np.ndarray[Any, Any]  # Shape: (M, 30, 17), float32
+    engine_ids: np.ndarray[Any, Any]  # Shape: (M,), int64
+    endpoint_cycles: np.ndarray[Any, Any]  # Shape: (M,), int64
+    failure_cycles: np.ndarray[Any, Any]  # Shape: (M,), int64
+    rul_true: np.ndarray[Any, Any]  # Shape: (M,), float64
+    rul_target: np.ndarray[Any, Any]  # Shape: (M,), float64
+    regimes: np.ndarray[Any, Any]  # Shape: (M,), object (str)
+    lifecycle_stages: np.ndarray[Any, Any]  # Shape: (M,), object (str)
 
     def __post_init__(self) -> None:
         """Validate array dimensions and data types."""
@@ -75,7 +76,7 @@ class WindowDataset:
     def __len__(self) -> int:
         return len(self.X_sequence)
 
-    def flatten_for_gbr(self) -> np.ndarray:
+    def flatten_for_gbr(self) -> np.ndarray[Any, Any]:
         """Flatten 3D sequences into 2D row-major arrays of shape (M, 510) for GBR.
 
         Order:
@@ -113,7 +114,7 @@ def construct_windows(
         if col not in df_transformed.columns:
             raise ValueError(f"Required column '{col}' missing from transformed DataFrame.")
 
-    x_list: list[np.ndarray] = []
+    x_list: list[np.ndarray[Any, Any]] = []
     unit_list: list[int] = []
     endpoint_list: list[int] = []
     failure_list: list[int] = []
@@ -193,8 +194,8 @@ def construct_windows(
 
 
 def compute_equal_engine_sample_weights(
-    engine_ids: np.ndarray | Sequence[int],
-) -> np.ndarray:
+    engine_ids: np.ndarray[Any, Any] | Sequence[int],
+) -> np.ndarray[Any, Any]:
     """Compute equal-engine training sample weights: w_{i,t} = M / (N * n_i).
 
     Parameters

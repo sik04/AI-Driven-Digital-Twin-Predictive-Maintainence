@@ -26,7 +26,7 @@ CANONICAL_REGIMES: Final[tuple[str, ...]] = ("C1", "C2", "C3", "C4", "C5", "C6")
 
 
 def _compute_column_stats(
-    arr: np.ndarray,
+    arr: np.ndarray[Any, Any],
 ) -> tuple[float, float, float, bool]:
     """Compute mean, population variance (ddof=0), effective scale, and zero-variance flag.
 
@@ -65,7 +65,7 @@ class ScalerParams:
     effective_scale: float
     is_zero_variance: bool
 
-    def transform(self, values: np.ndarray) -> np.ndarray:
+    def transform(self, values: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
         """Standardize values with frozen parameters."""
         z = (values - self.mean) / self.effective_scale
         if not np.all(np.isfinite(z)):
@@ -89,7 +89,9 @@ class FittedPreprocessor:
     sensor_scalers_by_regime: dict[str, dict[str, ScalerParams]]
     protocol_version: str = PROTOCOL_VERSION
 
-    def assign_regime(self, setting_values: np.ndarray) -> tuple[list[str], np.ndarray]:
+    def assign_regime(
+        self, setting_values: np.ndarray[Any, Any]
+    ) -> tuple[list[str], np.ndarray[Any, Any]]:
         """Assign canonical regime labels to standardized setting rows.
 
         Parameters

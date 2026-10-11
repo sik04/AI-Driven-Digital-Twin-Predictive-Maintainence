@@ -1,6 +1,7 @@
 """Tests for C-MAPSS preprocessing, scaling, regime assignment, and artifact persistence."""
 
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -32,7 +33,7 @@ def _make_training_df(
     units = np.repeat(np.arange(1, 7), n_rows // 6)
     cycles = np.tile(np.arange(1, (n_rows // 6) + 1), 6)
 
-    data: dict[str, np.ndarray] = {
+    data: dict[str, np.ndarray[Any, Any]] = {
         "unit": units,
         "cycle": cycles,
     }

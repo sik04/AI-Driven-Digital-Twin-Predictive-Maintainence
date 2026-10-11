@@ -38,7 +38,7 @@ class PreparedDataset:
     fitted_preprocessor: FittedPreprocessor
     train_windows: WindowDataset
     validation_windows: WindowDataset
-    train_sample_weights: np.ndarray
+    train_sample_weights: np.ndarray[Any, Any]
     provenance: dict[str, Any]
 
 
