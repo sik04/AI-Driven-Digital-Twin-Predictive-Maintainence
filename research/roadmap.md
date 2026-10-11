@@ -11,7 +11,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
-| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 Maintenance Simulator active | C-MAPSS dataset exploration, split protocol, metrics |
+| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 complete (ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
 | **Phase 6** | Proposed Model Development | Planned | Novel prognostic architecture formulation and training |
@@ -88,7 +88,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: In Progress — Step 5 complete; Step 6 Maintenance Simulator active (implementation and validation complete; numerical cost freeze pending researcher approval)
+- **Status**: In Progress — Step 5 complete; Step 6 complete (numerical freeze and evaluation protocol finalized under ADR-018); ready for Step 7 model specification
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
@@ -98,13 +98,13 @@ This document outlines the master research and development roadmap for the Intel
   - Canonical dataset organization in `data/raw/cmapss/`.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
-  - Document the deferred-threshold dependency and the protocol requirements that the later maintenance-simulator stage (Step 6) must satisfy before thresholds can be frozen.
+  - Frozen cost scenarios in `maintenance_cost_scenarios.yaml` and statistical inference protocol in `statistical_inference_protocol.md`.
 - **Acceptance Criteria**:
   - Strict train/calibration/validation/test engine isolation verified with automated assertions (130 / 52 / 26 / 52 for FD002; 50 / 20 / 10 / 20 for FD001; 124 / 50 / 25 / 50 for FD004).
   - Preprocessing scalers fit only on training sets.
-  - Primary metrics, comparators, and statistical governance remain locked. Simulator Python implementation complete and verified by 14 unit tests; numerical cost approval remains pending researcher decision.
+  - Primary metrics, comparators, and statistical governance locked. Simulator Python implementation complete and verified by deterministic unit tests; numerical cost scenarios and evaluation contract frozen under ADR-018.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator active (Simulator contract, core replay engine, 14-case deterministic validation suite, cost scenario families, and validation-only decision pilot complete. Numerical cost approval pending researcher decision).
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018).
 
 
 

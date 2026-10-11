@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Frozen Step 6 statistical inference protocol in `research/research_design/statistical_inference_protocol.md` (10,000 engine-cluster bootstrap with PCG64 `SeedSequence([2026, 6, dataset_number])`, 98.75% decision intervals with $\alpha=0.0125$ Bonferroni allocation across RQs, intersection-union testing, conservative missing-group bounds propagation $[0, 0.90]$, and cost-inefficient early PM diagnostic $W > r_{\text{equal}}$).
+- Methodological references `lakens2017equivalence` (equivalence/noninferiority testing) and `gneiting2007strictly` (strictly proper scoring rules and Winkler interval scores) in `paper/references.bib`.
+- Risk register entries RSK-11 through RSK-15 in `research/risk_register.md` (synthetic costs, small subgroup precision, approximate bootstrap inference, fixed-seed conditional inference, and absence of deployment/stopping-time guarantees).
+- Architectural decision record ADR-018 in `research/decision_log.md` formalizing Step 6 synthetic cost and numerical evaluation freeze.
 - Authoritative Step 5 protocol completion in `research/research_design/data_evaluation_protocol.md` (primary 90% nominal coverage, uncapped `rul_true` interval evaluation, engine-weighted metric equations with non-averaged RMSE, central Winkler interval score, fixed metadata subgroup governance, and K-means centroid reproducibility).
 - Completed `engine_ids` metadata in `quartile_membership` for `data/splits/fd001_engine_split_seed_2026.json` and `data/splits/fd004_engine_split_seed_2026.json` derived from validated source data sorted by (lifetime, engine_id).
 - Strengthened input validation in `scripts/generate_engine_splits.py` (pre-conversion integral scalar checks, consecutive ID constraints, testable `write_or_verify_manifest` helper).
@@ -17,6 +21,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architectural decision record ADR-017 in `research/decision_log.md` formalizing protocol reconciliation, validation hardening, and pilot provenance.
 
 ### Changed
+- Frozen 3 synthetic maintenance cost scenarios in `research/research_design/maintenance_cost_scenarios.yaml` under v2.0 and ADR-018 (`primary_reference` [1.0, 5.0, 0.20], `failure_sensitive` [1.0, 10.0, 0.20], `waste_sensitive` [1.0, 5.0, 0.40] SCU); removed active `primary_balanced` ID.
+- Locked canonical evaluation contract `step06-v2` in `research/hypotheses/hypothesis_framework.yaml` and `hypothesis_framework.tex` with numerical decision thresholds (0.20 SCU/engine cost margin, 0.01 worst-group error margin, 0.05 absolute coverage error ceiling, 1.0 cycle MPIW and Winkler interval score noninferiority margins, 0.0 observed failure rate increase allowed).
+- Corrected cost formulation, break-even equality horizons ($r_{\text{equal}} \in \{20, 45, 10\}$ cycles), and theoretical oracle costs (1.20, 1.20, 1.40 SCU) in `maintenance_simulator.md` and `step06_numerical_freeze_decision.md`, clarifying that deterministic pilot fixture demonstrates trigger execution, not cost-optimal intervention.
+- Corrected "30-cycle lookahead" to "30-cycle causal lookback" in `docs/reproducibility.md`.
+- Synchronized experiment specifications, checklists, roadmap, and experiment record templates across `research/` and `experiments/templates/`.
 - Reconciled Step 6 governance and status across `step06_freeze_checklist.md`, `step06_numerical_freeze_decision.md`, `roadmap.md`, `README.md`, `docs/reproducibility.md`, and `experiments/templates/experiment_record.md` (clarifying that numerical maintenance approval is required before confirmatory maintenance testing, not ordinary Step 7 base-predictor training).
 
 - Literature source verification register (`research/literature/source_verification.csv`) tracking metadata verification, methodology status, reproduction status, and verification basis for 26 bibliographic references.

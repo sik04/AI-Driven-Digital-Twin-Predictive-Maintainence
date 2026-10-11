@@ -467,6 +467,69 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Researcher review and formal numerical approval of maintenance cost parameters prior to confirmatory maintenance evaluation.
 
+> **Correction Note on FD002 Manifest Byte Hash**:
+> In ADR-017 item 2, the SHA-256 byte hash for `data/splits/fd002_engine_split_seed_2026.json` was recorded as `5d7b...` due to Windows git checkout CRLF line endings. The canonical exact-byte SHA-256 hash of the committed file in the repository (with LF endings) is:
+> `57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41`.
+> This correction amends the documentation record; the committed manifest file itself is preserved byte-for-byte.
+
+---
+
+### ADR-018: Step 6 Synthetic Cost and Numerical Evaluation Freeze
+- **Date**: 2026-10-11
+- **Status**: Accepted (Amends ADR-008, ADR-014, ADR-015, ADR-016, and ADR-017)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-issued implementation instruction containing the authoritative Step 6 numerical specification and evaluation contract (`step06-v2`).
+- **Context and Motivation**:
+  - Following the implementation and deterministic validation of the sequential maintenance simulator in Step 6, the synthetic maintenance cost scenarios and numerical evaluation thresholds remained pending formal approval.
+  - To enable subsequent Step 7 model training and prevent post-hoc criteria tuning after observing test outcomes, this ADR freezes the cost scenarios, the statistical inference contract, and the decision rules for RQ1–RQ4.
+- **Decisions**:
+  1. **Frozen Maintenance Cost Scenarios (`v2.0`)**:
+     - `primary_reference` (Role: `primary_confirmatory`): $C_{\text{PM}} = 1.0$, $C_{\text{FAIL}} = 5.0$, $C_{\text{WASTE}} = 0.20$ SCU per engine. Defines the normalized simulated cost unit ($C_{\text{PM}} = 1.0$).
+     - `failure_sensitive` (Role: `sensitivity_analysis`): $C_{\text{PM}} = 1.0$, $C_{\text{FAIL}} = 10.0$, $C_{\text{WASTE}} = 0.20$. Doubles failure penalty.
+     - `waste_sensitive` (Role: `sensitivity_analysis`): $C_{\text{PM}} = 1.0$, $C_{\text{FAIL}} = 5.0$, $C_{\text{WASTE}} = 0.40$. Doubles discarded-life penalty.
+     - All three scenarios: `status: frozen`, `approved_for_confirmatory: true`, `approval_reference: ADR-018`.
+     - The active `primary_balanced` scenario ID is removed and archived as superseded historical record.
+     - Approval of sensitivity scenarios permits prespecified secondary analyses; it does not promote them to primary confirmatory outcomes. No sensitivity scenario may replace an unfavorable primary result.
+  2. **Cost Model & Equality Horizon Interpretation**:
+     - $\text{Cost}_{\text{PM}} = C_{\text{PM}} + C_{\text{WASTE}} \times W$; $\text{Cost}_{\text{FAIL}} = C_{\text{FAIL}}$.
+     - Equality horizon $r_{\text{equal}} = (C_{\text{FAIL}} - C_{\text{PM}}) / C_{\text{WASTE}}$:
+       - `primary_reference`: 20 cycles
+       - `failure_sensitive`: 45 cycles
+       - `waste_sensitive`: 10 cycles
+     - $r_{\text{equal}}$ identifies exact equality between maintaining immediately and accepting unmitigated failure. These are NOT optimal replacement times, warning horizons, or evidence of optimal cost ratios.
+     - Oracle benchmark cost at cycle $T-1$ ($W = 1$ cycle): `primary_reference`: 1.20 SCU, `failure_sensitive`: 1.20 SCU, `waste_sensitive`: 1.40 SCU. Oracle knowledge is strictly prohibited from deployable policies.
+     - Corrected pilot interpretation: The PERFECT fixture maintains at 5 remaining cycles because its policy uses `lower_rul <= 5.0`, demonstrating correct trigger execution under oracle predictions, not cost-optimal intervention timing.
+  3. **Authoritative Numerical Evaluation Contract (`step06-v2`)**:
+     - Primary nominal coverage: 90% ($\alpha = 0.10$). Secondary levels: 80% and 95%.
+     - Cost improvement margin: $\Delta_{\text{cost}} > 0.20$ SCU per engine (cost of one discarded cycle).
+     - Coverage error improvement margin: $\Delta_{\text{error}} > 0.01$ (one percentage point).
+     - Coverage error ceiling: Maximum absolute coverage error $E < 0.05$ (85%–95% empirical acceptance band).
+     - Sharpness noninferiority margins: $D_{\text{width}} < 1.0$ cycle for MPIW; $D_{\text{score}} < 1.0$ cycle for Winkler interval score.
+     - Robustness non-harm margins: $\Delta_{\text{cost}} > -0.20$ SCU per engine; $\Delta_{\text{error}} > -0.01$.
+     - Observed failure safeguard: Proposed fleet failure rate increase $\le 0.0$.
+     - Model training seeds: Five fixed seeds `[2026, 2027, 2028, 2029, 2030]`.
+     - Supersession: The old percentage-based rules (5% cost, 10% MPIW, 15%, 75%) remain permanently superseded.
+  4. **Statistical Inference & Decision Contract**:
+     - Documented in `research/research_design/statistical_inference_protocol.md`.
+     - Resampling: 10,000 cluster-bootstrap resamples with replacement, stratified by split-generation lifetime quartiles, using PCG64 PRNG with `SeedSequence([2026, 6, dataset_number])`.
+     - Decision intervals: 98.75% percentile confidence intervals (`method="linear"`, quantiles 0.00625 and 0.99375), providing Bonferroni family-wise error control ($\alpha = 0.05 / 4 = 0.0125$) across the four RQs. Descriptive 95% intervals reported for context.
+     - Decision principle: Intersection-union testing (all required conditions must pass for Supported classification).
+     - Missing-group handling: Recomputed worst group per replicate across eligible groups ($\ge 10$ engines); missing groups propagate conservative $[0, 0.90]$ bounds.
+     - Supported / Unsupported / Inconclusive logic: Clearing the boundary requires the entire decision interval to fall on the passing side of the margin. Interval covering the boundary is Indeterminate.
+  5. **Premature-Intervention Diagnostic**:
+     - Binary diagnostic defined as: PM occurred AND PM cost $>$ failure cost under active scenario ($W > r_{\text{equal}}$).
+     - Reported as "cost-inefficient early PM under the scenario". Equality does not count.
+  6. **Scope and Limitations**:
+     - These are transparent benchmark acceptance preferences, not empirically validated aviation financial parameters or universal engineering constants.
+     - No thresholds were chosen from held-out comparative test results.
+     - Conformal coverage does not guarantee pointwise conditional coverage or stopping-time coverage.
+     - Step 6 numerical freeze is COMPLETE. Step 7 model architectures, training, and evaluation software remain the next scheduled development steps.
+- **Expected Implications**:
+  - Evaluation protocol, cost scenarios, and decision boundaries are fully locked.
+  - Ready to proceed to Step 7 model specification and training without risk of post-hoc threshold adjustment.
+- **Follow-up Review Date / Trigger**:
+  - Step 7 base RUL model training specification.
+
 
 
 

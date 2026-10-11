@@ -65,7 +65,7 @@ Every formal experiment must generate an entry following `experiments/templates/
 1. **Dataset / Source Hashes**: Raw file exact-byte SHA-256 (e.g. `train_FD002.txt`).
 2. **Split Manifest Hash**: JSON split manifest exact-byte SHA-256 (e.g. `fd002_engine_split_seed_2026.json`).
 3. **Protocol Version**: Data & Evaluation Protocol version (Step 5 v1.0).
-4. **Feature Order & Window Configuration**: Canonical 17-feature order and 30-cycle lookahead parameters.
+4. **Feature Order & Window Configuration**: Canonical 17-feature order and 30-cycle causal lookback parameters.
 5. **Preprocessing Artifact Hashes**: SHA-256 of setting scalers, K-means centroids, and sensor normalization statistics.
 6. **Model Seed & Full Configuration**: Model run seed (`2026`–`2030`) and complete hyperparameter dict.
 7. **Calibration Configuration**: Conformal calibration method, nonconformity score, and calibrator parameters.

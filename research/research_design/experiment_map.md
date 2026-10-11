@@ -1,6 +1,6 @@
 # High-Level Experiment Map
 
-This document establishes the high-level mapping between the formal research questions (RQ1–RQ4) and planned experimental evaluation suites (Experiment A–D).
+This document establishes the high-level mapping between the formal research questions (RQ1–RQ4) and planned experimental evaluation suites (Experiment A–D) under **ADR-018** (Protocol Version: `step06-v2`).
 
 ---
 
@@ -16,10 +16,11 @@ This document establishes the high-level mapping between the formal research que
   - Global conformal calibration
   - Standard condition-aware calibration
 - **Primary Type of Evidence Expected**:
-  - **Primary Outcome**: Total simulated maintenance cost per engine
-  - **Secondary / Supporting Outcomes**: Late/failure intervention rate; required prediction-interval coverage
-  - **Statistical Framework**: Paired engine-level comparisons on shared splits; effect size and 95% engine-level paired/cluster bootstrap confidence intervals; required coverage constraint enforcement.
-- **Decisions Deferred**: Exact algorithmic loss functions, nonconformity score definitions, optimization objectives, and operational cost ratios ($C_{\text{failure}} / C_{\text{preventive}}$). Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
+  - **Primary Outcome**: Total simulated maintenance cost per engine contrast ($\Delta_{\text{cost}}$)
+  - **Secondary / Supporting Outcomes**: Marginal, worst-regime, and worst-stage coverage errors; fleet failure rate
+  - **Statistical Framework**: Paired engine-level cluster bootstrap (10,000 resamples); 98.75% percentile decision intervals; Bonferroni $\alpha = 0.05 / 4 = 0.0125$.
+- **Frozen Parameters (ADR-018)**: Dataset FD002; `primary_reference` scenario ($C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$); nominal coverage 90%; threshold $\Delta_{\text{cost}} > 0.20$ SCU per engine; absolute coverage error ceiling $E < 0.05$; failure rate increase $\le 0.0$.
+- **Remaining Methodological Deferrals (Step 7+)**: Exact algorithmic loss functions, nonconformity score definitions, base predictor training hyperparameters, and deployable maintenance policy optimization.
 
 ---
 
@@ -29,12 +30,13 @@ This document establishes the high-level mapping between the formal research que
 - **Associated Hypotheses**: $H_{0,2}$ / $H_{1,2}$
 - **Purpose**: Evaluate whether the proposed method improves conditional coverage and worst-group reliability across operating regimes and wear conditions without making prediction intervals excessively wide.
 - **High-Level Comparison**:
-  - Proposed method vs. relevant global and condition-aware calibration baselines.
+  - Proposed method vs. relevant global and condition-aware calibration baselines (both GBR and LSTM; both regimes and stages required).
 - **Primary Type of Evidence Expected**:
-  - **Primary Outcome**: Worst-group conditional coverage error
-  - **Secondary / Supporting Outcomes**: Mean Prediction Interval Width (MPIW); interval score
-  - **Statistical Framework**: Engine-level uncertainty quantification for worst-group conditional coverage error; MPIW and Winkler interval-score sharpness safeguards.
-- **Decisions Deferred**: Exact subgroup partitioning boundaries, clustering cutoffs, and numerical sharpness trade-off parameters. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
+  - **Primary Outcome**: Worst-group conditional coverage error contrast ($\Delta_{\text{error}}$)
+  - **Secondary / Supporting Outcomes**: Mean Prediction Interval Width contrast ($D_{\text{width}}$); Winkler interval score contrast ($D_{\text{score}}$); worst-group absolute coverage error
+  - **Statistical Framework**: Engine-level cluster bootstrap (10,000 resamples); 98.75% decision intervals with conservative missing-group bound propagation.
+- **Frozen Parameters (ADR-018)**: Dataset FD002; nominal coverage 90%; threshold $\Delta_{\text{error}} > 0.01$; worst-group error ceiling $E < 0.05$; sharpness noninferiority margins $D_{\text{width}} < 1.0$ cycle and $D_{\text{score}} < 1.0$ cycle.
+- **Remaining Methodological Deferrals (Step 7+)**: Conformal nonconformity score functions, conditional binning algorithms, and calibrator fitting implementations.
 
 ---
 
@@ -44,15 +46,16 @@ This document establishes the high-level mapping between the formal research que
 - **Associated Hypotheses**: $H_{0,3}$ / $H_{1,3}$
 - **Purpose**: Disambiguate true decision-aware calibration utility from trivial interval expansion or naive early intervention by comparing against matched-conservatism baselines.
 - **High-Level Comparison**:
-  - Proposed method vs. simple conservative controls:
+  - Proposed method vs. three prespecified conservative control families:
     - Matched-width / widened prediction intervals
     - Tuned point-prediction safety margins
     - Earlier-intervention conservative policies
 - **Primary Type of Evidence Expected**:
-  - **Primary Outcome**: Maintenance cost/utility improvement over strongest pre-specified matched-conservatism baseline
-  - **Secondary / Supporting Outcomes**: Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); premature intervention rate
-  - **Statistical Framework**: Paired proposed-vs-matched-conservatism comparisons; effect size and 95% engine-level paired/cluster bootstrap confidence intervals.
-- **Decisions Deferred**: Exact baseline implementation details, safety margin tuning steps, and policy parameterizations. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
+  - **Primary Outcome**: Maintenance cost improvement over every prespecified matched-conservatism baseline ($\Delta_{\text{cost}}$)
+  - **Secondary / Supporting Outcomes**: Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); cost-inefficient early PM rate; coverage error
+  - **Statistical Framework**: Paired proposed-vs-control comparisons; 98.75% engine-level cluster bootstrap decision intervals.
+- **Frozen Parameters (ADR-018)**: Dataset FD002; `primary_reference` scenario; nominal coverage 90%; threshold $\Delta_{\text{cost}} > 0.20$ SCU per engine against **EVERY** prespecified control family; coverage ceiling $E < 0.05$; failure increase $\le 0.0$.
+- **Remaining Methodological Deferrals (Step 7+)**: Specific control parameterization and tuning algorithms (to be specified using development data only; confirmatory RQ3 evaluation cannot run until that protocol is frozen).
 
 ---
 
@@ -62,21 +65,36 @@ This document establishes the high-level mapping between the formal research que
 - **Associated Hypotheses**: $H_{0,4}$ / $H_{1,4}$
 - **Purpose**: Evaluate whether the principal reliability and maintenance-utility benefits persist across diverse operating conditions, model families, datasets, and repeated stochastic runs.
 - **High-Level Comparison**:
-  - Proposed method performance consistency across multiple configurations vs. baseline models across datasets and random seeds.
+  - Proposed method vs. Global Conformal and Standard Condition-Aware Calibration across 6 mandatory configuration cells:
+    - Cell 1: FD001 × GBR
+    - Cell 2: FD001 × LSTM
+    - Cell 3: FD002 × GBR
+    - Cell 4: FD002 × LSTM
+    - Cell 5: FD004 × GBR
+    - Cell 6: FD004 × LSTM
 - **Primary Type of Evidence Expected**:
-  - **Primary Outcome**: Cross-configuration consistency of the proposed method's effect
-  - **Secondary / Supporting Outcomes**: Effect size; engine-level confidence intervals
-  - **Statistical Framework**: Consistency across predefined robustness configurations; effect sizes and engine-level confidence intervals across settings. *(Note: Support does not require every single configuration to independently show positive effect, but requires no systematic reversal across configurations).*
-- **Decisions Deferred**: Exact benchmark datasets, base model architectures, random seed counts, and statistical testing packages. Exact numerical practical-effect thresholds are deferred until after maintenance simulator validation.
+  - **Primary Outcome**: Weighted aggregate contrasts and cell-level non-harm bounds across the 6 cells (weight $1/6$ each)
+  - **Secondary / Supporting Outcomes**: Individual cell effect sizes; cell-level decision intervals
+  - **Statistical Framework**: 98.75% engine-level cluster bootstrap decision intervals across configurations.
+- **Frozen Parameters (ADR-018)**: `primary_reference` scenario; nominal coverage 90%; 5 model seeds `[2026, 2027, 2028, 2029, 2030]`; weighted aggregate thresholds $\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$; cell-level non-harm thresholds $\Delta_{\text{cost}} > -0.20$ SCU, $\Delta_{\text{error}} > -0.01$; cell-level coverage and sharpness safeguards.
+- **Remaining Methodological Deferrals (Step 7+)**: Base model architecture specifications, training pipelines, and multi-dataset model deployment.
 
 ---
 
-## 2. Experimental Boundaries and Deferred Parameters
+## 2. Experimental Boundaries and Resolved vs. Deferred Parameters
 
-The exact specification of the following parameters is explicitly deferred to Phase 3–4 protocol definition and Phase 5–7 experimental design:
-- Exact calibration algorithms and loss equations
-- Exact numerical decision thresholds and cost ratios
-- Exact subgroup partitioning cutoffs
-- Exact statistical test procedures and seed counts
+### Parameters Frozen in Step 6 (ADR-018)
+- Cost scenario triples and roles (`primary_reference`, `failure_sensitive`, `waste_sensitive`)
+- Numerical practical-effect thresholds for all 4 RQs ($\Delta_{\text{cost}}, \Delta_{\text{error}}, E, D_{\text{width}}, D_{\text{score}}$)
+- Resampling procedure (10,000 cluster-bootstrap resamples, stratified by quartiles)
+- Multiplicity control (Bonferroni $\alpha=0.0125$ across RQs, 98.75% decision intervals, intersection-union testing)
+- Missing-group conservative bound propagation
+- Model training seed list `[2026, 2027, 2028, 2029, 2030]`
 
-These parameters will be pre-specified in Phase 3–4 prior to confirmatory model training and testing.
+### Genuine Methodological Deferrals (Step 7+)
+The following items belong to their existing later development steps and are intentionally deferred:
+- Step 7 base model neural network and tree architectures, loss functions, and hyperparameters
+- Conformal calibration algorithms, nonconformity functions, and conditional binning
+- Deployable maintenance policy design, threshold tuning, and action mapping
+- Matched-conservatism parameterization algorithms (Experiment C)
+- Implementation of the future evaluation runner software
