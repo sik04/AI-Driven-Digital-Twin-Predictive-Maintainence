@@ -4,7 +4,7 @@
 > **Authors**: Mayank Singh, Shiksha Pandey, Ruchi Gupta  
 > **Protocol Reference**: `step06-v2` / ADR-018 / ADR-019  
 > **Scientific Role**: Supporting Point-RUL Base Predictors  
-> **Implementation Scope**: Specification Only (Implementation Deferred to Step 7.2+)
+> **Implementation Scope**: Step 7.2 data pipeline implemented. GBR/LSTM training and selection remain pending Step 7.3.
 
 ---
 
@@ -25,7 +25,7 @@ In accordance with ADR-002, ADR-018, and ADR-019:
 ## 2. Dataset Scope, Inputs, and Preprocessing
 
 ### 2.1 Datasets
-- **FD002 (Primary)**: 6 operating regimes, 2 fault modes (HPC + Fan). Primary confirmatory benchmark for RQ1–RQ3.
+- **FD002 (Primary)**: 6 operating regimes, 1 fault mode. Primary multi-operating-condition benchmark for RQ1–RQ3.
 - **FD001 (Control)**: 1 operating regime, 1 fault mode (HPC). Single-condition control benchmark for RQ4.
 - **FD004 (Robustness)**: 6 operating regimes, 2 fault modes (HPC + Fan). Complex multi-condition robustness benchmark for RQ4.
 - *FD003 remains optional/inactive.*
@@ -218,6 +218,6 @@ torch.use_deterministic_algorithms(True, warn_only=True)
 
 ## 8. Boundary Constraints
 
-- **This document is a specification only.**
-- Model training code, data loader pipelines, and preprocessing modules are **NOT** implemented in Step 7.0.
-- Implementation of this specification begins in Step 7.2.
+- **Implementation Status**: Step 7.2 data pipeline implemented. GBR/LSTM training and selection remain pending Step 7.3.
+- No GBR or LSTM model training has started.
+- All 30 model artifacts will be trained and evaluated under the frozen specification in Step 7.3+.

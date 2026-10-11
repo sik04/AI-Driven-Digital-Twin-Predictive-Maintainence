@@ -50,8 +50,10 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
   - Step 4 Dataset Qualification: **Completed** (FD002 primary, FD001 control, FD004 robustness).
   - Step 5 Data & Evaluation Protocol: **Completed** (Authoritative protocol with primary 90% nominal coverage, uncapped `rul_true` interval calibration and evaluation, engine-weighted metric aggregation, locked 17-feature schema, zero-variance scaling rule, 30-cycle windowing, retrospective stages, completed quartile membership metadata, and verified split manifests in `data/splits/`).
   - Step 6 Sequential Maintenance Simulator: **Completed** (Simulator contract, Python replay engine, 18-case deterministic validation suite, cost scenario infrastructure, verifiable validation pilot, frozen synthetic maintenance cost scenarios [ADR-018], and complete statistical inference protocol in [`research/research_design/statistical_inference_protocol.md`](research/research_design/statistical_inference_protocol.md)).
-  - Step 7.0 Protocol Reconciliation: **Completed** (FD002 lifetime-quartile provenance reconstructed, strict train/validation/calibration/test roles enforced, missing-group bounds logic formalized, and Step 7.1 base-predictor specification locked under ADR-019).
-- **Step 7: Base Predictor Development**: **Next Up** (Required base predictors: GBR and LSTM point-RUL predictors under frozen Step-5 protocol and Step 7.1 specification; models not yet implemented or trained).
+  - Step 7.0 Protocol Reconciliation: **COMPLETE** (FD002 lifetime-quartile provenance reconstructed, strict train/validation/calibration/test roles enforced, missing-group bounds logic formalized, and Step 7.1 base-predictor specification locked under ADR-019).
+  - Step 7.1 Specification: **LOCKED** (HistGradientBoostingRegressor and LSTM base predictor architectures, search grids, and validation-only selection criteria frozen in [`research/research_design/step07_base_predictor_specification.md`](research/research_design/step07_base_predictor_specification.md)).
+  - Step 7.2 Data/Preprocessing/Window Pipeline: **COMPLETE** (Strict C-MAPSS data loader, frozen split validation, training-only preprocessors, K-means k=6 regime models, 30-cycle causal windows, equal-engine weights, and deterministic artifact persistence).
+- **Step 7.3 Base-Model Implementation and Selection**: **NEXT** (Implement GBR and LSTM model code, execute frozen configuration-selection procedure on FD002 validation engines first, and freeze selected configurations before training full 5-seed matrix).
 
 
 
