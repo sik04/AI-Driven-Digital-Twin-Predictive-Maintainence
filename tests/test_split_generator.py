@@ -1,8 +1,6 @@
 """Unit tests for the deterministic engine split generator (scripts/generate_engine_splits.py)."""
 
-# ruff: noqa: E402
 import json
-import sys
 from pathlib import Path
 
 try:
@@ -10,17 +8,13 @@ try:
 except ImportError:
     pytest = None  # type: ignore[assignment]
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT / "scripts") not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT / "scripts"))
-
-
-from generate_engine_splits import (  # type: ignore[import-not-found]
+from scripts.generate_engine_splits import (
     FD001_ALLOCATIONS,
     FD004_ALLOCATIONS,
     generate_split_manifest,
 )
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
 SPLITS_DIR = REPO_ROOT / "data" / "splits"
 RAW_DATA_DIR = REPO_ROOT / "data" / "raw" / "cmapss"
 RAW_FD001_EXISTS = (RAW_DATA_DIR / "train_FD001.txt").exists()
