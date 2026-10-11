@@ -48,6 +48,29 @@ class SplitManifest:
         )
 
 
+def partition_counts(manifest: SplitManifest) -> dict[str, int]:
+    """Derive partition counts directly from a loaded split manifest.
+
+    Parameters
+    ----------
+    manifest : SplitManifest
+        Loaded split manifest.
+
+    Returns
+    -------
+    dict[str, int]
+        Dictionary with keys 'train', 'calibration', 'validation', 'test', 'total'.
+    """
+    counts = {
+        "train": len(manifest.train),
+        "calibration": len(manifest.calibration),
+        "validation": len(manifest.validation),
+        "test": len(manifest.test),
+    }
+    counts["total"] = sum(counts.values())
+    return counts
+
+
 def load_split_manifest(path: Path | str) -> SplitManifest:
     """Load a split manifest from a JSON file.
 

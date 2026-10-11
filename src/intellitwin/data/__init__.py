@@ -42,6 +42,7 @@ from intellitwin.data.schema import (
 from intellitwin.data.splits import (
     SplitManifest,
     load_split_manifest,
+    partition_counts,
     select_partition,
     validate_split_manifest,
 )
@@ -76,6 +77,7 @@ __all__ = [
     # Splits
     "SplitManifest",
     "load_split_manifest",
+    "partition_counts",
     "validate_split_manifest",
     "select_partition",
     # Preprocessing
