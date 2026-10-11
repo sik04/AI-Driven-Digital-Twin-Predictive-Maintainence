@@ -8,15 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Complete Step 5 Data & Evaluation Protocol specifications in `research/research_design/data_evaluation_protocol.md` (17-feature schema, zero-variance ddof=0 scaling rule, 30-cycle windowing, retrospective lifecycle stages, engine-weighted worst-group coverage metrics, and 5-seed model run protocol).
-- Engine split manifests `data/splits/fd001_engine_split_seed_2026.json` (50/20/10/20) and `data/splits/fd004_engine_split_seed_2026.json` (124/50/25/50) generated deterministically via `scripts/generate_engine_splits.py`. Preserved `fd002_engine_split_seed_2026.json` byte-for-byte.
-- Split generator unit tests in `tests/test_split_generator.py`.
-- Sequential maintenance simulator core in `src/intellitwin/simulator/` (`types.py`, `costs.py`, `engine.py`) and 14 deterministic validation unit tests in `tests/test_maintenance_simulator.py`.
-- Step 6 numerical decision pilot script `scripts/run_step06_simulator_validation.py` and regenerated validation pilot summary `research/research_design/step06_validation_pilot_summary.json`.
-- Architectural decision record ADR-016 in `research/decision_log.md` reconciling Step 5 protocol and correcting Step 6 governance status.
+- Authoritative Step 5 protocol completion in `research/research_design/data_evaluation_protocol.md` (primary 90% nominal coverage, uncapped `rul_true` interval evaluation, engine-weighted metric equations with non-averaged RMSE, central Winkler interval score, fixed metadata subgroup governance, and K-means centroid reproducibility).
+- Completed `engine_ids` metadata in `quartile_membership` for `data/splits/fd001_engine_split_seed_2026.json` and `data/splits/fd004_engine_split_seed_2026.json` derived from validated source data sorted by (lifetime, engine_id).
+- Strengthened input validation in `scripts/generate_engine_splits.py` (pre-conversion integral scalar checks, consecutive ID constraints, testable `write_or_verify_manifest` helper).
+- Comprehensive synthetic test suite and isolated integration tests in `tests/test_split_generator.py` and `tests/test_simulator_validation_pilot.py`.
+- Strict integral scalar input validation and pre-policy checks in `src/intellitwin/simulator/engine.py` and 4 new regression tests in `tests/test_maintenance_simulator.py`.
+- Verifiable provenance framework for validation pilot in `scripts/run_step06_simulator_validation.py` using `sha256-utf8-lf-v1` normalized source-code hashing.
+- Architectural decision record ADR-017 in `research/decision_log.md` formalizing protocol reconciliation, validation hardening, and pilot provenance.
 
 ### Changed
-- Reconciled Step 6 governance status across `maintenance_cost_scenarios.yaml`, `step06_numerical_freeze_decision.md`, `step06_freeze_checklist.md`, `maintenance_simulator.md`, `roadmap.md`, and `README.md` (marking simulator implementation complete while keeping numerical cost approval pending researcher decision).
+- Reconciled Step 6 governance and status across `step06_freeze_checklist.md`, `step06_numerical_freeze_decision.md`, `roadmap.md`, `README.md`, `docs/reproducibility.md`, and `experiments/templates/experiment_record.md` (clarifying that numerical maintenance approval is required before confirmatory maintenance testing, not ordinary Step 7 base-predictor training).
 
 - Literature source verification register (`research/literature/source_verification.csv`) tracking metadata verification, methodology status, reproduction status, and verification basis for 26 bibliographic references.
 - Literature evidence corrections log (`research/literature/evidence_corrections.md`) recording exact previous assertions, replacements, supplied sources, and remaining uncertainties.

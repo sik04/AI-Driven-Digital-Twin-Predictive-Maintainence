@@ -48,8 +48,8 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
 - **Phase 2: Research Gap, Questions, Hypotheses & Contributions**: **Completed** (Final Research Problem, RQ1–RQ4, and pre-specified hypotheses locked in [`research/research_questions.md`](research/research_questions.md)).
 - **Phase 3: Dataset Study and Experimental Protocol**: **In Progress**:
   - Step 4 Dataset Qualification: **Completed** (FD002 primary, FD001 control, FD004 robustness).
-  - Step 5 Data & Evaluation Protocol: **Completed** (Locked 17-feature schema, zero-variance scaling rule, 30-cycle windowing, retrospective stages, and split manifests in `data/splits/`).
-  - Step 6 Sequential Maintenance Simulator: **In Progress** (Simulator contract, Python replay engine, 14-case deterministic validation suite, cost scenario infrastructure, and validation pilot complete. Numerical cost approval pending researcher decision).
+  - Step 5 Data & Evaluation Protocol: **Completed** (Authoritative protocol with primary 90% nominal coverage, uncapped `rul_true` interval calibration and evaluation, engine-weighted metric aggregation, locked 17-feature schema, zero-variance scaling rule, 30-cycle windowing, retrospective stages, completed quartile membership metadata, and verified split manifests in `data/splits/`).
+  - Step 6 Sequential Maintenance Simulator: **In Progress** (Simulator contract, Python replay engine, 18-case deterministic validation suite, cost scenario infrastructure, and verifiable validation pilot provenance complete. Numerical cost approval pending researcher decision).
 
 
 

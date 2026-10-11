@@ -14,9 +14,10 @@
 - [x] Held-out test untouched
 - [ ] Numerical cost values frozen
 - [ ] Practical-effect thresholds frozen
-- [ ] Final cost-scenario YAML contains no null values
-- [ ] maintenance_simulator.md matches implementation
+- [ ] Complete approved confirmatory configuration established (null approval_reference is correct while approval is pending)
+- [x] maintenance_simulator.md matches implementation
 - [ ] ADR updated with final numerical freeze
 - [ ] Step 6 marked COMPLETE
 - [ ] PR reviewed
 - [ ] PR ready for merge
+

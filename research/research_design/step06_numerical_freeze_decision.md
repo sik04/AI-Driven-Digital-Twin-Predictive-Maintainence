@@ -28,6 +28,22 @@ Decision states were generated from cycle 30 through $T-1$. The pilot policy fix
 - **OPTIMISTIC**: Demonstrates failure behavior when predictions systematically overestimate remaining life; policy continues past cycle $T-1$, terminating in functional failure at cycle $T$ across all 26 engines.
 - **PESSIMISTIC**: Demonstrates premature maintenance when predictions underestimate remaining life; policy triggers maintenance early, discarding an average of 30.0 usable operational cycles per engine.
 
+### Execution Provenance
+
+| Parameter / Provenance Artifact | Recorded Value |
+|---|---|
+| **Execution Code Commit SHA** | `534f8356dfe6b96253fef85fc052fb33743d4ad0` |
+| **Git Dirty Status at Run Start** | `false` |
+| **Raw Dataset SHA-256 (FD002)** | `dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f` |
+| **Split Manifest SHA-256** | `57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41` |
+| **Source Hash Scheme** | `sha256-utf8-lf-v1` |
+| **Runner Source Hash** | `a4730ae2b99959081105f2b811f0e10a1d51952d5e6865a789d0d1f4a78db678` |
+| **Simulator Engine Hash** | `5ee02d6913ffbc1c45e6fea52f52468c8c1eff184d8b629f3ebceec8e86d823c` |
+| **Simulator Costs Hash** | `d9d4b9d78c0bf2a344a0e0ad493ada346b1da788bd4309b581e13a580ed59ee6` |
+| **Simulator Types Hash** | `fecca455aa5347b5ea6e234d419f05aaa4aea1648d62c9de229edbb21766b7bc` |
+| **Evaluated Engines** | 26 validation engines (cycles $30$ through $T-1$) |
+| **Held-Out Test Engines Inspected** | `0` (strictly zero) |
+
 *Label: SIMULATOR VALIDATION ONLY — NOT MODEL PERFORMANCE OR RESEARCH RESULTS.*
 
 ---

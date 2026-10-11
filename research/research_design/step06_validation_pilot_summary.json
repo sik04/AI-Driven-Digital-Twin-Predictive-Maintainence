@@ -4,23 +4,37 @@
   "provenance": {
     "dataset": "FD002",
     "dataset_sha256": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
-    "split_manifest_sha256": "5d7b27372d45b762921c5e952c87feaf90412cce14009d8031ad726289d30545",
-    "script_sha256": "a7fa89595a19591d9fb5718e9bc1241901e7921b9b744c122cd5eed422d0362e",
-    "git_commit_sha": "1437642d97fb17b74cbc39343491b1ee5ffd182f",
-    "git_dirty": true,
+    "split_manifest_sha256": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+    "source_hash_scheme": "sha256-utf8-lf-v1",
+    "source_hashes": {
+      "runner": "a4730ae2b99959081105f2b811f0e10a1d51952d5e6865a789d0d1f4a78db678",
+      "engine": "5ee02d6913ffbc1c45e6fea52f52468c8c1eff184d8b629f3ebceec8e86d823c",
+      "costs": "d9d4b9d78c0bf2a344a0e0ad493ada346b1da788bd4309b581e13a580ed59ee6",
+      "types": "fecca455aa5347b5ea6e234d419f05aaa4aea1648d62c9de229edbb21766b7bc"
+    },
+    "git_commit_sha": "534f8356dfe6b96253fef85fc052fb33743d4ad0",
+    "git_dirty": false,
     "start_cycle": 30,
     "software_versions": {
       "python": "3.14.0",
       "numpy": "2.5.3",
       "pandas": "3.0.6"
     },
-    "fixtures": {
-      "policy": "MAINTAIN_NOW when lower_rul <= 5.0 else CONTINUE",
-      "cost_fixture": {
-        "preventive_cost": 100.0,
-        "failure_cost": 500.0,
-        "wasted_rul_cost_per_cycle": 10.0
-      }
+    "synthetic_stream_formulas": {
+      "PERFECT": "point=y, lower=y, upper=y",
+      "OPTIMISTIC": "point=y+20, lower=point-5, upper=point+5",
+      "PESSIMISTIC": "point=max(y-20,0), lower=max(point-5,0), upper=point+5"
+    },
+    "policy_fixture": {
+      "description": "MAINTAIN_NOW if lower_rul <= 5.0 else CONTINUE",
+      "threshold": 5.0,
+      "notice": "Validation fixture only \u2014 not an approved research policy"
+    },
+    "cost_fixture": {
+      "preventive_cost": 100.0,
+      "failure_cost": 500.0,
+      "wasted_rul_cost_per_cycle": 10.0,
+      "notice": "Validation fixtures only \u2014 not approved economic parameters"
     }
   },
   "validation_engine_count": 26,
@@ -53,6 +67,7 @@
     256
   ],
   "held_out_test_engines_inspected": 0,
+  "data_processing_notes": "Raw dataset file is parsed and hashed; records are strictly filtered to the 26 frozen validation engines before trajectory validation and simulation. Held-out test engines are never evaluated or used for parameter selection.",
   "stream_results": {
     "PERFECT": {
       "label": "SIMULATOR VALIDATION ONLY \u2014 NOT MODEL PERFORMANCE",

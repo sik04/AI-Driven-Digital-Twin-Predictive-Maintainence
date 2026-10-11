@@ -1,0 +1,6 @@
+# Set default behavior to automatically detect text files and force LF line endings
+* text=auto eol=lf
+*.json text eol=lf
+*.py text eol=lf
+*.md text eol=lf
+*.txt text eol=lf

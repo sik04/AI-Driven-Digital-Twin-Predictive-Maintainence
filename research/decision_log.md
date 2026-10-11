@@ -426,6 +426,48 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Researcher review and approval of numerical cost scenario parameters.
 
+---
+
+### ADR-017: Protocol Reconciliation, Input Validation Hardening, and Pilot Provenance Verification
+- **Date**: 2026-10-11
+- **Status**: Accepted (Amends ADR-013, ADR-015, and ADR-016)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Context and Motivation**:
+  - Comprehensive audit identified remaining ambiguities in the Step 5 protocol (target coverage levels, evaluation metric formulas, bootstrap specification scope, K-means reproducibility, subgroup governance), input validation gaps in split generation and simulator execution, and missing verifiable provenance in the Step 6 validation pilot.
+  - This ADR establishes the authoritative Step 5 protocol, strengthens input validation and test isolation, repairs pilot provenance with normalized source hashing, and reconciles governance status.
+- **Decisions**:
+  1. **Authoritative Step 5 Protocol Completion**:
+     - Primary nominal coverage is strictly 90% ($\alpha = 0.10$). Secondary sensitivity levels (80%, 95%) cannot replace an unfavorable primary result.
+     - Base predictors train on $\min(\text{rul\_true}, 125)$, but primary interval calibration and evaluation use uncapped $\text{rul\_true}$. Upper interval bounds must not be capped at 125.
+     - Metric formulas define $V_i = \{30, \dots, T_i\}$ and $n_i = T_i - 29$. RMSE is the square root of mean engine MSEs; engine-specific RMSE values must not be averaged. Central Winkler interval score is engine-averaged, then fleet-averaged.
+     - Removed $B=1000$ active requirement. Retained 95% engine-level paired/cluster bootstrap. Bootstrap replication count, CI construction, multiplicity adjustments, and numerical practical-effect tolerance rules remain pending separate formal research decisions.
+     - Subgroup membership and eligibility are derived from fixed endpoint metadata; no reselection within bootstrap replicates; ineligible groups remain visible as descriptive-only.
+     - K-means reproducibility specification clarified: float64 training settings, row-sorted, canonical C1–C6 centroids lexicographically ordered, minimum squared Euclidean distance, lowest index tie-breaking, dataset-local parameters.
+     - NASA official test trajectories are secondary terminal benchmarks only; validate engine-to-label alignment; report excluded trajectories ($T < 30$). FD003 remains optional and inactive.
+  2. **Split Generator Input Validation & Metadata Completion**:
+     - Pre-conversion integral scalar validation on raw records; reject nulls, non-numeric, booleans, non-finite, nonpositive, or fractional values; reject duplicates and gaps; require cycle 1..T; require unit IDs 1..100 (FD001) and 1..249 (FD004).
+     - Completed `engine_ids` in `quartile_membership` for FD001 and FD004, ordered by `(lifetime, engine_id)`, derived from validated source data while preserving frozen partitions, seed, and generation environment metadata.
+     - Preserved `fd002_engine_split_seed_2026.json` byte-for-byte (`5d7b27372d45b762921c5e952c87feaf90412cce14009d8031ad726289d30545`).
+     - Testable `write_or_verify_manifest` helper; core synthetic unit tests run without raw NASA data; real-data regeneration isolated under `@pytest.mark.integration`.
+  3. **Simulator Input Hardening**:
+     - Require `engine_id`, `failure_cycle`, and every state's `engine_id` and `cycle` to be positive integral scalar types; reject booleans, strings, floats, NaN, infinity before policy invocation.
+     - Every state validated before policy calls; duplicate engine IDs rejected in `simulate_fleet`. Generic simulator accommodates start at cycle 1 (cycle 30 not hardcoded).
+  4. **Validation Pilot Driver & Provenance Verification**:
+     - Pilot driver uses FD002 validation engines only; validates and sorts trajectories; explicitly rejects $T \le 30$.
+     - Established normalized source-code hashing scheme `sha256-utf8-lf-v1` for cross-platform provenance verification.
+     - Provenance captures clean git commit SHA, `git_dirty=false`, exact data and manifest SHA-256 hashes, source hashes for runner and simulator modules, and environment package versions.
+  5. **Governance & Approval Status**:
+     - Step 5 Data Protocol is COMPLETE and authoritative.
+     - Step 6 simulator implementation exists and deterministic validation suite passes.
+     - Proposed cost triples remain provisional (`approved_for_confirmatory: false`, `approval_reference: null`). Traceable approval is not evidenced by the current record.
+     - Numerical maintenance approval is required before confirmatory maintenance evaluation, not ordinary Step 7 base-predictor training.
+- **Expected Implications**:
+  - Authoritative protocol and reproducible provenance infrastructure are fully locked.
+  - Ready to finalize the Step 7 model-training specification.
+- **Follow-up Review Date / Trigger**:
+  - Researcher review and formal numerical approval of maintenance cost parameters prior to confirmatory maintenance evaluation.
+
+
 
 
 

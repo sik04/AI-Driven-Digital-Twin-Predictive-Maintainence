@@ -32,13 +32,14 @@ jobs:
           pip install -e ".[dev,research]"
 
       - name: Ruff Format Check
-        run: ruff format --check src tests
+        run: ruff format --check src tests scripts
 
       - name: Ruff Lint Check
-        run: ruff check src tests
+        run: ruff check src tests scripts
 
       - name: Mypy Type Check
         run: mypy src tests
 
-      - name: Run Pytest Suite
-        run: pytest --cov=src/intellitwin --cov-report=term-missing tests
+      - name: Run Pytest Suite (Core Synthetic Tests)
+        run: pytest -m "not integration" --cov=src/intellitwin --cov-report=term-missing tests
+
