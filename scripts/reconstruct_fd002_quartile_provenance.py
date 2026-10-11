@@ -46,7 +46,7 @@ def compute_sha256(filepath: Path) -> str:
     return hasher.hexdigest()
 
 
-def _validate_integral_series(s: pd.Series, name: str) -> np.ndarray:
+def _validate_integral_series(s: pd.Series, name: str) -> np.ndarray[Any, Any]:
     """Validate series contains positive integral values, rejecting booleans, floats, NaN, inf."""
     if len(s) == 0:
         raise ValueError(f"Empty series for {name}")
