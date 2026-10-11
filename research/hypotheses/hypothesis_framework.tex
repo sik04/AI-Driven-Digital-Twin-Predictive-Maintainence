@@ -6,118 +6,127 @@
 \usepackage{hyperref}
 \usepackage{enumitem}
 
-\title{IntelliTwin Authoritative Hypothesis Registry}
+\title{IntelliTwin Authoritative Hypothesis Registry and Numerical Evaluation Contract}
 \author{Mayank Singh \and Shiksha Pandey \and Ruchi Gupta}
-\date{October 4, 2026}
+\date{October 11, 2026}
 
 \begin{document}
 
 \maketitle
 
 \begin{abstract}
-This document presents the formal academic rendering of the IntelliTwin hypothesis framework, statistical uncertainty rules, decision logic, outcome hierarchy, and evaluation criteria. 
-\textbf{Note:} The structured YAML specification in \url{research/hypotheses/hypothesis_framework.yaml} serves as the canonical, authoritative source of truth for all hypothesis definitions, metrics, comparators, and experimental mappings.
+This document presents the formal academic rendering of the IntelliTwin hypothesis framework, frozen numerical evaluation contract (\texttt{step06-v2}), statistical uncertainty rules, decision logic, outcome hierarchy, and evaluation criteria approved under ADR-018.
+\textbf{Note:} The structured YAML specification in \url{research/hypotheses/hypothesis_framework.yaml} and the statistical protocol in \url{research/research_design/statistical_inference_protocol.md} serve as the canonical, authoritative sources of truth for all hypothesis definitions, metrics, comparators, numerical margins, and experimental mappings.
 \end{abstract}
 
 \section*{Governance Rules on Success Criteria and Protocol Integrity}
 
 \begin{quote}
-\textbf{Success Criteria Rule:} We discard old arbitrary thresholds (5\%, 10\%, 15\%, 75\%) unless independently justified. Each RQ defines a pre-specified primary outcome, comparator set, practical effect threshold policy, and statistical decision rule before confirmatory testing.
+\textbf{Success Criteria Rule:} The old percentage-based thresholds (5\%, 10\%, 15\%, 75\%) are permanently superseded. Each RQ possesses a pre-specified primary outcome, comparator set, frozen numerical practical-effect threshold, and cluster-bootstrap decision rule that classifies results as Supported, Unsupported, or Inconclusive under ADR-018.
 
 \textbf{Outcome Hierarchy Rule:} The primary outcome determines the main conclusion for each research question. Secondary/supporting outcomes verify constraints, characterize trade-offs, and provide interpretation, but a favorable secondary outcome cannot replace failure on the primary outcome.
 
 \textbf{No Post-Hoc Modification Rule:} No post-hoc modification of confirmatory evaluation criteria is permitted. Primary metrics, comparator sets, subgroup definitions, practical-effect thresholds, statistical decision rules, and outcome hierarchies must not be altered after observing confirmatory results. Any late modification must be documented as a protocol deviation and labelled exploratory.
 \end{quote}
 
+\section*{Numerical Evaluation Contract (ADR-018)}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Protocol Version}: \texttt{step06-v2}
+  \item \textbf{Primary Maintenance Scenario}: \texttt{primary\_reference} ($C_{\text{PM}} = 1.0, C_{\text{FAIL}} = 5.0, C_{\text{WASTE}} = 0.20$ SCU).
+  \item \textbf{Secondary Sensitivity Scenarios}: \texttt{failure\_sensitive} ($C_{\text{FAIL}} = 10.0$) and \texttt{waste\_sensitive} ($C_{\text{WASTE}} = 0.40$).
+  \item \textbf{Nominal Coverage}: Primary nominal coverage 90\% ($\alpha = 0.10$); secondary sensitivity levels at 80\% and 95\%.
+  \item \textbf{Cost Improvement Margin}: $\Delta_{\text{cost}} > 0.20$ SCU per engine (equal to the cost of one discarded cycle).
+  \item \textbf{Coverage Error Improvement Margin}: $\Delta_{\text{error}} > 0.01$ (one percentage point).
+  \item \textbf{Maximum Absolute Coverage Error Ceiling}: $E < 0.05$ (prespecified 85\%--95\% empirical acceptance band).
+  \item \textbf{Interval Noninferiority Margins}: $D_{\text{width}} < 1.0$ cycle for MPIW and $D_{\text{score}} < 1.0$ cycle for Winkler interval score.
+  \item \textbf{Robustness Non-Harm Margins}: $\Delta_{\text{cost}} > -0.20$ SCU per engine and $\Delta_{\text{error}} > -0.01$.
+  \item \textbf{Failure Safeguard}: Observed fleet failure rate increase $\le 0.0$ against comparator.
+  \item \textbf{Model Training Seeds}: Fixed five-seed estimand: \texttt{[2026, 2027, 2028, 2029, 2030]}.
+\end{itemize}
+
 \section*{Statistical Uncertainty Framework}
 
 \begin{enumerate}[leftmargin=*]
   \item \textbf{Independent Unit}: The engine unit is the independent statistical sample unit. Individual sequence time windows or time steps extracted from the same physical engine exhibit strong temporal autocorrelation and must \textbf{NEVER} be treated as independent statistical observations.
-  \item \textbf{Paired Comparisons}: Comparisons between the proposed method and baseline models evaluated on the same engine units or dataset splits must be paired.
-  \item \textbf{Confidence Intervals}: For each primary metric, statistical uncertainty will be quantified using a \textbf{95\% engine-level paired/cluster bootstrap confidence interval} (resampling engine units intact).
-  \item \textbf{Effect Reporting}: Effect sizes and their corresponding 95\% engine-level confidence intervals must always be reported together.
-  \item \textbf{Secondary P-Values}: P-values or statistical hypothesis test results, if reported, are secondary supporting evidence and cannot independently determine whether a research question is supported.
-  \item \textbf{Deferred Statistical Parameterizations}: Exact bootstrap resample counts, exact CI construction variants (percentile vs.\ BCa), secondary significance tests, and multiplicity corrections remain deferred to the detailed experimental protocol.
+  \item \textbf{Paired Comparisons}: Comparisons between the proposed method and baseline models evaluated on the same engine units or dataset splits are strictly paired.
+  \item \textbf{Resampling Procedure}: 10,000 cluster-bootstrap resamples with replacement, stratified by split-generation lifetime quartiles ($Q_1$--$Q_4$), using PCG64 PRNG with \texttt{SeedSequence([2026, 6, dataset\_number])}.
+  \item \textbf{Decision Intervals}: Confirmatory decision rules use \textbf{98.75\% cluster-bootstrap percentile confidence intervals} (quantiles 0.00625 and 0.99375), providing Bonferroni family-wise error control ($\alpha = 0.05 / 4 = 0.0125$) across the four research questions. Descriptive 95\% intervals (quantiles 0.025 and 0.975) are reported for context.
+  \item \textbf{Intersection-Union Principle}: Each RQ requires all component conditions to pass at the decision level to achieve Supported classification.
+  \item \textbf{Missing-Group Bound Propagation}: Replicate-level worst-group errors are recomputed across eligible groups ($\ge 10$ engines). Replicates with unrepresented groups propagate conservative $[0, 0.90]$ bounds rather than being dropped or redrawn.
+  \item \textbf{Secondary P-Values}: No supplementary p-value hypothesis tests form part of the confirmatory protocol.
 \end{enumerate}
 
-\section*{Global Decision Rule and Threshold Governance}
+\section*{Global Decision Rule}
 
 \begin{quote}
-After practical-effect thresholds are finalized, an RQ will be considered \textbf{supported} only when the estimated effect and its uncertainty provide evidence of a practically meaningful benefit; \textbf{unsupported} when the evidence indicates no meaningful benefit, an adverse effect, or violation of a required reliability constraint; and \textbf{inconclusive} when the confidence interval or cross-comparator evidence does not allow a clear distinction between meaningful and negligible effects.
-
-Exact numerical practical-effect thresholds remain deferred until maintenance-simulator implementation and validation in the later simulator stage (Step 6) and must be frozen before confirmatory testing. Confirmatory results cannot be used to select, tune, relax, or redefine these thresholds.
-\end{quote}
-
-\section*{Research Problem Statement}
-
-\begin{quote}
-Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.
+An RQ is \textbf{Supported} if and only if every required component condition passes using the 98.75\% decision intervals and observed failure safeguard; \textbf{Unsupported} if any required condition fails; and \textbf{Inconclusive} if any condition is indeterminate (e.g., CI overlaps the boundary) or degenerate.
 \end{quote}
 
 \section*{Formal Research Questions and Hypotheses}
 
 \subsection*{Research Question 1: Sequential Maintenance Utility and Coverage Reliability}
 \begin{description}[style=multiline,leftmargin=3.5cm]
-  \item[Status:] Locked
-  \item[Experiment:] \textbf{Experiment A}
+  \item[Status:] Frozen (ADR-018)
+  \item[Experiment:] \textbf{Experiment A} (FD002, \texttt{primary\_reference}, nominal 90\%)
   \item[Question:] Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?
-  \item[Null ($H_{0,1}$):] The proposed method does not significantly improve maintenance utility over standard global or condition-aware calibration while maintaining comparable coverage.
-  \item[Alt ($H_{1,1}$):] The proposed method improves maintenance utility over standard global and condition-aware calibration while maintaining the required coverage reliability.
-  \item[Primary Outcome:] Total simulated maintenance cost per engine
-  \item[Supporting Outcomes:] Late/failure intervention rate; required prediction-interval coverage
-  \item[Comparison:] Proposed method vs.\ standard global conformal calibration and standard condition-aware conformal calibration.
-  \item[Threshold Status:] Numerical practical-effect threshold: Deferred until after maintenance simulator validation and before confirmatory testing.
-  \item[Supported Logic:] Practically meaningful reduction in maintenance cost per engine supported by 95\% engine-level CI while maintaining required coverage reliability.
-  \item[Unsupported Logic:] No practically meaningful cost improvement over strongest baseline, baseline performs better, or lower cost is achieved by violating coverage constraints.
-  \item[Inconclusive Logic:] Estimated improvement is favorable but 95\% CI overlaps future threshold, or comparator evidence is mixed.
+  \item[Null ($H_{0,1}$):] The proposed method does not improve maintenance utility by at least 0.20 SCU per engine over both global and standard condition-aware calibration, or fails coverage constraints.
+  \item[Alt ($H_{1,1}$):] The proposed method improves maintenance utility by at least 0.20 SCU per engine over both global and standard condition-aware calibration while maintaining required coverage reliability.
+  \item[Primary Outcome:] Total simulated maintenance cost per engine contrast ($\Delta_{\text{cost}}$)
+  \item[Supporting Outcomes:] Marginal, worst-regime, and worst-stage coverage errors; fleet failure rate
+  \item[Comparison:] Proposed method vs.\ Global Conformal Calibration and Standard Condition-Aware Calibration (both GBR and LSTM required).
+  \item[Threshold:] $\Delta_{\text{cost}} > 0.20$ SCU per engine; coverage error ceiling $E < 0.05$.
+  \item[Supported Logic:] For both GBR and LSTM, lower CI of $\Delta_{\text{cost}} > 0.20$ SCU against both baselines, upper CI of coverage errors $< 0.05$, and observed fleet failure rate increase $\le 0.0$.
+  \item[Unsupported Logic:] For either model, upper CI of $\Delta_{\text{cost}} < 0.20$ SCU against either baseline, lower CI of any coverage error $> 0.05$, or observed failure rate increases.
+  \item[Inconclusive Logic:] No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
 \end{description}
 
 \subsection*{Research Question 2: Conditional Reliability and Interval Sharpness}
 \begin{description}[style=multiline,leftmargin=3.5cm]
-  \item[Status:] Locked
-  \item[Experiment:] \textbf{Experiment B}
+  \item[Status:] Frozen (ADR-018)
+  \item[Experiment:] \textbf{Experiment B} (FD002, nominal 90\%)
   \item[Question:] Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?
-  \item[Null ($H_{0,2}$):] The proposed method does not improve worst-group or conditional coverage, or any improvement is primarily obtained through substantially wider intervals.
-  \item[Alt ($H_{1,2}$):] The proposed method improves worst-group or conditional coverage while maintaining practically useful interval sharpness.
-  \item[Primary Outcome:] Worst-group conditional coverage error
-  \item[Supporting Outcomes:] Mean Prediction Interval Width (MPIW); interval score
-  \item[Comparison:] Reliability and sharpness of proposed method vs.\ relevant global and condition-aware calibration baselines.
-  \item[Threshold Status:] Numerical practical-effect threshold: Deferred until after maintenance simulator validation and before confirmatory testing.
-  \item[Supported Logic:] Practically meaningful improvement in worst-group coverage error supported by 95\% engine-level CI without materially degrading interval sharpness.
-  \item[Unsupported Logic:] No practically meaningful worst-group reliability improvement, worst-group reliability degrades, or coverage gain requires materially wider/poorer-quality intervals.
-  \item[Inconclusive Logic:] Worst-group reliability appears to improve but 95\% CI overlaps future threshold, or reliability-vs-sharpness trade-off is ambiguous.
+  \item[Null ($H_{0,2}$):] The proposed method does not improve worst-group coverage error by at least 0.01 over both baselines, or causes interval width or score to deteriorate by 1.0 cycle or more.
+  \item[Alt ($H_{1,2}$):] The proposed method improves worst-group coverage error by at least 0.01 over both baselines while restricting interval width and score deterioration to under 1.0 cycle.
+  \item[Primary Outcome:] Worst-group conditional coverage error contrast ($\Delta_{\text{error}}$)
+  \item[Supporting Outcomes:] MPIW contrast ($D_{\text{width}}$); interval score contrast ($D_{\text{score}}$); worst-group coverage error
+  \item[Comparison:] Proposed method vs.\ Global Conformal and Standard Condition-Aware Calibration (both GBR and LSTM; both regimes and stages required).
+  \item[Threshold:] $\Delta_{\text{error}} > 0.01$; worst-group error ceiling $E < 0.05$; $D_{\text{width}} < 1.0$ cycle; $D_{\text{score}} < 1.0$ cycle.
+  \item[Supported Logic:] For both models and both subgroup families, lower CI of $\Delta_{\text{error}} > 0.01$ against both baselines, upper CI of worst-group error $< 0.05$, upper CI of $D_{\text{width}} < 1.0$ cycle, and upper CI of $D_{\text{score}} < 1.0$ cycle.
+  \item[Unsupported Logic:] Upper CI of $\Delta_{\text{error}} < 0.01$, lower CI of worst-group error $> 0.05$, lower CI of $D_{\text{width}} > 1.0$ cycle, or lower CI of $D_{\text{score}} > 1.0$ cycle.
+  \item[Inconclusive Logic:] No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
 \end{description}
 
 \subsection*{Research Question 3: Decision-Value Attribution vs. Matched-Conservatism Baselines}
 \begin{description}[style=multiline,leftmargin=3.5cm]
-  \item[Status:] Locked
-  \item[Experiment:] \textbf{Experiment C}
+  \item[Status:] Frozen (ADR-018)
+  \item[Experiment:] \textbf{Experiment C} (FD002, \texttt{primary\_reference}, nominal 90\%)
   \item[Question:] Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?
-  \item[Null ($H_{0,3}$):] Any maintenance improvement can be matched by simpler conservative baselines such as widened intervals or safety margins.
-  \item[Alt ($H_{1,3}$):] The proposed method provides maintenance improvements beyond those achievable through matched-conservatism baselines, demonstrating useful decision information rather than simple over-conservatism.
-  \item[Primary Outcome:] Maintenance cost/utility improvement over strongest pre-specified matched-conservatism baseline
-  \item[Supporting Outcomes:] Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); premature intervention rate
-  \item[Comparison:] Proposed method vs.\ matched-width widened global intervals, fixed safety-margin heuristic policies, and conservative point-prediction rules.
-  \item[Threshold Status:] Numerical practical-effect threshold: Deferred until after maintenance simulator validation and before confirmatory testing.
-  \item[Supported Logic:] Practically meaningful improvement in maintenance utility over strongest pre-specified matched-conservatism baseline, supported by 95\% engine-level CI.
-  \item[Unsupported Logic:] Matched conservative controls reproduce or outperform proposed method's benefit, demonstrating that decision-aware calibration is unnecessary.
-  \item[Inconclusive Logic:] Proposed method appears superior but 95\% CI overlaps future threshold, or matched controls yield mixed evidence.
+  \item[Null ($H_{0,3}$):] The proposed method does not improve maintenance utility by at least 0.20 SCU per engine over every prespecified matched-conservatism control family, or violates coverage constraints.
+  \item[Alt ($H_{1,3}$):] The proposed method improves maintenance utility by at least 0.20 SCU per engine over every prespecified matched-conservatism control family while preserving required coverage reliability.
+  \item[Primary Outcome:] Maintenance cost improvement over matched-conservatism controls ($\Delta_{\text{cost}}$)
+  \item[Supporting Outcomes:] Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); cost-inefficient early PM rate; coverage error
+  \item[Comparison:] Proposed method vs.\ all three prespecified control families (widened intervals, point-prediction safety margins, earlier-intervention policies).
+  \item[Threshold:] $\Delta_{\text{cost}} > 0.20$ SCU per engine against EVERY control family; coverage ceiling $E < 0.05$.
+  \item[Supported Logic:] For both models, lower CI of $\Delta_{\text{cost}} > 0.20$ SCU against every control family, upper CI of coverage errors $< 0.05$, and failure increase $\le 0.0$.
+  \item[Unsupported Logic:] Upper CI of $\Delta_{\text{cost}} < 0.20$ SCU against any control family, lower CI of coverage error $> 0.05$, or failure rate increases.
+  \item[Inconclusive Logic:] No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
 \end{description}
 
 \subsection*{Research Question 4: Robustness and Generalization}
 \begin{description}[style=multiline,leftmargin=3.5cm]
-  \item[Status:] Locked
-  \item[Experiment:] \textbf{Experiment D}
+  \item[Status:] Frozen (ADR-018)
+  \item[Experiment:] \textbf{Experiment D} (6 cells: FD001, FD002, FD004 $\times$ GBR, LSTM; weight $1/6$ per cell)
   \item[Question:] Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?
-  \item[Null ($H_{0,4}$):] The observed benefits are specific to particular datasets, operating conditions, model families, or random seeds.
-  \item[Alt ($H_{1,4}$):] The principal reliability and maintenance-utility improvements persist across multiple operating conditions, model families, datasets, and repeated experimental runs.
-  \item[Primary Outcome:] Cross-configuration consistency of the proposed method's effect
-  \item[Supporting Outcomes:] Effect size; engine-level confidence intervals
-  \item[Comparison:] Proposed-vs-baseline performance across predefined datasets/operating conditions, model families, and random seeds.
-  \item[Threshold Status:] Numerical practical-effect threshold: Deferred until after maintenance simulator validation and before confirmatory testing.
-  \item[Supported Logic:] Consistently favorable and practically meaningful effect across predefined robustness configurations without systematic reversal across datasets, model families, or seeds. (Support does not require positive effect in literally every individual configuration).
-  \item[Unsupported Logic:] Benefit disappears, systematically reverses, or is restricted to specific datasets, model families, or seeds.
-  \item[Inconclusive Logic:] Mixed results across robustness configurations or statistical uncertainty is too large to confirm robustness.
+  \item[Null ($H_{0,4}$):] The proposed method fails to achieve aggregate improvements ($\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$) across the evaluation matrix, or exhibits material harm ($\Delta_{\text{cost}} < -0.20$ SCU or $\Delta_{\text{error}} < -0.01$) in any cell.
+  \item[Alt ($H_{1,4}$):] The proposed method achieves aggregate improvements across the evaluation matrix without material harm in any individual configuration cell.
+  \item[Primary Outcome:] Weighted aggregate contrasts and cell-level non-harm bounds
+  \item[Supporting Outcomes:] Individual cell effect sizes; cell-level decision intervals
+  \item[Comparison:] Proposed method vs.\ Global Conformal and Standard Condition-Aware Calibration across 6 cells.
+  \item[Threshold:] Aggregate: $\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$; Cell-level non-harm: $\Delta_{\text{cost}} > -0.20$ SCU, $\Delta_{\text{error}} > -0.01$.
+  \item[Supported Logic:] Lower CI of weighted aggregate $\Delta_{\text{cost}} > 0.20$ SCU, lower CI of weighted aggregate $\Delta_{\text{error}} > 0.01$, lower CI of cell $\Delta_{\text{cost}} > -0.20$ SCU in every cell, lower CI of cell $\Delta_{\text{error}} > -0.01$ in every cell, and all cell safeguards hold.
+  \item[Unsupported Logic:] Upper CI of aggregate $\Delta_{\text{cost}} < 0.20$ SCU, upper CI of aggregate $\Delta_{\text{error}} < 0.01$, upper CI of cell $\Delta_{\text{cost}} < -0.20$ SCU or $\Delta_{\text{error}} < -0.01$ in any cell, or any cell safeguard fails.
+  \item[Inconclusive Logic:] No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
 \end{description}
 
 \section*{Summary Matrix}
@@ -125,17 +134,17 @@ Existing RUL research has separately studied conformal uncertainty calibration, 
 \begin{table}[h!]
 \centering
 \small
-\begin{tabular}{p{0.8cm} p{2.0cm} p{3.6cm} p{3.4cm} p{2.0cm} p{2.0cm}}
+\begin{tabular}{p{0.8cm} p{2.0cm} p{3.2cm} p{3.2cm} p{2.2cm} p{2.4cm}}
 \toprule
-\textbf{ID} & \textbf{Experiment} & \textbf{Primary Outcome} & \textbf{Key Comparators} & \textbf{Statistical Unit} & \textbf{Threshold Status} \\
+\textbf{ID} & \textbf{Experiment} & \textbf{Primary Outcome} & \textbf{Key Comparators} & \textbf{Statistical Unit} & \textbf{Frozen Threshold} \\
 \midrule
-\textbf{RQ1} & Experiment A & Maintenance cost per engine & Global \& condition-aware & Engine (95\% CI) & Deferred (Post-Sim) \\
-\textbf{RQ2} & Experiment B & Worst-group coverage error & Global \& condition-aware & Engine (95\% CI) & Deferred (Post-Sim) \\
-\textbf{RQ3} & Experiment C & Utility vs.\ matched baseline & Matched-conservatism & Engine (95\% CI) & Deferred (Post-Sim) \\
-\textbf{RQ4} & Experiment D & Cross-config consistency & Multi-dataset, model, seed & Engine (95\% CI) & Deferred (Post-Sim) \\
+\textbf{RQ1} & Experiment A & Maintenance cost per engine ($\Delta_{\text{cost}}$) & Global \& condition-aware & Engine (98.75\% CI) & $\Delta_{\text{cost}} > 0.20$ SCU \\
+\textbf{RQ2} & Experiment B & Worst-group coverage error ($\Delta_{\text{error}}$) & Global \& condition-aware & Engine (98.75\% CI) & $\Delta_{\text{error}} > 0.01$ \\
+\textbf{RQ3} & Experiment C & Utility vs.\ matched controls ($\Delta_{\text{cost}}$) & 3 matched control families & Engine (98.75\% CI) & $\Delta_{\text{cost}} > 0.20$ SCU \\
+\textbf{RQ4} & Experiment D & Weighted aggregate \& cell non-harm & 6 cells (weight $1/6$ each) & Engine (98.75\% CI) & Agg: $>0.20, >0.01$; Harm: $>-0.20, >-0.01$ \\
 \bottomrule
 \end{tabular}
-\caption{Overview of IntelliTwin Formal Research Questions, Primary Outcomes, Comparators, Statistical Unit, and Threshold Status.}
+\caption{Overview of IntelliTwin Formal Research Questions, Primary Outcomes, Comparators, Statistical Unit, and Frozen Thresholds (ADR-018).}
 \end{table}
 
 \end{document}

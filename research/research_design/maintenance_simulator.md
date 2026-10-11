@@ -253,15 +253,46 @@ The simulator core is validated by an automated, deterministic test suite in `te
 
 ---
 
-## 15. Maintenance Cost Scenario Families
+## 15. Maintenance Cost Scenario Families & Economic Interpretation
 
-The cost infrastructure defines three scenario families in `research/research_design/maintenance_cost_scenarios.yaml`:
-- **`primary_balanced`**: Primary confirmatory maintenance scenario balancing failure avoidance and unnecessary early replacement.
-- **`failure_sensitive`**: Sensitivity scenario assigning greater relative importance to avoiding failure events ($C_{\text{FAIL}} \gg C_{\text{PM}}$).
-- **`waste_sensitive`**: Sensitivity scenario assigning greater relative importance to discarding usable remaining life ($C_{\text{WASTE}}$ weighted higher).
+The cost infrastructure defines three frozen scenario families in `research/research_design/maintenance_cost_scenarios.yaml` approved under **ADR-018** (Date: 2026-10-11):
 
-> **Governance Notice**:
-> Simulator implementation exists. Numerical cost proposals and practical-effect criteria are not approved for confirmatory use. A traceable researcher decision and justification remain required.
+| Scenario ID | Role | $C_{\text{PM}}$ | $C_{\text{FAIL}}$ | $C_{\text{WASTE}}$ | Status | Approved for Confirmatory | Approval Reference |
+|---|---|---|---|---|---|---|---|
+| `primary_reference` | Primary Confirmatory | 1.0 | 5.0 | 0.20 | `frozen` | **true** | ADR-018 |
+| `failure_sensitive` | Sensitivity Analysis | 1.0 | 10.0 | 0.20 | `frozen` | **true** | ADR-018 |
+| `waste_sensitive` | Sensitivity Analysis | 1.0 | 5.0 | 0.40 | `frozen` | **true** | ADR-018 |
+
+### 15.1 Cost Calculations
+For all scenarios, simulated maintenance costs are defined as:
+$$\text{Cost}_{\text{PM}} = C_{\text{PM}} + C_{\text{WASTE}} \times W$$
+$$\text{Cost}_{\text{FAIL}} = C_{\text{FAIL}}$$
+where $W = T - \tau_{\text{decision}} \ge 1$ is the uncapped wasted RUL at intervention cycle $\tau_{\text{decision}} \le T-1$.
+
+### 15.2 Equality Horizon ($r_{\text{equal}}$)
+For positive discarded-life costs ($C_{\text{WASTE}} > 0$), the breakeven remaining life where PM cost equals failure cost is:
+$$r_{\text{equal}} = \frac{C_{\text{FAIL}} - C_{\text{PM}}}{C_{\text{WASTE}}}$$
+
+The three $r_{\text{equal}}$ values are:
+- **`primary_reference`**: $(5.0 - 1.0) / 0.20 = 20$ cycles.
+- **`failure_sensitive`**: $(10.0 - 1.0) / 0.20 = 45$ cycles.
+- **`waste_sensitive`**: $(5.0 - 1.0) / 0.40 = 10$ cycles.
+
+**Critical Interpretive Boundaries**:
+- These values identify exact equality between maintaining immediately and accepting unmitigated failure. They are **NOT** optimal replacement times, policy thresholds, warning horizons, or evidence of a scientifically optimal cost ratio.
+- At equality ($W = r_{\text{equal}}$), the costs are equal; preventive maintenance is not strictly cheaper.
+- When $W > r_{\text{equal}}$, preventive maintenance is cost-inefficient relative to unmitigated failure under that scenario.
+
+### 15.3 Theoretical Oracle Benchmark
+Under these frozen positive-waste-cost scenarios, an idealized oracle with perfect knowledge of failure cycle $T$ and zero intervention lead time would intervene at cycle $T-1$ ($W = 1$ cycle):
+- **`primary_reference`**: $\text{Cost} = 1.0 + 0.20 \times 1 = 1.20$ SCU.
+- **`failure_sensitive`**: $\text{Cost} = 1.0 + 0.20 \times 1 = 1.20$ SCU.
+- **`waste_sensitive`**: $\text{Cost} = 1.0 + 0.40 \times 1 = 1.40$ SCU.
+
+*Notice: Oracle failure knowledge must never be provided to a deployable predictive policy.*
+
+### 15.4 Corrected Interpretation of Validation Pilot
+In the deterministic validation pilot (`scripts/run_step06_simulator_validation.py`), the PERFECT fixture maintains at five remaining cycles because its fixture policy uses `lower_rul <= 5.0`. It demonstrates **correct trigger execution** under oracle predictions, **not** cost-optimal intervention timing.
 
 
 

@@ -12,12 +12,11 @@
 - [x] Cost scenario families locked
 - [x] Validation-only pilot complete
 - [x] Held-out test untouched
-- [ ] Numerical cost values frozen
-- [ ] Practical-effect thresholds frozen
-- [ ] Complete approved confirmatory configuration established (null approval_reference is correct while approval is pending)
+- [x] Numerical cost values frozen (ADR-018: primary_reference 1.0/5.0/0.20, failure_sensitive 1.0/10.0/0.20, waste_sensitive 1.0/5.0/0.40)
+- [x] Practical-effect thresholds frozen (ADR-018: step06-v2 in hypothesis_framework.yaml)
+- [x] Complete approved confirmatory configuration established (approved_for_confirmatory: true, approval_reference: ADR-018)
 - [x] maintenance_simulator.md matches implementation
-- [ ] ADR updated with final numerical freeze
-- [ ] Step 6 marked COMPLETE
+- [x] ADR updated with final numerical freeze (ADR-018)
+- [x] Step 6 marked COMPLETE (numerical freeze and evaluation protocol finalized)
 - [ ] PR reviewed
 - [ ] PR ready for merge
-

@@ -1,53 +1,70 @@
 # IntelliTwin Maintenance Cost Scenarios Specification
-# Step 6 Infrastructure — Cost Scenario Families
+# Step 6 Frozen Maintenance Cost Scenarios (ADR-018)
 
-version: "1.0"
+version: "2.0"
 units: "simulated_cost_units"
 
 scenarios:
-  primary_balanced:
-    id: "primary_balanced"
-    role: "validation_only"
-    intended_role: "primary_confirmatory"
-    name: "Provisional Primary Balanced Cost Proposal"
-    description: "Provisional maintenance cost proposal for simulator validation only. Not approved for confirmatory testing."
-    status: "provisional_validation_only"
-    approved_for_confirmatory: false
-    approval_reference: null
-    preventive_cost: 10.0
-    failure_cost: 100.0
-    wasted_rul_cost_per_cycle: 1.0
+  primary_reference:
+    id: "primary_reference"
+    role: "primary_confirmatory"
+    name: "Primary Reference Cost Scenario"
+    description: "Primary confirmatory maintenance cost scenario defining the normalized simulated cost unit (C_PM=1.0) with C_FAIL=5.0 and C_WASTE=0.20."
+    status: "frozen"
+    approved_for_confirmatory: true
+    approval_reference: "ADR-018"
+    preventive_cost: 1.0
+    failure_cost: 5.0
+    wasted_rul_cost_per_cycle: 0.20
 
   failure_sensitive:
     id: "failure_sensitive"
-    role: "validation_only"
-    intended_role: "sensitivity_analysis"
-    name: "Provisional Failure Sensitive Cost Proposal"
-    description: "Provisional sensitivity scenario assigning greater relative weight to failure. Validation only."
-    status: "provisional_validation_only"
-    approved_for_confirmatory: false
-    approval_reference: null
-    preventive_cost: 10.0
-    failure_cost: 500.0
-    wasted_rul_cost_per_cycle: 1.0
+    role: "sensitivity_analysis"
+    name: "Failure Sensitive Cost Scenario"
+    description: "Prespecified secondary sensitivity scenario doubling failure penalty (C_FAIL=10.0) with C_PM=1.0 and C_WASTE=0.20. Approval permits prespecified secondary analyses; does not promote to primary confirmatory outcome."
+    status: "frozen"
+    approved_for_confirmatory: true
+    approval_reference: "ADR-018"
+    preventive_cost: 1.0
+    failure_cost: 10.0
+    wasted_rul_cost_per_cycle: 0.20
 
   waste_sensitive:
     id: "waste_sensitive"
-    role: "validation_only"
-    intended_role: "sensitivity_analysis"
-    name: "Provisional Waste Sensitive Cost Proposal"
-    description: "Provisional sensitivity scenario assigning greater relative weight to wasted RUL. Validation only."
-    status: "provisional_validation_only"
-    approved_for_confirmatory: false
-    approval_reference: null
-    preventive_cost: 10.0
-    failure_cost: 100.0
-    wasted_rul_cost_per_cycle: 5.0
+    role: "sensitivity_analysis"
+    name: "Waste Sensitive Cost Scenario"
+    description: "Prespecified secondary sensitivity scenario doubling discarded-life penalty (C_WASTE=0.40) with C_PM=1.0 and C_FAIL=5.0. Approval permits prespecified secondary analyses; does not promote to primary confirmatory outcome."
+    status: "frozen"
+    approved_for_confirmatory: true
+    approval_reference: "ADR-018"
+    preventive_cost: 1.0
+    failure_cost: 5.0
+    wasted_rul_cost_per_cycle: 0.40
 
 governance:
-  - "Simulator implementation exists. Numerical cost proposals and practical-effect criteria are not approved for confirmatory use. A traceable researcher decision and justification remain required."
-  - "Exactly one primary intended scenario (primary_balanced) and two sensitivity scenarios (failure_sensitive, waste_sensitive) are defined as provisional proposals."
-  - "The numerical cost values in this file are validation-only proposals (approved_for_confirmatory: false) and must not be treated as approved confirmatory parameters."
-  - "The identical frozen cost scenario parameters must apply to every comparative method in an evaluation once approved."
+  - "Step 6 maintenance cost scenarios are frozen under ADR-018."
+  - "C_PM = 1.0 defines the normalized simulation cost unit (SCU)."
+  - "The primary scenario specifies failure as five preventive-maintenance units (C_FAIL = 5.0) and each discarded cycle as 0.20 units (C_WASTE = 0.20)."
+  - "The two secondary scenarios independently double the failure cost (C_FAIL = 10.0) or discarded-life cost (C_WASTE = 0.40) while holding the other coefficients fixed."
+  - "These are transparent benchmark preferences chosen before confirmatory results, not estimated airline costs or universal engineering constants."
+  - "This is a substantive change in relative costs, not simply rescaling the old 10/100/1 scenario."
+  - "Approval of sensitivity scenarios permits prespecified secondary sensitivity analyses; it does not promote them to primary confirmatory outcomes."
+  - "No sensitivity scenario may replace an unfavorable primary result."
   - "Held-out test results must NEVER be inspected or used to tune cost scenario parameters."
   - "No scenario may be removed or modified post-hoc because comparative results are unfavorable."
+
+superseded_historical_proposals:
+  version_1_proposals:
+    notice: "SUPERSEDED HISTORICAL RECORD ONLY — NOT ACTIVE DECISION PARAMETERS"
+    primary_balanced:
+      preventive_cost: 10.0
+      failure_cost: 100.0
+      wasted_rul_cost_per_cycle: 1.0
+    failure_sensitive_v1:
+      preventive_cost: 10.0
+      failure_cost: 500.0
+      wasted_rul_cost_per_cycle: 1.0
+    waste_sensitive_v1:
+      preventive_cost: 10.0
+      failure_cost: 100.0
+      wasted_rul_cost_per_cycle: 5.0

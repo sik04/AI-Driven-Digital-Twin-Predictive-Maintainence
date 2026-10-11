@@ -276,8 +276,7 @@ The primary prognostic metrics are defined as follows:
 - **Unit of Independence**: Uncertainty is estimated via 95% engine-level paired/cluster-bootstrap confidence intervals with the **ENGINE** as the intact resampled unit.
 - **Preserved Pairing**: Engine resampling preserves pairing between compared methods across identical resampled engine clusters.
 - **Non-Independence of Windows**: Correlated time steps within an engine trajectory are non-independent observations; window-level resampling is strictly prohibited.
-- **Model Run Seeds**: Repeated model training seeds evaluate stochastic training variance, not additional independent engine units.
-- **Pending Statistical Specification**: The exact bootstrap replication count, bootstrap CI construction type, formal multiplicity adjustment procedure, and numerical practical-effect tolerance rules remain pending separate formal research decisions.
+- **Statistical Specification (ADR-018)**: The statistical inference specification is frozen under ADR-018 and detailed in `research/research_design/statistical_inference_protocol.md`: 10,000 cluster-bootstrap replicates stratified by split quartiles, 98.75% decision intervals (Bonferroni family-wise control $\alpha = 0.05 / 4 = 0.0125$ across RQ1–RQ4), percentile construction (`method="linear"`), intersection-union testing across component criteria, missing-group conservative bound propagation, and frozen benchmark practical-effect margins ($\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$, coverage ceiling $E < 0.05$, noninferiority margins $< 1.0$ cycle for width and score).
 
 ---
 
