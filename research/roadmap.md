@@ -13,8 +13,8 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 complete (ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
-| **Phase 5** | Reproducible Baseline Experiments | Planned | Standard linear, tree, and baseline deep learning models |
-| **Phase 6** | Proposed Model Development | Planned | Novel prognostic architecture formulation and training |
+| **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Planned | Train and select frozen point-RUL base predictors |
+| **Phase 6** | Decision-Aware Conformal Calibration Development | Planned | Develop and evaluate the decision-aware, condition-adaptive conformal calibration method |
 | **Phase 7** | Uncertainty and Maintenance Decision Experiments | Planned | Conformal prediction, interval calibration, DSS validation |
 | **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
 | **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
