@@ -1,7 +1,7 @@
 # Step 7.3 — FD002 Base-Model Implementation and Configuration Selection Completion Record
 
 > **Status**: **COMPLETE**  
-> **Dataset**: **FD002** (6 operating conditions, 2 fault modes)  
+> **Dataset**: **FD002** — 6 operating conditions, 1 fault mode  
 > **Protocol Reference**: `step07-selection-v1` / ADR-019 / `step07-base-predictor-v1`  
 > **Selection Metric**: Equal-engine-weighted uncapped-RUL RMSE  
 > **Selection Seeds**: 2026, 2027  
@@ -26,10 +26,10 @@
 | **Raw FD002 SHA-256** | `dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f` |
 | **Split Manifest Path** | `data/splits/fd002_engine_split_seed_2026.json` |
 | **Split Manifest SHA-256** | `57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41` |
-| **Training Partition** | 130 engines, 22,923 causal sequence windows |
-| **Validation Partition** | 26 engines, 4,669 causal sequence windows |
-| **Calibration Partition Role** | Reserved for conformal calibration (**UNTOUCHED**) |
-| **Held-Out Test Partition Role** | Reserved for confirmatory evaluation (**UNTOUCHED**) |
+| **Training Partition** | 130 engines, 22,923 windows |
+| **Validation Partition** | 26 engines, 4,669 windows |
+| **Calibration Partition** | 52 engines, UNTOUCHED (reserved for conformal calibration) |
+| **Held-Out Test Partition** | 52 engines, UNTOUCHED (reserved for confirmatory evaluation) |
 | **Implementation Commit** | `eba327dcc8eec660e06cf238e3a207d3af9826c1` |
 
 ---
@@ -100,10 +100,10 @@
 ## 4. Scientific Safeguards & Boundary Affirmation
 
 1. **Strict Data Boundary Separation**:
-   - `train` engines (130) were used exclusively for parameter optimization.
-   - `val` engines (26) were used exclusively for configuration ranking and early-stopping checkpoint selection.
-   - `cal` engines (36) were strictly untouched (no predictions, no evaluation, no conformal fitting).
-   - `test` engines (68) were strictly untouched (reserved for confirmatory evaluation).
+   - `train` engines (130) were used exclusively for parameter optimization (22,923 windows).
+   - `val` engines (26) were used exclusively for configuration ranking and early-stopping checkpoint selection (4,669 windows).
+   - `cal` engines (52) were strictly untouched (no predictions, no evaluation, no conformal fitting).
+   - `test` engines (52) were strictly untouched (reserved for confirmatory evaluation).
 2. **Deterministic Reproducibility**:
    - Exact seed sequences set across `random`, `numpy`, and PyTorch (CPU deterministic algorithm flags enabled).
    - Checkpoints persisted and verified loadable on CPU (`map_location="cpu"`).

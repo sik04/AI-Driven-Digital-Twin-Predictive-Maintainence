@@ -33,6 +33,10 @@ from intellitwin.models.metrics import (
     ModelEvaluationMetrics,
     compute_model_metrics,
 )
+from intellitwin.models.provenance import (
+    SelectionProvenanceReport,
+    validate_selection_provenance,
+)
 from intellitwin.models.reproducibility import (
     resolve_device,
     set_global_seed,
@@ -57,6 +61,7 @@ __all__ = [
     "SELECTION_SEEDS",
     "CandidateEvaluationResult",
     "SelectionOutcome",
+    "SelectionProvenanceReport",
     "compute_model_metrics",
     "evaluate_candidate",
     "get_gbr_grid",
@@ -70,4 +75,5 @@ __all__ = [
     "select_best_configuration",
     "set_global_seed",
     "train_lstm_candidate",
+    "validate_selection_provenance",
 ]

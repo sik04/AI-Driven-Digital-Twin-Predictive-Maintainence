@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Corrected Step 7.3 FD002 completion provenance in `research/research_design/step07_fd002_model_selection_completion.md`: FD002 has one fault mode, and the frozen engine split is 130 train / 52 calibration / 26 validation / 52 test (260 total engines).
+- Added automated model-selection provenance validation (`src/intellitwin/models/provenance.py`) and split partition-count reporting helper (`src/intellitwin/data/splits.py`) to prevent model-selection reports from diverging from frozen split manifests.
+- Added deterministic Step 7.3 FD002 provenance audit script (`scripts/audit_step07_fd002_provenance.py`) and regression test suite (`tests/test_step07_provenance.py`).
+- Reconciled Phase 3 research observation status in `research/roadmap.md` to reflect Step 7.3 completion and Step 7.4 next up.
+
 ### Added
 - HistGradientBoostingRegressor model wrapper (`src/intellitwin/models/gbr.py`) supporting 8 frozen hyperparameter configurations under ADR-019 with deterministic non-negative prediction post-processing.
 - Single-layer unidirectional LSTM model (`src/intellitwin/models/lstm.py`) with lookback 30, hidden size $H \in \{32, 64\}$, dropout $p=0.20$, linear output, AdamW optimizer, gradient clipping (norm 1.0), and weighted batch MSE loss.
