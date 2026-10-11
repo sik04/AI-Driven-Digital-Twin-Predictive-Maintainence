@@ -37,6 +37,10 @@ from intellitwin.models.provenance import (
     SelectionProvenanceReport,
     validate_selection_provenance,
 )
+from intellitwin.models.registry import (
+    FrozenBaseModel,
+    load_frozen_base_model,
+)
 from intellitwin.models.reproducibility import (
     resolve_device,
     set_global_seed,
@@ -53,6 +57,7 @@ __all__ = [
     "GBR_GRID",
     "GBRHyperparameters",
     "GBRModel",
+    "FrozenBaseModel",
     "LSTM_GRID",
     "LSTMHyperparameters",
     "LSTMPointPredictor",
@@ -66,6 +71,7 @@ __all__ = [
     "evaluate_candidate",
     "get_gbr_grid",
     "get_lstm_grid",
+    "load_frozen_base_model",
     "load_lstm_checkpoint",
     "resolve_device",
     "save_lstm_checkpoint",
