@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- HistGradientBoostingRegressor model wrapper (`src/intellitwin/models/gbr.py`) supporting 8 frozen hyperparameter configurations under ADR-019 with deterministic non-negative prediction post-processing.
+- Single-layer unidirectional LSTM model (`src/intellitwin/models/lstm.py`) with lookback 30, hidden size $H \in \{32, 64\}$, dropout $p=0.20$, linear output, AdamW optimizer, gradient clipping (norm 1.0), and weighted batch MSE loss.
+- Equal-engine-weighted model evaluation metrics (`src/intellitwin/models/metrics.py`) implementing uncapped-RUL RMSE ($\sqrt{\frac{1}{N}\sum \text{MSE}_i}$), uncapped MAE, and capped-target RMSE.
+- Deterministic model reproducibility module (`src/intellitwin/models/reproducibility.py`) enforcing global seed synchronization across `random`, `numpy`, and PyTorch with CPU deterministic algorithms.
+- Deterministic candidate ranking and 3-stage tie-breaking module (`src/intellitwin/models/selection.py`) operating on validation-only selection score.
+- Model artifact and prediction persistence utilities (`src/intellitwin/models/artifacts.py`).
+- Deterministic FD002 model-selection runner script (`scripts/run_step07_fd002_model_selection.py`) executing the 24-run validation selection grid with fail-fast guards against dirty worktrees and hash mismatches.
+- FD002 model selection records and summary artifacts in `experiments/model_selection/FD002/` (16 GBR runs and 8 LSTM runs across seeds 2026 and 2027 with serialized checkpoints and prediction CSVs).
+- Frozen winning GBR configuration `gbr_lr010_leaf31_l2_0` (learning rate 0.10, max leaf nodes 31, L2 regularization 0.0; validation uncapped RMSE 34.6613 cycles).
+- Frozen winning LSTM configuration `lstm_h64_lr0010` (hidden size 64, learning rate 0.0010; mean validation uncapped RMSE 35.2523 cycles across seeds 2026 and 2027).
+- Step 7.3 FD002 model selection completion record in `research/research_design/step07_fd002_model_selection_completion.md`.
 - Deterministic C-MAPSS data package `src/intellitwin/data/` implementing strict raw data loading, split validation, training-only preprocessing, K-means k=6 regime modeling with canonical C1..C6 ordering, 30-cycle causal sequence windowing, and equal-engine sample weighting ($w_{i,t} = M / (N \cdot n_i)$).
 - Preprocessing artifact persistence and round-trip loading in `src/intellitwin/data/artifacts.py` producing deterministic JSON artifacts in `experiments/preprocessing/{FD001,FD002,FD004}/preprocessor.json`.
 - Preprocessing artifact builder script `scripts/build_step07_data_artifacts.py`.
