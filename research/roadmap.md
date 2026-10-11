@@ -105,7 +105,7 @@ This document outlines the master research and development roadmap for the Intel
   - Preprocessing scalers fit only on training sets.
   - Primary metrics, comparators, and statistical governance locked. Simulator Python implementation complete and verified by deterministic unit tests; numerical cost scenarios and evaluation contract frozen under ADR-018.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018). Step 7.0 Protocol Reconciliation and Step 7.1 Base Predictor Specification COMPLETE.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018). Step 7.0 Protocol Reconciliation COMPLETE; Step 7.1 Base Predictor Specification LOCKED under ADR-019; Step 7.2 Data Preprocessing and Window Pipeline COMPLETE; Step 7.3 Base-Model Implementation and Selection NEXT.
 
 ---
 
@@ -124,7 +124,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 5: Reproducible Base Predictor Experiments (Step 7)
-- **Status**: Next Up
+- **Status**: Step 7.2 Complete / Step 7.3 Next Up
 - **Objective**: Implement and evaluate reproducible point-RUL base predictors (GBR and LSTM only) under the frozen Step-5 protocol and locked Step 7.1 specification, to establish reliable base predictions rather than conducting a broad architectural benchmark.
 - **Expected Deliverables**:
   - Base predictor implementations under `src/intellitwin/models/` (Histogram Gradient Boosting Regressor and unidirectional LSTM only).

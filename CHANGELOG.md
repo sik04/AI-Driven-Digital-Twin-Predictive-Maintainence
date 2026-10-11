@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Deterministic C-MAPSS data package `src/intellitwin/data/` implementing strict raw data loading, split validation, training-only preprocessing, K-means k=6 regime modeling with canonical C1..C6 ordering, 30-cycle causal sequence windowing, and equal-engine sample weighting ($w_{i,t} = M / (N \cdot n_i)$).
+- Preprocessing artifact persistence and round-trip loading in `src/intellitwin/data/artifacts.py` producing deterministic JSON artifacts in `experiments/preprocessing/{FD001,FD002,FD004}/preprocessor.json`.
+- Preprocessing artifact builder script `scripts/build_step07_data_artifacts.py`.
+- Comprehensive synthetic test suites in `tests/test_data_loader.py`, `tests/test_data_splits.py`, `tests/test_preprocessing.py`, `tests/test_windowing.py`, `tests/test_data_pipeline.py`, and integration tests in `tests/test_step07_data_integration.py`.
+- Step 7.2 completion record in `research/research_design/step07_data_pipeline_completion.md`.
 - Separate FD002 lifetime-quartile provenance artifact in `data/splits/fd002_lifetime_quartile_provenance.json` reconstructing quartile stratification from documented original rule without modifying frozen partition assignments.
 - Deterministic research utility `scripts/reconstruct_fd002_quartile_provenance.py` and comprehensive test suite in `tests/test_fd002_quartile_provenance.py`.
 - Step 7.1 base-predictor specification in `research/research_design/step07_base_predictor_specification.md` locking GBR and LSTM architectures, grids, data roles, and artifact provenance.
@@ -26,6 +31,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architectural decision record ADR-017 in `research/decision_log.md` formalizing protocol reconciliation, validation hardening, and pilot provenance.
 
 ### Changed
+- Corrected FD002 fault mode description in `research/research_design/step07_base_predictor_specification.md` from 2 fault modes to 1 fault mode (FD002 has 6 operating regimes, 1 fault mode; HPC fault mode only).
+- Removed stale bootstrap "pending" statement in `research/research_design/data_evaluation_protocol.md` and added explicit cross-reference to ADR-018/ADR-019 and statistical inference protocol $[0.0, 0.90]$ conservative bounds.
+- Updated `README.md`, `research/roadmap.md`, and `step07_base_predictor_specification.md` to reflect Step 7.2 completion and Step 7.3 next up.
 - Enforced strict data partition roles across `statistical_inference_protocol.md`, `research_questions.md`, `experiment_map.md`, `hypothesis_framework.yaml`, and `hypothesis_framework.tex`: training data for preprocessing/models, validation data for hyperparameter/matched-control tuning, calibration data reserved for conformal calibration, and test data untouched until confirmatory evaluation.
 - Fixed bootstrap replicate missing-group bound calculation in `statistical_inference_protocol.md` to eliminate undefined $\max(\emptyset)$ and establish conservative $[0.0, 0.90]$ bounds when all eligible groups are absent.
 - Reconciled `research/roadmap.md` and `README.md` to reflect GBR and LSTM base-predictor scope and remove obsolete "novel prognostic architecture" and broad baseline suite language.

@@ -1,0 +1,156 @@
+{
+  "dataset": "FD001",
+  "feature_order": [
+    "setting1",
+    "setting2",
+    "setting3",
+    "s2",
+    "s3",
+    "s4",
+    "s7",
+    "s8",
+    "s9",
+    "s11",
+    "s12",
+    "s13",
+    "s14",
+    "s15",
+    "s17",
+    "s20",
+    "s21"
+  ],
+  "fitted_partition": "train",
+  "lookback": 30,
+  "padding": false,
+  "protocol_reference": "ADR-019",
+  "regime_configuration": {
+    "canonical_standardized_centroids": null,
+    "canonical_unscaled_centroids": null,
+    "kmeans_config": null,
+    "original_cluster_to_canonical_mapping": null,
+    "regime_mode": "single_condition",
+    "training_cluster_counts": {
+      "C1": 10257
+    }
+  },
+  "schema_version": "step07-data-v1",
+  "sensor_normalization": {
+    "C1": {
+      "s11": {
+        "effective_scale": 0.2654757484210596,
+        "is_zero_variance": false,
+        "mean": 47.54586136297163,
+        "variance": 0.07047737299972172
+      },
+      "s12": {
+        "effective_scale": 0.7326075168006689,
+        "is_zero_variance": false,
+        "mean": 521.4079165447987,
+        "variance": 0.5367137736728423
+      },
+      "s13": {
+        "effective_scale": 0.07256514690544943,
+        "is_zero_variance": false,
+        "mean": 2388.0968821292777,
+        "variance": 0.005265700545409458
+      },
+      "s14": {
+        "effective_scale": 19.378366032612902,
+        "is_zero_variance": false,
+        "mean": 8144.207842449059,
+        "variance": 375.5210700939255
+      },
+      "s15": {
+        "effective_scale": 0.037218270926731335,
+        "is_zero_variance": false,
+        "mean": 8.44257120990543,
+        "variance": 0.001385199690775575
+      },
+      "s17": {
+        "effective_scale": 1.5334203130941453,
+        "is_zero_variance": false,
+        "mean": 393.2402261869942,
+        "variance": 2.3513778566097465
+      },
+      "s2": {
+        "effective_scale": 0.49340292886559056,
+        "is_zero_variance": false,
+        "mean": 642.690377303305,
+        "variance": 0.24344645021314304
+      },
+      "s20": {
+        "effective_scale": 0.17903508876608676,
+        "is_zero_variance": false,
+        "mean": 38.81257677683533,
+        "variance": 0.03205356300948057
+      },
+      "s21": {
+        "effective_scale": 0.10796765190651761,
+        "is_zero_variance": false,
+        "mean": 23.287596353709663,
+        "variance": 0.011657013858206954
+      },
+      "s3": {
+        "effective_scale": 6.101158154709769,
+        "is_zero_variance": false,
+        "mean": 1590.61970556693,
+        "variance": 37.22413082878152
+      },
+      "s4": {
+        "effective_scale": 8.954490103733043,
+        "is_zero_variance": false,
+        "mean": 1409.10940625914,
+        "variance": 80.182893017853
+      },
+      "s7": {
+        "effective_scale": 0.8777239810410614,
+        "is_zero_variance": false,
+        "mean": 553.3530125767768,
+        "variance": 0.7703993868945695
+      },
+      "s8": {
+        "effective_scale": 0.0717137226721741,
+        "is_zero_variance": false,
+        "mean": 2388.0971161158236,
+        "variance": 0.005142858019501497
+      },
+      "s9": {
+        "effective_scale": 22.273497892317657,
+        "is_zero_variance": false,
+        "mean": 9065.823799356536,
+        "variance": 496.1087083590792
+      }
+    }
+  },
+  "setting_scalers": {
+    "setting1": {
+      "effective_scale": 0.0021870392344768255,
+      "is_zero_variance": false,
+      "mean": 1.2771765623476705e-06,
+      "variance": 4.783140613140979e-06
+    },
+    "setting2": {
+      "effective_scale": 0.0002934111884083222,
+      "is_zero_variance": false,
+      "mean": 4.972214097689383e-06,
+      "variance": 8.609012548318395e-08
+    },
+    "setting3": {
+      "effective_scale": 1.0,
+      "is_zero_variance": true,
+      "mean": 100.0,
+      "variance": 0.0
+    }
+  },
+  "software_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "python": "3.14.0",
+    "scikit_learn": "1.9.1"
+  },
+  "source_raw_file": "data/raw/cmapss/train_FD001.txt",
+  "source_raw_sha256": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+  "split_manifest_file": "data/splits/fd001_engine_split_seed_2026.json",
+  "split_manifest_sha256": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+  "stride": 1
+}

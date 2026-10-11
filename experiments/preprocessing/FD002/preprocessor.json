@@ -1,0 +1,668 @@
+{
+  "dataset": "FD002",
+  "feature_order": [
+    "setting1",
+    "setting2",
+    "setting3",
+    "s2",
+    "s3",
+    "s4",
+    "s7",
+    "s8",
+    "s9",
+    "s11",
+    "s12",
+    "s13",
+    "s14",
+    "s15",
+    "s17",
+    "s20",
+    "s21"
+  ],
+  "fitted_partition": "train",
+  "lookback": 30,
+  "padding": false,
+  "protocol_reference": "ADR-019",
+  "regime_configuration": {
+    "canonical_standardized_centroids": [
+      [
+        -1.6263079256114696,
+        -1.841864857461579,
+        0.4181103314733983
+      ],
+      [
+        -0.9485116870454753,
+        -1.0360150000311477,
+        0.4181103314733982
+      ],
+      [
+        -0.2708105604041511,
+        0.41458858037369,
+        0.41811033147339827
+      ],
+      [
+        0.06804189857170324,
+        0.15667130281537164,
+        -2.3917132027712293
+      ],
+      [
+        0.7457485491363399,
+        0.8657759224904211,
+        0.4181103314733983
+      ],
+      [
+        1.220129553835001,
+        0.8657476812583935,
+        0.4181103314733876
+      ]
+    ],
+    "canonical_unscaled_centroids": [
+      [
+        0.001508391608410875,
+        0.0005010239760151469,
+        99.99999999999987
+      ],
+      [
+        10.002927327028353,
+        0.25049905425585417,
+        99.99999999999987
+      ],
+      [
+        20.00294281086468,
+        0.7005184151507573,
+        99.99999999999987
+      ],
+      [
+        25.00297852467271,
+        0.62050498489426,
+        59.999999999999886
+      ],
+      [
+        35.00307551836122,
+        0.8404898326255271,
+        99.99999999999987
+      ],
+      [
+        42.0029419871315,
+        0.8404810713751347,
+        99.99999999999972
+      ]
+    ],
+    "kmeans_config": {
+      "algorithm": "lloyd",
+      "init": "k-means++",
+      "max_iter": 300,
+      "n_clusters": 6,
+      "n_init": 10,
+      "random_state": 2026,
+      "tol": 0.0001
+    },
+    "original_cluster_to_canonical_mapping": {
+      "0": "C4",
+      "1": "C3",
+      "2": "C2",
+      "3": "C6",
+      "4": "C1",
+      "5": "C5"
+    },
+    "regime_mode": "kmeans_6",
+    "training_cluster_counts": {
+      "C1": 4004,
+      "C2": 4018,
+      "C3": 4013,
+      "C4": 3972,
+      "C5": 4003,
+      "C6": 6683
+    }
+  },
+  "schema_version": "step07-data-v1",
+  "sensor_normalization": {
+    "C1": {
+      "s11": {
+        "effective_scale": 0.26644983599035366,
+        "is_zero_variance": false,
+        "mean": 47.53784715284716,
+        "variance": 0.07099551509928635
+      },
+      "s12": {
+        "effective_scale": 0.7426363183541603,
+        "is_zero_variance": false,
+        "mean": 521.4190309690309,
+        "variance": 0.5515087013386217
+      },
+      "s13": {
+        "effective_scale": 0.07178725336607819,
+        "is_zero_variance": false,
+        "mean": 2388.0973251748255,
+        "variance": 0.005153409745845505
+      },
+      "s14": {
+        "effective_scale": 16.893030416150655,
+        "is_zero_variance": false,
+        "mean": 8142.507872127872,
+        "variance": 285.3744766409912
+      },
+      "s15": {
+        "effective_scale": 0.037143819076159296,
+        "is_zero_variance": false,
+        "mean": 8.441679795204795,
+        "variance": 0.001379663295562455
+      },
+      "s17": {
+        "effective_scale": 1.5428583807730942,
+        "is_zero_variance": false,
+        "mean": 393.1800699300699,
+        "variance": 2.3804119831217743
+      },
+      "s2": {
+        "effective_scale": 0.49591987104293456,
+        "is_zero_variance": false,
+        "mean": 642.6738736263736,
+        "variance": 0.2459365184952408
+      },
+      "s20": {
+        "effective_scale": 0.1785359996430964,
+        "is_zero_variance": false,
+        "mean": 38.82081918081918,
+        "variance": 0.031875103168559724
+      },
+      "s21": {
+        "effective_scale": 0.10480572846643699,
+        "is_zero_variance": false,
+        "mean": 23.29090999000999,
+        "variance": 0.01098424071938052
+      },
+      "s3": {
+        "effective_scale": 6.079123499915243,
+        "is_zero_variance": false,
+        "mean": 1590.3349275724274,
+        "variance": 36.955742527221744
+      },
+      "s4": {
+        "effective_scale": 8.985372438110401,
+        "is_zero_variance": false,
+        "mean": 1408.6970979020978,
+        "variance": 80.73691785155405
+      },
+      "s7": {
+        "effective_scale": 0.8685096638709549,
+        "is_zero_variance": false,
+        "mean": 553.3687437562438,
+        "variance": 0.754309036237239
+      },
+      "s8": {
+        "effective_scale": 0.07156746118241117,
+        "is_zero_variance": false,
+        "mean": 2388.097897102897,
+        "variance": 0.00512190150009593
+      },
+      "s9": {
+        "effective_scale": 19.615173277549182,
+        "is_zero_variance": false,
+        "mean": 9063.660996503495,
+        "variance": 384.75502270827957
+      }
+    },
+    "C2": {
+      "s11": {
+        "effective_scale": 0.2491878816895277,
+        "is_zero_variance": false,
+        "mean": 45.474235938277744,
+        "variance": 0.062094600380914064
+      },
+      "s12": {
+        "effective_scale": 0.5436610714377356,
+        "is_zero_variance": false,
+        "mean": 371.4695993031359,
+        "variance": 0.2955673605968266
+      },
+      "s13": {
+        "effective_scale": 0.09723538205032994,
+        "is_zero_variance": false,
+        "mean": 2388.1569313091086,
+        "variance": 0.009454719522473627
+      },
+      "s14": {
+        "effective_scale": 15.617146022458458,
+        "is_zero_variance": false,
+        "mean": 8135.632108013938,
+        "variance": 243.89524988679003
+      },
+      "s15": {
+        "effective_scale": 0.03779627837120656,
+        "is_zero_variance": false,
+        "mean": 8.663278546540568,
+        "variance": 0.0014285586587137367
+      },
+      "s17": {
+        "effective_scale": 1.4904908409074065,
+        "is_zero_variance": false,
+        "mean": 369.65953210552516,
+        "variance": 2.2215629468288673
+      },
+      "s2": {
+        "effective_scale": 0.47836634012260254,
+        "is_zero_variance": false,
+        "mean": 604.8957416625186,
+        "variance": 0.22883435536229343
+      },
+      "s20": {
+        "effective_scale": 0.14216572393794602,
+        "is_zero_variance": false,
+        "mean": 28.53207068193131,
+        "variance": 0.02021109306280028
+      },
+      "s21": {
+        "effective_scale": 0.08617715631059665,
+        "is_zero_variance": false,
+        "mean": 17.118429766052763,
+        "variance": 0.007426502269781007
+      },
+      "s3": {
+        "effective_scale": 5.741900449145701,
+        "is_zero_variance": false,
+        "mean": 1501.8855475360876,
+        "variance": 32.96942076789961
+      },
+      "s4": {
+        "effective_scale": 8.402541074775078,
+        "is_zero_variance": false,
+        "mean": 1310.828494275759,
+        "variance": 70.60269651328232
+      },
+      "s7": {
+        "effective_scale": 0.6611090656125149,
+        "is_zero_variance": false,
+        "mean": 394.35339970134396,
+        "variance": 0.4370651966350525
+      },
+      "s8": {
+        "effective_scale": 0.09496062000803981,
+        "is_zero_variance": false,
+        "mean": 2318.9535664509704,
+        "variance": 0.009017519352311331
+      },
+      "s9": {
+        "effective_scale": 17.78223794730555,
+        "is_zero_variance": false,
+        "mean": 8785.900587356895,
+        "variance": 316.2079864145935
+      }
+    },
+    "C3": {
+      "s11": {
+        "effective_scale": 0.23870493805597903,
+        "is_zero_variance": false,
+        "mean": 44.442514328432594,
+        "variance": 0.05698004745230879
+      },
+      "s12": {
+        "effective_scale": 0.500454129907184,
+        "is_zero_variance": false,
+        "mean": 314.88571891353104,
+        "variance": 0.25045433614115653
+      },
+      "s13": {
+        "effective_scale": 0.13313896559516747,
+        "is_zero_variance": false,
+        "mean": 2388.157381011712,
+        "variance": 0.017725984159751188
+      },
+      "s14": {
+        "effective_scale": 15.615220110810771,
+        "is_zero_variance": false,
+        "mean": 8066.645008721655,
+        "variance": 243.83509910906915
+      },
+      "s15": {
+        "effective_scale": 0.03870081715879049,
+        "is_zero_variance": false,
+        "mean": 9.231944879142787,
+        "variance": 0.0014977532487581325
+      },
+      "s17": {
+        "effective_scale": 1.478965581575561,
+        "is_zero_variance": false,
+        "mean": 365.36655868427613,
+        "variance": 2.187339191485137
+      },
+      "s2": {
+        "effective_scale": 0.4644061139532169,
+        "is_zero_variance": false,
+        "mean": 607.560154497882,
+        "variance": 0.2156730386771283
+      },
+      "s20": {
+        "effective_scale": 0.137890980827552,
+        "is_zero_variance": false,
+        "mean": 24.456416645900823,
+        "variance": 0.01901392259358431
+      },
+      "s21": {
+        "effective_scale": 0.08038905642849238,
+        "is_zero_variance": false,
+        "mean": 14.673217443309245,
+        "variance": 0.006462400393463332
+      },
+      "s3": {
+        "effective_scale": 5.796624456500314,
+        "is_zero_variance": false,
+        "mean": 1485.4385596810364,
+        "variance": 33.60085508969756
+      },
+      "s4": {
+        "effective_scale": 7.851782061450309,
+        "is_zero_variance": false,
+        "mean": 1252.8542761026663,
+        "variance": 61.650481540512864
+      },
+      "s7": {
+        "effective_scale": 0.6099955989192929,
+        "is_zero_variance": false,
+        "mean": 334.5154921505108,
+        "variance": 0.37209463070090687
+      },
+      "s8": {
+        "effective_scale": 0.1292554947324362,
+        "is_zero_variance": false,
+        "mean": 2324.0246125093445,
+        "variance": 0.016706982918526844
+      },
+      "s9": {
+        "effective_scale": 17.72438756366618,
+        "is_zero_variance": false,
+        "mean": 8730.56190630451,
+        "variance": 314.15391450704436
+      }
+    },
+    "C4": {
+      "s11": {
+        "effective_scale": 0.2084690043450191,
+        "is_zero_variance": false,
+        "mean": 36.794483887210475,
+        "variance": 0.0434593257726036
+      },
+      "s12": {
+        "effective_scale": 0.34502664072294803,
+        "is_zero_variance": false,
+        "mean": 164.57772910372609,
+        "variance": 0.11904338280856228
+      },
+      "s13": {
+        "effective_scale": 0.28126211438102183,
+        "is_zero_variance": false,
+        "mean": 2028.327479859013,
+        "variance": 0.079108376986083
+      },
+      "s14": {
+        "effective_scale": 13.196047698011018,
+        "is_zero_variance": false,
+        "mean": 7879.013429003022,
+        "variance": 174.1356748481819
+      },
+      "s15": {
+        "effective_scale": 0.043466705206507104,
+        "is_zero_variance": false,
+        "mean": 10.912810146022155,
+        "variance": 0.0018893544615093919
+      },
+      "s17": {
+        "effective_scale": 1.2929415519659888,
+        "is_zero_variance": false,
+        "mean": 307.3313192346425,
+        "variance": 1.6716978568002199
+      },
+      "s2": {
+        "effective_scale": 0.36033565115544397,
+        "is_zero_variance": false,
+        "mean": 536.8570896273918,
+        "variance": 0.1298417814936178
+      },
+      "s20": {
+        "effective_scale": 0.11073505649949839,
+        "is_zero_variance": false,
+        "mean": 14.262698892245721,
+        "variance": 0.012262252737947099
+      },
+      "s21": {
+        "effective_scale": 0.06664420392206874,
+        "is_zero_variance": false,
+        "mean": 8.558671651560926,
+        "variance": 0.0044414499164062825
+      },
+      "s3": {
+        "effective_scale": 5.345118258728714,
+        "is_zero_variance": false,
+        "mean": 1262.6173640483385,
+        "variance": 28.570289199795084
+      },
+      "s4": {
+        "effective_scale": 6.856192713882508,
+        "is_zero_variance": false,
+        "mean": 1050.104133937563,
+        "variance": 47.00737852989559
+      },
+      "s7": {
+        "effective_scale": 0.4477588129272081,
+        "is_zero_variance": false,
+        "mean": 175.42959718026185,
+        "variance": 0.20048795455398255
+      },
+      "s8": {
+        "effective_scale": 0.26500299444753284,
+        "is_zero_variance": false,
+        "mean": 1915.4275730110776,
+        "variance": 0.07022658706615913
+      },
+      "s9": {
+        "effective_scale": 14.292901150928058,
+        "is_zero_variance": false,
+        "mean": 8016.0489224572,
+        "variance": 204.2870233102006
+      }
+    },
+    "C5": {
+      "s11": {
+        "effective_scale": 0.23308848628381781,
+        "is_zero_variance": false,
+        "mean": 41.97960029977518,
+        "variance": 0.05433024243808153
+      },
+      "s12": {
+        "effective_scale": 0.3758506413387824,
+        "is_zero_variance": false,
+        "mean": 183.02745191106666,
+        "variance": 0.14126370459477403
+      },
+      "s13": {
+        "effective_scale": 0.3065408808396497,
+        "is_zero_variance": false,
+        "mean": 2388.151763677242,
+        "variance": 0.09396731162594833
+      },
+      "s14": {
+        "effective_scale": 15.8625573352965,
+        "is_zero_variance": false,
+        "mean": 8072.9303747189615,
+        "variance": 251.6207252155688
+      },
+      "s15": {
+        "effective_scale": 0.03864002975990102,
+        "is_zero_variance": false,
+        "mean": 9.332248238820886,
+        "variance": 0.0014930518998460369
+      },
+      "s17": {
+        "effective_scale": 1.418500450432586,
+        "is_zero_variance": false,
+        "mean": 334.21808643517363,
+        "variance": 2.0121435278774493
+      },
+      "s2": {
+        "effective_scale": 0.44353138478130405,
+        "is_zero_variance": false,
+        "mean": 555.7921833624782,
+        "variance": 0.19672008928602117
+      },
+      "s20": {
+        "effective_scale": 0.11402742660301317,
+        "is_zero_variance": false,
+        "mean": 14.82962028478641,
+        "variance": 0.013002254017705555
+      },
+      "s21": {
+        "effective_scale": 0.06784026664007192,
+        "is_zero_variance": false,
+        "mean": 8.897677516862352,
+        "variance": 0.004602301777796055
+      },
+      "s3": {
+        "effective_scale": 5.631124340008424,
+        "is_zero_variance": false,
+        "mean": 1366.7513115163626,
+        "variance": 31.709561332635303
+      },
+      "s4": {
+        "effective_scale": 7.467118471998082,
+        "is_zero_variance": false,
+        "mean": 1131.4849862603048,
+        "variance": 55.75785827485496
+      },
+      "s7": {
+        "effective_scale": 0.48543537042791607,
+        "is_zero_variance": false,
+        "mean": 194.4503397451911,
+        "variance": 0.23564749886248806
+      },
+      "s8": {
+        "effective_scale": 0.2860174456267184,
+        "is_zero_variance": false,
+        "mean": 2223.0535223582315,
+        "variance": 0.08180597920283281
+      },
+      "s9": {
+        "effective_scale": 17.450192208325646,
+        "is_zero_variance": false,
+        "mean": 8356.768740944293,
+        "variance": 304.50920810750904
+      }
+    },
+    "C6": {
+      "s11": {
+        "effective_scale": 0.23817211287999224,
+        "is_zero_variance": false,
+        "mean": 42.14616788867275,
+        "variance": 0.05672595535371977
+      },
+      "s12": {
+        "effective_scale": 0.342931800756827,
+        "is_zero_variance": false,
+        "mean": 130.55606913062996,
+        "variance": 0.1176022199703201
+      },
+      "s13": {
+        "effective_scale": 0.32436094692221884,
+        "is_zero_variance": false,
+        "mean": 2388.0628924135867,
+        "variance": 0.10521002388827848
+      },
+      "s14": {
+        "effective_scale": 16.501892734937975,
+        "is_zero_variance": false,
+        "mean": 8089.917997905132,
+        "variance": 272.3124638353988
+      },
+      "s15": {
+        "effective_scale": 0.03772105236070149,
+        "is_zero_variance": false,
+        "mean": 9.374429866826276,
+        "variance": 0.0014228777911987835
+      },
+      "s17": {
+        "effective_scale": 1.4122063844843271,
+        "is_zero_variance": false,
+        "mean": 331.0701780637438,
+        "variance": 1.9943268723782954
+      },
+      "s2": {
+        "effective_scale": 0.4297807238829507,
+        "is_zero_variance": false,
+        "mean": 549.7004803232081,
+        "variance": 0.1847114706213531
+      },
+      "s20": {
+        "effective_scale": 0.10796052285206544,
+        "is_zero_variance": false,
+        "mean": 10.585374831662426,
+        "variance": 0.011655474494491343
+      },
+      "s21": {
+        "effective_scale": 0.06384703095800207,
+        "is_zero_variance": false,
+        "mean": 6.35180246895107,
+        "variance": 0.004076443362152074
+      },
+      "s3": {
+        "effective_scale": 5.617396275463417,
+        "is_zero_variance": false,
+        "mean": 1354.4319557085141,
+        "variance": 31.555140915590265
+      },
+      "s4": {
+        "effective_scale": 7.614601649136074,
+        "is_zero_variance": false,
+        "mean": 1127.6879994014664,
+        "variance": 57.98215827502582
+      },
+      "s7": {
+        "effective_scale": 0.4401825027041833,
+        "is_zero_variance": false,
+        "mean": 138.6294568307646,
+        "variance": 0.19376063568691834
+      },
+      "s8": {
+        "effective_scale": 0.3006841479936079,
+        "is_zero_variance": false,
+        "mean": 2211.981382612599,
+        "variance": 0.09041095685464187
+      },
+      "s9": {
+        "effective_scale": 17.947324336579516,
+        "is_zero_variance": false,
+        "mean": 8328.324789765074,
+        "variance": 322.10645084237933
+      }
+    }
+  },
+  "setting_scalers": {
+    "setting1": {
+      "effective_scale": 14.75578996510784,
+      "is_zero_variance": false,
+      "mean": 23.998966560521485,
+      "variance": 217.73333749437725
+    },
+    "setting2": {
+      "effective_scale": 0.3102290432575044,
+      "is_zero_variance": false,
+      "mean": 0.5719009965159405,
+      "variance": 0.09624205928046652
+    },
+    "setting3": {
+      "effective_scale": 14.235769439789141,
+      "is_zero_variance": false,
+      "mean": 94.04787772075076,
+      "variance": 202.65713154283446
+    }
+  },
+  "software_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "python": "3.14.0",
+    "scikit_learn": "1.9.1"
+  },
+  "source_raw_file": "data/raw/cmapss/train_FD002.txt",
+  "source_raw_sha256": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+  "split_manifest_file": "data/splits/fd002_engine_split_seed_2026.json",
+  "split_manifest_sha256": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+  "stride": 1
+}

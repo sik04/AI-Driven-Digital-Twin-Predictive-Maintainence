@@ -194,7 +194,7 @@ Primary subgroup families are evaluated separately:
 - **Reporting Counts**: Evaluation reports must provide distinct engine counts and total evaluation endpoint counts for each subgroup.
 - **Ineligible Group Transparency**: Ineligible groups ($< 10$ contributing engines) remain visible in summary tables marked *descriptive-only*.
 - **Family Availability**: If a required family has no eligible subgroup, mark that component as unavailable and do not claim full empirical support for RQ2.
-- **Pending Statistical Specification**: The handling of bootstrap replicates with unavailable subgroup estimates remains part of the later statistical specification; no heuristic rule is invented here.
+- **Frozen Bootstrap Missing-Group Specification**: The handling of bootstrap replicates with unavailable subgroup estimates is frozen under ADR-018/ADR-019 and the statistical inference protocol (`statistical_inference_protocol.md`). If an eligible group is absent from a bootstrap replicate, conservative error propagation bounds it into $[ \text{WorstErr}_{\text{lower}}^{(b)}, \max(\text{WorstErr}_{\text{lower}}^{(b)}, 0.90) ]$; if all eligible groups are absent ($|G_{\text{available}}^{(b)}| = 0$), the conservative interval is exactly $[0.0, 0.90]$. Replicates are never discarded or redrawn.
 - **Engine-Weighted Subgroup Coverage**: Within an eligible subgroup $g$, compute empirical coverage for each contributing engine $i$, then take the simple unweighted average across all contributing engines $N_g$:
   $$\text{Coverage}(g) = \frac{1}{N_g} \sum_{i \in \mathcal{E}_g} \text{Coverage}(i, g)$$
 - **Subgroup Coverage Error**:
