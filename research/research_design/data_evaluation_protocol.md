@@ -42,7 +42,7 @@ $$\text{RUL}_{\text{target}}(i, t) = \min\left(\text{RUL}_{\text{true}}(i, t), 1
 
 ### 1.5 Model Output Interpretation & Maintenance Consequence Analysis
 
-- **Early-Life Point Prediction Saturation**: Because base point predictors are trained against $\min(\text{RUL}_{\text{true}}, 125)$, point predictions during early engine life saturate near 125 cycles. However, primary conformal prediction intervals target uncapped `rul_true`.
+- **Early-Life Point Prediction Behavior**: Capped-target training encourages early-life predictions near the cap; the model's output behavior is not mathematically guaranteed by the target cap. However, primary conformal prediction intervals target uncapped `rul_true`.
 - **Reporting Rule**: The capped prediction target `rul_target` must **NEVER** be reported or interpreted as if it were the engine's actual uncapped remaining operational lifetime.
 - **Wasted Useful Life Rule**: Wasted useful life resulting from premature maintenance interventions must be calculated strictly from uncapped `rul_true` ($\text{RUL}_{\text{wasted}} = \text{RUL}_{\text{true}}(i, t_{\text{replacement}})$), **NEVER** from `rul_target`.
 
@@ -51,13 +51,28 @@ $$\text{RUL}_{\text{target}}(i, t) = \min\left(\text{RUL}_{\text{true}}(i, t), 1
 Consistent with Step 4 leakage governance rules (ADR-011):
 
 1. Neither `rul_true`, `rul_target`, engine failure cycle $T_{\text{failure}}(i)$, nor any future-cycle information may be used as predictive model inputs at inference time.
-2. Failure cycle $T_{\text{failure}}(i)$ may be used strictly to construct supervised labels for offline training on full run-to-failure trajectories.
+2. Failure cycle $T_{\text{failure}}(i)$ is available offline strictly for label construction, retrospective degradation stage labeling, and simulator consequence evaluation, but remains strictly prohibited as a deployed predictive or policy input.
 3. `rul_true` is strictly prohibited from being used as:
    - A deployed model feature input
    - An operating-condition feature or regime identification input
    - A conformal calibration condition variable
    - A maintenance policy decision input
    - Information assumed to be available at prediction time
+
+### 1.7 Nominal Coverage Levels and Interval Target Convention
+
+- **Primary Nominal Coverage**: The primary coverage level is strictly locked at $1 - \alpha = 90\%$ ($\alpha = 0.10$). All primary hypothesis evaluations (RQ1, RQ2, RQ3, RQ4) evaluate against nominal 90% coverage.
+- **Secondary Sensitivity Levels**: Secondary coverage levels are evaluated at $80\%$ ($\alpha = 0.20$) and $95\%$ ($\alpha = 0.05$) for sensitivity analysis. Secondary sensitivity levels cannot replace or override an unfavorable primary result.
+- **Uncapped Response Calibration**: Base predictors are trained on $\min(\text{rul\_true}, 125)$, but primary interval calibration responses and interval evaluation use uncapped $\text{rul\_true}$.
+- **Upper Bound Policy**: Upper interval bounds $U_{it}$ must **NOT** be capped at 125 cycles. Prediction intervals must be free to express genuine prognostic uncertainty above the training target cap.
+- **Secondary Capped Diagnostic**: Evaluation of prediction interval coverage against the capped target $\text{rul\_target}$ is permitted strictly as a secondary diagnostic, never as primary coverage evidence.
+
+### 1.8 Interpretation and Methodological Boundaries
+
+- **Evaluation vs. Training Weighting**: Engine-weighted evaluation across trajectories does not itself define training-loss weighting or conformal quantile weighting.
+- **Nonconformity Construction**: Exact nonconformity scores and dependence-aware calibration construction remain later research decisions.
+- **Guarantees Scope**: Empirical marginal coverage does not establish conditional coverage, simultaneous-trajectory validity, or stopping-time guarantees.
+- **No-Tuning Restrictions**: Calibration set outcomes must not be used to select base-model hyperparameters. Held-out test outcomes must never be inspected or used for model tuning.
 
 ---
 
@@ -171,8 +186,15 @@ Primary subgroup families are evaluated separately:
 
 *Regime $\times$ Stage intersections are secondary diagnostic analyses only.*
 
-### 6.3 Subgroup Eligibility and Metric Aggregation
+### 6.3 Subgroup Eligibility and Metric Aggregation Governance
 - **Eligibility Threshold**: A subgroup is eligible for primary worst-group reliability analysis if at least **10 distinct engines** contribute at least 1 valid evaluation endpoint to that subgroup.
+- **Fixed Endpoint Metadata Derivation**: Subgroup membership and eligibility are determined strictly from fixed offline endpoint metadata.
+- **Identical Eligibility Rule**: Identical subgroup membership and eligibility definitions are enforced across all compared methods and random seeds.
+- **No Reselection in Bootstrap**: Subgroup eligibility is not reselected within bootstrap resamples; eligibility remains fixed at the dataset partition level.
+- **Reporting Counts**: Evaluation reports must provide distinct engine counts and total evaluation endpoint counts for each subgroup.
+- **Ineligible Group Transparency**: Ineligible groups ($< 10$ contributing engines) remain visible in summary tables marked *descriptive-only*.
+- **Family Availability**: If a required family has no eligible subgroup, mark that component as unavailable and do not claim full empirical support for RQ2.
+- **Pending Statistical Specification**: The handling of bootstrap replicates with unavailable subgroup estimates remains part of the later statistical specification; no heuristic rule is invented here.
 - **Engine-Weighted Subgroup Coverage**: Within an eligible subgroup $g$, compute empirical coverage for each contributing engine $i$, then take the simple unweighted average across all contributing engines $N_g$:
   $$\text{Coverage}(g) = \frac{1}{N_g} \sum_{i \in \mathcal{E}_g} \text{Coverage}(i, g)$$
 - **Subgroup Coverage Error**:
@@ -181,11 +203,10 @@ Primary subgroup families are evaluated separately:
   - Maximum coverage error among eligible operating regimes
   - Maximum coverage error among eligible lifecycle stages
   - Overall worst-group coverage error across the union of eligible groups
-- Ineligible groups ($< 10$ contributing engines) remain visible in reports marked *descriptive-only*.
 
 ---
 
-## 7. Dataset Splits and Official NASA Benchmark Protocol (Step 5.6)
+## 7. Dataset Splits and Benchmark Protocols (Step 5.6)
 
 ### 7.1 Split Manifest Protocol
 - **FD002**: `data/splits/fd002_engine_split_seed_2026.json` (130 / 52 / 26 / 52) is preserved byte-for-byte.
@@ -196,31 +217,71 @@ Primary subgroup families are evaluated separately:
 - NASA official test trajectories (`test_FD001.txt`–`test_FD004.txt`) are truncated prior to failure and supply terminal RUL labels in `RUL_FD00x.txt`.
 - Official NASA test data serves as a secondary terminal-RUL benchmark only.
 - Excluded from sequential maintenance simulation and primary RQ1–RQ4 confirmatory inference.
+- Official test evaluation requires explicit validation of engine-to-terminal-label alignment.
 - Official test evaluation uses the final 30 observed cycles of each test trajectory transformed with frozen training preprocessing.
-- Trajectories shorter than 30 cycles are excluded and reported as an eligible-subset benchmark.
+- Trajectories shorter than 30 cycles are excluded; reports must explicitly provide IDs and counts of excluded trajectories.
+- Pipelines must not claim a full-test benchmark when only an eligible subset was evaluated.
 - Official test set labels MUST NEVER be used to tune preprocessing parameters, model architectures, or decision thresholds.
 
+### 7.3 Optional Dataset Status (FD003)
+- **FD003 Status**: FD003 remains an optional and inactive dataset. No FD003 artifacts, split manifests, or experiments are introduced in this phase.
+
 ---
 
-## 8. Target Metric Aggregation & Bootstrap Governance (Step 5.7)
+## 8. Target Metric Aggregation & Statistical Uncertainty (Step 5.7)
 
 ### 8.1 Primary Engine-Weighted Metric Aggregation
-All primary prognostic metrics are aggregated by computing engine-level mean statistics first, then averaging across engines $N$:
 
-- **Engine MAE**: $\bar{\text{MAE}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{1}{T_i} \sum_{t=1}^{T_i} |\hat{y}_{i,t} - y_{i,t}| \right)$
-- **Engine RMSE**: $\bar{\text{RMSE}} = \sqrt{\frac{1}{N} \sum_{i=1}^N \left( \frac{1}{T_i} \sum_{t=1}^{T_i} (\hat{y}_{i,t} - y_{i,t})^2 \right)}$ *(Note: Root of average engine MSEs; engine-specific RMSEs are NOT averaged).*
-- **Engine PICP**: $\bar{\text{PICP}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{1}{T_i} \sum_{t=1}^{T_i} \mathbb{I}(y_{i,t} \in [\hat{L}_{i,t}, \hat{U}_{i,t}]) \right)$
-- **Engine MPIW**: $\bar{\text{MPIW}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{1}{T_i} \sum_{t=1}^{T_i} (\hat{U}_{i,t} - \hat{L}_{i,t}) \right)$
-- **Engine Interval Score**: Engine-averaged central Winkler interval score at level $\alpha$.
-- **Engine Maintenance Cost**: $\bar{C} = \frac{1}{N} \sum_{i=1}^N C_i$ (one terminal cost per engine).
+Let:
+- $N$ denote the total number of evaluated engines in the partition.
+- $T_i$ denote engine $i$'s final run-to-failure cycle.
+- $V_i = \{30, 31, \dots, T_i\}$ denote the set of evaluated offline prognostic endpoints for engine $i$.
+- $n_i = |V_i| = T_i - 29$ denote the number of qualified prediction endpoints for engine $i$ ($T_i \ge 30$).
+- $y_{it} = \text{RUL}_{\text{true}}(i, t)$ denote the uncapped ground-truth RUL.
+- $p_{it}$ denote the point prediction for engine $i$ at cycle $t$.
+- $[L_{it}, U_{it}]$ denote the conformal prediction interval for engine $i$ at cycle $t$.
 
-### 8.2 Statistical Uncertainty Framework
-- 95% engine-level paired/cluster-bootstrap confidence intervals ($B=1000$ resamples) with the **ENGINE** as the resampled unit of independence.
-- Correlated time steps within an engine are non-independent time series; individual window samples MUST NOT be treated as independent bootstrap units.
+The primary prognostic metrics are defined as follows:
+
+- **Mean Absolute Error (MAE)**:
+  $$\text{MAE} = \frac{1}{N} \sum_{i=1}^N \left[ \frac{1}{n_i} \sum_{t \in V_i} |p_{it} - y_{it}| \right]$$
+
+- **Root Mean Squared Error (RMSE)**:
+  $$\text{RMSE} = \sqrt{\frac{1}{N} \sum_{i=1}^N \left[ \frac{1}{n_i} \sum_{t \in V_i} (p_{it} - y_{it})^2 \right]}$$
+  *(Critical Governance Rule: The overall RMSE is the square root of the average engine-level mean squared errors. Engine-specific RMSE values must NOT be averaged).*
+
+- **Prediction Interval Coverage Probability (PICP)**:
+  $$\text{PICP} = \frac{1}{N} \sum_{i=1}^N \left[ \frac{1}{n_i} \sum_{t \in V_i} \mathbf{1}\{L_{it} \le y_{it} \le U_{it}\} \right]$$
+
+- **Mean Prediction Interval Width (MPIW)**:
+  $$\text{MPIW} = \frac{1}{N} \sum_{i=1}^N \left[ \frac{1}{n_i} \sum_{t \in V_i} (U_{it} - L_{it}) \right]$$
+
+- **Central Winkler Interval Score**:
+  For nominal miscoverage level $\alpha$ (primary $\alpha = 0.10$):
+  $$\text{IS}_\alpha(L, U; y) = (U - L) + \frac{2}{\alpha}(L - y)\mathbf{1}\{y < L\} + \frac{2}{\alpha}(y - U)\mathbf{1}\{y > U\}$$
+  The metric is averaged within each engine, then equally across engines:
+  $$\bar{\text{IS}}_\alpha = \frac{1}{N} \sum_{i=1}^N \left[ \frac{1}{n_i} \sum_{t \in V_i} \text{IS}_\alpha(L_{it}, U_{it}; y_{it}) \right]$$
+
+- **Mean Simulated Maintenance Cost**:
+  $$\bar{C} = \frac{1}{N} \sum_{i=1}^N C_i$$
+  where $C_i$ is the single terminal cost realized by engine $i$ under sequential chronological replay.
+
+### 8.2 Evaluation Scope Integrity Rules
+- **Fixed Offline Endpoint Set**: The primary offline evaluation endpoint set $V_i$ is fixed across all evaluated models, calibration variants, and seeds.
+- **No Policy Truncation**: The offline prognostic evaluation set $V_i$ is **NOT** truncated by an agent's maintenance policy intervention. Prognostic evaluation assesses model fidelity across the entire operational trajectory independently of maintenance decisions.
+- **Missing Predictions**: Missing predictions at required endpoints in $V_i$ constitute a fatal evaluation error; pipelines are never permitted to silently drop endpoints or engines.
+- **Maintenance Opportunities**: Sequential maintenance decision opportunities are strictly cycles 30 through $T_i - 1$. No maintenance decision occurs at terminal failure cycle $T_i$.
+
+### 8.3 Statistical Uncertainty Framework
+- **Unit of Independence**: Uncertainty is estimated via 95% engine-level paired/cluster-bootstrap confidence intervals with the **ENGINE** as the intact resampled unit.
+- **Preserved Pairing**: Engine resampling preserves pairing between compared methods across identical resampled engine clusters.
+- **Non-Independence of Windows**: Correlated time steps within an engine trajectory are non-independent observations; window-level resampling is strictly prohibited.
+- **Model Run Seeds**: Repeated model training seeds evaluate stochastic training variance, not additional independent engine units.
+- **Pending Statistical Specification**: The exact bootstrap replication count, bootstrap CI construction type, formal multiplicity adjustment procedure, and numerical practical-effect tolerance rules remain pending separate formal research decisions.
 
 ---
 
-## 9. Model Training Seeds & Reproducibility (Step 5.8)
+## 9. Model Training Seeds & K-Means Reproducibility (Step 5.8)
 
 ### 9.1 Model Run Seeds
 To evaluate training stability across random initializations, all model training pipelines must run across 5 fixed seeds:
@@ -231,7 +292,8 @@ To evaluate training stability across random initializations, all model training
 - Seeds are NOT additional independent engine units.
 
 ### 9.2 K-Means Regime Model Reproducibility
-For FD002 and FD004 operating regime identification:
+For FD002 and FD004 operating regime identification, the KMeans configuration is locked as:
+
 ```python
 KMeans(
     n_clusters=6,
@@ -243,4 +305,15 @@ KMeans(
     algorithm="lloyd",
 )
 ```
-Fit on float64 training-setting rows sorted by engine and cycle. Centroids are lexicographically sorted by `(setting1, setting2, setting3)` to assign canonical C1–C6 labels. Save mapping, centroids, unscaled centroids, and scaler parameters. Assign new observations to nearest frozen centroid using squared Euclidean distance.
+
+**Reproducibility Specification**:
+1. **Training Data Only**: Fitted strictly on standardized training partition settings in `float64` precision.
+2. **Deterministically Sorted Rows**: Input rows must be sorted by `unit` and `cycle` prior to fitting.
+3. **Single Row Contribution**: Each training observation row contributes exactly once.
+4. **Canonical Label Assignment**: Canonical labels C1 through C6 are assigned by sorting fitted centroids lexicographically by `(setting1, setting2, setting3)`.
+5. **Distance Assignment**: Observations are assigned to the nearest centroid using minimum squared Euclidean distance.
+6. **Tie-Breaking Rule**: Exact distance ties are broken deterministically by selecting the lowest canonical regime index.
+7. **Cluster Validity**: Pipelines must reject duplicate fitted centroids or empty fitted clusters with an explicit ValueError.
+8. **Artifact Preservation**: Pipelines must persist the original-to-canonical cluster mapping, standardized centroids, unscaled original-unit centroids, and setting-scaler parameters.
+9. **Dataset-Local Parameters**: FD004 fits its own regime model independently from FD002; regime cluster labels are dataset-local and not cross-dataset transferable.
+10. **Scope Boundary**: No preprocessing implementation is added in this repair phase.

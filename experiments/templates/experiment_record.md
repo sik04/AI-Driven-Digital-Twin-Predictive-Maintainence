@@ -24,7 +24,9 @@
   - `scipy`: `{{SCIPY_VERSION}}`
   - `scikit-learn`: `{{SKLEARN_VERSION}}`
 - **Hardware Platform**: [OS, CPU Model, GPU Model, CUDA Driver]
-- **Random Seeds**: `[2026, 2027, 2028, 2029, 2030]`
+- **Random Seeds (Planned Suite)**: `[2026, 2027, 2028, 2029, 2030]`
+- **Run Seed (Current Execution)**: `{{RUN_SEED}}`
+
 
 ---
 
@@ -64,13 +66,16 @@
 
 ## 6. Empirical Results & Artifact Locations
 - **Performance Summary**:
-  | Metric | Validation | Test Mean +/- Std | Baseline Comparison |
-  | :--- | :---: | :---: | :---: |
-  | Mean Absolute Error (MAE) | | | |
-  | Root Mean Squared Error (RMSE) | | | |
-  | Prediction Interval Coverage Probability (PICP) | | | |
-  | Mean Prediction Interval Width (MPIW) | | | |
-  | Mean Simulated Cost ($\bar{C}$) | | | |
+  | Metric | Validation | Test Estimate [95% Engine-Level Cluster Bootstrap CI] | 5-Seed Summary (Mean +/- Std Across Seeds) | Baseline Comparison |
+  | :--- | :---: | :---: | :---: | :---: |
+  | Mean Absolute Error (MAE) | | | | |
+  | Root Mean Squared Error (RMSE) | | | | |
+  | Prediction Interval Coverage Probability (PICP) | | | | |
+  | Mean Prediction Interval Width (MPIW) | | | | |
+  | Mean Simulated Cost ($\bar{C}$) | | | | |
+
+  *(Note: 95% Bootstrap CIs quantify engine-level sampling uncertainty with engines resampled intact; 5-Seed summary quantifies training stochasticity across random initializations. These two uncertainty sources must not be conflated).*
+
 - **Output Artifact Locations**:
   - Model Checkpoint: `experiments/checkpoints/exp_{{ID}}/`
   - Predictions / Calibration Logs: `experiments/runs/exp_{{ID}}/`
@@ -86,6 +91,6 @@
 ---
 
 ## 8. Scientific Conclusion and Next Step
-- **Hypothesis Evaluation**: [Supported / Partially Supported / Refuted / Inconclusive]
+- **Hypothesis Evaluation**: [Supported / Unsupported / Inconclusive]
 - **Decision Rationale**:
 - **Next Action**:

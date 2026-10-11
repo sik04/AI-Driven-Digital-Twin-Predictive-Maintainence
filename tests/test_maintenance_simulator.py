@@ -484,6 +484,120 @@ def test_non_finite_cost_rejection() -> None:
     )
 
 
+def test_scalar_integral_type_validation() -> None:
+    """Verify strict positive integral scalar type requirements."""
+    cost_cfg = TEST_COST_CONFIG
+    valid_states = [PredictionState(1, t, 10.0 - t, 5.0, 15.0) for t in range(1, 10)]
+
+    policy_called = False
+
+    def probe_policy(state: PredictionState) -> MaintenanceAction:
+        nonlocal policy_called
+        policy_called = True
+        return MaintenanceAction.CONTINUE
+
+    # Invalid engine_id types
+    for bad_id in [True, False, "1", 1.0, float("nan"), float("inf"), 0, -5]:
+        policy_called = False
+        _assert_raises_value_error(
+            lambda b=bad_id: simulate_engine_trajectory(
+                b,
+                10,
+                valid_states,
+                probe_policy,
+                cost_cfg,
+            )
+        )
+        assert not policy_called, f"Policy was invoked despite invalid engine_id {bad_id}"
+
+    # Invalid failure_cycle types
+    for bad_fc in [True, False, "10", 10.0, float("nan"), float("inf"), 0, -10]:
+        policy_called = False
+        _assert_raises_value_error(
+            lambda b=bad_fc: simulate_engine_trajectory(
+                1,
+                b,
+                valid_states,
+                probe_policy,
+                cost_cfg,
+            )
+        )
+        assert not policy_called, f"Policy was invoked despite invalid failure_cycle {bad_fc}"
+
+
+def test_validate_every_state_before_policy() -> None:
+    """Verify that every state is validated before policy invocation."""
+    cost_cfg = TEST_COST_CONFIG
+    policy_called = False
+
+    def probe_policy(state: PredictionState) -> MaintenanceAction:
+        nonlocal policy_called
+        policy_called = True
+        return MaintenanceAction.CONTINUE
+
+    # State 1 is valid, but state 3 has invalid cycle type (float)
+    bad_states = [
+        PredictionState(1, 1, 9.0, 5.0, 15.0),
+        PredictionState(1, 2, 8.0, 5.0, 15.0),
+        PredictionState(1, 3.0, 7.0, 5.0, 15.0),  # type: ignore[arg-type]
+        PredictionState(1, 4, 6.0, 5.0, 15.0),
+    ]
+    _assert_raises_value_error(
+        lambda: simulate_engine_trajectory(1, 5, bad_states, probe_policy, cost_cfg)
+    )
+    assert not policy_called, "Policy must not be invoked when invalid state exists"
+
+    # State 1 is valid, but state 3 has invalid bounds (lower > upper)
+    bad_bound_states = [
+        PredictionState(1, 1, 9.0, 5.0, 15.0),
+        PredictionState(1, 2, 8.0, 5.0, 15.0),
+        PredictionState(1, 3, 7.0, 20.0, 5.0),
+        PredictionState(1, 4, 6.0, 5.0, 15.0),
+    ]
+    _assert_raises_value_error(
+        lambda: simulate_engine_trajectory(1, 5, bad_bound_states, probe_policy, cost_cfg)
+    )
+    assert not policy_called, "Policy must not be invoked when invalid state bounds exist"
+
+
+def test_fleet_duplicate_engine_rejection() -> None:
+    """Verify that simulate_fleet rejects duplicate engine IDs."""
+    traj1 = (
+        1,
+        10,
+        [PredictionState(1, t, float(10 - t), float(8 - t), float(12 - t)) for t in range(1, 10)],
+    )
+    traj2 = (
+        1,  # Duplicate engine ID 1
+        10,
+        [PredictionState(1, t, float(10 - t), float(8 - t), float(12 - t)) for t in range(1, 10)],
+    )
+    _assert_raises_value_error(
+        lambda: simulate_fleet(
+            [traj1, traj2], lambda s: MaintenanceAction.CONTINUE, TEST_COST_CONFIG
+        )
+    )
+
+
+def test_generic_fixture_cycle_1_start() -> None:
+    """Verify generic simulator allows trajectories starting at cycle 1 without hardcoding 30."""
+
+    states = [
+        PredictionState(1, t, float(10 - t), float(8 - t), float(12 - t)) for t in range(1, 10)
+    ]
+    result = simulate_engine_trajectory(
+        engine_id=1,
+        failure_cycle=10,
+        states=states,
+        policy=lambda s: MaintenanceAction.CONTINUE,
+        cost_config=TEST_COST_CONFIG,
+    )
+    assert result.terminal_event == TerminalEvent.FAILURE
+    assert len(result.decision_history) == 9
+    assert result.decision_history[0].cycle == 1
+    assert result.decision_history[-1].cycle == 9
+
+
 if __name__ == "__main__":
     test_funcs = [
         test_case_1_perfect_timing_path,
@@ -500,6 +614,10 @@ if __name__ == "__main__":
         test_incomplete_trajectory_rejection,
         test_undefined_conditional_metrics,
         test_non_finite_cost_rejection,
+        test_scalar_integral_type_validation,
+        test_validate_every_state_before_policy,
+        test_fleet_duplicate_engine_rejection,
+        test_generic_fixture_cycle_1_start,
     ]
     for func in test_funcs:
         print(f"Running {func.__name__}...", end=" ")
