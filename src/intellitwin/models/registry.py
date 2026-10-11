@@ -28,8 +28,8 @@ import numpy as np
 import pandas as pd
 import torch
 
-from intellitwin.data.artifacts import compute_sha256
-from intellitwin.data.preprocessor import CMapssPreprocessor
+from intellitwin.data.artifacts import compute_sha256, load_preprocessor_artifact
+from intellitwin.data.preprocessing import FittedPreprocessor
 from intellitwin.models.gbr import GBRModel
 from intellitwin.models.lstm import load_lstm_checkpoint
 
@@ -61,7 +61,7 @@ class FrozenBaseModel:
     seed: int
     configuration_id: str
     model: GBRModel | torch.nn.Module
-    preprocessor: CMapssPreprocessor
+    preprocessor: FittedPreprocessor
     metadata: dict[str, Any]
 
     def predict(self, X: np.ndarray[Any, Any]) -> np.ndarray[Any, Any]:
@@ -176,7 +176,7 @@ def load_frozen_base_model(
         meta_dict = json.load(f)
 
     # Load preprocessor
-    preprocessor = CMapssPreprocessor.load(prep_path)
+    preprocessor, _ = load_preprocessor_artifact(prep_path)
 
     # Load model
     if model_family == "GBR":
