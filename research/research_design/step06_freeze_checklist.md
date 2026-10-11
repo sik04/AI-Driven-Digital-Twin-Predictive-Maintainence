@@ -18,5 +18,5 @@
 - [x] maintenance_simulator.md matches implementation
 - [x] ADR updated with final numerical freeze (ADR-018)
 - [x] Step 6 marked COMPLETE (numerical freeze and evaluation protocol finalized)
-- [ ] PR reviewed
-- [ ] PR ready for merge
+- [x] Step 6 PR reviewed
+- [x] Step 6 completion PR merged to main (PR #16)

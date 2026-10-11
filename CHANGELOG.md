@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Separate FD002 lifetime-quartile provenance artifact in `data/splits/fd002_lifetime_quartile_provenance.json` reconstructing quartile stratification from documented original rule without modifying frozen partition assignments.
+- Deterministic research utility `scripts/reconstruct_fd002_quartile_provenance.py` and comprehensive test suite in `tests/test_fd002_quartile_provenance.py`.
+- Step 7.1 base-predictor specification in `research/research_design/step07_base_predictor_specification.md` locking GBR and LSTM architectures, grids, data roles, and artifact provenance.
+- Formal bootstrap replicate missing-group bounds unit test suite in `tests/test_statistical_inference.py`.
+- Architectural decision record ADR-019 in `research/decision_log.md` formalizing Step 7.0 protocol reconciliation and Step 7.1 base-predictor specification freeze.
 - Frozen Step 6 statistical inference protocol in `research/research_design/statistical_inference_protocol.md` (10,000 engine-cluster bootstrap with PCG64 `SeedSequence([2026, 6, dataset_number])`, 98.75% decision intervals with $\alpha=0.0125$ Bonferroni allocation across RQs, intersection-union testing, conservative missing-group bounds propagation $[0, 0.90]$, and cost-inefficient early PM diagnostic $W > r_{\text{equal}}$).
 - Methodological references `lakens2017equivalence` (equivalence/noninferiority testing) and `gneiting2007strictly` (strictly proper scoring rules and Winkler interval scores) in `paper/references.bib`.
 - Risk register entries RSK-11 through RSK-15 in `research/risk_register.md` (synthetic costs, small subgroup precision, approximate bootstrap inference, fixed-seed conditional inference, and absence of deployment/stopping-time guarantees).
@@ -21,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architectural decision record ADR-017 in `research/decision_log.md` formalizing protocol reconciliation, validation hardening, and pilot provenance.
 
 ### Changed
+- Enforced strict data partition roles across `statistical_inference_protocol.md`, `research_questions.md`, `experiment_map.md`, `hypothesis_framework.yaml`, and `hypothesis_framework.tex`: training data for preprocessing/models, validation data for hyperparameter/matched-control tuning, calibration data reserved for conformal calibration, and test data untouched until confirmatory evaluation.
+- Fixed bootstrap replicate missing-group bound calculation in `statistical_inference_protocol.md` to eliminate undefined $\max(\emptyset)$ and establish conservative $[0.0, 0.90]$ bounds when all eligible groups are absent.
+- Reconciled `research/roadmap.md` and `README.md` to reflect GBR and LSTM base-predictor scope and remove obsolete "novel prognostic architecture" and broad baseline suite language.
+- Updated `research/research_design/step06_freeze_checklist.md` to mark Step 6 completion PR #16 merged to main.
 - Frozen 3 synthetic maintenance cost scenarios in `research/research_design/maintenance_cost_scenarios.yaml` under v2.0 and ADR-018 (`primary_reference` [1.0, 5.0, 0.20], `failure_sensitive` [1.0, 10.0, 0.20], `waste_sensitive` [1.0, 5.0, 0.40] SCU); removed active `primary_balanced` ID.
 - Locked canonical evaluation contract `step06-v2` in `research/hypotheses/hypothesis_framework.yaml` and `hypothesis_framework.tex` with numerical decision thresholds (0.20 SCU/engine cost margin, 0.01 worst-group error margin, 0.05 absolute coverage error ceiling, 1.0 cycle MPIW and Winkler interval score noninferiority margins, 0.0 observed failure rate increase allowed).
 - Corrected cost formulation, break-even equality horizons ($r_{\text{equal}} \in \{20, 45, 10\}$ cycles), and theoretical oracle costs (1.20, 1.20, 1.40 SCU) in `maintenance_simulator.md` and `step06_numerical_freeze_decision.md`, clarifying that deterministic pilot fixture demonstrates trigger execution, not cost-optimal intervention.
