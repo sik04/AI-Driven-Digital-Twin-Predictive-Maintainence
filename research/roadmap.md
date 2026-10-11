@@ -88,13 +88,14 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 3: Dataset Study and Experimental Protocol
-- **Status**: In Progress — Step 5 complete; Step 6 complete (numerical freeze and evaluation protocol finalized under ADR-018); ready for Step 7 model specification
+- **Status**: Completed (Step 4, Step 5, Step 6 complete; Step 7 base predictor specification locked under ADR-019)
 - **Objective**: Conduct exploratory analysis of benchmark degradation datasets (e.g., NASA C-MAPSS FD001–FD004), verify sensor characteristics, and establish leak-free evaluation splits.
 - **Expected Deliverables**:
   - Dataset qualification specification in `research/research_design/dataset_qualification.md`.
   - Data & Evaluation Protocol specification in `research/research_design/data_evaluation_protocol.md`.
   - Sequential Maintenance Simulator specification in `research/research_design/maintenance_simulator.md`.
   - Machine-readable reproducible engine split manifests in `data/splits/fd001_engine_split_seed_2026.json`, `fd002_engine_split_seed_2026.json`, `fd004_engine_split_seed_2026.json`.
+  - FD002 lifetime-quartile provenance artifact in `data/splits/fd002_lifetime_quartile_provenance.json`.
   - Canonical dataset organization in `data/raw/cmapss/`.
   - Strict engine-level data splitting protocol document.
   - Canonical feature preconditioning and sequence windowing pipeline.
@@ -104,10 +105,7 @@ This document outlines the master research and development roadmap for the Intel
   - Preprocessing scalers fit only on training sets.
   - Primary metrics, comparators, and statistical governance locked. Simulator Python implementation complete and verified by deterministic unit tests; numerical cost scenarios and evaluation contract frozen under ADR-018.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018).
-
-
-
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018). Step 7.0 Protocol Reconciliation and Step 7.1 Base Predictor Specification COMPLETE.
 
 ---
 
@@ -125,39 +123,42 @@ This document outlines the master research and development roadmap for the Intel
 
 ---
 
-### Phase 5: Reproducible Baseline Experiments
-- **Status**: Planned
-- **Objective**: Implement and evaluate standard baseline models (Linear Regression, SVR, Random Forest, MLP, basic LSTM/GRU) under the identical protocol established in Phase 3.
+### Phase 5: Reproducible Base Predictor Experiments (Step 7)
+- **Status**: Next Up
+- **Objective**: Implement and evaluate reproducible point-RUL base predictors (GBR and LSTM only) under the frozen Step-5 protocol and locked Step 7.1 specification, to establish reliable base predictions rather than conducting a broad architectural benchmark.
 - **Expected Deliverables**:
-  - Baseline model implementations under `src/intellitwin/models/`.
+  - Base predictor implementations under `src/intellitwin/models/` (Histogram Gradient Boosting Regressor and unidirectional LSTM only).
   - Comprehensive experiment records in `experiments/`.
-  - Baseline performance benchmark table across RMSE, Score, and compute overhead.
+  - Benchmark performance records across uncapped-RUL RMSE, MAE, and compute overhead.
+  - 30 final trained base model artifacts (3 datasets × 2 model families × 5 seeds).
 - **Acceptance Criteria**:
-  - All baselines evaluated under exact identical engine splits and seed sets.
-  - Full provenance logged (commit hash, environment, execution time).
+  - All base predictors evaluated under exact identical engine splits and seed sets `[2026, 2027, 2028, 2029, 2030]`.
+  - Hyperparameter selection conducted on validation engines only; calibration and test engines remain untouched.
+  - Full provenance logged (commit hash, environment, execution time, artifact hashes).
 - **Dependencies**: Phase 3, Phase 4.
-- **Research Observations to Record**: Baseline convergence properties, degradation tracking limits, baseline failure modes.
+- **Research Observations to Record**: Base predictor convergence properties, degradation tracking limits, baseline failure modes.
 
 ---
 
-### Phase 6: Proposed Model Development
+### Phase 6: Decision-Aware Conformal Calibration Development
 - **Status**: Planned
-- **Objective**: Design, implement, and train the proposed prognostic architecture targeting identified literature gaps.
+- **Objective**: Design, implement, and calibrate the proposed decision-aware, condition-adaptive conformal calibration method applied on top of the frozen GBR and LSTM base predictors. Scientific novelty is centered on calibration reliability and downstream sequential maintenance utility, not point-predictor architecture.
 - **Expected Deliverables**:
-  - Proposed model source code with strict type hints and docstrings.
-  - Training scripts with convergence monitoring and checkpointing.
-  - Verified experiment records comparing proposed model with baselines.
+  - Proposed conformal calibration source code under `src/intellitwin/uncertainty/` with strict type hints and docstrings.
+  - Calibration scripts operating exclusively on reserved calibration engines.
+  - Verified experiment records comparing proposed calibration against global conformal and standard condition-aware calibration baselines.
 - **Acceptance Criteria**:
-  - Reproducible training pipeline with deterministic seed behavior.
-  - Empirically substantiated improvements over baselines under identical test sets.
+  - Reproducible calibration pipeline with deterministic seed behavior.
+  - Prediction intervals achieve target nominal coverage (90% primary, 80% and 95% secondary).
+  - Base predictor weights and parameters remain strictly frozen.
 - **Dependencies**: Phase 5.
-- **Research Observations to Record**: Training dynamics, loss landscape behavior, hyperparameter sensitivity.
+- **Research Observations to Record**: Calibration error across operating regimes, interval width distributions, and nonconformity scoring dynamics.
 
 ---
 
 ### Phase 7: Uncertainty and Maintenance Decision Experiments
 - **Status**: Planned
-- **Objective**: Implement uncertainty quantification (e.g., conformal prediction intervals, deep ensembles, or Bayesian approximations) and evaluate uncertainty-aware maintenance decision policies.
+- **Objective**: Evaluate decision-aware conformal prediction intervals and uncertainty-aware maintenance decision policies inside the frozen sequential maintenance simulator across Experiments A through D (RQ1–RQ4).
 - **Expected Deliverables**:
   - UQ implementation under `src/intellitwin/uncertainty/`.
   - Decision support module under `src/intellitwin/decision/`.

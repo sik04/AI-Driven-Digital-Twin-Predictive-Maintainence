@@ -82,7 +82,7 @@
   - **Supported Rule**: For both models, lower CI of $\Delta_{\text{cost}} > 0.20$ SCU against every prespecified control family, upper CI of coverage errors $< 0.05$, and observed fleet failure rate increase $\le 0.0$.
   - **Unsupported Rule**: Upper CI of $\Delta_{\text{cost}} < 0.20$ SCU against any control family, lower CI of coverage error $> 0.05$, or failure rate increases over any control family.
   - **Inconclusive Rule**: No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
-  - *(Note: Control tuning and matching will be specified in the later method-design step using development data only; confirmatory RQ3 evaluation cannot run until that protocol is frozen).*
+  - *(Note: Control-family structure and parameter grids must be prespecified before confirmatory evaluation. Any numerical control-parameter selection must use validation engines only. Training engines may be used only where fitting of a trainable control component is required. Calibration engines must not be used to select or optimize matched-control parameters. Test engines must never be used for tuning or selection. Confirmatory RQ3 evaluation cannot run until that protocol is frozen).*
 
 ---
 

@@ -530,6 +530,58 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 7 base RUL model training specification.
 
+---
+
+### ADR-019: Step 7.0 Protocol Reconciliation and Step 7.1 Base Predictor Specification Freeze
+- **Date**: 2026-10-11
+- **Status**: Accepted (Amends ADR-002, ADR-017, and ADR-018)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-issued implementation instruction containing the Step 7.0 reconciliation mandate and locked Step 7.1 base-predictor specification.
+- **Context and Motivation**:
+  - Following the Step 6 freeze (ADR-018), four protocol inconsistencies required resolution before base predictor implementation:
+    1. Missing FD002 lifetime-quartile provenance metadata in split records.
+    2. Ambiguous wording allowing calibration data to be used for development/tuning.
+    3. Stale roadmap language suggesting an obsolete wide baseline suite (e.g., SVR, RF, MLP) and "novel prognostic architecture".
+    4. Undefined $\max(\emptyset)$ edge case in bootstrap replicate missing-group error bounds.
+  - To ensure methodological rigor and complete transparency, Step 7.1 base predictor specifications are frozen prior to implementation.
+- **Decisions**:
+  1. **FD002 Lifetime-Quartile Provenance Reconstruction**:
+     - Documented in a dedicated provenance artifact `data/splits/fd002_lifetime_quartile_provenance.json`.
+     - Explicitly records `status = reconstructed_from_documented_original_rule`, NOT historically preserved metadata.
+     - Reconstructed from raw run-to-failure file `train_FD002.txt` (SHA-256: `dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f`) by sorting 260 engines ascending by $(T_i, \text{engine\_id})$ and slicing into 4 contiguous quartiles of 65 engines each.
+     - Frozen manifest `data/splits/fd002_engine_split_seed_2026.json` (SHA-256: `57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41`) and its partition assignments (Train 130, Cal 52, Val 26, Test 52) remain 100% byte-for-byte untouched.
+     - Created deterministic research utility `scripts/reconstruct_fd002_quartile_provenance.py` and comprehensive unit/integration tests to reproduce and verify provenance without random operations.
+  2. **Strict Data Role Policy**:
+     - **Training data**: Preprocessing fitting (scalers) and base-predictor parameter estimation.
+     - **Validation data**: Hyperparameter selection, checkpoint selection, matched-control parameter selection, maintenance-policy development, protocol debugging.
+     - **Calibration data**: Reserved strictly for fitting subsequent conformal calibration mechanisms; must NOT be used for unrestricted base-model, policy, or matched-control selection.
+     - **Held-out test data**: Confirmatory hypothesis evaluation only; never inspected or tuned.
+     - **Matched-conservatism controls (RQ3)**: Control-family structure and parameter grids must be prespecified before confirmatory evaluation. Any numerical control-parameter selection must use validation engines only. Training engines may be used only where fitting of a trainable control component is required. Calibration engines must not be used to select or optimize matched-control parameters. Test engines must never be used for tuning or selection.
+  3. **Bootstrap Missing-Group Mathematics Fix**:
+     - Formalized missing-group bounds calculation removing potential $\max(\emptyset)$ operations:
+       - If $|G_{\text{available}}^{(b)}| > 0$, $\text{WorstErr}_{\text{lower}}^{(b)} = \max_{g \in G_{\text{available}}^{(b)}} \text{Err}^{(b)}(g)$, else $0.0$.
+       - If $|G_{\text{missing}}^{(b)}| > 0$, $\text{WorstErr}_{\text{upper}}^{(b)} = \max(\text{WorstErr}_{\text{lower}}^{(b)}, 0.90)$, else $\text{WorstErr}_{\text{lower}}^{(b)}$.
+       - If every eligible group is absent: $\text{WorstErr}_{\text{lower}}^{(b)} = 0.0, \text{WorstErr}_{\text{upper}}^{(b)} = 0.90$ ($[0.0, 0.90]$).
+       - Replicates are never discarded, redrawn, or rerolled.
+  4. **Base Predictor Scope & Methodological Lock (Step 7.1)**:
+     - Documented in `research/research_design/step07_base_predictor_specification.md`.
+     - Base predictors are supporting infrastructure; scientific novelty lies in decision-aware conformal calibration and sequential maintenance utility.
+     - Base models restricted strictly to GBR (`HistGradientBoostingRegressor`) and single-layer unidirectional LSTM (`torch.nn.LSTM`).
+     - 30-cycle causal lookback, stride 1, no padding, 17 frozen features (GBR: flattened 510; LSTM: $30 \times 17$).
+     - Training target $\min(\text{rul\_true}, 125)$, evaluation target uncapped $\text{rul\_true}$, prediction post-processing $\max(0.0, \hat{y})$.
+     - Equal engine-weighted training loss $w_{i,t} = M / (N \cdot n_i)$.
+     - Selection on seeds 2026 and 2027 using validation uncapped engine-weighted RMSE; final runs on seeds 2026–2030 (30 artifacts total).
+     - GBR grid: 8 configurations; LSTM grid: 4 configurations; deterministic tie-breaking.
+  5. **Scientific Integrity Safeguards**:
+     - No held-out test data were inspected.
+     - No model performance results were used to select these methodological choices.
+     - Reconstructed quartiles are documented transparently as reconstructed, not historical.
+- **Expected Implications**:
+  - Protocol inconsistencies are closed. Step 7.0 is complete. Step 7.1 methodology is locked.
+  - Step 7.2 implementation of preprocessing pipelines and model training can proceed without methodological ambiguity.
+- **Follow-up Review Date / Trigger**:
+  - Step 7.2 implementation and training completion.
+
 
 
 

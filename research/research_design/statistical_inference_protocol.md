@@ -50,6 +50,13 @@ For comparisons between a baseline method ($B$) and the proposed method ($P$):
   - Optimistic misses: fraction of qualified endpoints with $y_{it} < L_{it}$ (actual RUL shorter than lower bound).
   - Pessimistic misses: fraction of qualified endpoints with $y_{it} > U_{it}$ (actual RUL longer than upper bound).
 
+### 1.3 Data Partition Roles and Information Boundaries
+- **Training data**: Used for preprocessing fitting and base-predictor parameter estimation.
+- **Validation data**: Used for hyperparameter selection, checkpoint selection, matched-control parameter selection, maintenance-policy development, protocol debugging, and other permitted development decisions.
+- **Calibration data**: Reserved strictly for fitting the final conformal calibration mechanism and must NOT be used for unrestricted base-model, policy, or matched-control selection.
+- **Held-out test data**: Used only after all relevant methods, configurations, thresholds, and decision rules are frozen, for confirmatory evaluation.
+- **Matched-conservatism controls**: Control-family structure and parameter grids must be prespecified before confirmatory evaluation. Any numerical control-parameter selection must use validation engines only. Training engines may be used only where fitting of a trainable control component is required. Calibration engines must not be used to select or optimize matched-control parameters. Test engines must never be used for tuning or selection.
+
 ---
 
 ## 2. Resampling & Cluster-Bootstrap Specification
@@ -58,7 +65,7 @@ For comparisons between a baseline method ($B$) and the proposed method ($P$):
 - **Replicate Count**: $B = 10,000$ bootstrap resamples.
 - **Resampling Unit**: Resample engines intact with replacement (engine-cluster bootstrap). When an engine is drawn, all of its cycles, endpoints, models, predictions across all 5 seeds, and comparator states are included simultaneously to preserve pairing and trajectory autocorrelation.
 - **Stratification**: Resampling is stratified within dataset by the original lifetime quartiles ($Q_1, Q_2, Q_3, Q_4$) defined during split generation. The exact engine count per stratum in the held-out split is strictly preserved.
-- **Original Quartile Membership**: Stratum memberships are fixed from the split generator manifest (`quartile_membership`), not re-derived from the held-out sample.
+- **Original Quartile Membership**: Stratum memberships are fixed from split-generation metadata (for FD001 and FD004, from `quartile_membership` in the split manifest; for FD002, from the reconstructed provenance artifact `data/splits/fd002_lifetime_quartile_provenance.json`), not re-derived from the held-out sample.
 - **Paired Consistency**: The identical engine resample draws are used for every comparative method, comparator, metric, and contrast within a dataset.
 - **Cross-Dataset Independence**: Resampling is conducted independently across datasets (FD001, FD002, FD004).
 
@@ -103,15 +110,20 @@ For comparisons between a baseline method ($B$) and the proposed method ($P$):
 ### 4.2 Conservative Missing-Group Bound Propagation
 - Because cluster resampling samples with replacement, an eligible subgroup may have zero contributing engines in a particular replicate $b$. An eligible subgroup is **never dropped** due to zero replicate representation.
 - For a subgroup with zero engines in replicate $b$, its possible absolute coverage error is bounded by $[0.0, 0.90]$ (since nominal coverage is 0.90 and empirical coverage is bounded in $[0, 1]$).
-- For a subgroup family $G$, the replicate lower and upper error bounds are constructed as:
-  $$\text{WorstErr}_{\text{lower}}^{(b)} = \max_{g \in G_{\text{available}}^{(b)}} \text{Err}^{(b)}(g)$$
-  $$\text{WorstErr}_{\text{upper}}^{(b)} = \max\left(\max_{g \in G_{\text{available}}^{(b)}} \text{Err}^{(b)}(g), \; 0.90 \cdot \mathbf{1}\{|G_{\text{missing}}^{(b)}| > 0\}\right)$$
+- For a subgroup family $G$ in bootstrap replicate $b$:
+  - Let $G_{\text{available}}^{(b)}$ be eligible groups represented in that replicate.
+  - Let $G_{\text{missing}}^{(b)}$ be eligible groups absent from that replicate.
+  - Replicate lower error bound:
+    $$\text{WorstErr}_{\text{lower}}^{(b)} = \begin{cases} \max_{g \in G_{\text{available}}^{(b)}} \text{Err}^{(b)}(g), & \text{if } |G_{\text{available}}^{(b)}| > 0 \\ 0.0, & \text{if } |G_{\text{available}}^{(b)}| = 0 \end{cases}$$
+  - Replicate upper error bound:
+    $$\text{WorstErr}_{\text{upper}}^{(b)} = \begin{cases} \max\left(\text{WorstErr}_{\text{lower}}^{(b)}, \; 0.90\right), & \text{if } |G_{\text{missing}}^{(b)}| > 0 \\ \text{WorstErr}_{\text{lower}}^{(b)}, & \text{if } |G_{\text{missing}}^{(b)}| = 0 \end{cases}$$
+  - Therefore, if every eligible group is absent ($|G_{\text{available}}^{(b)}| = 0$): $\text{WorstErr}_{\text{lower}}^{(b)} = 0.0$, $\text{WorstErr}_{\text{upper}}^{(b)} = 0.90$. The conservative missing-group interval for that replicate is exactly $[0.0, 0.90]$. No $\max(\emptyset)$ operation may occur.
 - When evaluating the difference $\Delta_{\text{error}} = \text{WorstErr}_B - \text{WorstErr}_P$, bounds propagate conservatively:
   $$\Delta_{\text{error, lower}}^{(b)} = \text{WorstErr}_{B, \text{lower}}^{(b)} - \text{WorstErr}_{P, \text{upper}}^{(b)}$$
   $$\Delta_{\text{error, upper}}^{(b)} = \text{WorstErr}_{B, \text{upper}}^{(b)} - \text{WorstErr}_{P, \text{lower}}^{(b)}$$
 - The final decision interval endpoints are obtained from the specified quantiles of the replicate lower and upper bounds:
   $$\text{CI}_{\text{lower}} = \text{Quantile}(\Delta_{\text{error, lower}}, 0.00625), \quad \text{CI}_{\text{upper}} = \text{Quantile}(\Delta_{\text{error, upper}}, 0.99375)$$
-- The evaluator must record and report the exact number of replicates that required missing-group bound propagation. Replicates are never discarded, redrawn, or rerolled.
+- The evaluator must record and report the exact number of replicates that required missing-group bound propagation. Replicates must **NOT** be discarded, rerolled, or redrawn.
 
 ---
 
@@ -197,7 +209,7 @@ Applies to absolute coverage error ($\text{WorstErr} < 0.05$):
   1. $\Delta_{\text{cost}} > 0.20$ SCU per engine against **EVERY** prespecified control family ($\text{CI}_{\text{lower}} > 0.20$). This guarantees benefit over the strongest control family without cherry-picking.
   2. Coverage ceilings: $E < 0.05$ on marginal, worst-regime, and worst-stage coverage.
   3. Observed failure safeguard: $\overline{\text{FailRate}}_P \le \overline{\text{FailRate}}_{\text{control}}$ against every control family.
-- *Notice*: Control parameter tuning will be pre-specified in the later method-design phase using training/calibration data only. Confirmatory RQ3 evaluation cannot be run until that tuning protocol is frozen.
+- *Notice*: Control-family structure and parameter grids must be prespecified before confirmatory evaluation. Any numerical control-parameter selection must use validation engines only. Training engines may be used only where fitting of a trainable control component is required. Calibration engines must not be used to select or optimize matched-control parameters. Test engines must never be used for tuning or selection. Confirmatory RQ3 evaluation cannot be run until that tuning protocol is frozen.
 
 ### 6.4 RQ4 — Robustness Across Configurations
 - **Evaluation Matrix**: Six mandatory cells:

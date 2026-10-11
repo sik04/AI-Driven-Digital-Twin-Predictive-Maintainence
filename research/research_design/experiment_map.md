@@ -55,7 +55,7 @@ This document establishes the high-level mapping between the formal research que
   - **Secondary / Supporting Outcomes**: Wasted Remaining Useful Life ($RUL_{\text{wasted}}$); cost-inefficient early PM rate; coverage error
   - **Statistical Framework**: Paired proposed-vs-control comparisons; 98.75% engine-level cluster bootstrap decision intervals.
 - **Frozen Parameters (ADR-018)**: Dataset FD002; `primary_reference` scenario; nominal coverage 90%; threshold $\Delta_{\text{cost}} > 0.20$ SCU per engine against **EVERY** prespecified control family; coverage ceiling $E < 0.05$; failure increase $\le 0.0$.
-- **Remaining Methodological Deferrals (Step 7+)**: Specific control parameterization and tuning algorithms (to be specified using development data only; confirmatory RQ3 evaluation cannot run until that protocol is frozen).
+- **Remaining Methodological Deferrals (Step 7+)**: Specific control parameterization and tuning algorithms (control structure and grids prespecified; parameter selection using validation engines only; calibration engines reserved for conformal calibration; confirmatory RQ3 evaluation cannot run until that protocol is frozen).
 
 ---
 

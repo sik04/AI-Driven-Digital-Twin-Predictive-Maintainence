@@ -53,7 +53,7 @@ This document presents the formal academic rendering of the IntelliTwin hypothes
   \item \textbf{Resampling Procedure}: 10,000 cluster-bootstrap resamples with replacement, stratified by split-generation lifetime quartiles ($Q_1$--$Q_4$), using PCG64 PRNG with \texttt{SeedSequence([2026, 6, dataset\_number])}.
   \item \textbf{Decision Intervals}: Confirmatory decision rules use \textbf{98.75\% cluster-bootstrap percentile confidence intervals} (quantiles 0.00625 and 0.99375), providing Bonferroni family-wise error control ($\alpha = 0.05 / 4 = 0.0125$) across the four research questions. Descriptive 95\% intervals (quantiles 0.025 and 0.975) are reported for context.
   \item \textbf{Intersection-Union Principle}: Each RQ requires all component conditions to pass at the decision level to achieve Supported classification.
-  \item \textbf{Missing-Group Bound Propagation}: Replicate-level worst-group errors are recomputed across eligible groups ($\ge 10$ engines). Replicates with unrepresented groups propagate conservative $[0, 0.90]$ bounds rather than being dropped or redrawn.
+  \item \textbf{Missing-Group Bound Propagation}: Replicate-level worst-group errors are recomputed across eligible groups ($\ge 10$ engines). For replicate $b$, if $|G_{\text{available}}^{(b)}| > 0$, $\text{WorstErr}_{\text{lower}}^{(b)} = \max_{g \in G_{\text{available}}^{(b)}} \text{Err}^{(b)}(g)$, else $0.0$; if $|G_{\text{missing}}^{(b)}| > 0$, $\text{WorstErr}_{\text{upper}}^{(b)} = \max(\text{WorstErr}_{\text{lower}}^{(b)}, 0.90)$, else $\text{WorstErr}_{\text{lower}}^{(b)}$. All-groups-missing yields exactly $[0.0, 0.90]$ with no $\max(\emptyset)$ error. Replicates are never discarded or redrawn.
   \item \textbf{Secondary P-Values}: No supplementary p-value hypothesis tests form part of the confirmatory protocol.
 \end{enumerate}
 
@@ -111,6 +111,7 @@ An RQ is \textbf{Supported} if and only if every required component condition pa
   \item[Supported Logic:] For both models, lower CI of $\Delta_{\text{cost}} > 0.20$ SCU against every control family, upper CI of coverage errors $< 0.05$, and failure increase $\le 0.0$.
   \item[Unsupported Logic:] Upper CI of $\Delta_{\text{cost}} < 0.20$ SCU against any control family, lower CI of coverage error $> 0.05$, or failure rate increases.
   \item[Inconclusive Logic:] No condition fails, but at least one decision interval covers its boundary, or inference is degenerate.
+  \item[Control Selection:] Control-family structure and parameter grids must be prespecified before confirmatory evaluation. Numerical control-parameter selection must use validation engines only; calibration engines must not be used to select or optimize matched-control parameters; test engines are untouched until confirmatory evaluation.
 \end{description}
 
 \subsection*{Research Question 4: Robustness and Generalization}
