@@ -582,6 +582,42 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Step 7.2 implementation and training completion.
 
+---
+
+### ADR-020: Step 7 Base Predictor Production Matrix and Model Freeze
+- **Date**: 2026-10-12
+- **Status**: Accepted (Amends ADR-019)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-directed completion and verification of Step 7.4 full base-model matrix and Step 7.5 independent audit and model registry.
+- **Context and Motivation**:
+  - Following the specification freeze under ADR-019 and the deterministic data pipeline completion in Step 7.2, the 24-run validation selection procedure was executed for FD001, FD002, and FD004 across seeds `[2026, 2027]`.
+  - Exactly one winning configuration per dataset and model family was frozen:
+    - **FD001**: GBR `gbr_lr010_leaf15_l2_0` (validation RMSE 28.4243), LSTM `lstm_h64_lr0010` (validation RMSE 30.0831).
+    - **FD002**: GBR `gbr_lr010_leaf31_l2_0` (validation RMSE 34.6613), LSTM `lstm_h64_lr0010` (validation RMSE 35.2524).
+    - **FD004**: GBR `gbr_lr010_leaf31_l2_0` (validation RMSE 48.8283), LSTM `lstm_h64_lr0010` (validation RMSE 48.2471).
+  - All 30 official base models (3 datasets × 2 families × 5 seeds `2026..2030`) have been trained, evaluated, and verified on CPU without accessing calibration or held-out test partitions.
+  - An immutable model registry and authoritative loading interface are required to govern downstream conformal calibration (Phase 6 / Step 8) and sequential maintenance simulation (Phase 7 / Step 9).
+- **Decisions**:
+  1. **Formal Freeze of 30 Base Predictor Models**:
+     - All 30 model checkpoints, metadata JSON files, metric summaries, and validation prediction CSVs located in `experiments/base_models/{FD001,FD002,FD004}/{GBR,LSTM}/seed_{2026..2030}/` are immutably frozen.
+     - Six five-seed summary records in `experiments/base_models/{dataset}/{family}/summary.json` and the consolidated validation summary `experiments/base_models/base_predictor_validation_summary.csv` are frozen as official validation benchmark baselines.
+  2. **Authoritative Model Registry & SHA-256 Verification**:
+     - The canonical registry artifact `experiments/base_models/model_registry.json` contains exactly 30 verified entries with full artifact paths, file SHA-256 hashes, preprocessor hashes, split manifest hashes, and provenance commit tags.
+     - Model loading must be performed strictly via `src/intellitwin/models/registry.py::load_frozen_base_model`, which enforces CPU loadability, non-negative prediction truncation ($\ge 0.0$), and mandatory runtime SHA-256 verification against the registry.
+  3. **Reproducibility Audit Verification**:
+     - The representative reproducibility audit re-running the 6 official seed-2026 models from scratch confirmed exact numerical equivalence for GBR (max absolute difference $< 5.0 \times 10^{-7} \ll 10^{-4}$) and identical convergence for LSTM ($\Delta_{\text{RMSE}} = 0.0000 \le 0.05$).
+  4. **Strict Immutability and Downstream Boundaries**:
+     - Base-model weights, architectures, and hyperparameters must **NOT** be altered, fine-tuned, or retrospectively selected based on downstream conformal calibration error, interval width, or maintenance simulator cost outcomes.
+     - Both GBR and LSTM model families are carried forward through all subsequent research phases across all three datasets.
+     - Downstream uncertainty quantification (Step 8) will consume these models strictly to generate predictions on reserved calibration engines for nonconformity scoring, and on test engines for interval construction.
+- **Expected Implications**:
+  - Step 7 (Base Predictor Experiments) is formally closed.
+  - Phase 5 is COMPLETE.
+  - Downstream research proceeds to Phase 6: Decision-Aware Conformal Calibration Development (Step 8) with zero data leakage and immutable base predictions.
+- **Follow-up Review Date / Trigger**:
+  - Phase 6 / Step 8 Conformal Calibration specification and development.
+
+
 
 
 

@@ -55,7 +55,9 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
   - Step 7.2 Data/Preprocessing/Window Pipeline: **COMPLETE** (Strict C-MAPSS data loader, frozen split validation, training-only preprocessors, K-means k=6 regime models, 30-cycle causal windows, equal-engine weights, and deterministic artifact persistence).
   - Step 7.3 FD002 Base-Model Implementation and Selection: **COMPLETE** (Implemented GBR and LSTM model architectures under ADR-019, executed frozen 24-run configuration-selection procedure on FD002 validation partition across seeds 2026 and 2027, froze winning configurations `gbr_lr010_leaf31_l2_0` and `lstm_h64_lr0010` with zero calibration/test data leakage).
   - Step 7.4 Multi-Dataset/Five-Seed Final Base-Model Matrix: **COMPLETE** (Executed 24-run validation selection for FD001 and FD004 freezing dataset winners; trained complete 30-model matrix across official seeds 2026–2030; all 30 checkpoints verified on CPU; zero calibration/test data leakage).
-- **Step 7.5 Independent Audit, Registry, and Formal Freeze**: **NEXT** (Execute independent 30-model audit, construct authoritative model registry, perform seed-2026 reproducibility verification, publish freeze documentation and ADR-020).
+  - Step 7.5 Independent Audit, Registry, and Formal Freeze: **COMPLETE** (Executed independent 30-model audit, constructed authoritative model registry [`experiments/base_models/model_registry.json`](experiments/base_models/model_registry.json), verified seed-2026 reproducibility across all 6 cells, authored formal freeze record [`research/research_design/step07_base_predictor_freeze.md`](research/research_design/step07_base_predictor_freeze.md), and accepted ADR-020).
+- **Step 7 Base Predictor Experiments**: **COMPLETE**
+- **Next: Phase 6 / Step 8 — Decision-Aware Conformal Calibration Development**: (Design, implement, and calibrate condition-adaptive conformal prediction intervals on top of frozen base predictors using reserved calibration engines).
 
 
 

@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Completed Step 7.5 independent audit, model registry, formal freeze, and Step 7 closure:
+  - Constructed authoritative 30-model registry in `experiments/base_models/model_registry.json` tracking model IDs, file paths, SHA-256 hashes, preprocessor hashes, split manifest hashes, and git commit provenance.
+  - Implemented immutable base predictor loading interface `load_frozen_base_model` and `FrozenBaseModel` wrapper with automatic runtime SHA-256 integrity verification and non-negative prediction post-processing.
+  - Authored and verified independent audit suite (`scripts/audit_step07_base_models.py`) verifying all 30 models match disk artifacts, produce non-negative predictions, reproduce validation predictions, and preserve zero calibration/test data leakage.
+  - Executed representative seed-2026 reproducibility audit (`scripts/run_step07_reproducibility_audit.py`) confirming numerical equivalence for GBR ($< 5.0 \times 10^{-7}$ max diff) and exact convergence for LSTM ($\Delta_{\text{RMSE}} = 0.0000 \le 0.05$).
+  - Generated consolidated validation benchmark summary in `experiments/base_models/base_predictor_validation_summary.csv`.
+  - Authored formal base predictor freeze document in `research/research_design/step07_base_predictor_freeze.md`.
+  - Appended ADR-020 to `research/decision_log.md` formalizing the immutable 30-model freeze and downstream boundaries.
+  - Created and executed test suite in `tests/test_step07_base_models.py` verifying registry completeness, loader functionality, tamper detection, and summary tables.
 - Completed Step 7.4 full multi-dataset and five-seed base-model matrix:
   - Validated and froze winning configurations for FD001 (`gbr_lr010_leaf15_l2_0` and `lstm_h64_lr0010`) and FD004 (`gbr_lr010_leaf31_l2_0` and `lstm_h64_lr0010`) following frozen Step 7.1 grid on validation-only engines.
   - Trained all 30 official base models across 3 datasets (FD001, FD002, FD004), 2 model families (GBR, LSTM), and 5 seeds (2026–2030) using `scripts/run_step07_full_base_model_matrix.py`.

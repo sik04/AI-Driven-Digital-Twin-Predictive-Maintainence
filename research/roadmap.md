@@ -13,8 +13,8 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
 | **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 complete (ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
-| **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Planned | Train and select frozen point-RUL base predictors |
-| **Phase 6** | Decision-Aware Conformal Calibration Development | Planned | Develop and evaluate the decision-aware, condition-adaptive conformal calibration method |
+| **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
+| **Phase 6** | Decision-Aware Conformal Calibration Development | Next Up (Step 8) | Develop and evaluate condition-adaptive conformal calibration method |
 | **Phase 7** | Uncertainty and Maintenance Decision Experiments | Planned | Conformal prediction, interval calibration, DSS validation |
 | **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
 | **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
@@ -105,7 +105,7 @@ This document outlines the master research and development roadmap for the Intel
   - Preprocessing scalers fit only on training sets.
   - Primary metrics, comparators, and statistical governance locked. Simulator Python implementation complete and verified by deterministic unit tests; numerical cost scenarios and evaluation contract frozen under ADR-018.
 - **Dependencies**: Phase 2.
-- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018). Step 7.0 Protocol Reconciliation COMPLETE; Step 7.1 Base Predictor Specification LOCKED under ADR-019; Step 7.2 Data Preprocessing and Window Pipeline COMPLETE; Step 7.3 FD002 Base-Model Implementation and Selection COMPLETE. Step 7.4 Multi-Dataset/Five-Seed Final Base-Model Matrix COMPLETE. Step 7.5 Independent Audit, Registry, and Formal Freeze NEXT.
+- **Research Observations to Record**: Sensor degradation trends, operating condition shifts, censoring points, and pre-test frozen effect thresholds. Step 4 dataset qualification established: FD002 primary (PASS), FD001 control, FD004 robustness, FD003 optional extension; strict input leakage rules; seed 2026 stratified engine-level split manifests. Step 5 Data & Evaluation Protocol COMPLETE. Step 6 Sequential Maintenance Simulator COMPLETE (contract, core replay engine, deterministic validation suite, cost scenario families, and numerical freeze finalized under ADR-018). Step 7.0 Protocol Reconciliation COMPLETE; Step 7.1 Base Predictor Specification LOCKED under ADR-019; Step 7.2 Data Preprocessing and Window Pipeline COMPLETE; Step 7.3 FD002 Base-Model Implementation and Selection COMPLETE; Step 7.4 Multi-Dataset/Five-Seed Base-Model Matrix COMPLETE; Step 7.5 Independent Audit, Registry, and Formal Freeze COMPLETE (30 base models immutably frozen under ADR-020). Step 8 Decision-Aware Conformal Calibration Development NEXT.
 
 ---
 
@@ -124,7 +124,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 5: Reproducible Base Predictor Experiments (Step 7)
-- **Status**: Step 7.4 Complete / Step 7.5 Next Up (Step 7.4 multi-dataset/five-seed final base-model matrix complete with 30 official base models verified; Step 7.5 independent audit, registry, and formal freeze next up)
+- **Status**: Completed (Step 7 Complete: 30 base models trained, independently audited, verified on CPU, and frozen under ADR-020; Step 8 Decision-Aware Conformal Calibration Development next up)
 - **Objective**: Implement and evaluate reproducible point-RUL base predictors (GBR and LSTM only) under the frozen Step-5 protocol and locked Step 7.1 specification, to establish reliable base predictions rather than conducting a broad architectural benchmark.
 - **Expected Deliverables**:
   - Base predictor implementations under `src/intellitwin/models/` (Histogram Gradient Boosting Regressor and unidirectional LSTM only).
