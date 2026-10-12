@@ -84,11 +84,13 @@ class FrozenBaseModel:
                 X_seq = X.reshape(M, 30, 17)
             else:
                 X_seq = X
+            assert isinstance(self.model, torch.nn.Module)
             self.model.eval()
             with torch.no_grad():
                 tensor_x = torch.from_numpy(X_seq).float()
                 raw = self.model(tensor_x).cpu().numpy()
-                return np.maximum(0.0, raw)
+                res: np.ndarray[Any, Any] = np.maximum(0.0, raw)
+                return res
 
         raise ValueError(f"Unsupported model family: {self.model_family}")
 

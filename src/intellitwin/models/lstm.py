@@ -380,10 +380,15 @@ def save_lstm_checkpoint(
 
 def load_lstm_checkpoint(
     filepath: Path | str,
-    device: torch.device | None = None,
+    device: torch.device | str | None = None,
 ) -> tuple[LSTMPointPredictor, dict[str, Any]]:
     """Load PyTorch checkpoint on CPU or specified device."""
-    target_device = device if device is not None else torch.device("cpu")
+    if isinstance(device, str):
+        target_device = torch.device(device)
+    elif device is not None:
+        target_device = device
+    else:
+        target_device = torch.device("cpu")
     checkpoint = torch.load(filepath, map_location="cpu", weights_only=False)
 
     cfg_dict = checkpoint["configuration"]

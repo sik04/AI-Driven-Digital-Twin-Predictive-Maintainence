@@ -129,7 +129,7 @@ def test_gbr_synthetic_training_and_reproducibility(tmp_path: Path) -> None:
 def test_lstm_synthetic_training_and_reproducibility(tmp_path: Path) -> None:
     """Synthetic unit test for LSTM model saving, loading, and inference."""
     torch.manual_seed(2026)
-    model = LSTMPointPredictor(input_size=17, hidden_size=16, num_layers=1)
+    model = LSTMPointPredictor(hidden_size=16)
 
     X_seq = torch.randn(10, 30, 17)
     model.eval()
@@ -139,9 +139,9 @@ def test_lstm_synthetic_training_and_reproducibility(tmp_path: Path) -> None:
     assert np.all(truncated_preds >= 0.0)
 
     # Save checkpoint
-    from intellitwin.models.lstm import LSTMExecutionResult
+    from intellitwin.models.lstm import LSTMTrainingResult
 
-    res = LSTMExecutionResult(
+    res = LSTMTrainingResult(
         model=model,
         hyperparameters=LSTMHyperparameters(
             config_id="lstm_synthetic",
@@ -152,7 +152,6 @@ def test_lstm_synthetic_training_and_reproducibility(tmp_path: Path) -> None:
         training_duration_seconds=1.0,
         best_epoch=1,
         epochs_completed=1,
-        best_val_loss=10.0,
         validation_metrics=compute_model_metrics(
             predictions=truncated_preds,
             rul_true=np.ones(10) * 50.0,
@@ -160,7 +159,6 @@ def test_lstm_synthetic_training_and_reproducibility(tmp_path: Path) -> None:
             engine_ids=np.ones(10, dtype=int),
         ),
         validation_predictions=truncated_preds,
-        epoch_history=[],
     )
 
     ckpt_path = tmp_path / "checkpoint"

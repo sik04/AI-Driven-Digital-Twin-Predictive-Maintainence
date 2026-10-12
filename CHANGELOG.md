@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Completed Step 7.4 full multi-dataset and five-seed base-model matrix:
+  - Validated and froze winning configurations for FD001 (`gbr_lr010_leaf15_l2_0` and `lstm_h64_lr0010`) and FD004 (`gbr_lr010_leaf31_l2_0` and `lstm_h64_lr0010`) following frozen Step 7.1 grid on validation-only engines.
+  - Trained all 30 official base models across 3 datasets (FD001, FD002, FD004), 2 model families (GBR, LSTM), and 5 seeds (2026–2030) using `scripts/run_step07_full_base_model_matrix.py`.
+  - Persisted complete checkpoints, metadata, metrics, and validation prediction CSVs with zero data leakage (calibration and test engines strictly untouched).
+  - Generated summary records for each dataset-model pair with exact mean and standard deviation metrics.
+  - Added unit and regression test coverage in `tests/test_step07_matrix.py` verifying checkpoint reload, metadata validation, and summary schemas.
+  - Authored Step 7.4 matrix completion record in `research/research_design/step07_full_base_model_matrix_completion.md`.
+
 ### Fixed
 - Corrected Step 7.3 FD002 completion provenance in `research/research_design/step07_fd002_model_selection_completion.md`: FD002 has one fault mode, and the frozen engine split is 130 train / 52 calibration / 26 validation / 52 test (260 total engines).
 - Added automated model-selection provenance validation (`src/intellitwin/models/provenance.py`) and split partition-count reporting helper (`src/intellitwin/data/splits.py`) to prevent model-selection reports from diverging from frozen split manifests.
