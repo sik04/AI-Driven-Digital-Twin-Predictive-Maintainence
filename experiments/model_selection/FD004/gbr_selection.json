@@ -11,7 +11,7 @@
   "calibration_data_used": false,
   "test_data_used": false,
   "preprocessing_artifact_sha256": "fdfa4c0284c38554f8b8026c27c71f56ebd9c157a47f9acd2baf9ae34cbe0502",
-  "git_commit": "f7ff5bfa786f6732e11c94a37abda23a33b8966b",
+  "git_commit": "57c6511b5bfd41f83d0327d6cceddf9206fed11d",
   "selected_configuration_id": "gbr_lr010_leaf31_l2_0",
   "selected_configuration": {
     "config_id": "gbr_lr010_leaf31_l2_0",
