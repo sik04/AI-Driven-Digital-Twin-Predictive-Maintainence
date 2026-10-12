@@ -1,0 +1,36 @@
+{
+  "schema_version": "step07-base-model-summary-v1",
+  "dataset": "FD001",
+  "model_family": "LSTM",
+  "selected_configuration_id": "lstm_h64_lr0010",
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "validation_uncapped_rmse": {
+    "mean": 29.89866897736845,
+    "std": 0.23036594416363493,
+    "min": 29.498924801165085,
+    "max": 30.105463431474366
+  },
+  "validation_uncapped_mae": {
+    "mean": 20.356054298937032,
+    "std": 0.2627891170955494,
+    "min": 19.86011450699512,
+    "max": 20.60937089855377
+  },
+  "validation_capped_rmse": {
+    "mean": 16.100528812860066,
+    "std": 0.41256455366424705,
+    "min": 15.338861664050016,
+    "max": 16.45893339011767
+  },
+  "training_duration_seconds": {
+    "mean": 172.58274255999987,
+    "std": 9.4735744860716
+  },
+  "note": "Development/validation results only. Not confirmatory test evidence. Seed variability does not constitute a confidence interval."
+}

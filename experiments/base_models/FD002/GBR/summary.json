@@ -1,0 +1,36 @@
+{
+  "schema_version": "step07-base-model-summary-v1",
+  "dataset": "FD002",
+  "model_family": "GBR",
+  "selected_configuration_id": "gbr_lr010_leaf31_l2_0",
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "validation_uncapped_rmse": {
+    "mean": 34.66132808744305,
+    "std": 0.0,
+    "min": 34.66132808744305,
+    "max": 34.66132808744305
+  },
+  "validation_uncapped_mae": {
+    "mean": 23.271014666540303,
+    "std": 0.0,
+    "min": 23.271014666540303,
+    "max": 23.271014666540303
+  },
+  "validation_capped_rmse": {
+    "mean": 17.267404271510625,
+    "std": 0.0,
+    "min": 17.267404271510625,
+    "max": 17.267404271510625
+  },
+  "training_duration_seconds": {
+    "mean": 152.29475678,
+    "std": 24.250190073184655
+  },
+  "note": "Development/validation results only. Not confirmatory test evidence. Seed variability does not constitute a confidence interval."
+}
