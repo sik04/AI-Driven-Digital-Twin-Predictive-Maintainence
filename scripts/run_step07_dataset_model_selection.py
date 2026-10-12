@@ -11,6 +11,7 @@ Executes the frozen Step 7.3 / Step 7.4 / ADR-019 model-selection procedure:
 """
 
 import argparse
+import json
 import platform
 import subprocess
 import time
@@ -101,7 +102,11 @@ def check_git_status() -> tuple[str, bool]:
     return commit_sha, False
 
 
-def run_dataset_model_selection(dataset_name: str, allow_dirty: bool = False) -> None:
+def run_dataset_model_selection(
+    dataset_name: str,
+    allow_dirty: bool = False,
+    resume: bool = True,
+) -> None:
     """Execute complete GBR and LSTM model selection for a given dataset."""
     if dataset_name not in DATASET_CONFIGS:
         raise ValueError(
@@ -220,6 +225,23 @@ def run_dataset_model_selection(dataset_name: str, allow_dirty: bool = False) ->
         seed_metrics_map: dict[int, ModelEvaluationMetrics] = {}
         for seed in SELECTION_SEEDS:
             run_id = f"{cfg.config_id}_seed{seed}"
+            ckpt_path = gbr_ckpts_dir / f"{run_id}.pkl"
+            pred_csv_path = gbr_preds_dir / f"{run_id}.csv"
+            run_json_path = gbr_runs_dir / f"{run_id}.json"
+
+            if resume and run_json_path.exists() and pred_csv_path.exists() and ckpt_path.exists():
+                print(f"Loading cached GBR candidate: {run_id} ...", end=" ", flush=True)
+                with open(run_json_path, encoding="utf-8") as f:
+                    cached_rec = json.load(f)
+                metrics = ModelEvaluationMetrics(
+                    uncapped_rmse=cached_rec["validation_uncapped_rmse"],
+                    uncapped_mae=cached_rec["validation_uncapped_mae"],
+                    capped_rmse=cached_rec["validation_capped_rmse"],
+                )
+                seed_metrics_map[seed] = metrics
+                print(f"cached | Val RMSE: {metrics.uncapped_rmse:.4f}")
+                continue
+
             print(f"Running GBR candidate: {run_id} ...", end=" ", flush=True)
 
             model = GBRModel(hyperparameters=cfg, run_seed=seed)
@@ -374,6 +396,23 @@ def run_dataset_model_selection(dataset_name: str, allow_dirty: bool = False) ->
         seed_metrics_map = {}
         for seed in SELECTION_SEEDS:
             run_id = f"{cfg_lstm.config_id}_seed{seed}"
+            ckpt_path = lstm_ckpts_dir / f"{run_id}.pt"
+            pred_csv_path = lstm_preds_dir / f"{run_id}.csv"
+            run_json_path = lstm_runs_dir / f"{run_id}.json"
+
+            if resume and run_json_path.exists() and pred_csv_path.exists() and ckpt_path.exists():
+                print(f"Loading cached LSTM candidate: {run_id} ...", end=" ", flush=True)
+                with open(run_json_path, encoding="utf-8") as f:
+                    cached_rec = json.load(f)
+                metrics = ModelEvaluationMetrics(
+                    uncapped_rmse=cached_rec["validation_uncapped_rmse"],
+                    uncapped_mae=cached_rec["validation_uncapped_mae"],
+                    capped_rmse=cached_rec["validation_capped_rmse"],
+                )
+                seed_metrics_map[seed] = metrics
+                print(f"cached | Val RMSE: {metrics.uncapped_rmse:.4f}")
+                continue
+
             print(f"Running LSTM candidate: {run_id} ...", end=" ", flush=True)
 
             res = train_lstm_candidate(
@@ -538,11 +577,20 @@ def main() -> None:
         action="store_true",
         help="Allow running with uncommitted changes (git_dirty recorded)",
     )
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Do not resume/skip already completed runs",
+    )
     args = parser.parse_args()
 
     datasets = ["FD001", "FD004"] if args.dataset == "ALL" else [args.dataset]
     for ds in datasets:
-        run_dataset_model_selection(ds, allow_dirty=args.allow_dirty)
+        run_dataset_model_selection(
+            ds,
+            allow_dirty=args.allow_dirty,
+            resume=not args.no_resume,
+        )
 
 
 if __name__ == "__main__":
