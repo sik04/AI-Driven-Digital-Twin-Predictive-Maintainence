@@ -237,6 +237,8 @@ def run_dataset_model_selection(
                     uncapped_rmse=cached_rec["validation_uncapped_rmse"],
                     uncapped_mae=cached_rec["validation_uncapped_mae"],
                     capped_rmse=cached_rec["validation_capped_rmse"],
+                    engine_count=val_engine_count,
+                    window_count=val_window_count,
                 )
                 seed_metrics_map[seed] = metrics
                 print(f"cached | Val RMSE: {metrics.uncapped_rmse:.4f}")
@@ -408,6 +410,8 @@ def run_dataset_model_selection(
                     uncapped_rmse=cached_rec["validation_uncapped_rmse"],
                     uncapped_mae=cached_rec["validation_uncapped_mae"],
                     capped_rmse=cached_rec["validation_capped_rmse"],
+                    engine_count=val_engine_count,
+                    window_count=val_window_count,
                 )
                 seed_metrics_map[seed] = metrics
                 print(f"cached | Val RMSE: {metrics.uncapped_rmse:.4f}")
