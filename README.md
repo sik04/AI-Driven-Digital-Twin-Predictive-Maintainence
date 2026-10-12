@@ -54,7 +54,8 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
   - Step 7.1 Specification: **LOCKED** (HistGradientBoostingRegressor and LSTM base predictor architectures, search grids, and validation-only selection criteria frozen in [`research/research_design/step07_base_predictor_specification.md`](research/research_design/step07_base_predictor_specification.md)).
   - Step 7.2 Data/Preprocessing/Window Pipeline: **COMPLETE** (Strict C-MAPSS data loader, frozen split validation, training-only preprocessors, K-means k=6 regime models, 30-cycle causal windows, equal-engine weights, and deterministic artifact persistence).
   - Step 7.3 FD002 Base-Model Implementation and Selection: **COMPLETE** (Implemented GBR and LSTM model architectures under ADR-019, executed frozen 24-run configuration-selection procedure on FD002 validation partition across seeds 2026 and 2027, froze winning configurations `gbr_lr010_leaf31_l2_0` and `lstm_h64_lr0010` with zero calibration/test data leakage).
-- **Step 7.4 Multi-Dataset/Five-Seed Final Base-Model Matrix**: **NEXT** (Repeat frozen selection procedure for FD001 and FD004, then train frozen winners across seeds 2026–2030 to generate the 30-model production matrix).
+  - Step 7.4 Multi-Dataset/Five-Seed Final Base-Model Matrix: **COMPLETE** (Executed 24-run validation selection for FD001 and FD004 freezing dataset winners; trained complete 30-model matrix across official seeds 2026–2030; all 30 checkpoints verified on CPU; zero calibration/test data leakage).
+- **Step 7.5 Independent Audit, Registry, and Formal Freeze**: **NEXT** (Execute independent 30-model audit, construct authoritative model registry, perform seed-2026 reproducibility verification, publish freeze documentation and ADR-020).
 
 
 

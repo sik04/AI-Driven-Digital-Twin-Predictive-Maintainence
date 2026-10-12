@@ -1,0 +1,309 @@
+{
+  "schema_version": "step07-selection-v1",
+  "dataset": "FD004",
+  "model_family": "GBR",
+  "selection_seeds": [
+    2026,
+    2027
+  ],
+  "selection_metric": "equal-engine-weighted uncapped-RUL RMSE",
+  "training_target": "min(rul_true,125)",
+  "calibration_data_used": false,
+  "test_data_used": false,
+  "preprocessing_artifact_sha256": "fdfa4c0284c38554f8b8026c27c71f56ebd9c157a47f9acd2baf9ae34cbe0502",
+  "git_commit": "61c01a788ad97186a2762e3b611d968b02141f91",
+  "selected_configuration_id": "gbr_lr010_leaf31_l2_0",
+  "selected_configuration": {
+    "config_id": "gbr_lr010_leaf31_l2_0",
+    "learning_rate": 0.1,
+    "max_leaf_nodes": 31,
+    "l2_regularization": 0.0,
+    "loss": "squared_error",
+    "early_stopping": false,
+    "validation_fraction": null,
+    "min_samples_leaf": 20,
+    "max_bins": 255,
+    "max_features": 1.0,
+    "categorical_features": null,
+    "warm_start": false,
+    "max_iter": 300
+  },
+  "selection_score": 48.82832148677692,
+  "selected_worst_seed_rmse": 48.82832148677692,
+  "tie_detected": false,
+  "tie_break_rule_used": null,
+  "candidate_configurations": [
+    {
+      "configuration_id": "gbr_lr005_leaf15_l2_0",
+      "hyperparameters": {
+        "config_id": "gbr_lr005_leaf15_l2_0",
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 15,
+        "l2_regularization": 0.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.40062279633298,
+        "uncapped_mae": 32.343725482466155,
+        "capped_rmse": 16.35260824041012,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.40062279633298,
+        "uncapped_mae": 32.343725482466155,
+        "capped_rmse": 16.35260824041012,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.40062279633298,
+      "worst_seed_rmse": 49.40062279633298
+    },
+    {
+      "configuration_id": "gbr_lr005_leaf15_l2_1",
+      "hyperparameters": {
+        "config_id": "gbr_lr005_leaf15_l2_1",
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 15,
+        "l2_regularization": 1.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.3682785075288,
+        "uncapped_mae": 32.299279806921135,
+        "capped_rmse": 16.26448849073662,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.3682785075288,
+        "uncapped_mae": 32.299279806921135,
+        "capped_rmse": 16.26448849073662,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.3682785075288,
+      "worst_seed_rmse": 49.3682785075288
+    },
+    {
+      "configuration_id": "gbr_lr005_leaf31_l2_0",
+      "hyperparameters": {
+        "config_id": "gbr_lr005_leaf31_l2_0",
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 0.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.08455619194385,
+        "uncapped_mae": 32.176083871186535,
+        "capped_rmse": 16.340639175476397,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.08455619194385,
+        "uncapped_mae": 32.176083871186535,
+        "capped_rmse": 16.340639175476397,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.08455619194385,
+      "worst_seed_rmse": 49.08455619194385
+    },
+    {
+      "configuration_id": "gbr_lr005_leaf31_l2_1",
+      "hyperparameters": {
+        "config_id": "gbr_lr005_leaf31_l2_1",
+        "learning_rate": 0.05,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 1.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.080389920180636,
+        "uncapped_mae": 32.20414712398463,
+        "capped_rmse": 16.348003527192745,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.080389920180636,
+        "uncapped_mae": 32.20414712398463,
+        "capped_rmse": 16.348003527192745,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.080389920180636,
+      "worst_seed_rmse": 49.080389920180636
+    },
+    {
+      "configuration_id": "gbr_lr010_leaf15_l2_0",
+      "hyperparameters": {
+        "config_id": "gbr_lr010_leaf15_l2_0",
+        "learning_rate": 0.1,
+        "max_leaf_nodes": 15,
+        "l2_regularization": 0.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.13382525745875,
+        "uncapped_mae": 32.19985318959641,
+        "capped_rmse": 16.421984373030675,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.13382525745875,
+        "uncapped_mae": 32.19985318959641,
+        "capped_rmse": 16.421984373030675,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.13382525745875,
+      "worst_seed_rmse": 49.13382525745875
+    },
+    {
+      "configuration_id": "gbr_lr010_leaf15_l2_1",
+      "hyperparameters": {
+        "config_id": "gbr_lr010_leaf15_l2_1",
+        "learning_rate": 0.1,
+        "max_leaf_nodes": 15,
+        "l2_regularization": 1.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 49.1000523586516,
+        "uncapped_mae": 32.171049478182205,
+        "capped_rmse": 16.36421598712408,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 49.1000523586516,
+        "uncapped_mae": 32.171049478182205,
+        "capped_rmse": 16.36421598712408,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 49.1000523586516,
+      "worst_seed_rmse": 49.1000523586516
+    },
+    {
+      "configuration_id": "gbr_lr010_leaf31_l2_0",
+      "hyperparameters": {
+        "config_id": "gbr_lr010_leaf31_l2_0",
+        "learning_rate": 0.1,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 0.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 48.82832148677692,
+        "uncapped_mae": 31.95590776821716,
+        "capped_rmse": 16.29765028474753,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 48.82832148677692,
+        "uncapped_mae": 31.95590776821716,
+        "capped_rmse": 16.29765028474753,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 48.82832148677692,
+      "worst_seed_rmse": 48.82832148677692
+    },
+    {
+      "configuration_id": "gbr_lr010_leaf31_l2_1",
+      "hyperparameters": {
+        "config_id": "gbr_lr010_leaf31_l2_1",
+        "learning_rate": 0.1,
+        "max_leaf_nodes": 31,
+        "l2_regularization": 1.0,
+        "loss": "squared_error",
+        "early_stopping": false,
+        "validation_fraction": null,
+        "min_samples_leaf": 20,
+        "max_bins": 255,
+        "max_features": 1.0,
+        "categorical_features": null,
+        "warm_start": false,
+        "max_iter": 300
+      },
+      "seed_2026": {
+        "uncapped_rmse": 48.83199863896148,
+        "uncapped_mae": 32.0307041039597,
+        "capped_rmse": 16.426824366684862,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "seed_2027": {
+        "uncapped_rmse": 48.83199863896148,
+        "uncapped_mae": 32.0307041039597,
+        "capped_rmse": 16.426824366684862,
+        "engine_count": 25,
+        "window_count": 5201
+      },
+      "mean_selection_score": 48.83199863896148,
+      "worst_seed_rmse": 48.83199863896148
+    }
+  ]
+}
