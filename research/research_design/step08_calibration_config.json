@@ -1,0 +1,60 @@
+{
+  "schema_version": "step08-config-v1",
+  "protocol_version": "step08-v1",
+  "datasets": ["FD001", "FD002", "FD004"],
+  "model_families": ["GBR", "LSTM"],
+  "model_seeds": [2026, 2027, 2028, 2029, 2030],
+  "nominal_coverage_levels": [0.80, 0.90, 0.95],
+  "coverage_fractions": {
+    "0.80": {"numerator": 4, "denominator": 5},
+    "0.90": {"numerator": 9, "denominator": 10},
+    "0.95": {"numerator": 19, "denominator": 20}
+  },
+  "methods": [
+    "global_hcp",
+    "regime_hcp",
+    "decision_aware_hcp"
+  ],
+  "candidates": [
+    {"candidate_id": "gamma0_beta0", "gamma": 0, "beta_code": 0, "beta_val": 0.0},
+    {"candidate_id": "gamma0_betam1", "gamma": 0, "beta_code": -1, "beta_val": -0.6931471805599453},
+    {"candidate_id": "gamma0_betap1", "gamma": 0, "beta_code": 1, "beta_val": 0.6931471805599453},
+    {"candidate_id": "gamma1_beta0", "gamma": 1, "beta_code": 0, "beta_val": 0.0},
+    {"candidate_id": "gamma1_betam1", "gamma": 1, "beta_code": -1, "beta_val": -0.6931471805599453},
+    {"candidate_id": "gamma1_betap1", "gamma": 1, "beta_code": 1, "beta_val": 0.6931471805599453},
+    {"candidate_id": "gamma2_beta0", "gamma": 2, "beta_code": 0, "beta_val": 0.0},
+    {"candidate_id": "gamma2_betam1", "gamma": 2, "beta_code": -1, "beta_val": -0.6931471805599453},
+    {"candidate_id": "gamma2_betap1", "gamma": 2, "beta_code": 1, "beta_val": 0.6931471805599453}
+  ],
+  "reference_scales": {
+    "sigma_scale": 125.0,
+    "z_scale": 20.0
+  },
+  "maintenance_policy": {
+    "policy_id": "lower_bound_one_cycle_policy",
+    "threshold_rul": 1.0,
+    "scenario": "primary_reference",
+    "c_pm": 1.0,
+    "c_fail": 5.0,
+    "c_waste": 0.20,
+    "eval_cycles": {"min_cycle": 30, "max_cycle_offset": -1}
+  },
+  "support_thresholds": {
+    "final_min_engines_regime": {
+      "0.80": 10,
+      "0.90": 10,
+      "0.95": 19
+    },
+    "development_min_other_engines": 10,
+    "regime_eligibility_min_validation_engines": 10
+  },
+  "selection_filters": {
+    "min_marginal_picp": 0.85,
+    "max_marginal_picp": 0.95,
+    "min_regime_picp": 0.85,
+    "max_regime_picp": 0.95,
+    "max_mpiw_inflation": 1.0,
+    "max_is_inflation": 1.0,
+    "cost_tie_tolerance": 1e-8
+  }
+}

@@ -4,7 +4,7 @@
 > **Authors**: Mayank Singh, Shiksha Pandey, Ruchi Gupta  
 > **Protocol Reference**: `step06-v2` / ADR-018 / ADR-019  
 > **Scientific Role**: Supporting Point-RUL Base Predictors  
-> **Implementation Scope**: Step 7.2 data pipeline implemented. GBR/LSTM training and selection remain pending Step 7.3.
+> **Implementation Scope**: Base predictor implementation, model selection, matrix training, and formal freeze completed under ADR-019 and ADR-020 (Step 7 Complete).
 
 ---
 
@@ -218,6 +218,6 @@ torch.use_deterministic_algorithms(True, warn_only=True)
 
 ## 8. Boundary Constraints
 
-- **Implementation Status**: Step 7.2 data pipeline implemented. GBR/LSTM training and selection remain pending Step 7.3.
-- No GBR or LSTM model training has started.
-- All 30 model artifacts will be trained and evaluated under the frozen specification in Step 7.3+.
+- **Implementation Status**: GBR and LSTM base predictors, 24-run model selection, 30-model production matrix, and independent verification are COMPLETE and immutably frozen under ADR-020.
+- All 30 model artifacts are registered in `experiments/base_models/model_registry.json`.
+- Base predictor parameters, architectures, and weights are strictly frozen and may not be altered by downstream calibration or simulation steps.

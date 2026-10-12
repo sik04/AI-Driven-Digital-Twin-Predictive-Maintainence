@@ -56,25 +56,29 @@ The 30 production models were evaluated across the 5 official seeds (`2026`–`2
 | **FD004** | **LSTM** | `lstm_h64_lr0010` | 48.6663 ± 0.3569 | 31.6923 ± 0.1823 | 17.1145 ± 0.5379 | 374.44 ± 39.67 s |
 
 ### Key Methodological Observations
-1. **Deterministic GBR**: Across all seeds and datasets, GBR exhibits zero seed variance ($\sigma_{\text{RMSE}} = 0.0000$) due to deterministic HistGradientBoosting implementation without subsampling (`subsample=1.0`).
-2. **Stable LSTM Convergence**: Across 5 independent seed runs with early stopping on validation uncapped RMSE, LSTM models exhibit tight standard deviations ($\sigma \le 0.36$ cycles across all datasets).
-3. **Complexity Scaling**: Single-condition FD001 models achieved uncapped RMSE around 28–30 cycles; 6-regime FD002 achieved ~34–35 cycles; complex 2-fault FD004 achieved ~48 cycles, aligning directly with degradation complexity.
+1. **Deterministic GBR Outputs**: Across all seeds and datasets, GBR models produce identical outputs ($\sigma_{\text{RMSE}} = 0.0000$) under the frozen configuration and deterministic implementation.
+2. **Stable LSTM Convergence**: Across 5 independent seed runs with early stopping on validation uncapped RMSE, LSTM models exhibit standard deviations $\sigma \le 0.36$ cycles across all datasets.
+3. **Empirical Performance Levels**: Uncapped validation RMSE was observed at ~28–30 cycles for FD001, ~34–35 cycles for FD002, and ~48 cycles for FD004 across both predictor families.
 
 ---
 
-## 4. Reproducibility Audit Results
+## 4. Audit Evidence
 
-A representative reproducibility audit (`scripts/run_step07_reproducibility_audit.py`) was executed on the official `seed_2026` models for all 6 cells from scratch. The audit confirmed:
-- **GBR Models**: Exact numerical prediction equivalence within float precision tolerance:
+### 4.1 Historical Seed-2026 Training Rerun Audit
+A representative historical reproducibility check (`scripts/run_step07_reproducibility_audit.py`) was executed for the 6 official `seed_2026` cells from scratch:
+- **GBR Models**: Verified numerical prediction agreement within float precision tolerance against saved checkpoints:
   - FD001 GBR: max absolute prediction difference = $4.998 \times 10^{-7}$ cycles ($\ll 10^{-4}$ tolerance).
   - FD002 GBR: max absolute prediction difference = $4.999 \times 10^{-7}$ cycles ($\ll 10^{-4}$ tolerance).
   - FD004 GBR: max absolute prediction difference = $4.999 \times 10^{-7}$ cycles ($\ll 10^{-4}$ tolerance).
-- **LSTM Models**: Exact metric convergence to saved production checkpoint:
+- **LSTM Models**: Verified validation RMSE agreement within the pre-specified 0.05 cycle threshold against saved checkpoints:
   - FD001 LSTM: saved RMSE = 30.1055, audit rerun RMSE = 30.1055 ($\Delta = 0.0000 \le 0.05$).
   - FD002 LSTM: saved RMSE = 35.1934, audit rerun RMSE = 35.1934 ($\Delta = 0.0000 \le 0.05$).
   - FD004 LSTM: saved RMSE = 48.3554, audit rerun RMSE = 48.3554 ($\Delta = 0.0000 \le 0.05$).
 
-All audit results are preserved in `experiments/base_models/reproducibility_audit_seed_2026.json`.
+*Note: This historical check confirmed GBR prediction agreement and LSTM RMSE convergence for seed 2026 only; it did not claim that all 30 production models were independently retrained or that LSTM predictions were identical across arbitrary rerun environments.*
+
+### 4.2 Comprehensive 30-Model Checkpoint-to-Prediction Reproduction Audit
+The authoritative registry audit (`scripts/audit_step07_base_models.py --reproduce-predictions`) performs checkpoint-to-prediction reproduction across all 30 production models by loading frozen checkpoints and recomputing validation predictions and metrics from raw data without refitting preprocessors. Results are recorded under `experiments/audits/step07_prediction_reproduction.json`.
 
 ---
 
@@ -107,6 +111,6 @@ y_pred = frozen_model.predict(X_calib)
 ```
 
 ### Consumption Rules for Step 8:
-- **Calibration Phase**: Step 8 will evaluate `frozen_model.predict(X_calib)` on reserved calibration engines to compute nonconformity scores $\alpha_i = |y_i - \hat{y}_i|$.
-- **Inference Phase**: Step 8 will evaluate `frozen_model.predict(X_test)` to construct calibrated prediction intervals $[\hat{y} - q_{1-\alpha}, \hat{y} + q_{1-\alpha}]$ truncated at zero.
-- **No Backpropagation**: Under no circumstances will calibration errors or nonconformity scores propagate back into base-model parameter adjustments.
+- **Specification Governance**: Step 8 calibration methodology, nonconformity score functions, hierarchical quantiles, and fallback mechanisms are formally governed by [`research/research_design/step08_calibration_specification.md`](step08_calibration_specification.md) and ADR-021.
+- **Data Role Enforcement**: Step 8 evaluates `frozen_model.predict(X_calib)` on reserved calibration engines to fit conformal thresholds, and `frozen_model.predict(X_val)` for validation development diagnostics.
+- **No Backpropagation**: Calibration nonconformity scores, thresholds, or interval metrics must never propagate back to modify base-model parameters, architectures, or selections.

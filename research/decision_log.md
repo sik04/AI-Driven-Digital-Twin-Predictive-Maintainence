@@ -617,18 +617,50 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Phase 6 / Step 8 Conformal Calibration specification and development.
 
+---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+### ADR-021: Engine-Weighted Decision-Aware Calibration Specification and Development Boundary
+- **Date**: 2026-10-12
+- **Status**: Accepted (Specification frozen; execution pending)
+- **Protocol Identifier**: `step08-v1`
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-issued implementation instruction specifying the complete Step 8 conformal calibration methodology, validation candidate selection protocol, selection-freeze gate, and final calibration execution.
+- **Context and Motivation**:
+  - Following the formal freeze and independent verification of the 30 base predictors in Step 7 (ADR-020), Phase 6 / Step 8 requires an authoritative specification for conformal uncertainty quantification.
+  - Standard split conformal prediction assumes i.i.d. observations. C-MAPSS data consists of sequential, autocorrelated run-to-failure trajectories clustered by engine, with unequal trajectory lengths.
+  - Downstream predictive maintenance requires prediction intervals whose coverage and asymmetric width reflect sequential decision trade-offs (penalizing late maintenance more severely than early maintenance).
+  - To prevent data leakage and p-hacking, calibration candidates must be evaluated and selected strictly on validation data before freezing and fitting final calibration thresholds on the reserved calibration partition.
+- **Alternatives Considered**:
+  1. *Unweighted window-level conformal prediction*: Rejected. Engines with longer trajectories dominate the calibration pool, violating equal engine representation and distorting coverage across engine populations.
+  2. *Unconstrained neural calibration networks / arbitrary hyperparameter tuning*: Rejected. Introduces substantial risk of overfitting, high compute complexity, and opaque parameter selection without theoretical guarantees.
+  3. *Engine-weighted hierarchical conformal calibration with prespecified asymmetric scaling grid (Selected Approach)*: Adopted. Combines hierarchical conformal quantile estimation (Lee, Barber, & Willett 2023) with a prespecified 9-candidate parameter grid modulating interval width and asymmetry via point predictions.
+- **Decisions**:
+  1. **Three Conformal Methods**:
+     - `global_hcp`: Global engine-weighted hierarchical conformal baseline using absolute residuals $s = |y - p|$.
+     - `regime_hcp`: Condition-aware hierarchical conformal baseline fitting separate thresholds per operating regime with global fallback.
+     - `decision_aware_hcp`: Proposed asymmetric decision-aware method modulating scale $\sigma(p) = (1 + p/125)^\gamma$ and asymmetry $z(p) = \exp(-p/20)$, $a(p) = \sigma(p)\exp(\beta z(p))$, $b(p) = \sigma(p)\exp(-\beta z(p))$.
+  2. **Prespecified Nine-Candidate Grid**:
+     - $\gamma \in \{0, 1, 2\}$, $\beta_{\text{code}} \in \{-1, 0, 1\}$, $\beta = \beta_{\text{code}} \ln(2)$.
+     - Identity candidate `gamma0_beta0` exactly reproduces `regime_hcp`.
+  3. **Exact Engine-Weighted Quantiles**:
+     - Each contributing engine receives equal mass $\frac{1}{m}$.
+     - Validation development uses empirical CDF $F_{\text{dev}}(q) = \frac{1}{m} \sum_i \frac{\sum_t \mathbb{I}(s_{it} \le q)}{n_i}$.
+     - Final calibration uses hierarchical finite-score mass $F_{\text{final}}(q) = \frac{1}{m+1} \sum_i \frac{\sum_t \mathbb{I}(s_{it} \le q)}{n_i}$ with mass $\frac{1}{m+1}$ at $+\infty$.
+     - Quantile boundaries verified using exact rational arithmetic (`fractions.Fraction`).
+  4. **Fallback and Support Rules**:
+     - Final regime thresholds require $m_g \ge \max(10, \lceil 1/\alpha \rceil - 1)$ (10 engines for 80%/90%, 19 engines for 95%). Otherwise route to global fallback.
+     - Infinite global thresholds trigger `InsufficientCalibrationSupport` rejection.
+  5. **Validation-Only Selection & Selection Freeze Gate**:
+     - Leave-one-engine-out cross-validation diagnostics across all 5 seeds under `primary_reference` cost scenario and `lower_bound_one_cycle_policy`.
+     - Feasibility filters: $0.85 \le \text{PICP} \le 0.95$ (marginal and per eligible regime), $\Delta \text{MPIW} \le 1.0$, $\Delta \text{IS} \le 1.0$, failure rate $\le \min(\text{global}, \text{regime})$.
+     - Minimize mean maintenance cost with deterministic tie-breaking.
+     - Selection freeze manifest must be committed to Git prior to running final calibration.
+  6. **Data Boundaries and Scientific Claims**:
+     - Validation predictions/labels only for development selection; calibration partition only for final fitting.
+     - Zero access to held-out test engines or official test files.
+     - No claims of i.i.d. exchangeability across time, cycle-wise coverage, or zero failure risk.
+- **Expected Implications**:
+  - Implements the complete uncertainty quantification pipeline across all 30 base predictors (90 calibrator bundles; 270 coverage configs).
+  - Prepares the calibrated models for Phase 7 / Step 9 confirmatory maintenance evaluation.
+- **Follow-up Review Date / Trigger**:
+  - Completion of Step 8 final calibration fitting and independent verification audit.

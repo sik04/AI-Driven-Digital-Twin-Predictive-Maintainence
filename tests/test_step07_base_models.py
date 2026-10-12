@@ -4,9 +4,11 @@ Verifies:
 1. model_registry.json structure, completeness (30 entries), and schema invariants.
 2. load_frozen_base_model function for GBR and LSTM with sha256 integrity enforcement.
 3. Tamper detection (fails on checkpoint or preprocessor hash mismatch).
-4. FrozenBaseModel inference consistency and non-negative truncation.
+4. FrozenBaseModel inference consistency, non-negative truncation, and robust input validation.
 5. base_predictor_validation_summary.csv match with summary.json files.
-6. Full audit_base_model_registry pass.
+6. Full audit_base_model_registry pass in load-only mode (reporting NOT RUN).
+7. Permission of legitimate experiments/calibration/ directory.
+8. Prediction reproduction audit on real data (marked integration).
 """
 
 import json
@@ -119,6 +121,47 @@ def test_load_frozen_base_model_lstm() -> None:
     assert np.all(preds_flat >= 0.0)
 
 
+def test_frozen_base_model_predict_input_validation() -> None:
+    """Verify FrozenBaseModel.predict rejects invalid inputs, geometry, NaN, and Inf."""
+    model_obj = load_frozen_base_model(dataset="FD001", model_family="GBR", seed=2026)
+
+    # Rejection of non-numpy array
+    with pytest.raises(TypeError, match="numpy ndarray"):
+        model_obj.predict([[1.0] * 510])  # type: ignore[arg-type]
+
+    # Rejection of non-numeric array
+    with pytest.raises(TypeError, match="numeric"):
+        model_obj.predict(np.array([["str"] * 510]))
+
+    # Rejection of NaN
+    bad_x = np.ones((2, 510))
+    bad_x[0, 5] = np.nan
+    with pytest.raises(ValueError, match="NaN or infinite"):
+        model_obj.predict(bad_x)
+
+    # Rejection of Inf
+    bad_x = np.ones((2, 510))
+    bad_x[1, 10] = np.inf
+    with pytest.raises(ValueError, match="NaN or infinite"):
+        model_obj.predict(bad_x)
+
+    # Rejection of wrong 2D dimension
+    with pytest.raises(ValueError, match="shape"):
+        model_obj.predict(np.ones((2, 509)))
+
+    # Rejection of wrong 3D dimension
+    with pytest.raises(ValueError, match="shape"):
+        model_obj.predict(np.ones((2, 31, 17)))
+    with pytest.raises(ValueError, match="shape"):
+        model_obj.predict(np.ones((2, 30, 16)))
+
+    # Rejection of 1D or 4D array
+    with pytest.raises(ValueError, match="2D or 3D"):
+        model_obj.predict(np.ones(510))
+    with pytest.raises(ValueError, match="2D or 3D"):
+        model_obj.predict(np.ones((1, 2, 30, 17)))
+
+
 def test_load_frozen_base_model_rejection_and_tampering(tmp_path: Path) -> None:
     """Verify loader rejects invalid cell queries and tampered artifacts."""
     # Query non-existent seed
@@ -192,8 +235,45 @@ def test_validation_summary_table_exactness() -> None:
         assert np.isclose(row["capped_rmse_std"], sum_data["validation_capped_rmse"]["std"])
 
 
-def test_full_registry_audit_pass() -> None:
-    """Verify that audit_base_model_registry passes completely."""
-    res = audit_base_model_registry(reload_checkpoints=True)
+def test_full_registry_audit_load_only_mode() -> None:
+    """Verify that audit_base_model_registry in load-only mode explicitly reports NOT RUN."""
+    res = audit_base_model_registry(reload_checkpoints=True, reproduce_predictions=False)
     assert res["status"] == "PASS"
     assert res["models_audited"] == 30
+    assert res["checkpoint_integrity"] == "PASS"
+    assert res["prediction_reproduction"] == "NOT RUN"
+    assert res["reproduction_details"] is None
+
+
+def test_isolation_permits_legitimate_calibration_folder(tmp_path: Path) -> None:
+    """Verify audit permits legitimate experiments/calibration outputs without false positives."""
+    calib_dummy = Path("experiments/calibration/dummy_test_allowed.txt")
+    calib_dummy.parent.mkdir(parents=True, exist_ok=True)
+    calib_dummy.write_text("dummy calibration output", encoding="utf-8")
+    try:
+        res = audit_base_model_registry(reload_checkpoints=False, reproduce_predictions=False)
+        assert res["status"] == "PASS"
+    finally:
+        if calib_dummy.exists():
+            calib_dummy.unlink()
+
+
+@pytest.mark.integration
+def test_full_registry_audit_reproduce_predictions_mode() -> None:
+    """Verify that full raw-data prediction reproduction mode passes on official NASA data."""
+    raw_dir = Path("data/raw/cmapss")
+    for ds in ("FD001", "FD002", "FD004"):
+        if not (raw_dir / f"train_{ds}.txt").exists():
+            pytest.skip(f"Raw data file train_{ds}.txt not available")
+
+    res = audit_base_model_registry(
+        reload_checkpoints=True,
+        reproduce_predictions=True,
+        raw_data_dir=raw_dir,
+    )
+    assert res["status"] == "PASS"
+    assert res["models_audited"] == 30
+    assert res["checkpoint_integrity"] == "PASS"
+    assert res["prediction_reproduction"] == "PASS"
+    assert res["reproduction_details"] is not None
+    assert len(res["reproduction_details"]) == 30
