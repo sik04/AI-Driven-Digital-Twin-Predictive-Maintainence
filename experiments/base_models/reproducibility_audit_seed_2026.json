@@ -1,0 +1,47 @@
+{
+  "FD001": {
+    "gbr": {
+      "config_id": "gbr_lr010_leaf15_l2_0",
+      "max_abs_diff": 4.998170481940178e-07,
+      "mean_abs_diff": 2.448865259023586e-07,
+      "status": "PASS"
+    },
+    "lstm": {
+      "config_id": "lstm_h64_lr0010",
+      "saved_rmse": 30.105463431474366,
+      "rerun_rmse": 30.105463431474366,
+      "rmse_diff": 0.0,
+      "status": "PASS"
+    }
+  },
+  "FD002": {
+    "gbr": {
+      "config_id": "gbr_lr010_leaf31_l2_0",
+      "max_abs_diff": 4.99894085237429e-07,
+      "mean_abs_diff": 2.458811934351719e-07,
+      "status": "PASS"
+    },
+    "lstm": {
+      "config_id": "lstm_h64_lr0010",
+      "saved_rmse": 35.193381228583526,
+      "rerun_rmse": 35.193381228583526,
+      "rmse_diff": 0.0,
+      "status": "PASS"
+    }
+  },
+  "FD004": {
+    "gbr": {
+      "config_id": "gbr_lr010_leaf31_l2_0",
+      "max_abs_diff": 4.999380607273451e-07,
+      "mean_abs_diff": 2.5052910248221155e-07,
+      "status": "PASS"
+    },
+    "lstm": {
+      "config_id": "lstm_h64_lr0010",
+      "saved_rmse": 48.35541598699652,
+      "rerun_rmse": 48.35541598699652,
+      "rmse_diff": 0.0,
+      "status": "PASS"
+    }
+  }
+}
