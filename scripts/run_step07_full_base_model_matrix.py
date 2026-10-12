@@ -177,6 +177,7 @@ def load_winning_lstm_configuration(dataset: str) -> LSTMHyperparameters:
 def train_production_matrix(
     target_datasets: list[str] | None = None,
     allow_dirty: bool = False,
+    resume: bool = True,
 ) -> None:
     """Train all 30 production models across datasets and seeds."""
     datasets_to_run = target_datasets or list(DATASETS)
@@ -270,6 +271,57 @@ def train_production_matrix(
         for seed in OFFICIAL_SEEDS:
             seed_dir = BASE_MODELS_ROOT / dataset_name / "GBR" / f"seed_{seed}"
             seed_dir.mkdir(parents=True, exist_ok=True)
+            ckpt_path = seed_dir / "checkpoint"
+            meta_path = seed_dir / "metadata.json"
+            metrics_path = seed_dir / "metrics.json"
+            pred_path = seed_dir / "validation_predictions.csv"
+
+            if (
+                resume
+                and ckpt_path.exists()
+                and meta_path.exists()
+                and metrics_path.exists()
+                and pred_path.exists()
+            ):
+                print(
+                    f"  Verifying existing {dataset_name} GBR seed {seed} ...", end=" ", flush=True
+                )
+                with open(metrics_path, encoding="utf-8") as f:
+                    m_data = json.load(f)
+                with open(meta_path, encoding="utf-8") as f:
+                    meta_data = json.load(f)
+                metrics = ModelEvaluationMetrics(
+                    uncapped_rmse=m_data["uncapped_rmse"],
+                    uncapped_mae=m_data["uncapped_mae"],
+                    capped_rmse=m_data["capped_rmse"],
+                    engine_count=val_engine_count,
+                    window_count=val_window_count,
+                )
+                gbr_seed_metrics[seed] = metrics
+                gbr_seed_durations[seed] = meta_data.get("training_duration_seconds", 0.0)
+
+                # Verify reload
+                reloaded_gbr = GBRModel.load(str(ckpt_path))
+                reloaded_preds = reloaded_gbr.predict(X_val_gbr)
+                df_existing = pd.read_csv(pred_path)
+                if not np.allclose(reloaded_preds, df_existing["prediction"].to_numpy(), atol=1e-5):
+                    raise RuntimeError(
+                        f"Reload prediction mismatch for existing {dataset_name} GBR seed {seed}"
+                    )
+
+                print(f"verified | Val RMSE: {metrics.uncapped_rmse:.4f}")
+                total_models_trained += 1
+                all_models_verification.append(
+                    {
+                        "dataset": dataset_name,
+                        "family": "GBR",
+                        "seed": seed,
+                        "ckpt_sha": compute_sha256(ckpt_path),
+                        "reload_verified": True,
+                    }
+                )
+                continue
+
             print(f"  Training {dataset_name} GBR seed {seed} ...", end=" ", flush=True)
 
             model = GBRModel(hyperparameters=gbr_cfg, run_seed=seed)
@@ -437,6 +489,61 @@ def train_production_matrix(
         for seed in OFFICIAL_SEEDS:
             seed_dir = BASE_MODELS_ROOT / dataset_name / "LSTM" / f"seed_{seed}"
             seed_dir.mkdir(parents=True, exist_ok=True)
+            ckpt_path = seed_dir / "checkpoint"
+            meta_path = seed_dir / "metadata.json"
+            metrics_path = seed_dir / "metrics.json"
+            pred_path = seed_dir / "validation_predictions.csv"
+
+            if (
+                resume
+                and ckpt_path.exists()
+                and meta_path.exists()
+                and metrics_path.exists()
+                and pred_path.exists()
+            ):
+                print(
+                    f"  Verifying existing {dataset_name} LSTM seed {seed} ...", end=" ", flush=True
+                )
+                with open(metrics_path, encoding="utf-8") as f:
+                    m_data = json.load(f)
+                with open(meta_path, encoding="utf-8") as f:
+                    meta_data = json.load(f)
+                metrics = ModelEvaluationMetrics(
+                    uncapped_rmse=m_data["uncapped_rmse"],
+                    uncapped_mae=m_data["uncapped_mae"],
+                    capped_rmse=m_data["capped_rmse"],
+                    engine_count=val_engine_count,
+                    window_count=val_window_count,
+                )
+                lstm_seed_metrics[seed] = metrics
+                lstm_seed_durations[seed] = meta_data.get("training_duration_seconds", 0.0)
+
+                # Verify reload
+                reloaded_model, _ = load_lstm_checkpoint(ckpt_path, device="cpu")
+                reloaded_model.eval()
+                with torch.no_grad():
+                    tensor_val = torch.from_numpy(X_val_lstm).float()
+                    raw_reloaded = reloaded_model(tensor_val).cpu().numpy()
+                    reloaded_preds = np.maximum(0.0, raw_reloaded)
+                df_existing = pd.read_csv(pred_path)
+                if not np.allclose(reloaded_preds, df_existing["prediction"].to_numpy(), atol=1e-5):
+                    raise RuntimeError(
+                        f"Reload prediction mismatch for existing {dataset_name} LSTM seed {seed}"
+                    )
+
+                print(f"verified | Val RMSE: {metrics.uncapped_rmse:.4f}")
+                total_models_trained += 1
+                all_models_verification.append(
+                    {
+                        "dataset": dataset_name,
+                        "family": "LSTM",
+                        "seed": seed,
+                        "ckpt_sha": compute_sha256(ckpt_path),
+                        "reload_verified": True,
+                    }
+                )
+                continue
+
             print(f"  Training {dataset_name} LSTM seed {seed} ...", end=" ", flush=True)
 
             res = train_lstm_candidate(
@@ -625,9 +732,18 @@ def main() -> None:
         action="store_true",
         help="Allow running with uncommitted changes",
     )
+    parser.add_argument(
+        "--no-resume",
+        action="store_true",
+        help="Do not resume/skip already completed runs",
+    )
     args = parser.parse_args()
 
-    train_production_matrix(target_datasets=args.datasets, allow_dirty=args.allow_dirty)
+    train_production_matrix(
+        target_datasets=args.datasets,
+        allow_dirty=args.allow_dirty,
+        resume=not args.no_resume,
+    )
 
 
 if __name__ == "__main__":
