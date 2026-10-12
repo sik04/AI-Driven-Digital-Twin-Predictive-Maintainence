@@ -1,0 +1,43 @@
+{
+  "candidate_parameters": {
+    "beta": -0.6931471805599453,
+    "beta_code": -1,
+    "gamma": 2
+  },
+  "dataset": "FD002",
+  "eval_timestamp_utc": "2026-10-12T12:35:39.046979+00:00",
+  "git_commit": "d25d0fa5f50377ddf90e039be3a01da6067c1972",
+  "git_dirty": false,
+  "model_family": "LSTM",
+  "protocol_version": "step08-v1",
+  "schema_version": "step08-selection-v1",
+  "selected_candidate_id": "gamma2_betam1",
+  "selection_status": "feasible_optimal",
+  "tie_breaking_log": [
+    {
+      "event": "evaluated_feasible",
+      "feasible_count": 8,
+      "min_cost": 4.584615384615384,
+      "tied_candidates": [
+        "gamma2_betam1"
+      ],
+      "tied_count": 1
+    }
+  ],
+  "winning_metrics": {
+    "failure_rate": 0.0,
+    "interval_score": 149.67657149095203,
+    "marginal_picp": 0.8983361585687839,
+    "mean_cost": 4.584615384615384,
+    "mpiw": 93.84388730934528,
+    "regime_picp": {
+      "C1": 0.8982345655644643,
+      "C2": 0.8978206059860919,
+      "C3": 0.8982531675389295,
+      "C4": 0.8986318110582641,
+      "C5": 0.8972509861897187,
+      "C6": 0.8974810608370116
+    },
+    "total_failures": 0
+  }
+}
