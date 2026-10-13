@@ -18,6 +18,12 @@ from intellitwin.provenance import (
 )
 from intellitwin.uncertainty.artifacts import resolve_repo_relative_path
 
+AUDIT_IGNORED_PATHS = [
+    "experiments/audits/step08_repair_verification.json",
+    "experiments/confirmatory_development/protocol_freeze.json",
+    "experiments/confirmatory_development/pretest_audit.json",
+]
+
 
 def build_protocol_freeze(
     base_dir: Path | str = ".",
@@ -25,7 +31,10 @@ def build_protocol_freeze(
 ) -> dict[str, Any]:
     """Assemble all binding cryptographic hashes and specifications for protocol_freeze.json."""
     base = Path(base_dir).resolve()
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty)
+    git_sha, git_dirty = get_git_info(
+        allow_dirty=allow_dirty,
+        ignored_paths=AUDIT_IGNORED_PATHS,
+    )
     env_meta = capture_environment_metadata()
 
     # 1. Confirmatory protocol config
@@ -135,7 +144,10 @@ def run_pretest_audit(
 ) -> dict[str, Any]:
     """Execute pre-test audit verifying all freeze gates and anti-leakage barriers."""
     base = Path(base_dir).resolve()
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty)
+    git_sha, git_dirty = get_git_info(
+        allow_dirty=allow_dirty,
+        ignored_paths=AUDIT_IGNORED_PATHS,
+    )
 
     checks: dict[str, Any] = {}
 

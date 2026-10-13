@@ -40,7 +40,10 @@ def run_step08_audit(
     base = Path(base_dir).resolve()
 
     # Provenance tracking at entry
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty)
+    git_sha, git_dirty = get_git_info(
+        allow_dirty=allow_dirty,
+        ignored_paths=["experiments/audits/step08_repair_verification.json"],
+    )
     env_meta = capture_environment_metadata()
 
     results: dict[str, Any] = {

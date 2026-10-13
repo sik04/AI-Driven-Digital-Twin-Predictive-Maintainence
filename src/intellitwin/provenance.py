@@ -21,13 +21,18 @@ import yaml
 from intellitwin.data.artifacts import compute_sha256
 
 
-def get_git_info(allow_dirty: bool = False) -> tuple[str, bool]:
+def get_git_info(
+    allow_dirty: bool = False,
+    ignored_paths: Sequence[str] | None = None,
+) -> tuple[str, bool]:
     """Retrieve git HEAD commit SHA and porcelain dirty status.
 
     Parameters
     ----------
     allow_dirty : bool
         If False, raises RuntimeError when working tree is dirty or Git is unavailable.
+    ignored_paths : Sequence[str], optional
+        Paths (e.g. self-generated audit outputs) that should not trigger dirty status.
 
     Returns
     -------
@@ -51,14 +56,30 @@ def get_git_info(allow_dirty: bool = False) -> tuple[str, bool]:
             text=True,
             check=True,
         )
-        status = status_proc.stdout.strip()
-        dirty = len(status) > 0
+        raw_lines = [line.strip() for line in status_proc.stdout.splitlines() if line.strip()]
+
+        if ignored_paths:
+            norm_ignored = {Path(p).as_posix() for p in ignored_paths}
+            filtered_lines: list[str] = []
+            for line in raw_lines:
+                parts = line.split(maxsplit=1)
+                if len(parts) == 2:
+                    file_p = Path(parts[1]).as_posix()
+                    if file_p in norm_ignored:
+                        continue
+                filtered_lines.append(line)
+            status_lines = filtered_lines
+        else:
+            status_lines = raw_lines
+
+        dirty = len(status_lines) > 0
     except (subprocess.CalledProcessError, FileNotFoundError) as exc:
         raise RuntimeError(f"Git inspection failed: {exc}") from exc
 
     if dirty and not allow_dirty:
+        dirty_summary = "\n".join(status_lines)
         raise RuntimeError(
-            f"Official execution refused on dirty working tree:\n{status}\n"
+            f"Official execution refused on dirty working tree:\n{dirty_summary}\n"
             "Working tree must be clean before running official tasks."
         )
 
