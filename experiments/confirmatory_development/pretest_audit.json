@@ -1,5 +1,5 @@
 {
-  "audit_timestamp_utc": "2026-10-13T18:34:18.979797+00:00",
+  "audit_timestamp_utc": "2026-10-13T19:04:56.878263+00:00",
   "gates": {
     "base_model_registry_present": true,
     "calibrator_count_is_90": true,
@@ -9,8 +9,8 @@
     "step08_repair_verification_present": true,
     "zero_test_artifacts": true
   },
-  "git_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
-  "git_dirty": true,
+  "git_commit": "7691f95712e77084024f8788762503cdaee169e6",
+  "git_dirty": false,
   "held_out_execution_status": "NOT_STARTED",
   "overall_status": "PASS",
   "protocol_version": "step09-v1",

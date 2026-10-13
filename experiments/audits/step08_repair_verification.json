@@ -12,8 +12,7 @@
   "current_reconstruction": {
     "environment": {
       "command_args": [
-        "scripts/audit_step08_calibration.py",
-        "--allow-dirty"
+        "scripts/audit_step08_calibration.py"
       ],
       "device": "cpu",
       "packages": {
@@ -25,10 +24,10 @@
       },
       "platform": "Windows-10-10.0.19045-SP0",
       "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-      "timestamp_utc": "2026-10-13T18:30:36.706975+00:00"
+      "timestamp_utc": "2026-10-13T18:56:09.983301+00:00"
     },
-    "git_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
-    "git_dirty": true
+    "git_commit": "7691f95712e77084024f8788762503cdaee169e6",
+    "git_dirty": false
   },
   "details": {
     "isolation": {
