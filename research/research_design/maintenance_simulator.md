@@ -294,5 +294,13 @@ Under these frozen positive-waste-cost scenarios, an idealized oracle with perfe
 ### 15.4 Corrected Interpretation of Validation Pilot
 In the deterministic validation pilot (`scripts/run_step06_simulator_validation.py`), the PERFECT fixture maintains at five remaining cycles because its fixture policy uses `lower_rul <= 5.0`. It demonstrates **correct trigger execution** under oracle predictions, **not** cost-optimal intervention timing.
 
+### 15.5 Step 8 Benchmark Maintenance Policy: `lower_bound_one_cycle_policy`
+In Step 8 (ADR-021), a standardized benchmark policy is introduced in `src/intellitwin/decision/policies.py`:
+- **Policy Rule**: Trigger `MAINTAIN_NOW` if and only if $\hat{L}(i, t) \le 1.0$; otherwise `CONTINUE`.
+- **Operational Window**: Active exclusively during cycles $t \in [30, T-1]$.
+- **Episode Termination**: Episode terminates immediately following `MAINTAIN_NOW`.
+- **Information Isolation**: Reads only the calibrated lower bound $\hat{L}(i, t)$; strictly prohibited from inspecting true RUL, failure cycle $T$, lifecycle stage, or future telemetry.
+- **Role**: Serves as a prespecified development benchmark policy to evaluate sequential decision utility during candidate selection under `primary_reference` costs, not as a proven cost-optimal or safety-guaranteed policy.
+
 
 

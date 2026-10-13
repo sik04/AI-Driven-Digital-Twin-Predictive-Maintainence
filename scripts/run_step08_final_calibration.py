@@ -166,7 +166,10 @@ def main() -> None:
     reg_path = Path("experiments/base_models/model_registry.json")
     with open(reg_path, encoding="utf-8") as f:
         registry_data = json.load(f)
-    reg_entries = {e["model_id"]: e for e in registry_data["entries"]}
+    registry_list = (
+        registry_data if isinstance(registry_data, list) else registry_data.get("entries", [])
+    )
+    reg_entries = {e["model_id"]: e for e in registry_list}
 
     source_hashes = {
         "calibration_py": compute_sha256(Path("src/intellitwin/uncertainty/calibration.py")),
@@ -418,7 +421,7 @@ def main() -> None:
                         "selected_candidate_id": winning_cand.candidate_id
                         if method_id == METHOD_DECISION_AWARE
                         else None,
-                        "calibrator_artifact_path": str(art_path.relative_to(Path("."))),
+                        "calibrator_artifact_path": art_path.relative_to(Path(".")).as_posix(),
                         "artifact_sha256": art_hash,
                         "checkpoint_sha256": ckpt_hash,
                         "preprocessor_sha256": prep_hash,

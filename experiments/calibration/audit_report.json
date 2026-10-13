@@ -1,0 +1,58 @@
+{
+  "schema_version": "step08-audit-report-v1",
+  "protocol_version": "step08-v1",
+  "audit_timestamp_utc": "2026-10-12T18:32:49.712130+00:00",
+  "status": "PASS",
+  "git_commit": "1ba34208b442e9824b653a67eff1046535c7859c",
+  "git_dirty": true,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "package_versions": {
+    "python": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6"
+  },
+  "results": {
+    "artifact_integrity": "PASS",
+    "selection_reconstruction": "PASS",
+    "threshold_reconstruction": "PASS",
+    "validation_metric_reconstruction": "PASS",
+    "data_isolation": "PASS",
+    "checkpoint_prediction_reproduction": "PASS",
+    "details": {
+      "selection_reconstruction": {
+        "FD001_GBR": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        },
+        "FD001_LSTM": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        },
+        "FD002_GBR": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        },
+        "FD002_LSTM": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        },
+        "FD004_GBR": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        },
+        "FD004_LSTM": {
+          "frozen_winner": "gamma2_betam1",
+          "reconstructed_winner": "gamma2_betam1",
+          "status": "MATCH"
+        }
+      },
+      "max_threshold_diff": 2.842170943040401e-14,
+      "max_metric_diff": 0.0
+    }
+  }
+}

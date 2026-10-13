@@ -1,0 +1,64 @@
+{
+  "dataset": "FD001",
+  "eval_timestamp_utc": "2026-10-12T16:51:51.418410+00:00",
+  "method_id": "global_hcp",
+  "metrics": {
+    "coverage_80": {
+      "fallback_fraction": 0.0,
+      "interval_score": 111.16206220375607,
+      "lifecycle_stage_picp": {
+        "early": 0.6432262293253006,
+        "late": 0.9781083142639208,
+        "mid": 0.9526570048309179
+      },
+      "lower_miss_rate": 0.01371438959279624,
+      "marginal_picp": 0.8886111962423188,
+      "mpiw": 88.18712973498894,
+      "nominal_coverage": 0.8,
+      "regime_picp": {
+        "C1": 0.8886111962423188
+      },
+      "upper_miss_rate": 0.09767441416488498
+    },
+    "coverage_90": {
+      "fallback_fraction": 0.0,
+      "interval_score": 162.3435271907944,
+      "lifecycle_stage_picp": {
+        "early": 0.9333333333333332,
+        "late": 1.0,
+        "mid": 1.0
+      },
+      "lower_miss_rate": 0.0,
+      "marginal_picp": 0.982995951417004,
+      "mpiw": 155.31744720212168,
+      "nominal_coverage": 0.9,
+      "regime_picp": {
+        "C1": 0.982995951417004
+      },
+      "upper_miss_rate": 0.01700404858299595
+    },
+    "coverage_95": {
+      "fallback_fraction": 0.0,
+      "interval_score": 237.4448230944544,
+      "lifecycle_stage_picp": {
+        "early": 1.0,
+        "late": 1.0,
+        "mid": 1.0
+      },
+      "lower_miss_rate": 0.0,
+      "marginal_picp": 1.0,
+      "mpiw": 237.4448230944544,
+      "nominal_coverage": 0.95,
+      "regime_picp": {
+        "C1": 1.0
+      },
+      "upper_miss_rate": 0.0
+    }
+  },
+  "model_family": "LSTM",
+  "notice": "POST-SELECTION DEVELOPMENT DIAGNOSTICS ONLY \u2014 NOT CONFIRMATORY EVIDENCE",
+  "protocol_version": "step08-v1",
+  "schema_version": "step08-validation-metrics-v1",
+  "seed": 2026,
+  "selected_candidate_id": null
+}

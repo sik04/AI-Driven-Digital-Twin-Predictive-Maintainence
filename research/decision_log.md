@@ -621,7 +621,7 @@ This log documents formal architectural, methodological, and research governance
 
 ### ADR-021: Engine-Weighted Decision-Aware Calibration Specification and Development Boundary
 - **Date**: 2026-10-12
-- **Status**: Accepted (Specification frozen; execution pending)
+- **Status**: Accepted (Executed and Independently Audited; Confirmatory Evaluation Pending)
 - **Protocol Identifier**: `step08-v1`
 - **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
 - **Approval Basis**: Researcher-issued implementation instruction specifying the complete Step 8 conformal calibration methodology, validation candidate selection protocol, selection-freeze gate, and final calibration execution.

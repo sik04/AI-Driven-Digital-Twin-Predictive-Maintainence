@@ -91,10 +91,11 @@ This document establishes the high-level mapping between the formal research que
 - Missing-group conservative bound propagation
 - Model training seed list `[2026, 2027, 2028, 2029, 2030]`
 
-### Genuine Methodological Deferrals (Step 7+)
-The following items belong to their existing later development steps and are intentionally deferred:
-- Step 7 base model neural network and tree architectures, loss functions, and hyperparameters
-- Conformal calibration algorithms, nonconformity functions, and conditional binning
-- Deployable maintenance policy design, threshold tuning, and action mapping
-- Matched-conservatism parameterization algorithms (Experiment C)
-- Implementation of the future evaluation runner software
+### Resolved in Step 7 and Step 8 (ADR-020, ADR-021)
+- **Step 7 Base Models**: Frozen 30-model production matrix across FD001, FD002, FD004, GBR and LSTM, seeds 2026–2030 (ADR-020).
+- **Step 8 Conformal Calibration**: Engine-weighted hierarchical conformal calibration with asymmetric score scaling ($\gamma=2, \beta=-\ln(2)$), regime adaptation, and exact rational quantile thresholds across 90 bundles / 270 coverage configurations (ADR-021).
+- **Benchmark Maintenance Policy**: `lower_bound_one_cycle_policy` (`lower_rul <= 1.0` during cycles $30 \le t \le T-1$).
+
+### Remaining Deferrals Prior to Confirmatory Evaluation
+- Matched-conservatism parameterization algorithms and control grid freezing (Experiment C / RQ3) using validation data only.
+- Implementation and execution of the final confirmatory evaluation runner software on held-out test data.
