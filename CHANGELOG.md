@@ -8,7 +8,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Completed Step 7.5 independent audit, model registry, formal freeze, and Step 7 closure:
+- Completed Step 8 Decision-Aware Conformal Calibration and independent verification audit under ADR-021:
+  - Designed and implemented engine-weighted hierarchical conformal calibration modules in `src/intellitwin/uncertainty/` (`scores.py`, `quantiles.py`, `calibration.py`, `metrics.py`, `selection.py`, `artifacts.py`, `schema.py`).
+  - Implemented exact engine-weighted empirical and hierarchical quantiles with finite mass $F(q) = \frac{1}{m+1}\sum \frac{\text{count}}{n_i}$, mass $\frac{1}{m+1}$ at $+\infty$, and exact boundary verification via `fractions.Fraction`.
+  - Implemented three conformal methods: `global_hcp`, `regime_hcp`, and proposed `decision_aware_hcp` with prespecified 9-candidate parameter grid ($\gamma \in \{0, 1, 2\}$, $\beta_{\text{code}} \in \{-1, 0, 1\}$).
+  - Implemented named benchmark maintenance policy `lower_bound_one_cycle_policy` (`src/intellitwin/decision/policies.py`) operating during cycles $30 \le t \le T-1$ under `primary_reference` cost scenario.
+  - Implemented strict calibration data pipeline (`src/intellitwin/data/calibration_pipeline.py`) strictly permitting only validation and calibration partitions while raising `ForbiddenPartitionAccessError` on test partitions.
+  - Executed validation-only leave-one-engine-out candidate development (`scripts/run_step08_development.py`) across all 6 cells and 5 seeds, selecting `gamma2_betam1` as `feasible_optimal` across all cells with zero fallback required.
+  - Created and committed authoritative selection freeze manifest in `experiments/calibration/selection/selection_freeze.json`.
+  - Executed final calibration fitting (`scripts/run_step08_final_calibration.py`) on reserved calibration partition across all 30 base predictors, producing 90 calibrator bundles and 270 coverage configurations registered in `experiments/calibration/calibration_registry.json`.
+  - Generated consolidated validation diagnostics in `experiments/calibration/validation_summary.csv`.
+  - Implemented and executed independent audit suite (`scripts/audit_step08_calibration.py`), verifying artifact integrity, candidate selection reconstruction, threshold numerical reconstruction (max diff $2.84 \times 10^{-14}$), validation metric reconstruction, data isolation, and raw-data checkpoint prediction reproduction (recorded in `experiments/calibration/audit_report.json`).
+  - Authored comprehensive Step 8 specification, freeze checklist, and completion reports in `research/research_design/step08_calibration_specification.md`, `step08_freeze_checklist.md`, and `step08_calibration_completion.md`.
+  - Appended and accepted ADR-021 in `research/decision_log.md`.
+  - Added scholarly citations for Lee et al. (arXiv:2306.06342v4) and Cortes-Gomez et al. (ICLR 2025) in `paper/references.bib`.
+
+### Fixed
+- Corrected Step 7 base predictor verification and documentation:
+  - Extended `src/intellitwin/models/registry.py` and `scripts/audit_step07_base_models.py` with `--reproduce-predictions` to re-transform raw validation data and verify prediction reproduction across all 30 frozen models (max diff $\le 5.0 \times 10^{-7} \ll 10^{-4}$ cycles; recorded in `experiments/audits/step07_prediction_reproduction.json`).
+  - Strengthened `FrozenBaseModel.predict` with strict input geometry and type assertions ($(M, 510)$ or $(M, 30, 17)$, finite floats only, preserving non-negative truncation and C-order flattening).
+  - Repaired documentation in `step07_full_base_model_matrix_completion.md` where FD004 GBR capped RMSE was corrected from 22.7538 to verified 16.2977.
+  - Replaced crude filename substring scans with partition role verification, permitting legitimate calibration artifacts under `experiments/calibration/`.
   - Constructed authoritative 30-model registry in `experiments/base_models/model_registry.json` tracking model IDs, file paths, SHA-256 hashes, preprocessor hashes, split manifest hashes, and git commit provenance.
   - Implemented immutable base predictor loading interface `load_frozen_base_model` and `FrozenBaseModel` wrapper with automatic runtime SHA-256 integrity verification and non-negative prediction post-processing.
   - Authored and verified independent audit suite (`scripts/audit_step07_base_models.py`) verifying all 30 models match disk artifacts, produce non-negative predictions, reproduce validation predictions, and preserve zero calibration/test data leakage.

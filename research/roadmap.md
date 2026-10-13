@@ -140,19 +140,26 @@ This document outlines the master research and development roadmap for the Intel
 
 ---
 
-### Phase 6: Decision-Aware Conformal Calibration Development
-- **Status**: Planned
-- **Objective**: Design, implement, and calibrate the proposed decision-aware, condition-adaptive conformal calibration method applied on top of the frozen GBR and LSTM base predictors. Scientific novelty is centered on calibration reliability and downstream sequential maintenance utility, not point-predictor architecture.
+### Phase 6: Decision-Aware Conformal Calibration Development (Step 8)
+- **Status**: Completed (Step 8 Complete: 90 calibrator bundles and 270 coverage configurations fitted on calibration partition, independently audited, and verified; confirmatory evaluation pending)
+- **Objective**: Design, implement, calibrate, and verify engine-weighted hierarchical conformal calibration methods applied strictly on top of the 30 frozen GBR and LSTM base predictors. Scientific novelty is centered on calibration reliability and downstream sequential maintenance utility under prespecified comparisons, not point-predictor architecture.
 - **Expected Deliverables**:
-  - Proposed conformal calibration source code under `src/intellitwin/uncertainty/` with strict type hints and docstrings.
-  - Calibration scripts operating exclusively on reserved calibration engines.
-  - Verified experiment records comparing proposed calibration against global conformal and standard condition-aware calibration baselines.
+  - Proposed conformal calibration source code under `src/intellitwin/uncertainty/` with strict type hints, schemas, and docstrings.
+  - Decision support module under `src/intellitwin/decision/` (`lower_bound_one_cycle_policy`).
+  - Validation-only candidate selection pipeline (`scripts/run_step08_development.py`) and committed selection freeze manifest (`experiments/calibration/selection/selection_freeze.json`).
+  - Calibration scripts operating exclusively on reserved calibration engines (`scripts/run_step08_final_calibration.py`).
+  - Independent audit suite (`scripts/audit_step08_calibration.py`) verifying artifact integrity, selection reconstruction, threshold reconstruction, and prediction reproduction (`experiments/calibration/audit_report.json`).
+  - 90 fitted calibrator bundles across 270 coverage configurations registered in `experiments/calibration/calibration_registry.json`.
 - **Acceptance Criteria**:
-  - Reproducible calibration pipeline with deterministic seed behavior.
-  - Prediction intervals achieve target nominal coverage (90% primary, 80% and 95% secondary).
+  - Reproducible calibration pipeline with deterministic seed behavior and exact engine-weighted quantiles.
+  - Successful implementation does not require obtaining favorable coverage or maintenance improvements. Observed performance must be reported, including unfavorable outcomes.
+  - Do not mark any RQ scientifically supported from Step 8 development data.
+  - Preserve the Step 6 confirmatory numerical criteria; do not silently replace them with development feasibility filters.
+  - Step 8 is marked complete only because real calibration artifacts and required audit evidence exist.
   - Base predictor weights and parameters remain strictly frozen.
+  - Next step after completion: Freeze matched-conservatism controls and the complete confirmatory experiment execution plan before any held-out evaluation.
 - **Dependencies**: Phase 5.
-- **Research Observations to Record**: Calibration error across operating regimes, interval width distributions, and nonconformity scoring dynamics.
+- **Research Observations to Record**: Selected candidate `gamma2_betam1` across all 6 cells (`feasible_optimal`). Full regime support ($m_g \ge 19$) achieved on final calibration across FD001, FD002, and FD004 with zero fallback triggers in final bundles. Post-selection validation diagnostics recorded in `validation_summary.csv`. Confirmatory evaluation on held-out test partition remains strictly pending.
 
 ---
 

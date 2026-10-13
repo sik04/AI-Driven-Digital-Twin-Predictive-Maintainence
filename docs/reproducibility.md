@@ -84,4 +84,12 @@ To guarantee verifiable code provenance across platforms regardless of git line-
 This ensures identical source code checked out on Windows and Linux produces the exact same cryptographic hash.
 Raw data files (`.txt`) and JSON split manifests use exact binary byte SHA-256 hashes without line-ending normalization.
 
+---
 
+## 6. Hierarchical Conformal Calibration Reproduction Protocol (Step 8)
+
+For conformal calibration reproducibility under `step08-v1`:
+1. **Engine-Weighted Non-Interpolated Quantiles**: Each contributing engine receives equal total probability mass ($1/m$). Window-count weighting and numpy percentile interpolation are strictly prohibited.
+2. **Exact Rational Threshold Verification**: Floating-point threshold candidate boundaries are verified via exact rational arithmetic using `fractions.Fraction`.
+3. **Selection Freeze Gate**: Calibration candidate parameters are selected strictly on validation engines and frozen in Git before final calibrators are fitted on calibration engines.
+4. **Independent Audit Script**: `scripts/audit_step08_calibration.py` independently verifies registry artifact hashes, reconstructs selection winners, refits numerical thresholds from prediction caches, and reproduces point predictions directly from frozen model checkpoints.

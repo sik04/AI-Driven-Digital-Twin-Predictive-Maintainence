@@ -1,0 +1,86 @@
+{
+  "candidate_parameters": {
+    "beta": null,
+    "beta_code": null,
+    "gamma": null
+  },
+  "dataset": "FD001",
+  "method_id": "global_hcp",
+  "model_family": "GBR",
+  "model_seed": 2028,
+  "protocol_version": "step08-v1",
+  "provenance": {
+    "calibration_prediction_cache_sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+    "checkpoint_sha256": "ee36b46ac0061dea40efe5a31247c0aae864971fd2b390bdd8c1a27fa68e4216",
+    "git_commit": "1ba34208b442e9824b653a67eff1046535c7859c",
+    "preprocessor_sha256": "6f88491a46e2a0b5f8955df85a71e991f1cffc600c5e8becb713a1520b1e1c0a",
+    "raw_dataset_sha256": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+    "selection_freeze_sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0",
+    "source_hashes": {
+      "calibration_py": "da2f74cce4a01dc938285f6aacfda118ed0dd26366ab9c3158b8097fe962a1b5",
+      "metrics_py": "f88c52caaad1bb244b1cfd5bbe23e3bcc4fb0e52d5d838bd5202f330955bdb37",
+      "quantiles_py": "d42aaa11bb762b0ddd3ee1d775786e2d045fdf3adb489ff06e1967799ac842fc",
+      "runner_py": "2a1dc132d0e9b1d5613d206970df6e11f4d774ce035e8794824129face7d16a5",
+      "scores_py": "2fa64d5b7c7ccacd65fbf84fe5863c5916d06b1b8aca74f4f13cc1b323c6be22"
+    },
+    "split_manifest_sha256": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56"
+  },
+  "quantile_definition": "engine-weighted hierarchical non-interpolated quantile with mass 1/(m+1) at infinity",
+  "schema_version": "step08-calibrator-v1",
+  "score_definition": "abs(y - p)",
+  "selected_candidate_id": null,
+  "target_definition": "rul_true (uncapped remaining useful life)",
+  "threshold_bundles": {
+    "coverage_80": {
+      "coverage_fraction": "4/5",
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "global_threshold": 43.11497655647469,
+      "nominal_coverage": 0.8,
+      "regime_thresholds": {
+        "C1": {
+          "fallback_reason": null,
+          "fallback_used": false,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "regime": "C1",
+          "threshold": 43.11497655647469
+        }
+      }
+    },
+    "coverage_90": {
+      "coverage_fraction": "9/10",
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "global_threshold": 84.21779661453843,
+      "nominal_coverage": 0.9,
+      "regime_thresholds": {
+        "C1": {
+          "fallback_reason": null,
+          "fallback_used": false,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "regime": "C1",
+          "threshold": 84.21779661453843
+        }
+      }
+    },
+    "coverage_95": {
+      "coverage_fraction": "19/20",
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "global_threshold": 155.46134374158115,
+      "nominal_coverage": 0.95,
+      "regime_thresholds": {
+        "C1": {
+          "fallback_reason": null,
+          "fallback_used": false,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "regime": "C1",
+          "threshold": 155.46134374158115
+        }
+      }
+    }
+  }
+}

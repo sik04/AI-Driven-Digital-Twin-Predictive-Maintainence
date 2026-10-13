@@ -34,12 +34,14 @@ research = [
     "pandas>=2.0.0",
     "scikit-learn>=1.2.0",
     "torch>=2.2",
+    "PyYAML>=6,<7",
 ]
 dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "ruff>=0.1.0",
-    "mypy>=1.5.0"
+    "mypy>=1.5.0",
+    "types-PyYAML>=6",
 ]
 
 [tool.setuptools.packages.find]

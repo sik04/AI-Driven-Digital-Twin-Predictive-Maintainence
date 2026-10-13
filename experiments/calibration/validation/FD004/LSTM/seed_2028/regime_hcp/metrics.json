@@ -1,0 +1,79 @@
+{
+  "dataset": "FD004",
+  "eval_timestamp_utc": "2026-10-12T16:51:51.418410+00:00",
+  "method_id": "regime_hcp",
+  "metrics": {
+    "coverage_80": {
+      "fallback_fraction": 0.0,
+      "interval_score": 181.219965596208,
+      "lifecycle_stage_picp": {
+        "early": 0.48489661019397196,
+        "late": 0.9976470588235294,
+        "mid": 0.9041075190625943
+      },
+      "lower_miss_rate": 0.000975609756097561,
+      "marginal_picp": 0.833065906998272,
+      "mpiw": 108.14600630256012,
+      "nominal_coverage": 0.8,
+      "regime_picp": {
+        "C1": 0.8449296807391355,
+        "C2": 0.8483051241959099,
+        "C3": 0.8232783204913049,
+        "C4": 0.8310745443304239,
+        "C5": 0.831673976165376,
+        "C6": 0.827670023556899
+      },
+      "upper_miss_rate": 0.16595848324563042
+    },
+    "coverage_90": {
+      "fallback_fraction": 0.0,
+      "interval_score": 227.97357925919408,
+      "lifecycle_stage_picp": {
+        "early": 0.7884658265706606,
+        "late": 1.0,
+        "mid": 0.9938108427520193
+      },
+      "lower_miss_rate": 0.0,
+      "marginal_picp": 0.9412318191150092,
+      "mpiw": 184.69512714867912,
+      "nominal_coverage": 0.9,
+      "regime_picp": {
+        "C1": 0.9471002120302227,
+        "C2": 0.9327957240369499,
+        "C3": 0.9366224726169416,
+        "C4": 0.9430042656686343,
+        "C5": 0.9506671439989506,
+        "C6": 0.9388609028992186
+      },
+      "upper_miss_rate": 0.05876818088499074
+    },
+    "coverage_95": {
+      "fallback_fraction": 0.0,
+      "interval_score": 252.5141700528262,
+      "lifecycle_stage_picp": {
+        "early": 0.9257925157203695,
+        "late": 1.0,
+        "mid": 1.0
+      },
+      "lower_miss_rate": 0.0,
+      "marginal_picp": 0.9799389696967538,
+      "mpiw": 236.20237084051098,
+      "nominal_coverage": 0.95,
+      "regime_picp": {
+        "C1": 0.9815777434732896,
+        "C2": 0.9807207271520718,
+        "C3": 0.9774051187172371,
+        "C4": 0.9859030996463491,
+        "C5": 0.9804749253551739,
+        "C6": 0.9761214590582913
+      },
+      "upper_miss_rate": 0.020061030303246196
+    }
+  },
+  "model_family": "LSTM",
+  "notice": "POST-SELECTION DEVELOPMENT DIAGNOSTICS ONLY \u2014 NOT CONFIRMATORY EVIDENCE",
+  "protocol_version": "step08-v1",
+  "schema_version": "step08-validation-metrics-v1",
+  "seed": 2028,
+  "selected_candidate_id": null
+}

@@ -1,0 +1,38 @@
+{
+  "candidate_parameters": {
+    "beta": -0.6931471805599453,
+    "beta_code": -1,
+    "gamma": 2
+  },
+  "dataset": "FD001",
+  "eval_timestamp_utc": "2026-10-12T12:35:39.046979+00:00",
+  "git_commit": "d25d0fa5f50377ddf90e039be3a01da6067c1972",
+  "git_dirty": false,
+  "model_family": "GBR",
+  "protocol_version": "step08-v1",
+  "schema_version": "step08-selection-v1",
+  "selected_candidate_id": "gamma2_betam1",
+  "selection_status": "feasible_optimal",
+  "tie_breaking_log": [
+    {
+      "event": "evaluated_feasible",
+      "feasible_count": 8,
+      "min_cost": 3.4400000000000004,
+      "tied_candidates": [
+        "gamma2_betam1"
+      ],
+      "tied_count": 1
+    }
+  ],
+  "winning_metrics": {
+    "failure_rate": 0.0,
+    "interval_score": 113.78075232425624,
+    "marginal_picp": 0.8975045508438553,
+    "mean_cost": 3.4400000000000004,
+    "mpiw": 75.05844429373411,
+    "regime_picp": {
+      "C1": 0.8975045508438553
+    },
+    "total_failures": 0
+  }
+}
