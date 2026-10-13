@@ -90,6 +90,8 @@ class FrozenBaseModel:
         if not np.all(np.isfinite(X)):
             raise ValueError("X contains NaN or infinite values")
 
+        X_seq: np.ndarray[Any, Any]
+        X_flat: np.ndarray[Any, Any]
         if X.ndim == 2:
             if X.shape[1] != 510:
                 raise ValueError(f"2D input must have shape (M, 510), got {X.shape}")

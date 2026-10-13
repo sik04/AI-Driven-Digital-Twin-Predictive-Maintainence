@@ -8,11 +8,11 @@ import numpy as np
 
 
 def compute_observation_interval_score(
-    lower: np.ndarray,
-    upper: np.ndarray,
-    labels: np.ndarray,
+    lower: np.ndarray[Any, Any],
+    upper: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
     alpha: float = 0.10,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """Compute central interval score for each observation.
 
     Formula:
@@ -33,12 +33,12 @@ def compute_observation_interval_score(
 
 
 def compute_engine_weighted_interval_metrics(
-    engine_ids: np.ndarray,
-    endpoint_cycles: np.ndarray,
-    labels: np.ndarray,
-    lower: np.ndarray,
-    upper: np.ndarray,
-    regimes: np.ndarray | None = None,
+    engine_ids: np.ndarray[Any, Any],
+    endpoint_cycles: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
+    lower: np.ndarray[Any, Any],
+    upper: np.ndarray[Any, Any],
+    regimes: np.ndarray[Any, Any] | None = None,
     alpha: float = 0.10,
 ) -> dict[str, Any]:
     """Compute engine-weighted interval performance metrics.

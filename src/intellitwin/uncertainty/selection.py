@@ -218,18 +218,21 @@ def run_leave_one_engine_out_evaluation(
                     else None
                 )
 
+                ep_thresholds: np.ndarray[Any, Any]
                 if item_id == METHOD_GLOBAL:
                     ep_thresholds = np.full(len(test_preds), th_dict["global"], dtype=np.float64)
                     cand_for_invert = None
                 elif item_id == METHOD_REGIME:
                     ep_thresholds = np.array(
-                        [th_dict.get(f"regime_{r}", th_dict["global"]) for r in test_regimes]
+                        [th_dict.get(f"regime_{r}", th_dict["global"]) for r in test_regimes],
+                        dtype=np.float64,
                     )
                     cand_for_invert = None
                 else:
                     assert cand_obj is not None
                     ep_thresholds = np.array(
-                        [th_dict.get(f"regime_{r}", th_dict["global"]) for r in test_regimes]
+                        [th_dict.get(f"regime_{r}", th_dict["global"]) for r in test_regimes],
+                        dtype=np.float64,
                     )
                     cand_for_invert = cand_obj
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
@@ -61,10 +62,10 @@ class Calibrator:
 
     def predict_intervals(
         self,
-        predictions: np.ndarray,
-        regimes: Sequence[str] | np.ndarray,
+        predictions: np.ndarray[Any, Any],
+        regimes: Sequence[str] | np.ndarray[Any, Any],
         nominal_coverage: float,
-    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any]]:
         """Predict prediction intervals [lower, upper] and fallback flags.
 
         Parameters
@@ -146,11 +147,11 @@ class Calibrator:
 
 def fit_calibrator_bundle(
     method_id: str,
-    predictions: np.ndarray,
-    labels: np.ndarray,
-    regimes: np.ndarray,
-    engine_ids: np.ndarray,
-    endpoint_cycles: np.ndarray,
+    predictions: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
+    regimes: np.ndarray[Any, Any],
+    engine_ids: np.ndarray[Any, Any],
+    endpoint_cycles: np.ndarray[Any, Any],
     dataset_name: str,
     model_family: str,
     model_seed: int,

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 
 from intellitwin.uncertainty.schema import (
@@ -12,9 +14,9 @@ from intellitwin.uncertainty.schema import (
 
 
 def compute_absolute_residual_score(
-    predictions: np.ndarray,
-    labels: np.ndarray,
-) -> np.ndarray:
+    predictions: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
+) -> np.ndarray[Any, Any]:
     """Compute standard absolute residual score s = |y - p|.
 
     Parameters
@@ -47,10 +49,10 @@ def compute_absolute_residual_score(
 
 
 def compute_shape_factors(
-    predictions: np.ndarray,
+    predictions: np.ndarray[Any, Any],
     gamma: int,
     beta: float,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """Compute asymmetric scale and asymmetry factors a(p) and b(p).
 
     Equations:
@@ -101,10 +103,10 @@ def compute_shape_factors(
 
 
 def compute_decision_aware_score(
-    predictions: np.ndarray,
-    labels: np.ndarray,
+    predictions: np.ndarray[Any, Any],
+    labels: np.ndarray[Any, Any],
     candidate: CandidateConfig,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """Compute proposed decision-aware asymmetric nonconformity score.
 
     Score Equation:
@@ -151,10 +153,10 @@ def compute_decision_aware_score(
 
 
 def invert_score_to_interval(
-    predictions: np.ndarray,
-    threshold: float | np.ndarray,
+    predictions: np.ndarray[Any, Any],
+    threshold: float | np.ndarray[Any, Any],
     candidate: CandidateConfig | None = None,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """Invert nonconformity score threshold to prediction interval bounds [L, U].
 
     For standard residual score (candidate is None or identity):

@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from collections import defaultdict
 from fractions import Fraction
+from typing import Any
 
 import numpy as np
 
@@ -14,10 +15,10 @@ from intellitwin.uncertainty.schema import COVERAGE_FRACTIONS
 
 
 def _validate_inputs(
-    engine_ids: np.ndarray,
-    endpoint_cycles: np.ndarray,
-    scores: np.ndarray,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    engine_ids: np.ndarray[Any, Any],
+    endpoint_cycles: np.ndarray[Any, Any],
+    scores: np.ndarray[Any, Any],
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any]]:
     """Validate engine IDs, endpoint cycles, and score arrays."""
     eids = np.asarray(engine_ids)
     cycles = np.asarray(endpoint_cycles)
@@ -60,9 +61,9 @@ def _validate_inputs(
 
 
 def compute_engine_weighted_dev_quantile(
-    engine_ids: np.ndarray,
-    endpoint_cycles: np.ndarray,
-    scores: np.ndarray,
+    engine_ids: np.ndarray[Any, Any],
+    endpoint_cycles: np.ndarray[Any, Any],
+    scores: np.ndarray[Any, Any],
     nominal_coverage: float,
 ) -> float:
     """Compute engine-weighted development empirical quantile threshold.
@@ -151,9 +152,9 @@ def compute_engine_weighted_dev_quantile(
 
 
 def compute_engine_weighted_hierarchical_quantile(
-    engine_ids: np.ndarray,
-    endpoint_cycles: np.ndarray,
-    scores: np.ndarray,
+    engine_ids: np.ndarray[Any, Any],
+    endpoint_cycles: np.ndarray[Any, Any],
+    scores: np.ndarray[Any, Any],
     nominal_coverage: float,
 ) -> float:
     """Compute engine-weighted final hierarchical conformal quantile threshold.

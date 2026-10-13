@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pytest
 
@@ -21,7 +23,13 @@ def _create_synthetic_calibration_data(
     n_engines: int = 25,
     points_per_engine: int = 20,
     regimes: tuple[str, ...] = ("C1", "C2", "C3", "C4", "C5", "C6"),
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+    np.ndarray[Any, Any],
+]:
     """Create synthetic calibration data fixture."""
     rng = np.random.default_rng(2026)
     eids_list: list[int] = []
