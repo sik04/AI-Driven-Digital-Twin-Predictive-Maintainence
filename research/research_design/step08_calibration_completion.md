@@ -42,20 +42,30 @@ Candidate selection evaluated all 9 candidates plus baselines across all 5 seeds
 
 ### 3.1 Selected Winning Configurations
 
+*(Aggregation: five-seed average within engine, then equal engine mean across validation partition)*
+
 | Dataset | Family | Selected Candidate | $\gamma$ | $\beta_{\text{code}}$ | $\beta$ | Selection Status | Mean Cost (SCU) | Marg. PICP | MPIW | Failed Constraints |
 | :--- | :--- | :--- | :---: | :---: | :---: | :--- | :---: | :---: | :---: | :--- |
-| **FD001** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8318 | 0.8879 | 67.55 | None |
-| **FD001** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8385 | 0.8931 | 67.24 | None |
-| **FD002** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8028 | 0.8887 | 78.43 | None |
-| **FD002** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8239 | 0.8875 | 78.71 | None |
-| **FD004** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8155 | 0.8872 | 87.21 | None |
-| **FD004** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 1.8184 | 0.8885 | 87.05 | None |
+| **FD001** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 3.4400 | 0.8975 | 75.06 | None |
+| **FD001** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 3.6840 | 0.8968 | 79.10 | None |
+| **FD002** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 5.0000 | 0.8984 | 91.79 | None |
+| **FD002** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 4.5846 | 0.8983 | 93.84 | None |
+| **FD004** | **GBR** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 8.1600 | 0.8964 | 133.13 | None |
+| **FD004** | **LSTM** | `gamma2_betam1` | 2 | -1 | $-\ln(2)$ | `feasible_optimal` | 8.3488 | 0.8965 | 132.99 | None |
 
 ### 3.2 Key Selection Observations
 - All 6 cells selected **`gamma2_betam1`** as `feasible_optimal`. Zero cells required identity fallback (`gamma0_beta0`).
-- The negative $\beta$ code ($\beta = -\ln(2) \approx -0.6931$) expands lower bounds when point predictions are near the critical threshold ($z(p) = \exp(-p/20) \to 1$), providing conservative, protective coverage against late failure without excessively inflating upper bounds.
+- **Asymmetry Mechanics**:
+  $$a(p) = \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))$$
+  $$L = \max(0, p - q a(p)), \quad U = p + q b(p)$$
+  For $\beta < 0$, holding $p$, $q$, and $\gamma$ fixed:
+  - $a(p)$ decreases, so the lower subtraction distance $q a(p)$ decreases.
+  - $b(p)$ increases, so the upper addition distance $q b(p)$ increases.
+  - The lower bound $L$ rises or remains at zero after clipping.
+  - The upper bound $U$ rises.
+  Holding fixed parameters, this shifts interval mass upward; it does not by itself justify claiming earlier preventive maintenance or protection against late failure. In practice, refitted conformal quantiles $q$ interact with empirical residual distributions to determine final boundary locations and observed maintenance decisions.
 - Quadratic scale expansion ($\gamma = 2$) narrows intervals for low RUL while permitting broader intervals for distant, high-RUL regimes.
-- The selection records and freeze manifest were committed to Git at `1ba34208b442e9824b653a67eff1046535c7859c` (`experiments/calibration/selection/selection_freeze.json`).
+- The selection records and freeze manifest are preserved at Git commit `1ba34208b442e9824b653a67eff1046535c7859c` (`experiments/calibration/selection/selection_freeze.json`).
 
 ---
 
@@ -64,17 +74,16 @@ Candidate selection evaluated all 9 candidates plus baselines across all 5 seeds
 Final hierarchical conformal thresholds were fitted on the reserved calibration partition for all 90 bundles (3 datasets × 2 families × 5 seeds × 3 methods).
 
 ### 4.1 Calibration Engine Counts and Finite Mass Boundary
-- **FD001**: 20 calibration engines, 1 operating regime.
-  - Hierarchical mass denominator: $m + 1 = 21$.
-  - 80% coverage: requires $(20/21) \sum \ge 0.80$ ($\ge 17$ engines). Supported.
-  - 90% coverage: requires $(20/21) \sum \ge 0.90$ ($\ge 19$ engines). Supported.
-  - 95% coverage: requires $(20/21) \sum \ge 0.95$ ($\ge 20$ engines). Supported.
-- **FD002**: 52 calibration engines, 6 operating regimes.
-  - Global mass denominator: $m + 1 = 53$. All coverages (80%, 90%, 95%) supported.
-  - Per-regime engines: All 6 regimes contain 52 contributing calibration engines ($m_g = 52 \ge 19$). All regime thresholds are fully supported without fallback.
-- **FD004**: 50 calibration engines, 6 operating regimes.
-  - Global mass denominator: $m + 1 = 51$. All coverages supported.
-  - Per-regime engines: All 6 regimes contain 50 contributing calibration engines ($m_g = 50 \ge 19$). All regime thresholds are fully supported without fallback.
+- Global finite support requires $m / (m + 1) \ge \text{nominal coverage}$.
+- Minimum global calibration engine counts are:
+  - 80% coverage: $m \ge 4$ engines ($4/5 = 0.80$).
+  - 90% coverage: $m \ge 9$ engines ($9/10 = 0.90$).
+  - 95% coverage: $m \ge 19$ engines ($19/20 = 0.95$).
+- Regime routing additionally requires a frozen minimum support threshold of $m_g \ge 10$ distinct contributing calibration engines before fitting regime-specific quantiles (at 95%, $m_g \ge 19$ is required). These are counts of contributing calibration engines with valid endpoints, not counts of fully covered engines.
+- Actual calibration partition engine counts:
+  - **FD001**: 20 calibration engines, 1 operating regime. Fully supported at 80%, 90%, 95%.
+  - **FD002**: 52 calibration engines, 6 operating regimes. All 6 regimes contain 52 contributing calibration engines ($m_g = 52 \ge 19$). Fully supported.
+  - **FD004**: 50 calibration engines, 6 operating regimes. All 6 regimes contain 50 contributing calibration engines ($m_g = 50 \ge 19$). Fully supported.
 
 ### 4.2 Fallback Routing Counts
 - **Total Bundles**: 90.
@@ -86,6 +95,8 @@ Final hierarchical conformal thresholds were fitted on the reserved calibration 
 ## 5. Post-Selection Validation Diagnostics (Summary Table)
 
 The following metrics are development diagnostics evaluated on validation engines using final calibrators. They are **not** independent confirmatory test results.
+
+*(Table below presents Seed 2026 validation diagnostics as an illustrative individual seed; full 270-row consolidated five-seed metrics are preserved in `experiments/calibration/validation_summary.csv`)*
 
 | Dataset | Family | Method | Nominal Cov | Marg. PICP | MPIW (cycles) | Interval Score | Lower Miss | Upper Miss | Fallback Frac |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
@@ -111,30 +122,37 @@ The following metrics are development diagnostics evaluated on validation engine
 | **FD004** | **GBR** | `regime_hcp` | 0.90 | 0.9845 | 187.90 | 194.50 | 0.0000 | 0.0155 | 0.0 |
 | **FD004** | **GBR** | `regime_hcp` | 0.95 | 1.0000 | 296.72 | 296.72 | 0.0000 | 0.0000 | 0.0 |
 
+**Validation Overcoverage Diagnostic**:
+Validation coverage exceeds 95% due to finite-sample hierarchical quantile conservatism (the remaining $1/(m+1)$ mass is placed at $+\infty$). In accordance with research integrity decisions, the selected calibrators are preserved without post-hoc retuning. Development-set overcoverage will be tested against unobserved held-out data during confirmatory evaluation.
+
 *(Full 270-row consolidated table recorded in `experiments/calibration/validation_summary.csv`.)*
 
 ---
 
-## 6. Independent Verification Audit Results
+## 6. Verification and Provenance Audit Results
 
-The independent audit script `scripts/audit_step08_calibration.py` executed across all saved artifacts and verified:
+The updated Step 8 audit (`scripts/audit_step08_calibration.py`) executed clean reconstruction and verification:
 1. **Artifact Integrity**: PASS (all 90 calibrator JSON files load and match registered SHA-256 hashes).
-2. **Selection Reconstruction**: PASS (exact match of selected winner `gamma2_betam1` for all 6 cells from cached validation predictions).
-3. **Threshold Numerical Reconstruction**: PASS (re-fitted thresholds from calibration prediction caches matched saved artifacts with maximum absolute difference $\Delta = 2.84 \times 10^{-14} \le 1.0 \times 10^{-4}$).
-4. **Validation Metric Reconstruction**: PASS (recomputed validation interval metrics matched saved `metrics.json` with maximum difference $\Delta = 0.0$).
-5. **Data Isolation**: PASS (verified zero test engines or test predictions appear in any Step 8 artifact; verified split partition disjointness).
-6. **Checkpoint Prediction Reproduction**: PASS (re-executed inference of all 30 frozen models on raw calibration engines; matched calibration caches within $\Delta \le 5.0 \times 10^{-7} \le 1.0 \times 10^{-4}$).
-7. **Audit Record Path**: `experiments/calibration/audit_report.json`.
+2. **Selection Reconstruction**: PASS (exact match of selected winner `gamma2_betam1` and full candidate evidence for all 6 cells from cached validation predictions).
+3. **Threshold Numerical Reconstruction**: PASS (re-fitted thresholds from calibration prediction caches matched saved artifacts within strict numerical tolerance $\Delta \le 1.0 \times 10^{-10}$).
+4. **Validation Metric Reconstruction**: PASS (recomputed validation interval metrics matched saved `metrics.json` within $\Delta \le 1.0 \times 10^{-10}$).
+5. **Scoped Data Isolation**: PASS (verified zero train or test engines appear in any Step 8 artifact; verified split partition disjointness scoped to Step 7/8).
+6. **Prediction Reproduction**: PASS (re-executed inference of all 30 frozen models on raw calibration and validation partitions; matched caches within $\Delta \le 5.0 \times 10^{-7} \le 1.0 \times 10^{-4}$).
+7. **Provenance & Baseline Preservation**: Recorded under ADR-022. Baseline manifest: `experiments/audits/step08_repair_baseline.json`. Clean verification report: `experiments/audits/step08_repair_verification.json`.
+
+*(Note: Automated verification confirms numerical reproducibility and code correctness against specified schemas; it is an automated verification suite, not an independent human review).*
 
 ---
 
 ## 7. Scientific Boundaries and Novelty Positioning
 
 ### 7.1 Formal Theoretical Limitations
-1. **Exchangeability Assumption**: Hierarchical conformal prediction (Lee, Barber, & Willett 2023) guarantees valid finite-sample marginal coverage under the assumption that contributing clusters (engines) are exchangeable.
-2. **Autocorrelation & Temporal Censoring**: Within each engine, run-to-failure observations are autocorrelated and chronologically ordered. Conformal theory does not provide pointwise conditional coverage at every operating cycle or every wear stage.
-3. **Stopping Times**: Conformal coverage guarantees do not hold automatically at policy-selected stopping times. Evaluating maintenance policies under prediction intervals is an empirical decision utility benchmark, not a safety guarantee.
-4. **Zero Observed Failures**: Observing zero unmitigated failures in simulated episodes does not prove zero risk in out-of-distribution deployments.
+1. **Exchangeability Assumption**: Hierarchical exchangeability is a mathematical modeling assumption, not an established physical property of turbofan degradation or the C-MAPSS engine sampling process.
+2. **No Pointwise or Trajectory Guarantees**: Conformal coverage bounds apply to the hierarchical marginal distribution. No pointwise, trajectory-wide, stopping-time, deployment-safety, or universal regime-conditional coverage guarantee is established.
+3. **Stopping Times and Decision Utility**: Maintenance decisions are empirical operational policies evaluated on observable prediction bounds; they carry no formal safety or risk-elimination guarantee.
+4. **Development vs. Confirmatory Status**: Validation selection and post-selection validation metrics are development-set observations. Confirmatory research conclusions remain strictly pending held-out evaluation.
+5. **Automated CI Scope**: Passing automated CI and unit tests demonstrates implementation correctness and contract satisfaction; it does not prove scientific hypotheses or deployment safety.
+6. **Zero Observed Failures**: Observing zero unmitigated failures in simulated episodes does not prove zero risk in out-of-distribution deployments.
 
 ### 7.2 Methodological Citations and Novelty Scope
 - **Hierarchical Conformal Method**: Lee, Foygel Barber, & Willett (2023), *"Distribution-Free Inference with Hierarchical Data"*, arXiv:2306.06342v4. This project uses their hierarchical conformal formulation, not an invention thereof.

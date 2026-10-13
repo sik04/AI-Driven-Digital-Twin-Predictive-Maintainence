@@ -1,0 +1,2906 @@
+{
+  "baseline_commit": "f1edce7858c9748b6ee92e7c4f4a3b7849e7b235",
+  "calibration_registry_migrated_sha256": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
+  "calibration_registry_migration_type": "path-only portability migration (backslashes replaced with canonical forward slashes)",
+  "calibration_registry_original_sha256": "83074624f8afa393636f27d70558fcb536cb03b17df1a1c083521ae36d5b0711",
+  "protected_artifacts": {
+    "data/splits/fd001_engine_split_seed_2026.json": {
+      "sha256": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+      "size_bytes": 3836
+    },
+    "data/splits/fd002_engine_split_seed_2026.json": {
+      "sha256": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+      "size_bytes": 3171
+    },
+    "data/splits/fd002_lifetime_quartile_provenance.json": {
+      "sha256": "10e80c73ef6af621aff7194f24b71374a98d91aae84d1500c51d3195a331f33a",
+      "size_bytes": 5134
+    },
+    "data/splits/fd004_engine_split_seed_2026.json": {
+      "sha256": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2",
+      "size_bytes": 7432
+    },
+    "experiments/audits/step07_prediction_reproduction.json": {
+      "sha256": "0aed1296aac90a0ac9eecdcbeaf4977b46b4b75fb81325cdb004ae8ec089d668",
+      "size_bytes": 19985
+    },
+    "experiments/base_models/FD001/GBR/seed_2026/checkpoint": {
+      "sha256": "69d2dff2370cf80cac5e7486c8db8c809a574ef92235e611b34037e19aa496be",
+      "size_bytes": 1167938
+    },
+    "experiments/base_models/FD001/GBR/seed_2026/metadata.json": {
+      "sha256": "080669a8875971d2c0dfd1a5e7c3045a48f1169afb8a76d269e46ac3f1204310",
+      "size_bytes": 1907
+    },
+    "experiments/base_models/FD001/GBR/seed_2026/metrics.json": {
+      "sha256": "6c11185c10b6361d07d2374f9e460b9c2136121eed989e834744618a5f0f6203",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/GBR/seed_2026/validation_predictions.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/base_models/FD001/GBR/seed_2027/checkpoint": {
+      "sha256": "1e4330c72a16dfb13f989352a62e31a5dd8414b22edbfde677e4b3a17d4b62bb",
+      "size_bytes": 1167938
+    },
+    "experiments/base_models/FD001/GBR/seed_2027/metadata.json": {
+      "sha256": "6a7785707ec0c42b5159a875bcc58e7648d552f4ad1cf805d587dd2612b23cf5",
+      "size_bytes": 1907
+    },
+    "experiments/base_models/FD001/GBR/seed_2027/metrics.json": {
+      "sha256": "6c11185c10b6361d07d2374f9e460b9c2136121eed989e834744618a5f0f6203",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/GBR/seed_2027/validation_predictions.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/base_models/FD001/GBR/seed_2028/checkpoint": {
+      "sha256": "ee36b46ac0061dea40efe5a31247c0aae864971fd2b390bdd8c1a27fa68e4216",
+      "size_bytes": 1167939
+    },
+    "experiments/base_models/FD001/GBR/seed_2028/metadata.json": {
+      "sha256": "e9c9bb0fae218b1a4a54b391eb2a599d0bda00a645484f183c9edb9fbe3aa321",
+      "size_bytes": 1907
+    },
+    "experiments/base_models/FD001/GBR/seed_2028/metrics.json": {
+      "sha256": "6c11185c10b6361d07d2374f9e460b9c2136121eed989e834744618a5f0f6203",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/GBR/seed_2028/validation_predictions.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/base_models/FD001/GBR/seed_2029/checkpoint": {
+      "sha256": "2dc62056f3169888e3d6653c75a869073cffa4f11166580703ebc5443ad76983",
+      "size_bytes": 1167939
+    },
+    "experiments/base_models/FD001/GBR/seed_2029/metadata.json": {
+      "sha256": "5b23bec6cf4609a94d5eede5afb1e42e161d45db62d61290d6cefa9a128dcd0e",
+      "size_bytes": 1907
+    },
+    "experiments/base_models/FD001/GBR/seed_2029/metrics.json": {
+      "sha256": "6c11185c10b6361d07d2374f9e460b9c2136121eed989e834744618a5f0f6203",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/GBR/seed_2029/validation_predictions.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/base_models/FD001/GBR/seed_2030/checkpoint": {
+      "sha256": "7e384e70ef5293b5d8e3ab4b2721b279f08920f09f928424d1e750631b79aa74",
+      "size_bytes": 1167938
+    },
+    "experiments/base_models/FD001/GBR/seed_2030/metadata.json": {
+      "sha256": "a877321678f1105d5494d01326f06871bce83df698c1212b7561e36f7b4aee53",
+      "size_bytes": 1907
+    },
+    "experiments/base_models/FD001/GBR/seed_2030/metrics.json": {
+      "sha256": "6c11185c10b6361d07d2374f9e460b9c2136121eed989e834744618a5f0f6203",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/GBR/seed_2030/validation_predictions.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/base_models/FD001/GBR/summary.json": {
+      "sha256": "f46a864a36ac3467b4255bd28b7d9ad1981770a0f55db17f8aa5d6eebbbd265f",
+      "size_bytes": 912
+    },
+    "experiments/base_models/FD001/LSTM/seed_2026/checkpoint": {
+      "sha256": "73d86fd8e4db64709a22259a6c4ee40bd9e748b2d507991270936515ed4ded36",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD001/LSTM/seed_2026/metadata.json": {
+      "sha256": "370e0db8708f5084b34fd155e4cebff8c4d4486b1738a6944544a048b955218a",
+      "size_bytes": 2018
+    },
+    "experiments/base_models/FD001/LSTM/seed_2026/metrics.json": {
+      "sha256": "072f0a650ea04e92922eb2d04666170db2a123c7b252d24a2c7b09a20017321e",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD001/LSTM/seed_2026/validation_predictions.csv": {
+      "sha256": "53b14ead232bc6c029401c9512a4252e43c54169383a3fd60be392f0e6f6a141",
+      "size_bytes": 79968
+    },
+    "experiments/base_models/FD001/LSTM/seed_2027/checkpoint": {
+      "sha256": "d61ec08776aec2f3dac286450e69c91fd168dd4396d7336ef4cd3d432bb300dd",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD001/LSTM/seed_2027/metadata.json": {
+      "sha256": "4342db40cc8b55165a5e94ddcc3d15fac7d6ae3de2fbbab27da3d43794e70446",
+      "size_bytes": 2020
+    },
+    "experiments/base_models/FD001/LSTM/seed_2027/metrics.json": {
+      "sha256": "feeccb9b59390ae9be116c3d7ffce2f2027db9b306de03e4ebe935c436c57624",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD001/LSTM/seed_2027/validation_predictions.csv": {
+      "sha256": "7982beaee3011e8399cb884b65948ba74c31b915ff86d4c1f826cb77343988f6",
+      "size_bytes": 80011
+    },
+    "experiments/base_models/FD001/LSTM/seed_2028/checkpoint": {
+      "sha256": "f954ae2cff91319a8cc5ff46b603afa34e907bee414e6295eb79bd9b4fc3a73f",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD001/LSTM/seed_2028/metadata.json": {
+      "sha256": "2db6ce5c757281088feb249c24af99660ca4d655896aa6bd5bd58249651ac06e",
+      "size_bytes": 2019
+    },
+    "experiments/base_models/FD001/LSTM/seed_2028/metrics.json": {
+      "sha256": "2d9b1cc31592d467cf6caf75dc39017cd51b9516b9aa90c85bbb8c153b4f3d38",
+      "size_bytes": 116
+    },
+    "experiments/base_models/FD001/LSTM/seed_2028/validation_predictions.csv": {
+      "sha256": "a850517f49bdb8151a316e655bb12620125fcdd230c960c6f03936f9c4a6ba62",
+      "size_bytes": 80034
+    },
+    "experiments/base_models/FD001/LSTM/seed_2029/checkpoint": {
+      "sha256": "a73afd2451b12e2beb368fa06570aa731fe8c194926b17810d08a4ebfa1c764f",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD001/LSTM/seed_2029/metadata.json": {
+      "sha256": "f4ad48eb9ccb22fffacf0357aba0d56be2ca892ec9e5af78ad6ff4af1bb270ad",
+      "size_bytes": 2019
+    },
+    "experiments/base_models/FD001/LSTM/seed_2029/metrics.json": {
+      "sha256": "1085f9b9db148a0fcbf8a71331f32bd77dcca7dfa3a6d08b0bf38fb4df26d2c5",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD001/LSTM/seed_2029/validation_predictions.csv": {
+      "sha256": "a7a0497c3f4c9622fdbbfbb7a4fd56d27ead163fb34c19437c25cae55f565f80",
+      "size_bytes": 80058
+    },
+    "experiments/base_models/FD001/LSTM/seed_2030/checkpoint": {
+      "sha256": "6c110a9239450516d06288de97f888895dfb72834c1e51dc96ece22e7caf19f8",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD001/LSTM/seed_2030/metadata.json": {
+      "sha256": "d9502982c98e7ea0b41875ed865e52ac71d0a0af19a3d23e65978fce146b5e79",
+      "size_bytes": 2020
+    },
+    "experiments/base_models/FD001/LSTM/seed_2030/metrics.json": {
+      "sha256": "f14c22a87cd0525f665ca466da7d202bdd0a1c18d05b5183280209ec2950502e",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD001/LSTM/seed_2030/validation_predictions.csv": {
+      "sha256": "fd8014aa1e574210a7f1302317228eb1ba8a3525443ed594790f5bf5849ea9f7",
+      "size_bytes": 79967
+    },
+    "experiments/base_models/FD001/LSTM/summary.json": {
+      "sha256": "dff91f1dc3b6576b4a3d4ddd467b94c0e53ce7ef84ba0762530017b5da2d6fb5",
+      "size_bytes": 936
+    },
+    "experiments/base_models/FD002/GBR/seed_2026/checkpoint": {
+      "sha256": "6df41d7547bbea4549791faa05e85f78adadc28a4fb12d84228824c5984fe12b",
+      "size_bytes": 1937222
+    },
+    "experiments/base_models/FD002/GBR/seed_2026/metadata.json": {
+      "sha256": "1859229547681d72fcdb9ea0febfd8019fd16dfaa8f9411d8a68bbc0a84d4286",
+      "size_bytes": 1911
+    },
+    "experiments/base_models/FD002/GBR/seed_2026/metrics.json": {
+      "sha256": "740abe1a94f9c541ec0dc8d33ee859c939818c03a54f9df247e25cd9b1ec5071",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/GBR/seed_2026/validation_predictions.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/base_models/FD002/GBR/seed_2027/checkpoint": {
+      "sha256": "a63fa9abc22c49ff8386a8114651cf7eb065d597b466539b2e75a260f8fa2887",
+      "size_bytes": 1937222
+    },
+    "experiments/base_models/FD002/GBR/seed_2027/metadata.json": {
+      "sha256": "d257763b35f5a338df6dcaca28b33ee31dbfbd6fc4db9f5c4a97cefa1428b669",
+      "size_bytes": 1911
+    },
+    "experiments/base_models/FD002/GBR/seed_2027/metrics.json": {
+      "sha256": "740abe1a94f9c541ec0dc8d33ee859c939818c03a54f9df247e25cd9b1ec5071",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/GBR/seed_2027/validation_predictions.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/base_models/FD002/GBR/seed_2028/checkpoint": {
+      "sha256": "11515a43318d7e54870369c4b37bb403f60e5622415af30bcde4d23ac9e261e2",
+      "size_bytes": 1937223
+    },
+    "experiments/base_models/FD002/GBR/seed_2028/metadata.json": {
+      "sha256": "2e29bf31eea8cc5990fa9c63bacbacec5288571a32ddc361fe2ea8470813508c",
+      "size_bytes": 1911
+    },
+    "experiments/base_models/FD002/GBR/seed_2028/metrics.json": {
+      "sha256": "740abe1a94f9c541ec0dc8d33ee859c939818c03a54f9df247e25cd9b1ec5071",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/GBR/seed_2028/validation_predictions.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/base_models/FD002/GBR/seed_2029/checkpoint": {
+      "sha256": "57be69eebe5c27edd08e5dd569a3f236586855bef3755a70f1dc03e319948eb2",
+      "size_bytes": 1937223
+    },
+    "experiments/base_models/FD002/GBR/seed_2029/metadata.json": {
+      "sha256": "663fb7e9e5edf18f911044c0c5d4fd3624e3fa4e282480449c0736ea112dd0be",
+      "size_bytes": 1911
+    },
+    "experiments/base_models/FD002/GBR/seed_2029/metrics.json": {
+      "sha256": "740abe1a94f9c541ec0dc8d33ee859c939818c03a54f9df247e25cd9b1ec5071",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/GBR/seed_2029/validation_predictions.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/base_models/FD002/GBR/seed_2030/checkpoint": {
+      "sha256": "24374450b8b24cf5ebff7a3175b5e35025454ba2f6ae40fc9e7d4ade1e6680f8",
+      "size_bytes": 1937222
+    },
+    "experiments/base_models/FD002/GBR/seed_2030/metadata.json": {
+      "sha256": "39369fdf6ff15cb7791c745eb303aa38c124a7a0099d3bb822b939a44a8d96a3",
+      "size_bytes": 1911
+    },
+    "experiments/base_models/FD002/GBR/seed_2030/metrics.json": {
+      "sha256": "740abe1a94f9c541ec0dc8d33ee859c939818c03a54f9df247e25cd9b1ec5071",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/GBR/seed_2030/validation_predictions.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/base_models/FD002/GBR/summary.json": {
+      "sha256": "6b25db4f98f54cb0418a6c4c37b2f6466366cb21778afd60ccc4febc5c51d03b",
+      "size_bytes": 892
+    },
+    "experiments/base_models/FD002/LSTM/seed_2026/checkpoint": {
+      "sha256": "3d1fa2a6f20ec664e783117c2f3979ae337ddafaaa530b9b0113e740f4c48ee1",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD002/LSTM/seed_2026/metadata.json": {
+      "sha256": "7a018b26e806ab0f3c574de13eccfa3832d45c96604c1134feac83ef83f689b1",
+      "size_bytes": 2020
+    },
+    "experiments/base_models/FD002/LSTM/seed_2026/metrics.json": {
+      "sha256": "3966185397b5966455c162ebca5d4b4abb8a244090b9b04753ae76491c642f99",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD002/LSTM/seed_2026/validation_predictions.csv": {
+      "sha256": "83516d3543e06ab21e3708a3fec1ea9ca2d9f6b7cb93c4593b0671405e622e35",
+      "size_bytes": 215440
+    },
+    "experiments/base_models/FD002/LSTM/seed_2027/checkpoint": {
+      "sha256": "f70e37ab4c4ce365e491f1dca1f87524304f5c734a52850edcb1e8c0b23880a3",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD002/LSTM/seed_2027/metadata.json": {
+      "sha256": "03e100d046ae4a370bc959712314dd223b4d07363bee57aeef432c799b6b3710",
+      "size_bytes": 2017
+    },
+    "experiments/base_models/FD002/LSTM/seed_2027/metrics.json": {
+      "sha256": "308444685148bd1a0982c7e16b5cba44f64056385c33d2a897ccd74cb07aeeb8",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD002/LSTM/seed_2027/validation_predictions.csv": {
+      "sha256": "025011ae371ac6b12cdbd2bc4a97946f3f12f891467435471ee343506cad6ea7",
+      "size_bytes": 215462
+    },
+    "experiments/base_models/FD002/LSTM/seed_2028/checkpoint": {
+      "sha256": "eef24ad0b01ed715c1c2aac50b48840b7cd988328066da4bb90a2e5e8037f1d8",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD002/LSTM/seed_2028/metadata.json": {
+      "sha256": "0f11204349d3b39fd1320b573c41fbd95a9ef492e435cb7a3ac087337694f890",
+      "size_bytes": 2018
+    },
+    "experiments/base_models/FD002/LSTM/seed_2028/metrics.json": {
+      "sha256": "5ac17c13f5ba5afefb9d7470fd08589aa8040e5b284064c90d43adf429fc1671",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD002/LSTM/seed_2028/validation_predictions.csv": {
+      "sha256": "e2746b66d46cb5ecb7aed992c717a50fa827444c38db045b446d46329a346485",
+      "size_bytes": 215399
+    },
+    "experiments/base_models/FD002/LSTM/seed_2029/checkpoint": {
+      "sha256": "75c965c9c3046a51784540470bf7d4d6489c92eb6bed70b1a9e6a6687c2d66a2",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD002/LSTM/seed_2029/metadata.json": {
+      "sha256": "e31a19bba5fcad7cc90c5d48c01b5f07129f1f74490ee48382de517f26ab68a0",
+      "size_bytes": 2019
+    },
+    "experiments/base_models/FD002/LSTM/seed_2029/metrics.json": {
+      "sha256": "e40a5a2a92bb9b7efd855b3d89b9cd63da79281dc54c1f90fa2bfbdeb2b798cc",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD002/LSTM/seed_2029/validation_predictions.csv": {
+      "sha256": "b23e16db4ebcfa7bd722343f62729e43c1558ed37fdb795c98877a30ec974ad1",
+      "size_bytes": 215446
+    },
+    "experiments/base_models/FD002/LSTM/seed_2030/checkpoint": {
+      "sha256": "284890fc6be5e71d9b239f1984756cf03c2d52c02a4cc4dcff11e45c70151edb",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD002/LSTM/seed_2030/metadata.json": {
+      "sha256": "a71c1eaefb9d64326bff52ceff200f9be70c91565634e5197019e4dec0629189",
+      "size_bytes": 2018
+    },
+    "experiments/base_models/FD002/LSTM/seed_2030/metrics.json": {
+      "sha256": "2d5d935afd54f9ed0bde135d7e7a9a7c0786985533cfe80f794b88bfbd0bb69a",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD002/LSTM/seed_2030/validation_predictions.csv": {
+      "sha256": "3ebd60f8c76868a533e0110370f123ee7a3aea5e03b9af14a531a08212fa26c5",
+      "size_bytes": 215350
+    },
+    "experiments/base_models/FD002/LSTM/summary.json": {
+      "sha256": "93149740874ead588c9b8d23114a192511c70b5cae4b789f3a2ec0c4f85442bd",
+      "size_bytes": 936
+    },
+    "experiments/base_models/FD004/GBR/seed_2026/checkpoint": {
+      "sha256": "006ac6d591749a6a7e878500ae6722f0c95124c11e2e6a1ec38921a95b54bcb3",
+      "size_bytes": 1947042
+    },
+    "experiments/base_models/FD004/GBR/seed_2026/metadata.json": {
+      "sha256": "f98be7e296058035d84a7cf2bd2dad46087e68dcb65c83a50b6f4a078594bd19",
+      "size_bytes": 1909
+    },
+    "experiments/base_models/FD004/GBR/seed_2026/metrics.json": {
+      "sha256": "4d9b4ab0644c390f237a07b25964342c1a8c6c24b7cf9a8b936ae65e0b23d630",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/GBR/seed_2026/validation_predictions.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/base_models/FD004/GBR/seed_2027/checkpoint": {
+      "sha256": "763085387e27db4ca70ff424a5f7370f81e4bedc872630c1cf1ab2a258843b65",
+      "size_bytes": 1947042
+    },
+    "experiments/base_models/FD004/GBR/seed_2027/metadata.json": {
+      "sha256": "8c05571bd7923911372abaf5cd38cfd244ab606376e7306fa1d525907a2e418d",
+      "size_bytes": 1908
+    },
+    "experiments/base_models/FD004/GBR/seed_2027/metrics.json": {
+      "sha256": "4d9b4ab0644c390f237a07b25964342c1a8c6c24b7cf9a8b936ae65e0b23d630",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/GBR/seed_2027/validation_predictions.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/base_models/FD004/GBR/seed_2028/checkpoint": {
+      "sha256": "7f166d88a3eaa1a2b2fbc507dd860d0962aefb2014efe8947c6d7661db865a82",
+      "size_bytes": 1947043
+    },
+    "experiments/base_models/FD004/GBR/seed_2028/metadata.json": {
+      "sha256": "1df7de58ab843c30c874648ac1ef23748fc61887c5ae37a48f9fed0a0a223680",
+      "size_bytes": 1909
+    },
+    "experiments/base_models/FD004/GBR/seed_2028/metrics.json": {
+      "sha256": "4d9b4ab0644c390f237a07b25964342c1a8c6c24b7cf9a8b936ae65e0b23d630",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/GBR/seed_2028/validation_predictions.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/base_models/FD004/GBR/seed_2029/checkpoint": {
+      "sha256": "82b9fdbe0b139397a9e43d224ad0f6d7f13e752d4824897c566f4a89fd26ecb1",
+      "size_bytes": 1947043
+    },
+    "experiments/base_models/FD004/GBR/seed_2029/metadata.json": {
+      "sha256": "105eca5772ec9333a9e43bd7ee8c8be4c28fe48acde38b291958a7eddeb29edb",
+      "size_bytes": 1909
+    },
+    "experiments/base_models/FD004/GBR/seed_2029/metrics.json": {
+      "sha256": "4d9b4ab0644c390f237a07b25964342c1a8c6c24b7cf9a8b936ae65e0b23d630",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/GBR/seed_2029/validation_predictions.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/base_models/FD004/GBR/seed_2030/checkpoint": {
+      "sha256": "200b1d8fe1241c498d3e7636604ecad9db7f17a626df74af62f7541f99ae6e7f",
+      "size_bytes": 1947042
+    },
+    "experiments/base_models/FD004/GBR/seed_2030/metadata.json": {
+      "sha256": "e3215f735acbed42e28fd8958c0e63ba2a65df4e0704ff3d909a0563e823b712",
+      "size_bytes": 1909
+    },
+    "experiments/base_models/FD004/GBR/seed_2030/metrics.json": {
+      "sha256": "4d9b4ab0644c390f237a07b25964342c1a8c6c24b7cf9a8b936ae65e0b23d630",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/GBR/seed_2030/validation_predictions.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/base_models/FD004/GBR/summary.json": {
+      "sha256": "32f8c9ea31f5548c57479cfe26bf1efce56ab9ac268a860bb70c8fc6865f7546",
+      "size_bytes": 911
+    },
+    "experiments/base_models/FD004/LSTM/seed_2026/checkpoint": {
+      "sha256": "31b5e180de43640ef6aded1144b98e07731c0d71bf68504f6bfbdeee1881402a",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD004/LSTM/seed_2026/metadata.json": {
+      "sha256": "739e7dfe662bb51565ab2763538e4f86fd8f0c1d4967aa5de5cf0e4f473f963b",
+      "size_bytes": 2020
+    },
+    "experiments/base_models/FD004/LSTM/seed_2026/metrics.json": {
+      "sha256": "f313ac49d9c56c0f7b814fb74f09c2be019e94a51c040058f9f523af6d02ef3b",
+      "size_bytes": 115
+    },
+    "experiments/base_models/FD004/LSTM/seed_2026/validation_predictions.csv": {
+      "sha256": "9bc72d07b0a4777c7a920143c58f1b8b1661bb8e655b09c5dfe326107ef2b9da",
+      "size_bytes": 241640
+    },
+    "experiments/base_models/FD004/LSTM/seed_2027/checkpoint": {
+      "sha256": "d1bfd82f8a43685dfba3b4243d3e73f678bdf39b022a9fe44c0e47a3cdb5248b",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD004/LSTM/seed_2027/metadata.json": {
+      "sha256": "2210c50b447c04f7ca3f448c8ca7e0e526cde0f585dc11a5dace8cb72f49fea9",
+      "size_bytes": 2016
+    },
+    "experiments/base_models/FD004/LSTM/seed_2027/metrics.json": {
+      "sha256": "a8ebdec535bcab850b405b4cb6f8759014e1b7a72abe599b5e051de51b5bfe29",
+      "size_bytes": 112
+    },
+    "experiments/base_models/FD004/LSTM/seed_2027/validation_predictions.csv": {
+      "sha256": "2c6e5a17a0eb0fa74bdbe2001d5772bfb482d004c91b9cdda229470d9db1876c",
+      "size_bytes": 241789
+    },
+    "experiments/base_models/FD004/LSTM/seed_2028/checkpoint": {
+      "sha256": "df42a2f8023d593ae5c76e3ad5b5c6fb042160651db95ec1758f54f53774416e",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD004/LSTM/seed_2028/metadata.json": {
+      "sha256": "acf56dad7b5fd0781ee3e5f118014f27d7ea4de19bc8d51baa49a333951f6d60",
+      "size_bytes": 2017
+    },
+    "experiments/base_models/FD004/LSTM/seed_2028/metrics.json": {
+      "sha256": "e7f8d56a184f82c86ffa685f3c8236864917dec7b272a7c059ebe7cd952b7f92",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/LSTM/seed_2028/validation_predictions.csv": {
+      "sha256": "efd1099b112a65cade63d5f5f28eb490a285b474ffd7c7d5f3becb98c06847d9",
+      "size_bytes": 241518
+    },
+    "experiments/base_models/FD004/LSTM/seed_2029/checkpoint": {
+      "sha256": "28b2161e85caa16eb4bc6db73d1f97b44431e5a69340dfd85b1cd247766a9a30",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD004/LSTM/seed_2029/metadata.json": {
+      "sha256": "07a1468b8363061d926d9aedcbf7cc092339bc2d8271a19ad07494a3e9ab403d",
+      "size_bytes": 2019
+    },
+    "experiments/base_models/FD004/LSTM/seed_2029/metrics.json": {
+      "sha256": "53e4c82be9b218de49592610c1638a4d4c0f4002acfa7d59c4b26d89eb7b8c11",
+      "size_bytes": 114
+    },
+    "experiments/base_models/FD004/LSTM/seed_2029/validation_predictions.csv": {
+      "sha256": "09a647bf3b13975a898adedeec48c67cabfd57d79b64b5b6414f29c41f43abbb",
+      "size_bytes": 241592
+    },
+    "experiments/base_models/FD004/LSTM/seed_2030/checkpoint": {
+      "sha256": "2c19dcad5f3d940632192012e98bc1da0cbcf5f37fc2d27ef49fe32d77968984",
+      "size_bytes": 88825
+    },
+    "experiments/base_models/FD004/LSTM/seed_2030/metadata.json": {
+      "sha256": "d904366738991ec813239f3debbad3d9162f3f2408b15b0eec1e4178bf4d3583",
+      "size_bytes": 2017
+    },
+    "experiments/base_models/FD004/LSTM/seed_2030/metrics.json": {
+      "sha256": "261635396a7cfa9a159f0dd4bbbc9557befb16be9c2f1e84c967928692a2b50d",
+      "size_bytes": 113
+    },
+    "experiments/base_models/FD004/LSTM/seed_2030/validation_predictions.csv": {
+      "sha256": "f347832ec8c4b086935f22307c3c8a417315b6904e8a9de62667f3cd3f67870b",
+      "size_bytes": 241494
+    },
+    "experiments/base_models/FD004/LSTM/summary.json": {
+      "sha256": "055de3b717063969e7e092d61bd3dee623f97588a6966443936ba9fe4173868a",
+      "size_bytes": 936
+    },
+    "experiments/base_models/base_predictor_validation_summary.csv": {
+      "sha256": "934792bd24d9d815418e8aa7f0682e50478812b9c938b87d7a6a76e38cb324c9",
+      "size_bytes": 1134
+    },
+    "experiments/base_models/model_registry.json": {
+      "sha256": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
+      "size_bytes": 30077
+    },
+    "experiments/base_models/reproducibility_audit_seed_2026.json": {
+      "sha256": "9f0058f2301bd796eb3aa59feb12eb0ed0405819038da1249a07fe3a066824ed",
+      "size_bytes": 1143
+    },
+    "experiments/calibration/audit_report.json": {
+      "sha256": "528bf18399a48b7a2dbc642a4dd35568ef7e9460662027b693824b0bbbb6fc2a",
+      "size_bytes": 1797
+    },
+    "experiments/calibration/execution_manifest.json": {
+      "sha256": "fef6f0754c1bd6d28fbe690915391c6891d06d6cdaf44ce68e8fe798ced7f06c",
+      "size_bytes": 1129
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "b4027c2f97e0b2baa68b489ec3957462c589ed74c8744bf259284733688318f3",
+      "size_bytes": 3131
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "1514713e36e6eea03ac441ecb93b462eb74788416ce0cf0f92a0929cb9a17c85",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "b5e928d0fec93b2aaa3a3e5ef185abdb7646d84e9a46cf5b7ff535d771985793",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "c4429e6535bfdef510211817883827c7920d81a820298ff39c3a8ef07292bfdd",
+      "size_bytes": 3131
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "9c3add68f7e775954a44a647a8ea61bbf65b359bbfb602b6497a1e674071202b",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "1b1c652f9366ac292e16c08c7b241c45ec9b18ae5bdbb9da15d54c34c76d684d",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "20a593a73da555890442e3dfbd513cd7fe62ba13266548b1e0a9c5d01e2e7f23",
+      "size_bytes": 3131
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "23c1d5d02bb04f425772b99b15a2b057f69a8567bbde2dab92c801e44b452ef8",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "87b7901e6ebdff2b6467dd2c9b2373b9a41080d581a0c69367da2c8d20c300b5",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "e2039ce4950f2eecc7c80de9825bcece778d2762bfc894809ca2a0d4edc81d8d",
+      "size_bytes": 3131
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "4e9e24344682e668807e2fe2eca917044961a00c018f456c6253f744d80d382e",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "a5797960c088749afd6bed14c7f4ad12225c5e4f8762340440ab34714d435116",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "3119412925997b25a6d46d81d78e674ed4f0d0d7603c834e932cef9e10b0b375",
+      "size_bytes": 3131
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "0f9135e70a0f18a6c2e13ebac2838eff7ade1b162afe3cd792545b77fe4dd539",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/GBR/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "4450cc7b76e5a84e254f56c74ac9c4b1f3502f1c901f15fbb880f0d86fd923a7",
+      "size_bytes": 3080
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "41b9feeb8bca98eacc0c54ed7e07f7871a040a0e7e9b38ce77608620fce4982e",
+      "size_bytes": 3132
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "50dec984e5d39ac1d376954bb4eac930382051cbc40d3bf335dd59e9a79c41d1",
+      "size_bytes": 3083
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "3830227c90f14f817dc4b53fb5f57d61b12f8e249cd9da7d6cfa383cf7ee4be8",
+      "size_bytes": 3083
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "64d71cdacabfd7b8d479e4757b8c50227b801159dfd90a548df692adf03a0873",
+      "size_bytes": 3136
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "5be52e2345a07a4c6042ba43f3bf104b0241ad0ad31e04237ec281ecf9d0472a",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "295b45ae84fae3d153b4764656e33bdc68e1e2c8ee58c4d163de6d91cb92d3a7",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "83ee7050f9919684675d36e69f71c85e2c7a830ee2bf349fb90baf3ff5a39b48",
+      "size_bytes": 3134
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "fe05b3a1cd23bf7ce2ef87b85e98daf12efa1b90f981ca178abcbee0ea60d37f",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "aecacaf4ea19c6445eab163e72b0b4054868e56cdc39479006df6d4125e76554",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "87e64c25bab1c9d916135725eb6c6e8d0f309e684e2386cc39f0e03752af62ed",
+      "size_bytes": 3136
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "c756123c338f5f4d1afc042260b07b704eada1bf1ea219ed490504bf6705b80c",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "e2a73b6ec8f9f5c6eac25a51921c47595dfe41092d289ff3e69688381e135600",
+      "size_bytes": 3081
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "1fad30d1021d127582dfa65d55744f53c73190cd75ac61b42f6fe70e1fc4d9d7",
+      "size_bytes": 3138
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "ea360343dae954d9348975b52572543c65e1389238d771ac81f133dd0bf312c9",
+      "size_bytes": 3077
+    },
+    "experiments/calibration/fitted/FD001/LSTM/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "8093f96926754d419069b1b03419751ebd21bb75146b7bc41d6b2b464e5b3cb5",
+      "size_bytes": 3077
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "cf1af2b9f4f974e5200224ab4bdf3160cea47ae36ed24ff3af0f5b386b64050e",
+      "size_bytes": 6463
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "4a4738091b586f5dddc63b3319fdf792bcee15e86e3c7bad037eb9758bf7b023",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "b45e3c20a5532d45242e4d14f4135e3fc3d87059121eea82ad5d1ed3786f6d32",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "40fb01e50d9ae5de093193d23c1462547581c8c9537856a9861dcb6b2c2ed1e0",
+      "size_bytes": 6463
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "d8d989f880a51798b4c61408d5699ffbb4020a491c274614321b8dacd210edd1",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "bbedfb8f87e59136fea7bcdd5fca81e4335b811e02d89004e6934c5c8a2c33c4",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "c4e3c417f4dae0e8c29b2664b9605cc278baa1e9d82ad072e819361f0dfa9b79",
+      "size_bytes": 6463
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "05021844ed6c413c292e5e96c0caf1859d608971405b59ed68574cf2b9702fdd",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "8b0f96264b56b35e2de64c3ac4e584a6e1087a825cb9dc23205325d8fb3f3fae",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "ace24199c5421f02010dbe8a6b4e5e253337f634692fde4803ab3a5f4b06b521",
+      "size_bytes": 6463
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "95c88f52d6d048cb88802855792531aad10de4662a2e6c66dc44d8711fa64b2e",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "ab8c90fe07df2347dddb41ef6d48e765a7d345ba9ede517076512d83abc39e68",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "2c823826bc28e5cc3e6ab4d5851c13013c91528039625a4b64c2f2adad617114",
+      "size_bytes": 6463
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "92a1bba3500ff010c7ebc3bec4cf5aa92c0eb1587427fc5abd724ed6be493c06",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/GBR/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "6761b0dd31e1084227ec5b604203d1fcf44f571673416d6a817b7675461994ba",
+      "size_bytes": 6398
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "bba93040a44f85507cee8f57594d3943cd374cd097413daca8f404084db66460",
+      "size_bytes": 6460
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "c3323f2bedefde6e377fdb1ebdf5487341992095b5f56779a7d31cb8ada27adf",
+      "size_bytes": 6396
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "db2c0afa35c4c0ba254fd467518bd80090ec35148b6c9fd7e6c48e32dbbc38fb",
+      "size_bytes": 6396
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "ee0ffd9b3b2d3c4acf4942a24cc1d3433010353e9744e5fcefeb182a48c50616",
+      "size_bytes": 6465
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "c5abaa9715c78256a3047ec0df0b0d656d305bb7c5313f84c19e2c5e32dcd755",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "3cd9fd071ef1e6dd46592b0096664b2cb214451b63b4a4a4260901c2a360b252",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "62938cc30a6777904453acf926bed655b42155b402e510b954333ddf3fa21dd6",
+      "size_bytes": 6458
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "79903d9513a703cdc4dfbd60626dd9be17d844d29897c7167300dea5e51807ef",
+      "size_bytes": 6399
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "3240dbf251e6175c37573e7faa75880c620fa14ad33879e09475c52551a09a48",
+      "size_bytes": 6399
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "47fc6584ea7b38d4daf93c66259ee8317cc77dc6a04642dd2d6167da13252793",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "4feea38d515ff5e9cc1fd061aa51059999bea4f420401a1fa485457412489674",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "35d217ad1ff711bf9401b7f9a4e91ce8c7b7f25b646c29474545a323cda07a2b",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "1c23fc88fe9db2ae417dcba12b8e6d4df58a9821de2bb8dc43bafb07fd24c79f",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "981b3f34a177fe79a6b20aa168c085297479cbd4f1a41b3008ecad20f7ae0169",
+      "size_bytes": 6403
+    },
+    "experiments/calibration/fitted/FD002/LSTM/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "cde556d4a57abc61ee213724f652bf0cc2cb08e1c0c784692ce3b788ebd8b06d",
+      "size_bytes": 6403
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "5b1759051fa8595d36a086d5db7508a923421c17f89d697305431ba4bd16b73b",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "82f33d6619c1d874a1824258f8c90e161f1fa9c9f7e51d41e555ac827d2c27a3",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "0c438810ef53cf43bdd64ab1d84cba9c7424889fab0e9866ace6955b3c1aff26",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "a4b286364d453b4e255fd0b3e242bb5c3bdeabcec0d5db6d74c02eabe4545dc6",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "6cb5caee766e2a0f5643711c92f65e12ef6538a4952ef6cd3c6f31e7b6bd8984",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "cb4e62e6e275a061adce824552a0b9f96bbc50b20182beac9e7fcec77cf07788",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "35201bc009683d163f957c408567458fdd6b096cdfc5877e69c13732d3083f2e",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "00385e0f9cdf67065602dee2e39d4b1211ffde3b64424a43d6defe9b4e79728d",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "34da1cd4b581e5cd92040785a359b631932cc9fac4c1742b474f8727fb939d97",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "8e49ae6728b66f0a7c51b4ab6291b66ecddd7cb3f1fadd44ede6f461fc642258",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "c75ed4fe8063d1f558f8ed6443829bf5f45d263805edf5368ecd9cbd7acf2fcb",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "4bcb91ecdd2b5b3d000c246bcec97569eb8182d29faacd46f6a2ab5b5c81ea39",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "5e223d886ba1e7b4dd2cad2a567de5ca019229d1929f8588c5a1c1c6c0842949",
+      "size_bytes": 6461
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "cbf683b69deff0ba5e3b310964a683e98ec1ceeffcba290bd65138e7da7146d5",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/GBR/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "e5611257bcc818a4733fef03cf1fe3e3e141a323a762fd3c17935d026d33e06a",
+      "size_bytes": 6407
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2026/decision_aware_hcp/calibrator.json": {
+      "sha256": "c8c66a93474a8c6de990bfea7f3101bed03e6580156a970291bb410845545b64",
+      "size_bytes": 6459
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2026/global_hcp/calibrator.json": {
+      "sha256": "bcaffaa384eb3e66d0d51cd439ca5e005d808a044d418be4418e95ac460fc805",
+      "size_bytes": 6410
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2026/regime_hcp/calibrator.json": {
+      "sha256": "c21d504a808462989187985627cd2372106f5ab893cd7692c4a92ad6f8602c4d",
+      "size_bytes": 6410
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2027/decision_aware_hcp/calibrator.json": {
+      "sha256": "4373696305960c418918fa51a5532a72c776dd04d5fa241882a5c4c14e3e1ad7",
+      "size_bytes": 6459
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2027/global_hcp/calibrator.json": {
+      "sha256": "0bb52065a86335ae4659e8828292c42f98c397d39e0ecfb1236397d8586e1ace",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2027/regime_hcp/calibrator.json": {
+      "sha256": "6ed29f195c1f93854fa1980e238e6545cd157f76a755b9b29093d67a8bc6c58e",
+      "size_bytes": 6401
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2028/decision_aware_hcp/calibrator.json": {
+      "sha256": "687ab48d9337dd4493ceb34a369572978c264e5ecdf8b841cbf78a10fb42ced2",
+      "size_bytes": 6459
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2028/global_hcp/calibrator.json": {
+      "sha256": "2e5cf28b1ca87af1c2a73439135bd4e78eec483e76dbc3a69d1ba896cbe87162",
+      "size_bytes": 6409
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2028/regime_hcp/calibrator.json": {
+      "sha256": "2ca83bd3c186226a9e3b728625e8f60a7acb1a158aab88a4af72f9d73fc1f949",
+      "size_bytes": 6409
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2029/decision_aware_hcp/calibrator.json": {
+      "sha256": "d947523d004429f38549e1373065124e10cb425abd91cde89d350a5c2a1344cc",
+      "size_bytes": 6458
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2029/global_hcp/calibrator.json": {
+      "sha256": "365f5f6eb70a17cbf6568acd8b9456c5d9f1470a945be49d404e23e936e7373a",
+      "size_bytes": 6405
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2029/regime_hcp/calibrator.json": {
+      "sha256": "86330b1918f053d8acf14f23ca79b0bfa589c693703aea8b68812e3b8b013ce8",
+      "size_bytes": 6405
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2030/decision_aware_hcp/calibrator.json": {
+      "sha256": "74779db7daad63bde80c77a177f84019cc8c1b28c17b682d723dcd079672bc78",
+      "size_bytes": 6455
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2030/global_hcp/calibrator.json": {
+      "sha256": "61415c1b9beadc3ef174d40652369f1253781ca14641d5c4421f36b85f95818b",
+      "size_bytes": 6411
+    },
+    "experiments/calibration/fitted/FD004/LSTM/seed_2030/regime_hcp/calibrator.json": {
+      "sha256": "90c6aa0a65c83fe65ac51168f166813d84147f7fb7ea3c726359700061346dd3",
+      "size_bytes": 6411
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/GBR/seed_2026.csv": {
+      "sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+      "size_bytes": 147616
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/GBR/seed_2027.csv": {
+      "sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+      "size_bytes": 147616
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/GBR/seed_2028.csv": {
+      "sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+      "size_bytes": 147616
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/GBR/seed_2029.csv": {
+      "sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+      "size_bytes": 147616
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/GBR/seed_2030.csv": {
+      "sha256": "179d7c90ef5fad475c4e1492d5425519bd5412380ba5ae3fb6adda84e24b5432",
+      "size_bytes": 147616
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/LSTM/seed_2026.csv": {
+      "sha256": "781175a95deaecf94676c333a61b4845cf21e28a91872c5e5683717e3d28c7d7",
+      "size_bytes": 147327
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/LSTM/seed_2027.csv": {
+      "sha256": "b94075e73e67299bb840f329369ccbde03d9762ad7f2917436c471e76b9a02b1",
+      "size_bytes": 147659
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/LSTM/seed_2028.csv": {
+      "sha256": "ffc85e019c14896d2d65df0637e8fc0d065e01feb7f6ff98ef184a960de38265",
+      "size_bytes": 147603
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/LSTM/seed_2029.csv": {
+      "sha256": "1cbd60fe8e5dafe848e19825dfea4b092482ba39641b461a34b694314b9548a9",
+      "size_bytes": 147317
+    },
+    "experiments/calibration/point_predictions/calibration/FD001/LSTM/seed_2030.csv": {
+      "sha256": "34d5e350a5f0ee550dd856c47d7ba0c1ea293618049ad6612d42ec447f6556b2",
+      "size_bytes": 147250
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/GBR/seed_2026.csv": {
+      "sha256": "a8f27b7d7257111c941a98f4be111206c2b65b5a1b33c34ee4673463452fdc91",
+      "size_bytes": 378308
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/GBR/seed_2027.csv": {
+      "sha256": "a8f27b7d7257111c941a98f4be111206c2b65b5a1b33c34ee4673463452fdc91",
+      "size_bytes": 378308
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/GBR/seed_2028.csv": {
+      "sha256": "a8f27b7d7257111c941a98f4be111206c2b65b5a1b33c34ee4673463452fdc91",
+      "size_bytes": 378308
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/GBR/seed_2029.csv": {
+      "sha256": "a8f27b7d7257111c941a98f4be111206c2b65b5a1b33c34ee4673463452fdc91",
+      "size_bytes": 378308
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/GBR/seed_2030.csv": {
+      "sha256": "a8f27b7d7257111c941a98f4be111206c2b65b5a1b33c34ee4673463452fdc91",
+      "size_bytes": 378308
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/LSTM/seed_2026.csv": {
+      "sha256": "8c4618f5dde67e1dcbf9ef28b199ee893dcb5b92b465aa091931939e584d0314",
+      "size_bytes": 377526
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/LSTM/seed_2027.csv": {
+      "sha256": "86cedf1e273f22064b666bccd564d19cedbfa19c053ce25f153e8660ee6e62f0",
+      "size_bytes": 377590
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/LSTM/seed_2028.csv": {
+      "sha256": "3a7ea3a0aa1724c35882a964de2c67624f5d9bb074f19b6c727f3aa82ce5b5d5",
+      "size_bytes": 378178
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/LSTM/seed_2029.csv": {
+      "sha256": "4d17fd9b042477f4c1b919dc3061953be0b4546b6c6622e8389b4c9d062674e8",
+      "size_bytes": 377623
+    },
+    "experiments/calibration/point_predictions/calibration/FD002/LSTM/seed_2030.csv": {
+      "sha256": "b711534ba407ce003256b7dcdb63a4da81945d71afd32f9fa2579646780e5944",
+      "size_bytes": 378307
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/GBR/seed_2026.csv": {
+      "sha256": "abe69fdeebf2bc9d79f9a45c15282c47cde13161ae4618a3766b2b4b127c4cbd",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/GBR/seed_2027.csv": {
+      "sha256": "abe69fdeebf2bc9d79f9a45c15282c47cde13161ae4618a3766b2b4b127c4cbd",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/GBR/seed_2028.csv": {
+      "sha256": "abe69fdeebf2bc9d79f9a45c15282c47cde13161ae4618a3766b2b4b127c4cbd",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/GBR/seed_2029.csv": {
+      "sha256": "abe69fdeebf2bc9d79f9a45c15282c47cde13161ae4618a3766b2b4b127c4cbd",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/GBR/seed_2030.csv": {
+      "sha256": "abe69fdeebf2bc9d79f9a45c15282c47cde13161ae4618a3766b2b4b127c4cbd",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/LSTM/seed_2026.csv": {
+      "sha256": "dcc74958906dd469d493b6e60be589893d026647242189cd3e86ad1f5fb67e6b",
+      "size_bytes": 435386
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/LSTM/seed_2027.csv": {
+      "sha256": "baccaa9f9985d560f99bbec2901d989be4b68b070192e02f63bb919ea23c00c5",
+      "size_bytes": 435692
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/LSTM/seed_2028.csv": {
+      "sha256": "c4d111bd2440eb0857581b8dd7b585ec83a81bf077d2078072bb5819646bdf58",
+      "size_bytes": 436375
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/LSTM/seed_2029.csv": {
+      "sha256": "962785809d08e3fb0b1fe620ffc44e571cc8fdcea5a8a2364288f28e0ad20a5f",
+      "size_bytes": 436407
+    },
+    "experiments/calibration/point_predictions/calibration/FD004/LSTM/seed_2030.csv": {
+      "sha256": "f39d6763b2082497508b245e0ffd571d91b6391b7101b2877672f0eff80be9a6",
+      "size_bytes": 435551
+    },
+    "experiments/calibration/point_predictions/validation/FD001/GBR/seed_2026.csv": {
+      "sha256": "f0bc92b16c87d780272e4c620e0ae681fa65503b6e7869b8fce6b5daef44bb57",
+      "size_bytes": 70265
+    },
+    "experiments/calibration/point_predictions/validation/FD001/GBR/seed_2027.csv": {
+      "sha256": "f0bc92b16c87d780272e4c620e0ae681fa65503b6e7869b8fce6b5daef44bb57",
+      "size_bytes": 70265
+    },
+    "experiments/calibration/point_predictions/validation/FD001/GBR/seed_2028.csv": {
+      "sha256": "f0bc92b16c87d780272e4c620e0ae681fa65503b6e7869b8fce6b5daef44bb57",
+      "size_bytes": 70265
+    },
+    "experiments/calibration/point_predictions/validation/FD001/GBR/seed_2029.csv": {
+      "sha256": "f0bc92b16c87d780272e4c620e0ae681fa65503b6e7869b8fce6b5daef44bb57",
+      "size_bytes": 70265
+    },
+    "experiments/calibration/point_predictions/validation/FD001/GBR/seed_2030.csv": {
+      "sha256": "f0bc92b16c87d780272e4c620e0ae681fa65503b6e7869b8fce6b5daef44bb57",
+      "size_bytes": 70265
+    },
+    "experiments/calibration/point_predictions/validation/FD001/LSTM/seed_2026.csv": {
+      "sha256": "149d019bd0ff3a4553324d52a0841bfd7f71a21e342f2c79eb6a763210c83265",
+      "size_bytes": 70133
+    },
+    "experiments/calibration/point_predictions/validation/FD001/LSTM/seed_2027.csv": {
+      "sha256": "bb4004e5ae04048c3bef3539306ee6b04a30efed751b660b69b292e5a3bc623c",
+      "size_bytes": 70342
+    },
+    "experiments/calibration/point_predictions/validation/FD001/LSTM/seed_2028.csv": {
+      "sha256": "310c8c27ffda22e4f7b691a6a64d289ed9005de276366218067f007326429f48",
+      "size_bytes": 70286
+    },
+    "experiments/calibration/point_predictions/validation/FD001/LSTM/seed_2029.csv": {
+      "sha256": "b58f453464e69da057d862366890926470f655325cd97efe6babae04a6883f89",
+      "size_bytes": 70201
+    },
+    "experiments/calibration/point_predictions/validation/FD001/LSTM/seed_2030.csv": {
+      "sha256": "7a2cd7ee0ccf1e5b64a672563d5afc49f11864d3d204b96ba42c0cfe22100e92",
+      "size_bytes": 70137
+    },
+    "experiments/calibration/point_predictions/validation/FD002/GBR/seed_2026.csv": {
+      "sha256": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+      "size_bytes": 189464
+    },
+    "experiments/calibration/point_predictions/validation/FD002/GBR/seed_2027.csv": {
+      "sha256": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+      "size_bytes": 189464
+    },
+    "experiments/calibration/point_predictions/validation/FD002/GBR/seed_2028.csv": {
+      "sha256": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+      "size_bytes": 189464
+    },
+    "experiments/calibration/point_predictions/validation/FD002/GBR/seed_2029.csv": {
+      "sha256": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+      "size_bytes": 189464
+    },
+    "experiments/calibration/point_predictions/validation/FD002/GBR/seed_2030.csv": {
+      "sha256": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+      "size_bytes": 189464
+    },
+    "experiments/calibration/point_predictions/validation/FD002/LSTM/seed_2026.csv": {
+      "sha256": "28ad8e3067a80663cc2f55cf5a25a1967483cc1a8d1958f15b3510c4fa0d7cea",
+      "size_bytes": 189062
+    },
+    "experiments/calibration/point_predictions/validation/FD002/LSTM/seed_2027.csv": {
+      "sha256": "399111f4d6423d98e2de27c479ffc32d543b62b6f7812d32ae4b2afcaef8fed6",
+      "size_bytes": 189212
+    },
+    "experiments/calibration/point_predictions/validation/FD002/LSTM/seed_2028.csv": {
+      "sha256": "d9d000ec7061dd3a077bccab220c44740e01596ebd9a092a152b0038609b3a2f",
+      "size_bytes": 189474
+    },
+    "experiments/calibration/point_predictions/validation/FD002/LSTM/seed_2029.csv": {
+      "sha256": "8178dc7954bfad7087f1609a049f9c98c3b53e7dc7a398a6917a0337bd6a1e39",
+      "size_bytes": 189269
+    },
+    "experiments/calibration/point_predictions/validation/FD002/LSTM/seed_2030.csv": {
+      "sha256": "b06174d45de0b71b1c1fd2112030febf838080e87f68f5acd6ec22f98846f85b",
+      "size_bytes": 189539
+    },
+    "experiments/calibration/point_predictions/validation/FD004/GBR/seed_2026.csv": {
+      "sha256": "5b41c1562defa48c3a42a4b4ee8df05a0d3f6aa92790f828300050398d0c2ee3",
+      "size_bytes": 212267
+    },
+    "experiments/calibration/point_predictions/validation/FD004/GBR/seed_2027.csv": {
+      "sha256": "5b41c1562defa48c3a42a4b4ee8df05a0d3f6aa92790f828300050398d0c2ee3",
+      "size_bytes": 212267
+    },
+    "experiments/calibration/point_predictions/validation/FD004/GBR/seed_2028.csv": {
+      "sha256": "5b41c1562defa48c3a42a4b4ee8df05a0d3f6aa92790f828300050398d0c2ee3",
+      "size_bytes": 212267
+    },
+    "experiments/calibration/point_predictions/validation/FD004/GBR/seed_2029.csv": {
+      "sha256": "5b41c1562defa48c3a42a4b4ee8df05a0d3f6aa92790f828300050398d0c2ee3",
+      "size_bytes": 212267
+    },
+    "experiments/calibration/point_predictions/validation/FD004/GBR/seed_2030.csv": {
+      "sha256": "5b41c1562defa48c3a42a4b4ee8df05a0d3f6aa92790f828300050398d0c2ee3",
+      "size_bytes": 212267
+    },
+    "experiments/calibration/point_predictions/validation/FD004/LSTM/seed_2026.csv": {
+      "sha256": "b5f5cafc7f1337b01dd661cd34b62edb5992dc4c82c2c3e58e4cf40e16092fc7",
+      "size_bytes": 212035
+    },
+    "experiments/calibration/point_predictions/validation/FD004/LSTM/seed_2027.csv": {
+      "sha256": "fbad19b2c34c0224ca57f25eedcf26194d8f45fa73c7aa997ee05c485ec839a1",
+      "size_bytes": 212029
+    },
+    "experiments/calibration/point_predictions/validation/FD004/LSTM/seed_2028.csv": {
+      "sha256": "d5cee2fbba9d8d3ff5f7a1f0fdaa21747517f3d9ff11781a31de7637b53b99f6",
+      "size_bytes": 212440
+    },
+    "experiments/calibration/point_predictions/validation/FD004/LSTM/seed_2029.csv": {
+      "sha256": "de9f6d950da60fe3448bf55d60ea6f2f700cfbd5827c602597e7c54021e4cc31",
+      "size_bytes": 212414
+    },
+    "experiments/calibration/point_predictions/validation/FD004/LSTM/seed_2030.csv": {
+      "sha256": "246f26bae0d6d168d7f2bc4fe977260a376110520699a61c4c115489897cdd0c",
+      "size_bytes": 212004
+    },
+    "experiments/calibration/selection/FD001/GBR/candidate_summary.csv": {
+      "sha256": "42dacd0e27054ac27b700d5eb84e842ccf836a15542b008d69688fc9d4cd3770",
+      "size_bytes": 1707
+    },
+    "experiments/calibration/selection/FD001/GBR/engine_seed_results.csv": {
+      "sha256": "787199f103d1cd7ca0bce6be5bf8b1dff53bb4954a876a147ee46536763e4c65",
+      "size_bytes": 59740
+    },
+    "experiments/calibration/selection/FD001/GBR/fold_thresholds.json": {
+      "sha256": "34c2c455440cf96567b80c2ab7e949eedeade308f1455feb07d1f424c3d91a95",
+      "size_bytes": 60033
+    },
+    "experiments/calibration/selection/FD001/GBR/regime_results.csv": {
+      "sha256": "b3078a3b6054d990653ea0eb6f69a29288a08ca6f6679c94f89bcbc573a912dc",
+      "size_bytes": 483
+    },
+    "experiments/calibration/selection/FD001/GBR/selection.json": {
+      "sha256": "2daef3f5631791b5ceb486761b1ca0c5b4c103767fbe11eb053e5f21c1891105",
+      "size_bytes": 970
+    },
+    "experiments/calibration/selection/FD001/LSTM/candidate_summary.csv": {
+      "sha256": "15b9116226073a696ea39c73918a60240138524adce5ac9d2dbc4850556f3615",
+      "size_bytes": 1762
+    },
+    "experiments/calibration/selection/FD001/LSTM/engine_seed_results.csv": {
+      "sha256": "0c714c5c13e83559f6f786dd35166ba8fd7e31f1f3197be98b928954ed57162e",
+      "size_bytes": 61578
+    },
+    "experiments/calibration/selection/FD001/LSTM/fold_thresholds.json": {
+      "sha256": "32078f9f19ac57a8ab3a4f837af14e5ca40871f7f0987978676df9db4a10ab63",
+      "size_bytes": 60056
+    },
+    "experiments/calibration/selection/FD001/LSTM/regime_results.csv": {
+      "sha256": "28f4eaff0d95b1d1f61d7c5463dfa8ffddd23591501c036a5a3af6fd90617d2c",
+      "size_bytes": 477
+    },
+    "experiments/calibration/selection/FD001/LSTM/selection.json": {
+      "sha256": "dc42a4aa5f636caa75a8b4bce47de027d5b4fdb4b30e24422d4c6b2950eb6742",
+      "size_bytes": 970
+    },
+    "experiments/calibration/selection/FD002/GBR/candidate_summary.csv": {
+      "sha256": "61db6371e98d81afd4c8266ecebb13522123ebf84282bda032323d910adccf9c",
+      "size_bytes": 1770
+    },
+    "experiments/calibration/selection/FD002/GBR/engine_seed_results.csv": {
+      "sha256": "fd2d48a7866173a204ec627e8a316d1c08d3c8f13fc2d092817319d1c7f78ac2",
+      "size_bytes": 224470
+    },
+    "experiments/calibration/selection/FD002/GBR/fold_thresholds.json": {
+      "sha256": "7cd5bb7241d955138211945321cc13bef070358668a75732de586ce19221063f",
+      "size_bytes": 418138
+    },
+    "experiments/calibration/selection/FD002/GBR/regime_results.csv": {
+      "sha256": "c48dbf2cb52c8a98982f5bc3c6ca3c60d3193a192f0a03098bf399fd87e19ffd",
+      "size_bytes": 2636
+    },
+    "experiments/calibration/selection/FD002/GBR/selection.json": {
+      "sha256": "93c973ff847bda1a787d75a8c2efddf446850572bb005b63359833c128633aa0",
+      "size_bytes": 1096
+    },
+    "experiments/calibration/selection/FD002/LSTM/candidate_summary.csv": {
+      "sha256": "0f6843363347bbc0e1ba6860dc0c67cb1983d799f3cd34c2eb4376f3e0d5616d",
+      "size_bytes": 1825
+    },
+    "experiments/calibration/selection/FD002/LSTM/engine_seed_results.csv": {
+      "sha256": "995568beeaed1a58924bdf3f7ac0477eafd12b8d4ed3f82d6cfc9ecd5b93a8a2",
+      "size_bytes": 235833
+    },
+    "experiments/calibration/selection/FD002/LSTM/fold_thresholds.json": {
+      "sha256": "3117d4f52a6d1ef0251384e07f389774e2cc0bd7e546e1fa3676cbe2fba1f510",
+      "size_bytes": 418604
+    },
+    "experiments/calibration/selection/FD002/LSTM/regime_results.csv": {
+      "sha256": "8dd948260f8fda5eceae81ad6acb839e560bd45b3c31209d1dc9146e1f9e3046",
+      "size_bytes": 2635
+    },
+    "experiments/calibration/selection/FD002/LSTM/selection.json": {
+      "sha256": "23f1c9b4d1533c4d4247bcd3aeaa4980cbc5aec1a13d2a3a72a5e8628cfb4813",
+      "size_bytes": 1129
+    },
+    "experiments/calibration/selection/FD004/GBR/candidate_summary.csv": {
+      "sha256": "738fa1cacb07a76963ec698f5ac6a9090f87d572f931d9ce61278d2628a05cf0",
+      "size_bytes": 1809
+    },
+    "experiments/calibration/selection/FD004/GBR/engine_seed_results.csv": {
+      "sha256": "14289b54b0f650211cdcfc491504824b857a9a35af5df362c08910bfb149e011",
+      "size_bytes": 216045
+    },
+    "experiments/calibration/selection/FD004/GBR/fold_thresholds.json": {
+      "sha256": "0d13d984c7ec23652f31a3fc85c08fc2d9747e8bde173206cdbaeab3c7e9b9b6",
+      "size_bytes": 400098
+    },
+    "experiments/calibration/selection/FD004/GBR/regime_results.csv": {
+      "sha256": "be14f4810c1b96a98a79b71c77d75abdc0ece526bc7a4a583e6942add0dbc6ba",
+      "size_bytes": 2638
+    },
+    "experiments/calibration/selection/FD004/GBR/selection.json": {
+      "sha256": "192723e270a615ab4e4ed8e54bdbb979cc929708b8af66d190128dbaa21c4424",
+      "size_bytes": 1129
+    },
+    "experiments/calibration/selection/FD004/LSTM/candidate_summary.csv": {
+      "sha256": "9d774812d8a6fb11fc86cdb09bf11d87391fc02a3d4f00f0325c3b0a19fb1080",
+      "size_bytes": 1726
+    },
+    "experiments/calibration/selection/FD004/LSTM/engine_seed_results.csv": {
+      "sha256": "010d8e5bd164b44c584ed775ca0701884bcba92fb671d9e7ee6bcd08a7d139f6",
+      "size_bytes": 216631
+    },
+    "experiments/calibration/selection/FD004/LSTM/fold_thresholds.json": {
+      "sha256": "ececdbd2ea6c72dd02e2aab15634b230014d0a268ca2a7c1fe2f4ed2aaadf0b4",
+      "size_bytes": 400352
+    },
+    "experiments/calibration/selection/FD004/LSTM/regime_results.csv": {
+      "sha256": "f17d96421eef81ab772bb433c96b4d21361d59046c717bb16c17b98cf96f7b01",
+      "size_bytes": 2634
+    },
+    "experiments/calibration/selection/FD004/LSTM/selection.json": {
+      "sha256": "54b679a0834fbed5aea7f9f7a7d58ad549891d0bf23947fcf727e8df565f37da",
+      "size_bytes": 1105
+    },
+    "experiments/calibration/selection/selection_freeze.json": {
+      "sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0",
+      "size_bytes": 5729
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "55d5f1b6fc86ff2e736ef8c00300c283d66658d8a92c358ca089cacbb193e147",
+      "size_bytes": 493094
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "39b39e39269b529ca610afcb746b10f382211d6db38f8e029a4912ae46a2d77e",
+      "size_bytes": 1796
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/global_hcp/metrics.json": {
+      "sha256": "ab8e9e87bcdab0a16a42c13128d820563ad99edec803a6fe6c9294367717604d",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "56c22d0b0f3be0b83ce155206e6e3a3e517ff5f4cb8d946b7ae29b16cfd0601d",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "55d5f1b6fc86ff2e736ef8c00300c283d66658d8a92c358ca089cacbb193e147",
+      "size_bytes": 493094
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "cf2186d359912866fefa7bfa97a62d659ffe7562f972cc304efa98ca1dc1fc6b",
+      "size_bytes": 1796
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/global_hcp/metrics.json": {
+      "sha256": "0ab83009a8c83f7ec0c10ddee55b34c0f29faf865faf0b153880b9bd83fa4cf0",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "8f6028c9e39616db8bd85db41b8fa83128167dc97fe953344b4c5986b452900e",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "55d5f1b6fc86ff2e736ef8c00300c283d66658d8a92c358ca089cacbb193e147",
+      "size_bytes": 493094
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "e3373e90500f6e1cb34617cc0d2a225740ef8946b5a93110e6cd1b5773098883",
+      "size_bytes": 1796
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/global_hcp/metrics.json": {
+      "sha256": "d82719db8c5e4cb75ad1fdb99d0b9044128a7e376f817ab108d267a52a54102a",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "ccb937bdebb9fd5660395eaa91f28edde01380a7c9d4e196ac70f933727ef67d",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "55d5f1b6fc86ff2e736ef8c00300c283d66658d8a92c358ca089cacbb193e147",
+      "size_bytes": 493094
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "73d02d3ccb01afe4e4cfc7c60ca4d7f4cc846140eb56a27850bb3edd5a4674bf",
+      "size_bytes": 1796
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/global_hcp/metrics.json": {
+      "sha256": "f9f753fe6dcde601a26dd6ba95f908e5f55a9ace575abab1553675dd111e2796",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "17e05fb8693afcb7262cc1a0433a5da68064b426f11f32a5ded5cab2aefd25a3",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "55d5f1b6fc86ff2e736ef8c00300c283d66658d8a92c358ca089cacbb193e147",
+      "size_bytes": 493094
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "8e0f1b1de5df58ecaf4a0972ff3767b9bec3fffa427b700b4bdca8bb1e49d181",
+      "size_bytes": 1796
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/global_hcp/metrics.json": {
+      "sha256": "5f482086d8599f0675c5c5dc9fa271e954371810fdd1d909919395788b9e793c",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "23e3f9c4ebdd3b6e65812cd20289b96c6fa10c64bebbea5c72c9db9c13090689",
+      "size_bytes": 481262
+    },
+    "experiments/calibration/validation/FD001/GBR/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "ebe8dc8af6b85009de62a1e6b94ba7c1ec38c5c051f186290d6493be7aa1c19c",
+      "size_bytes": 1782
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d7e1dbabefd12972730c8299424fc5e506be95540c94c97939747926837108e5",
+      "size_bytes": 491326
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "5ddf4d9f7a7c206ad23b8273f5e91954d5e4942cc7ff3db028f7e825eef5d913",
+      "size_bytes": 1815
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "c58ca2bd7c78a02ec89d7f9a1f34b9befbef913854a2a8b2c620c3008ec334f2",
+      "size_bytes": 476807
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/global_hcp/metrics.json": {
+      "sha256": "90fae0c742f9d01130a5f3ff9e7c745c0bdf367fac1908128f5b215d13890ea9",
+      "size_bytes": 1777
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "c58ca2bd7c78a02ec89d7f9a1f34b9befbef913854a2a8b2c620c3008ec334f2",
+      "size_bytes": 476807
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "06d14099f4831c9348f4866938a31c3943a9ffb767e6694e295eab49b0e6f3a7",
+      "size_bytes": 1777
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "17eb747090ea13f31712fbb3663a7d8a57a8612b3882fa6a56105c1c7e85e58c",
+      "size_bytes": 492355
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "256cab5a56e0a3a93e988c3a6b36e091009f0982df67fc6d2e544c817a17ef4d",
+      "size_bytes": 1877
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "baa4c83a394e0aa2e3975e3550603bb042e2dee757b32b3e43f1d0d40f8ab7fb",
+      "size_bytes": 479070
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/global_hcp/metrics.json": {
+      "sha256": "9341ae640cf25e5826366c40cdb38353e6bc375ff5a800444d99776af67b9dcc",
+      "size_bytes": 1781
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "baa4c83a394e0aa2e3975e3550603bb042e2dee757b32b3e43f1d0d40f8ab7fb",
+      "size_bytes": 479070
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "e207857953400e422349cb131e46bb67b11dc1a589264cab8f64bec5a0964d78",
+      "size_bytes": 1781
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "c2d8853221fc2881fef696a73dedfff61e95fcc92114f35c341cb5d4cb55f60a",
+      "size_bytes": 491637
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "71b87a5ce8d968532943968515e71162476c4d2b9a6ec8e4c735535e6463a545",
+      "size_bytes": 1800
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "dd86000e9a3e903b152162fe5a43ee66a55b71a4ed4e82e97f991a70a2af710b",
+      "size_bytes": 478495
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/global_hcp/metrics.json": {
+      "sha256": "0edb775e8700dbfba5902900956059c81852b6bf82d20a6b474c6197323f54e1",
+      "size_bytes": 1781
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "dd86000e9a3e903b152162fe5a43ee66a55b71a4ed4e82e97f991a70a2af710b",
+      "size_bytes": 478495
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "357d084bf67a4121aba3b6ac5aeea993a9b3da89a8c72edb83ff2aa0db1c2176",
+      "size_bytes": 1781
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "4266dfd34aadc200da0263e005c9cc40a70b86c8b1f60e5764d16cf0be18c5d1",
+      "size_bytes": 490730
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "166f6f4df64cf3c1836345032247a36693335ad5cb29937d80911e92a089165a",
+      "size_bytes": 1800
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "390a6de30c38d92b2236ca46a27cec31b84618f282a51263680921851e9c7a1a",
+      "size_bytes": 476941
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/global_hcp/metrics.json": {
+      "sha256": "eb278d7fe9689d8935f65aed4dcf2fc6377efa3776743858dc556002ec0161ca",
+      "size_bytes": 1779
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "390a6de30c38d92b2236ca46a27cec31b84618f282a51263680921851e9c7a1a",
+      "size_bytes": 476941
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "bd278745baca10a7be5075fc905356abbdd647c799d2081fef437d36e9170633",
+      "size_bytes": 1779
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "79ff8c108e560ea2c1cf2c595c04074bc6b2f8e7b6ca400754e9aaaa94c4072b",
+      "size_bytes": 490542
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "ec4247126cdec260be0f426c6b7e59f6013586f39dd41e371a0fb4ec7c34d5da",
+      "size_bytes": 1801
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "6af321163ee18788334327d4f9e27f310d190c6fdcdd1b25b3e9d1cee262efe8",
+      "size_bytes": 477045
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/global_hcp/metrics.json": {
+      "sha256": "64178fa0b9fa60ab88eefed2c6fc9f6852be66a36df176e5bbeb8108b2744b2d",
+      "size_bytes": 1783
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "6af321163ee18788334327d4f9e27f310d190c6fdcdd1b25b3e9d1cee262efe8",
+      "size_bytes": 477045
+    },
+    "experiments/calibration/validation/FD001/LSTM/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "ba881e98bb2e37dfb8524676179133f34a4929483993afacc7357de52394c246",
+      "size_bytes": 1783
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "82322fc02b3e9c01e20823ce57071f2946ba4ae14add4bc22a338ca6641b23df",
+      "size_bytes": 1364143
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "2fcde6493f1a412f41b127be14203896fc86ac4b909c33bc518f33ed0c22ef97",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "8b91766978a615a977fd241ae0e19860b431a3877f75b1c4400cf9ad3a2cb42f",
+      "size_bytes": 1321241
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/global_hcp/metrics.json": {
+      "sha256": "fdab2104a03c3ec42d4a72c8b5a3befb83d4656be006ca14ac600bf8ff7a0586",
+      "size_bytes": 2359
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "942bfbc9448e992041e211718a698d1f52f2418f31c13b3d090846217b794132",
+      "size_bytes": 1321140
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "2d8b6efde4cfd8174f302c550b0482957a799a69be012d4a338b7b4c4551b248",
+      "size_bytes": 2363
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "82322fc02b3e9c01e20823ce57071f2946ba4ae14add4bc22a338ca6641b23df",
+      "size_bytes": 1364143
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "84b56edbd4d564c8df8619cc243380375756a12ae1a2f800c4d58fe40c05441a",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "8b91766978a615a977fd241ae0e19860b431a3877f75b1c4400cf9ad3a2cb42f",
+      "size_bytes": 1321241
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/global_hcp/metrics.json": {
+      "sha256": "2ec1be47831fcbdd4c00722ad59dec6cf1d49dd311e948aeb50e93e5515fd93d",
+      "size_bytes": 2359
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "942bfbc9448e992041e211718a698d1f52f2418f31c13b3d090846217b794132",
+      "size_bytes": 1321140
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "9534b5805752b963938ee57e3bb3062db457cd9ab438894d5d1d781d4b92e0c6",
+      "size_bytes": 2363
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "82322fc02b3e9c01e20823ce57071f2946ba4ae14add4bc22a338ca6641b23df",
+      "size_bytes": 1364143
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "cba4e47a19ba4451204fffc057bb3e7acdcf00d49a4826c157d776be3192a4db",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "8b91766978a615a977fd241ae0e19860b431a3877f75b1c4400cf9ad3a2cb42f",
+      "size_bytes": 1321241
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/global_hcp/metrics.json": {
+      "sha256": "12c75ebcb19926ef5207c94241e65d10d25faff00fac971971d7928c841a60ea",
+      "size_bytes": 2359
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "942bfbc9448e992041e211718a698d1f52f2418f31c13b3d090846217b794132",
+      "size_bytes": 1321140
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "d7cf20272db4ea03bb295f1229ca0e9d36bb12403229e35c5b3fdc570363315a",
+      "size_bytes": 2363
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "82322fc02b3e9c01e20823ce57071f2946ba4ae14add4bc22a338ca6641b23df",
+      "size_bytes": 1364143
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "fa5ef0e5aa07bdb0fdabe377c2df209a8c4eb8af6a1b740e19302f0049a092a7",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "8b91766978a615a977fd241ae0e19860b431a3877f75b1c4400cf9ad3a2cb42f",
+      "size_bytes": 1321241
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/global_hcp/metrics.json": {
+      "sha256": "5ad584fa763f019468421b0b5813681cb8d6b4141a23ad2dc017215ce4012e31",
+      "size_bytes": 2359
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "942bfbc9448e992041e211718a698d1f52f2418f31c13b3d090846217b794132",
+      "size_bytes": 1321140
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "2b90e259eeb62e79b341170983438eb98877127a0d9577790759aa0b9e10f62a",
+      "size_bytes": 2363
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "82322fc02b3e9c01e20823ce57071f2946ba4ae14add4bc22a338ca6641b23df",
+      "size_bytes": 1364143
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "ec9f4c33f63ed07a60d347aea1914cb894fde348d638c5b0883f20b96aa26f1c",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "8b91766978a615a977fd241ae0e19860b431a3877f75b1c4400cf9ad3a2cb42f",
+      "size_bytes": 1321241
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/global_hcp/metrics.json": {
+      "sha256": "e97ccaf9cc954279349cae110e9f36edcde0f6a46d8751bc760366523788ce6f",
+      "size_bytes": 2359
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "942bfbc9448e992041e211718a698d1f52f2418f31c13b3d090846217b794132",
+      "size_bytes": 1321140
+    },
+    "experiments/calibration/validation/FD002/GBR/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "06b674e5e7f6fc7588929d3f423fc0b8cb96a696e19bf8f8d65935d864929214",
+      "size_bytes": 2363
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "fb2be3229f3a4d262d1b2c24e862f2ed75daa395915ddc3717ccdf3d67842a44",
+      "size_bytes": 1326544
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "f5c4bcfdc8819109be86097a01afed77e1218348276330b81661d46854c337e8",
+      "size_bytes": 2413
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "2d88280fa2e7adc2f4a414ca2dee208cb01bf9c36ad37467f7caa7fd2b7473cb",
+      "size_bytes": 1322381
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/global_hcp/metrics.json": {
+      "sha256": "3e778f9a75de9ea68cfb935457ba64ecaccd13a0a404af7c228d126879fb0679",
+      "size_bytes": 2394
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "fb636990b4188bcf58bc0fbb1d1fe91e0511eb4525f50d97fbea42835c135f4c",
+      "size_bytes": 1321597
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "56804471377852853f6c0a849fc88aaa879a8efab5d7c5da0f083ee763537cd3",
+      "size_bytes": 2365
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "54e4dc49037ce3f6afe439e878a34c8e8b53aabc898036dbc993b1532616a873",
+      "size_bytes": 1344456
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "b3c550ea51911b64b603b7fd3c54b4ec5690728b482955a3c5389a078ccf2794",
+      "size_bytes": 2409
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "e89f81e846df5863bbff076f50e4497c0f356415d64423af3b5f96421b6be0e0",
+      "size_bytes": 1321981
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/global_hcp/metrics.json": {
+      "sha256": "371856e6bd270fbf753da7512cf025cf25343fc50822d9edc37a46ed16287ce0",
+      "size_bytes": 2409
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "221020d6cda9635399ec50c09ed2ee8144cf1d3c665b8ff908b1394e4ad6faca",
+      "size_bytes": 1322633
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "172904c6eb71fcd8f15195ba2711d80e008ed0cf9099189496246785501867aa",
+      "size_bytes": 2413
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "0316b5bb37914a26d49c0bbcb33067caa154ac0e63985bfb7e3691101caf478e",
+      "size_bytes": 1359500
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "fc9343cf41d09cb80549011fd7ad614a5fef3d910ebc6979be2764beb32a832e",
+      "size_bytes": 2401
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "9110a83d172c7a5ebfcd339f92023fb78f723a0dfefac18faa84a66dc3c8cd54",
+      "size_bytes": 1323572
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/global_hcp/metrics.json": {
+      "sha256": "4b9e6beec36c81dd8c4e409c197b9a11e9ff452872ab0b162f917c55017a4ee2",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "fc4b28d170296450819c0f95a9885a87589b7893fd3360da5fa02277f3431912",
+      "size_bytes": 1323304
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "035e69e5c514f29cd98a2210e5d6d2aa5f2241a2684db7b832aa5f6eaf683663",
+      "size_bytes": 2378
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "059075ae9035d4663cdb1548fac84d83795eff086e9f720eb02770dbadc2f996",
+      "size_bytes": 1341118
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "e0f59775f2282eb98a239b94f67679cd5fbd8b0b66a2debad7a758270fa59eae",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "ab43c49162d64f5fecebc24ae9eb8e73e65d19e333f02207e927d61651e21873",
+      "size_bytes": 1321864
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/global_hcp/metrics.json": {
+      "sha256": "7ce9e1424dfa2c851d49f346a2b7c07cff20327fd29a38037952e5f7163090c4",
+      "size_bytes": 2396
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "19091a9529aa62323e446ee1aa95b36718fca3fcc3594562c589392a6a93e47e",
+      "size_bytes": 1321252
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "b1c9b22be5bbfb0d00c455870b13bcc1f4b6c0ab6a09725b318fcd134c190bc8",
+      "size_bytes": 2397
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "0747ad3617f592e629fa45845227b8c6c0323bdee51e61be5a0b6776a0a415c4",
+      "size_bytes": 1328039
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "6e487364da83e4ea2ca6d8daa2ac9c8301884838c79103901101b261c526dd9b",
+      "size_bytes": 2413
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "c14dce40c1b27ad46897b7ffd1dfdef4aa75c6c93acbb8a141c5ac5fadb55c95",
+      "size_bytes": 1319614
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/global_hcp/metrics.json": {
+      "sha256": "ca4d0b327cfde113294048c5d92ca33881f43f1250561aa3a0f632a43b951176",
+      "size_bytes": 2396
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "46bffcbc36d352a013859fa1c971445d2a4c1e5dd6669c21ea3883e86cdc4610",
+      "size_bytes": 1320493
+    },
+    "experiments/calibration/validation/FD002/LSTM/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "493f755fb0a5eac28467c329c5d12791981060229f7d1ab7b7803f9be1a019b6",
+      "size_bytes": 2395
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d69fb8e4dc70feb9aed2363483fe18b1af26ffd6e91027e2aa46c3a65fed773a",
+      "size_bytes": 1461768
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "0e926bf47f35fdb93b4d0b7b202d94e9e59317a51b8e436d45ef44fb106aba95",
+      "size_bytes": 2384
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "dee3a36d5d8754b139bea55878c6b687944ae3fcec4ab7f663fa4b2cf611c1ed",
+      "size_bytes": 1423412
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/global_hcp/metrics.json": {
+      "sha256": "4b2c071119bd2a330ca360f8cd88c23fd4dfb411fe5eff94cd9756bcad37041a",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "f986f9c07f1aa158fea0d39f56b0ac7659dcf33570b21899729124402ffad3fd",
+      "size_bytes": 1423430
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "d436efd19f51b04d8f143cf8bceab25a52e2b57b5e148ec12500666057a165d4",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d69fb8e4dc70feb9aed2363483fe18b1af26ffd6e91027e2aa46c3a65fed773a",
+      "size_bytes": 1461768
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "6d125cf47b12c610e2fa7db56cb28244b5fb361fdfc2ee568a129af3463fbdee",
+      "size_bytes": 2384
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "dee3a36d5d8754b139bea55878c6b687944ae3fcec4ab7f663fa4b2cf611c1ed",
+      "size_bytes": 1423412
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/global_hcp/metrics.json": {
+      "sha256": "1bc14af2ad620ce32e0f681fad407c7d73f31f43e56196a348fee7117813e183",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "f986f9c07f1aa158fea0d39f56b0ac7659dcf33570b21899729124402ffad3fd",
+      "size_bytes": 1423430
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "c1f376db620e662c88d35476a2e59a57d188d862999b32bee0f5c88586021f33",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d69fb8e4dc70feb9aed2363483fe18b1af26ffd6e91027e2aa46c3a65fed773a",
+      "size_bytes": 1461768
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "9ad567651c94f9fa5ff02b179c1de7fa70b00c697217e92ba3be519695087156",
+      "size_bytes": 2384
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "dee3a36d5d8754b139bea55878c6b687944ae3fcec4ab7f663fa4b2cf611c1ed",
+      "size_bytes": 1423412
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/global_hcp/metrics.json": {
+      "sha256": "3d763fc06a53738ff96a90c830ca4110a5a8d5e7209792450e403eaffe1cac5d",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "f986f9c07f1aa158fea0d39f56b0ac7659dcf33570b21899729124402ffad3fd",
+      "size_bytes": 1423430
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "3f0be6071f5868615a47dbd197c884cebd673ffdaf1159b3bb8caeaf5d7a62a6",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d69fb8e4dc70feb9aed2363483fe18b1af26ffd6e91027e2aa46c3a65fed773a",
+      "size_bytes": 1461768
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "9d84c379ce50eaa21fe67fd92ec12ce9a12f6e9b22459b3913eda06c5f74a6a1",
+      "size_bytes": 2384
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "dee3a36d5d8754b139bea55878c6b687944ae3fcec4ab7f663fa4b2cf611c1ed",
+      "size_bytes": 1423412
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/global_hcp/metrics.json": {
+      "sha256": "bb8d4ae278b1d6cd47789894bc3cc2e02f6d604b156573d940e2e16a03cce01f",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "f986f9c07f1aa158fea0d39f56b0ac7659dcf33570b21899729124402ffad3fd",
+      "size_bytes": 1423430
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "03096815e29b0b036880a68197ef308ea8115a2ac661ffc3964f7652916506d3",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "d69fb8e4dc70feb9aed2363483fe18b1af26ffd6e91027e2aa46c3a65fed773a",
+      "size_bytes": 1461768
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "97dd2aaa80c2fcc97f8e93ad861a21b7bab68372d96e7417ef54675c01a1fb82",
+      "size_bytes": 2384
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "dee3a36d5d8754b139bea55878c6b687944ae3fcec4ab7f663fa4b2cf611c1ed",
+      "size_bytes": 1423412
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/global_hcp/metrics.json": {
+      "sha256": "5f17e8da7893c2aec92ff8a811d5f1668d3b6362bc26e9c888a9a8737cce0dec",
+      "size_bytes": 2364
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "f986f9c07f1aa158fea0d39f56b0ac7659dcf33570b21899729124402ffad3fd",
+      "size_bytes": 1423430
+    },
+    "experiments/calibration/validation/FD004/GBR/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "c425cdfa0b02c04a22aa92dbed3b242a8624b94a9641bdc39680c467983846ba",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "e688dff70e3d76984930bc9fc79985c9f907d7995085df189f4459b4de4be811",
+      "size_bytes": 1456491
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/decision_aware_hcp/metrics.json": {
+      "sha256": "30ba2109990653b450da4b9bec12901b43c2f340c1931dfa59edf4541b05d2c7",
+      "size_bytes": 2400
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/global_hcp/interval_predictions.csv": {
+      "sha256": "00e2c54535e526d28d768bab460f02cb5bbc378e41c186db0610676ed236b7e5",
+      "size_bytes": 1424021
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/global_hcp/metrics.json": {
+      "sha256": "5ed54b27dfeba582e2aacbd94c8159f39598b388697677b9b91dcb7005c85d6b",
+      "size_bytes": 2366
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/regime_hcp/interval_predictions.csv": {
+      "sha256": "067cf4899e241bee73d2a1960120c36f4f063a51da8795183b69edbe3fcafe5c",
+      "size_bytes": 1422910
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2026/regime_hcp/metrics.json": {
+      "sha256": "e688e41c0e94f4525eff1a47f659752a02c04edf992216b6fb135c2ebf176b98",
+      "size_bytes": 2365
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "3ad5b7e80b0adb44162c55b17d6c959ebd6b244eeff4cdefc025d65133e7dc75",
+      "size_bytes": 1462334
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/decision_aware_hcp/metrics.json": {
+      "sha256": "9e49d96a4f5659272363c86bf34313bc748717c892d0218bf12c59a78d17ef46",
+      "size_bytes": 2399
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/global_hcp/interval_predictions.csv": {
+      "sha256": "985e084e729ebbc6be8d55a36c0859147124e65770ec41151b8b0a3e3133645c",
+      "size_bytes": 1428091
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/global_hcp/metrics.json": {
+      "sha256": "fd5225776f119c57e7dc2a935c1580f331520cb6da6aebac3a90dfce46ced0c7",
+      "size_bytes": 2365
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/regime_hcp/interval_predictions.csv": {
+      "sha256": "40d53fe5ed890867a6c507e0f19445f6ae2ef1cba4c679dcfee93ef609f13a7b",
+      "size_bytes": 1427576
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2027/regime_hcp/metrics.json": {
+      "sha256": "9fe8497a83369278e081f6937e2e9cdd1bee4d45897521576020e2adf492dbe9",
+      "size_bytes": 2362
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "dbeb7b06a5b1a29c7f97933b6c95670a24a8ef730018c390875369ef9a651d46",
+      "size_bytes": 1448655
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/decision_aware_hcp/metrics.json": {
+      "sha256": "fa4ab788163e37658caa97f463dd67716749766ef97f5852df7f0a16565af158",
+      "size_bytes": 2385
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/global_hcp/interval_predictions.csv": {
+      "sha256": "9637d672861f3d4a34f62078c8b1417356b292cffaaa3380e4277ee2475990b0",
+      "size_bytes": 1418466
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/global_hcp/metrics.json": {
+      "sha256": "b30fe8f86a6eeb1a70e7685214538964edda9e24a797fced34ab73cf72979d60",
+      "size_bytes": 2370
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/regime_hcp/interval_predictions.csv": {
+      "sha256": "11120996f99fed99a4b5d3844e8c561a4d309e418473b874a4cc4d9d5eb9f041",
+      "size_bytes": 1418149
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2028/regime_hcp/metrics.json": {
+      "sha256": "62555eabca8c928bda9e08710909194dab9ee9ab5c8129c90ce301990b920b71",
+      "size_bytes": 2366
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "7ff23d0ead397a0a7531a280a11807e29d9389de836600b480a1b7864663de2f",
+      "size_bytes": 1454341
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/decision_aware_hcp/metrics.json": {
+      "sha256": "e226a8717e9895bc7587ec1e53ef5639ddd333242fb1ad76badf23141506eaa1",
+      "size_bytes": 2403
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/global_hcp/interval_predictions.csv": {
+      "sha256": "6035b123b954a05f88b2d6664076d026809e493794ef21f22fa3a499f853a998",
+      "size_bytes": 1421231
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/global_hcp/metrics.json": {
+      "sha256": "37bed6ce245fb44fbab7c5bf4ca1992767dc610b84926085d8e61013990c4c8a",
+      "size_bytes": 2368
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/regime_hcp/interval_predictions.csv": {
+      "sha256": "2ab4f2b8c48db3e9257ac9306cf76b755c02645691b99f75642d0bd35874dc58",
+      "size_bytes": 1421955
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2029/regime_hcp/metrics.json": {
+      "sha256": "83b446cd9e8a35df970a638c79e0d749d7af824d29519f8a2b7ce63d8a90b431",
+      "size_bytes": 2369
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/decision_aware_hcp/interval_predictions.csv": {
+      "sha256": "8051da97146d96f18d88ba55c11c56b79215c0fb9677d69d350b4dbb1a3c21d8",
+      "size_bytes": 1452637
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/decision_aware_hcp/metrics.json": {
+      "sha256": "535ba9d7bab60724c00a1210b97eccdee08c4a12a9deced9dbcd19f650883425",
+      "size_bytes": 2418
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/global_hcp/interval_predictions.csv": {
+      "sha256": "c4584e272231975abb4cb18b01764c1e3959be8d6f6b607b08c91e61d3fac8a6",
+      "size_bytes": 1418448
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/global_hcp/metrics.json": {
+      "sha256": "4bdecf63f6944841b3cb96e55b3ebefbdefb69863fdd34150ce6b9b576a0f2fb",
+      "size_bytes": 2370
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/regime_hcp/interval_predictions.csv": {
+      "sha256": "45f0c4ed54c9cd893b1086717d6c5ee8fe0806d9d1cf653e51cb3e9590ab1372",
+      "size_bytes": 1417603
+    },
+    "experiments/calibration/validation/FD004/LSTM/seed_2030/regime_hcp/metrics.json": {
+      "sha256": "6e2c5b37537c2701fbc0905859c481967a9eb7a51e7f0e2b2ee34531a2c3630f",
+      "size_bytes": 2366
+    },
+    "experiments/calibration/validation_summary.csv": {
+      "sha256": "d16ac457774a168e677ccc914c02fb73ac7dbc47b9aeab91e46492775b73df57",
+      "size_bytes": 37947
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "0eae8e347c17172f9ae3ac0a8a8cc49b98656334ff3d73c88ec63ec84a45a6aa",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "e2102cbdb36e6b418e2ab46e343caaea66be8bf2a3bda8dc0bc68dfae8568805",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "2ab4a1226bd73ce1ac3b3eff9e7b9273cd8f0743513c7120a05b63bf4364702f",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "6df442ecfe27c62ea2cc22019de525a076c3c60050d762a7f68f4e8212dcb76e",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "8087c1610900a31d938d7b78351790358f6473f6ab34811d31af67dce90fde46",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "bc51ac4efd1b461497f3079ee4c163b910281d69798178ea28d29d299525790f",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "bc08238fbbb06c33f1355e5d1dbc24e3d92f0c047c54ef92557afcbcf4ed1f50",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "6c6e1b96345b32e1d5e6df1fa47ccc7fe592e501de3cabc795073308f7701c18",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "69d2dff2370cf80cac5e7486c8db8c809a574ef92235e611b34037e19aa496be",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "1e4330c72a16dfb13f989352a62e31a5dd8414b22edbfde677e4b3a17d4b62bb",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "b850e1605fa45d51c864b6e24809d44d87f9807fec0bc07a75139cb35148f71a",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "247a5ecf159d01f103afb308675d290e3b27a60d7b2606ba22f3eb1648cbd757",
+      "size_bytes": 1167938
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "41f878fb8b0f676b05e5bc5bda78d2695ebc3c85cdd007b0725b8ef23f097b67",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "c55dd2555932d8314abac5de74d20977ca0e8cb32e75f1c3d958d1ae0afbc4aa",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "b7cb18f948813ece887068aaa1b2d4b3d1c25e3c485178ca3f46f282755d2277",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "3cb13094f21e2e14b00e5e880e28ca28e6a39551c7c67ccb7006d30cfb5eacd4",
+      "size_bytes": 1705610
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2026.csv": {
+      "sha256": "400bfdff607507ea25e7419dbc3b98889683729265b3b78f449e217bba3059ef",
+      "size_bytes": 80022
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2027.csv": {
+      "sha256": "400bfdff607507ea25e7419dbc3b98889683729265b3b78f449e217bba3059ef",
+      "size_bytes": 80022
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2026.csv": {
+      "sha256": "6187baccf05941d2cf7925cfa9e08af13b63a2a6dc8a11ae360bde4666057d0b",
+      "size_bytes": 80028
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2027.csv": {
+      "sha256": "6187baccf05941d2cf7925cfa9e08af13b63a2a6dc8a11ae360bde4666057d0b",
+      "size_bytes": 80028
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2026.csv": {
+      "sha256": "612ef0d24cee70643434a8bf96a1f1bfe6389138bb64199917f73eb8df7972c7",
+      "size_bytes": 80041
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2027.csv": {
+      "sha256": "612ef0d24cee70643434a8bf96a1f1bfe6389138bb64199917f73eb8df7972c7",
+      "size_bytes": 80041
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2026.csv": {
+      "sha256": "a3acf608894fd05feacaebbc75447dab861197e62ae13e46ede26c0c346efd2d",
+      "size_bytes": 80035
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2027.csv": {
+      "sha256": "a3acf608894fd05feacaebbc75447dab861197e62ae13e46ede26c0c346efd2d",
+      "size_bytes": 80035
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2026.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2027.csv": {
+      "sha256": "2ef00a7a17ec9dd43e11c36c9429d2b91cd4b99203c6a2941f0f45131a787cb5",
+      "size_bytes": 80036
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2026.csv": {
+      "sha256": "d2ecea277927041507f7ed56977ed4abf7fe7fb384590c322898450bb63a12f5",
+      "size_bytes": 80023
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2027.csv": {
+      "sha256": "d2ecea277927041507f7ed56977ed4abf7fe7fb384590c322898450bb63a12f5",
+      "size_bytes": 80023
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2026.csv": {
+      "sha256": "9edf30c87cd94563bd82bdca79922f7297c1470e35e6bc2aff99e2af52520435",
+      "size_bytes": 80035
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2027.csv": {
+      "sha256": "9edf30c87cd94563bd82bdca79922f7297c1470e35e6bc2aff99e2af52520435",
+      "size_bytes": 80035
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2026.csv": {
+      "sha256": "3629adef9d23ec2f79cf18593b256a1246fcc7ac56576fec23f4b31134ef6bc5",
+      "size_bytes": 80044
+    },
+    "experiments/model_selection/FD001/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2027.csv": {
+      "sha256": "3629adef9d23ec2f79cf18593b256a1246fcc7ac56576fec23f4b31134ef6bc5",
+      "size_bytes": 80044
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf15_l2_0_seed2026.json": {
+      "sha256": "e667511c8506a734f33a391f84cd0fb5f1d2acd579090893ca2bb90d0cbfe2ae",
+      "size_bytes": 2071
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf15_l2_0_seed2027.json": {
+      "sha256": "f8be850364ce975b70de3a2f70fd9cab65c890a82cd7fdb065e50241e73d066b",
+      "size_bytes": 2070
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf15_l2_1_seed2026.json": {
+      "sha256": "a6ae0c568c00e11c2644b26ed852d619725d8a4dbb5420c66fced2ff1f6e62e8",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf15_l2_1_seed2027.json": {
+      "sha256": "91895cf13eb02dd78456c651961d2b41464f56833a9c173a108f84c9ba2b2f60",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf31_l2_0_seed2026.json": {
+      "sha256": "e11733a40f791c2ac69bc57fd122701dc7c6484078cd89b1540d1fcc8f15b13b",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf31_l2_0_seed2027.json": {
+      "sha256": "49ea151e2f251950189a4dd0b802f61e0cba10706484419ea71934b6ba28db0d",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf31_l2_1_seed2026.json": {
+      "sha256": "d61ba915a8e197917e92597c19b77bc17a60beaa6a5c085a8c97f3ab3c074ed7",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr005_leaf31_l2_1_seed2027.json": {
+      "sha256": "dfeb9ffeaa450e55c5c56a2b065723b7b289edf17b2df83ea3babbd846ca975e",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf15_l2_0_seed2026.json": {
+      "sha256": "61b72e09f94115ed7af483ba4fbe4d6409a7b3ba02508979cdecf104652c78bd",
+      "size_bytes": 2071
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf15_l2_0_seed2027.json": {
+      "sha256": "c048ae93f9c8b58d2cad88b6aa77fc09b2751254a6b8720717b939a7bd4d462f",
+      "size_bytes": 2071
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf15_l2_1_seed2026.json": {
+      "sha256": "03e187f5292ee3bd171dbfe9fbe3db0a7d8a3937129051b063eab3e504cb7f53",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf15_l2_1_seed2027.json": {
+      "sha256": "42ccd39f57a7af36cecd2f4e73f5ab3426bfda3a41ca7518544d179c5b652f5b",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf31_l2_0_seed2026.json": {
+      "sha256": "eafb726b3c2fcafdac6a95604da81564f6cda7419bf1d09a0db64084849ac6f5",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf31_l2_0_seed2027.json": {
+      "sha256": "c6ce949d41c49aa65b0acdcbc8e668b30716ebc1507c65d60e7fd4d1b5ca341b",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf31_l2_1_seed2026.json": {
+      "sha256": "9ae293c8b2d0f27325d04ad05b77b6d908eff9aad76b4540577666632a0d9608",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD001/GBR/runs/gbr_lr010_leaf31_l2_1_seed2027.json": {
+      "sha256": "2428f229875c071a56c6318e1f3690972cec792eaa1b90d5dc47287da2b40cd5",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h32_lr0003_seed2026.pt": {
+      "sha256": "620658575a116f431d58c83822263fd69a0e6652157fd6b7ad169565d7d2d3bc",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h32_lr0003_seed2027.pt": {
+      "sha256": "4bbd547e2e30e8a5d4501a3be2838df702aceccfcafa1525db512e1eb1e1e53f",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h32_lr0010_seed2026.pt": {
+      "sha256": "ce284ec37b4ca05d4d5c096cbfdd0814222f182b3435eb6b8552d69e0ef9802d",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h32_lr0010_seed2027.pt": {
+      "sha256": "b081c3fa549fe7258616d564c9064d05afd5589c150d10015c382108406181ed",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h64_lr0003_seed2026.pt": {
+      "sha256": "1d0475e927b005b854e389dc8453df67773b151d70558efc249e196f26ab6233",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h64_lr0003_seed2027.pt": {
+      "sha256": "f1184500229fd82cd547dd6462d4986cbf683ef3c57000b919dac330548a1d9e",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h64_lr0010_seed2026.pt": {
+      "sha256": "c27f092228c4a9002a8ea0bcdac43958f14f47b2853217f606aba254e46218c6",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD001/LSTM/checkpoints/lstm_h64_lr0010_seed2027.pt": {
+      "sha256": "eb4c9d04b199e399abf8ca0ab0c39a740228578320ac2e89b03b2419a6a4fc84",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h32_lr0003_seed2026.csv": {
+      "sha256": "79f91aa389d706db60c7de4bbff5d43c2af53ed917fe79bf9973e245e09ebacc",
+      "size_bytes": 79192
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h32_lr0003_seed2027.csv": {
+      "sha256": "bc51d27e09384c8c4a879ecce1a451a457ebcdb355b24a5bd9f684c607cda901",
+      "size_bytes": 79186
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h32_lr0010_seed2026.csv": {
+      "sha256": "46654505601180de9fcecfca1610f5faec07f8026041daaf6bdcfe55050bf51c",
+      "size_bytes": 79182
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h32_lr0010_seed2027.csv": {
+      "sha256": "319b3b77fdb087ba28501adfd885409999622cf0242661429af77a7b11388e14",
+      "size_bytes": 79181
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h64_lr0003_seed2026.csv": {
+      "sha256": "227ef346a0622d7b027dce7bc4a4c9fc76cc2d66b9a5f799015574f12f6b41a2",
+      "size_bytes": 79169
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h64_lr0003_seed2027.csv": {
+      "sha256": "792c81e80acb07083d471f8350a1f36e86e490eb50da638f56336bc2381c39ae",
+      "size_bytes": 79183
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h64_lr0010_seed2026.csv": {
+      "sha256": "53b14ead232bc6c029401c9512a4252e43c54169383a3fd60be392f0e6f6a141",
+      "size_bytes": 79968
+    },
+    "experiments/model_selection/FD001/LSTM/predictions/lstm_h64_lr0010_seed2027.csv": {
+      "sha256": "7982beaee3011e8399cb884b65948ba74c31b915ff86d4c1f826cb77343988f6",
+      "size_bytes": 80011
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h32_lr0003_seed2026.json": {
+      "sha256": "28f1bf3a449084f7d6eb4bcca783212870d07f9777d1685e2a9bfac227f4d067",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h32_lr0003_seed2027.json": {
+      "sha256": "5c7483ea51e65a8f05d72e4d5b82b21fa07aeb4dc640e180e53c203db33e3724",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h32_lr0010_seed2026.json": {
+      "sha256": "d29e5f102c60714c95f3fb7e8772c6abbcedc471bc59b2e0afbf00b32c3595fc",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h32_lr0010_seed2027.json": {
+      "sha256": "33655e3f5c0d33d2ed3208fce5acb862ee32fd89e5adefdc34a9416a5011981b",
+      "size_bytes": 2173
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h64_lr0003_seed2026.json": {
+      "sha256": "06a5788c82e7fe2416bd4666af7059bbe71ceb3eb8eda4469801914da6395194",
+      "size_bytes": 2171
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h64_lr0003_seed2027.json": {
+      "sha256": "580b75318e4cfca4bec289b5288381eecdc13706a71dadcd6d94c5c22662e9f4",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h64_lr0010_seed2026.json": {
+      "sha256": "b7b7e0d011ead46f4d13b29e94a07bf92522b94c5aec5a1529ff87fbf51c0a70",
+      "size_bytes": 2171
+    },
+    "experiments/model_selection/FD001/LSTM/runs/lstm_h64_lr0010_seed2027.json": {
+      "sha256": "dfd94d7dbe1642eb3ba7f8e77aad9fc30f6c60dab78f82015e6e1b55d01d07e3",
+      "size_bytes": 2173
+    },
+    "experiments/model_selection/FD001/gbr_selection.json": {
+      "sha256": "17fda8e907c49f2f02778ff4827bf7c0cba49af823b3990ee6c0b14073a5c44c",
+      "size_bytes": 9499
+    },
+    "experiments/model_selection/FD001/lstm_selection.json": {
+      "sha256": "612f24dcc42716cf3b736ec90b3246bae710217c53eb91b010753d0f7d8894c8",
+      "size_bytes": 5983
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "398f2c18f5aaf0e59d289d05998bb83f594568a353a10a42c62de6aad808411b",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "a0db16524be7a4dcca8988a5ceca224666aa761610c3a17ea56e50f365deab9c",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "e1581fe942a989b8711114df7bbc24f64037abc23c824dc768fae86b00ac2f94",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "1005c6fb79037101f066608841847455003c4f67f871b5d23bf330723886ba21",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "fd5dc97ad7fb6ddff2777e11229376177502c21849a72a5d3696761555a6a77d",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "e40ab70a073c2da404c6a0a8204287c97a4cfcca3c34523411cc7cafa5ac332f",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "542e2eadb9dc98e954f566bd923a34305269b5fe74ba0bfc73d73ce21ae5bfdf",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "9e263a9ff1334c7e6a91b56f6d4eeda1fb652aa6b4742b5f0769d0d383d56c84",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "dbae1f408a1a82480cb5570bd185854277a20ce874a2fffa6e7d32483764de48",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "d1a3c0b168296b439145327c2e34c98b399d6305445ae7b460d0ba26fc74d9ab",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "f02b5a791a2ebc591dff8c8edb98e4fb61f2d90a15d5068c544f12aa9f5ee64c",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "7a65c21f1d150e2d6c7aa66accae96f66395eef84ec4a71b3571a5c3413d196b",
+      "size_bytes": 1399550
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "6df41d7547bbea4549791faa05e85f78adadc28a4fb12d84228824c5984fe12b",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "a63fa9abc22c49ff8386a8114651cf7eb065d597b466539b2e75a260f8fa2887",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "5105d32ac79b94b5bb81b7e0c46c39d3a7b597c1a6e2066c5da3acb570ac874c",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "0750624392e265072556bc60e40df42e5ebc472692b32e8ff33517716337ab73",
+      "size_bytes": 1937222
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2026.csv": {
+      "sha256": "0f0975332ddad3e98bcb5fcaf9327e418133a62d7ab94a76160882afaced1518",
+      "size_bytes": 215236
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2027.csv": {
+      "sha256": "0f0975332ddad3e98bcb5fcaf9327e418133a62d7ab94a76160882afaced1518",
+      "size_bytes": 215236
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2026.csv": {
+      "sha256": "327323804c27dd475118fc0244e6d9e49d505a121641f66b4346d0ecaeef0bcb",
+      "size_bytes": 215230
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2027.csv": {
+      "sha256": "327323804c27dd475118fc0244e6d9e49d505a121641f66b4346d0ecaeef0bcb",
+      "size_bytes": 215230
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2026.csv": {
+      "sha256": "680c22b4adfd887d3157e8ca0d4036256ee671aa00e398be86759b058d15c0e7",
+      "size_bytes": 215260
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2027.csv": {
+      "sha256": "680c22b4adfd887d3157e8ca0d4036256ee671aa00e398be86759b058d15c0e7",
+      "size_bytes": 215260
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2026.csv": {
+      "sha256": "4c13eec1e94b89a35420778fc4b89169bc6c67376163e66445e72f042ec08396",
+      "size_bytes": 215275
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2027.csv": {
+      "sha256": "4c13eec1e94b89a35420778fc4b89169bc6c67376163e66445e72f042ec08396",
+      "size_bytes": 215275
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2026.csv": {
+      "sha256": "e93415f8fd656a5b6e1c1996061abf6b6b58e79aefabcf97cb513d923cb6e8f1",
+      "size_bytes": 215259
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2027.csv": {
+      "sha256": "e93415f8fd656a5b6e1c1996061abf6b6b58e79aefabcf97cb513d923cb6e8f1",
+      "size_bytes": 215259
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2026.csv": {
+      "sha256": "01e407bfc9fb86cc164853824a79fa60d481db2a2e8a3149ace84b1d1fb3ad1d",
+      "size_bytes": 215254
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2027.csv": {
+      "sha256": "01e407bfc9fb86cc164853824a79fa60d481db2a2e8a3149ace84b1d1fb3ad1d",
+      "size_bytes": 215254
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2026.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2027.csv": {
+      "sha256": "84e93cf23c484df273a33be8c882b893af87924377fa9cb891d373d57e6b2cc7",
+      "size_bytes": 215261
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2026.csv": {
+      "sha256": "33730882a9b9b35ea0a69c9607a1cb9c3a182d8997540fe2ff1e8d42bc0553ba",
+      "size_bytes": 215291
+    },
+    "experiments/model_selection/FD002/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2027.csv": {
+      "sha256": "33730882a9b9b35ea0a69c9607a1cb9c3a182d8997540fe2ff1e8d42bc0553ba",
+      "size_bytes": 215291
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf15_l2_0_seed2026.json": {
+      "sha256": "503a2c81d0ee45368bb035931f35044c887a6a7abd05a6fa2740afa30a1bf15b",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf15_l2_0_seed2027.json": {
+      "sha256": "5a03e76dc35b89b4ccd95b867c50b2203db4d94e9ad8ac3ce2a4fe37f284b6ac",
+      "size_bytes": 2075
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf15_l2_1_seed2026.json": {
+      "sha256": "6f7279c7e2cd6e9c817e3f34c2c8d9cd4c02b72e7cc97c41ebc6e7d54c735b75",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf15_l2_1_seed2027.json": {
+      "sha256": "466748286396b60c104f5a14f4628967c14a57e149c15aedca5a5748f569487c",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf31_l2_0_seed2026.json": {
+      "sha256": "7c4258f22f870e3a2eda36ccf1586665c7e2779fdfca093026a2d53b2d904337",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf31_l2_0_seed2027.json": {
+      "sha256": "ac1b230d7945b7311ff6d8fdec0410d9005f0f5ac4eef72f079bff47592ac92f",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf31_l2_1_seed2026.json": {
+      "sha256": "0edcba58eddb73121846c908ce985e0f61ebc1ed29763b6266f7bb75331305ed",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr005_leaf31_l2_1_seed2027.json": {
+      "sha256": "aa7e75071c11029a66999831f662cb0e8fce6102840ec02ce2e8b2d15b30f7ad",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf15_l2_0_seed2026.json": {
+      "sha256": "cf006175fec4c5c724f3ea223dadcafa29391aa8f38254c7fb57df1ca61dc092",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf15_l2_0_seed2027.json": {
+      "sha256": "f00eb50d237baa18333aa553c1d182e6522ad14854fd9015c6143a1f2d0205cd",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf15_l2_1_seed2026.json": {
+      "sha256": "cc9a44d45e48615d3922fa221157d4685e78e6b5b76b43fd6b6e49e4d311f282",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf15_l2_1_seed2027.json": {
+      "sha256": "74f20eb18743ea91978e8e1a5b51b7ec8d1432aeedc3498a863a5ce93d0d136b",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf31_l2_0_seed2026.json": {
+      "sha256": "fb8a51fdc029bed5b98f89c667bd41eac91e269b727e31903c7aeefb9b7ad768",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf31_l2_0_seed2027.json": {
+      "sha256": "62c184d660cbf5cde478707fab01ca979c261a38862eb43a1c01b1acf07bf23f",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf31_l2_1_seed2026.json": {
+      "sha256": "24d7a4b98c83ab7f9b47bf3e706588c461dac8a6691d826de52a828d1acdb680",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD002/GBR/runs/gbr_lr010_leaf31_l2_1_seed2027.json": {
+      "sha256": "d4cf30ea570095749df571b3bb16ee65a2d0afde2727bf0d011fcd5e1d01c7cf",
+      "size_bytes": 2071
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h32_lr0003_seed2026.pt": {
+      "sha256": "e798fb0eb8e27609d2edda022878b817a061e837a9b27ca5d9afacb9385fbcbb",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h32_lr0003_seed2027.pt": {
+      "sha256": "226b91653dfda457c988f39b50bbafaa8684d29b06893e7356a7f25cd4333a4e",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h32_lr0010_seed2026.pt": {
+      "sha256": "78ffd5894e2872daa241bee975e9c008d20324e0cf099ff13b393d30948b6c23",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h32_lr0010_seed2027.pt": {
+      "sha256": "13d03b9ee456655af71dff9b6593ed65a2eb99400f98dd28400327561c3591bb",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h64_lr0003_seed2026.pt": {
+      "sha256": "64fbe502e13e6c5781e65aa2f99f8073b94768edcaba2c43fa6e8cc1f01da723",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h64_lr0003_seed2027.pt": {
+      "sha256": "48ddc69545636239974c3f54a53040bd278ce2e44728e9fb22570929780a34d7",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h64_lr0010_seed2026.pt": {
+      "sha256": "94bde7dd238b8e1efc88cf9813f63004a9c0a2ee72588b0087e79f7c57e51372",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD002/LSTM/checkpoints/lstm_h64_lr0010_seed2027.pt": {
+      "sha256": "94c317ee9fbd6512773bc2e781b7dc4077a8382c97060bca4f5648706acb2b78",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h32_lr0003_seed2026.csv": {
+      "sha256": "54e302841c92707980511711051d6011310a84d98af1ba3f5fb8ffdd3134f804",
+      "size_bytes": 213257
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h32_lr0003_seed2027.csv": {
+      "sha256": "b3da4cc181a6fe473269b28fea5a532be580e4014d609210c9aa6fa11c0030c1",
+      "size_bytes": 213270
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h32_lr0010_seed2026.csv": {
+      "sha256": "62a047cce23c1ffa51ff1882d2f3f3a0fc751d9557722cf0fb9df635802da76a",
+      "size_bytes": 215488
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h32_lr0010_seed2027.csv": {
+      "sha256": "87f6e06613a675ef387d7255e523c0ae02b35181f3a9ef34db77f78f811c6c7e",
+      "size_bytes": 215397
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h64_lr0003_seed2026.csv": {
+      "sha256": "85dd4287e32799c16b1ae29f8042077c9d11208c492535a2319ad1a76f82eed4",
+      "size_bytes": 215569
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h64_lr0003_seed2027.csv": {
+      "sha256": "4b445fdb324dadb8c5cf871c9e3fd7568e86cc03fa51a4eb387a0a0bd4db32ab",
+      "size_bytes": 215579
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h64_lr0010_seed2026.csv": {
+      "sha256": "83516d3543e06ab21e3708a3fec1ea9ca2d9f6b7cb93c4593b0671405e622e35",
+      "size_bytes": 215440
+    },
+    "experiments/model_selection/FD002/LSTM/predictions/lstm_h64_lr0010_seed2027.csv": {
+      "sha256": "025011ae371ac6b12cdbd2bc4a97946f3f12f891467435471ee343506cad6ea7",
+      "size_bytes": 215462
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h32_lr0003_seed2026.json": {
+      "sha256": "22ff9eda44112046aaacb29dde5785a2090fd1e13dff89b6671ae0952e1a5a1e",
+      "size_bytes": 2177
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h32_lr0003_seed2027.json": {
+      "sha256": "3e31ea54d7f63b293f00c73bf14b12bd324187cc5fb9828f49e25000aa1dbab3",
+      "size_bytes": 2173
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h32_lr0010_seed2026.json": {
+      "sha256": "0d90b14b3d7e42be5f154c6ea0434fc7d994b13494874dde23b4b2a787da2c1c",
+      "size_bytes": 2175
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h32_lr0010_seed2027.json": {
+      "sha256": "3c8a19b0e18322965a5d9392c036ff9600159c69f64ffc4939a3ae985db13613",
+      "size_bytes": 2170
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h64_lr0003_seed2026.json": {
+      "sha256": "361b776a11d608d42b1eb57561847d5ef55ed27abef6f72e6fd9e7255aa3063d",
+      "size_bytes": 2176
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h64_lr0003_seed2027.json": {
+      "sha256": "a052cb1a341a9acb12cda12118f0e3ac4317a6006cb0f9936f4d075c7281dff6",
+      "size_bytes": 2175
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h64_lr0010_seed2026.json": {
+      "sha256": "387e53ec3ab16e000444c1c88cc47ffea839c6ffc46865133cbf6142b361fa90",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD002/LSTM/runs/lstm_h64_lr0010_seed2027.json": {
+      "sha256": "b679a8a5be334fda80c61faa8dcdabd1de9ccdb7b00c8f6444847309ca28ecb6",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD002/gbr_selection.json": {
+      "sha256": "c41251a0ec98d30f5ccdaedc1f466b70bf66b41ec441ade65e701c61833c3264",
+      "size_bytes": 9495
+    },
+    "experiments/model_selection/FD002/lstm_selection.json": {
+      "sha256": "5f75589d0597afefa3732901af86e54a07e7d5ff4756987e42a93fe8331817e2",
+      "size_bytes": 5985
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "f5630d4b248f45d3c62c8c53cd0d7baa2e465cae32c39fd3ade5ade4a8e9bba4",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "6c6fb8e1a2ce7b95733cac53e34ffb6de7d3933d0c063ca924e95078d6b03ecb",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "ca67be01269c21801d1529ddd1653ae5fabeb1623694ed8321626bd175a019a2",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "6a5c9cbba4c563a3a270c6e5a301c58e0bb2c7ceafc87145e749564500aad688",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "36748f3369a95047a4c5474642b1de55a021c5911f4efa66f7de8a71b1b2f479",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "3f9a1c643d6b1a397752efabba13ac7bc79d6e9a02b7acefe3e3fadcd209b869",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "e5bbe5babb2faebffd031e0b35f7466fa7f0079e810199c9f569cb2532b1c22e",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr005_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "1cecf690754621ce484dfa280759b9d3b4485e9b3dc1ecf4fff2117bbfce1328",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2026.pkl": {
+      "sha256": "2e683699b10c67670de65ebc669313edb54d25ce3e8128813ba186820ff59e5e",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf15_l2_0_seed2027.pkl": {
+      "sha256": "f45912f856d0242153ddf744b7b345c7afe9da15e6846b38c01ac3168082310e",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2026.pkl": {
+      "sha256": "316880181503996d5d443b6615d74c60357ff8a313133470ed7f862338fb78dd",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf15_l2_1_seed2027.pkl": {
+      "sha256": "f7d45df4f141f461c4ddf91d4461d09511f0e358dd341530de21ffbfc37d5be4",
+      "size_bytes": 1409174
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2026.pkl": {
+      "sha256": "612c6f54c1141d4d9082abc2586cf2fdd7b6f47bb9ac911554ba4faba8449a10",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf31_l2_0_seed2027.pkl": {
+      "sha256": "9e9b44a26aee2ce714f473b34f8ca74ec8454c86b6e0eb8d71fa93baf5f8f181",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2026.pkl": {
+      "sha256": "70d172acdf9e6355de801a367129a6aaaa66c4b3a6dc32af412ab9fab7125b52",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/checkpoints/gbr_lr010_leaf31_l2_1_seed2027.pkl": {
+      "sha256": "84b25ce674a113159269c79b34f34a589692c7bfa10fd386e6e46b5a274a20f7",
+      "size_bytes": 1946846
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2026.csv": {
+      "sha256": "a286ed5f90ac3bc21cd8d754760b48a884e3ffd6fcf37a5f253b45a53647abd2",
+      "size_bytes": 241569
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf15_l2_0_seed2027.csv": {
+      "sha256": "a286ed5f90ac3bc21cd8d754760b48a884e3ffd6fcf37a5f253b45a53647abd2",
+      "size_bytes": 241569
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2026.csv": {
+      "sha256": "8aa4e637bf79abcaf2d3b2d8be2607d386e1fb650bbc6e867cac9c4505dd5a7f",
+      "size_bytes": 241559
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf15_l2_1_seed2027.csv": {
+      "sha256": "8aa4e637bf79abcaf2d3b2d8be2607d386e1fb650bbc6e867cac9c4505dd5a7f",
+      "size_bytes": 241559
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2026.csv": {
+      "sha256": "db2be8510e09e0017fb9d76896187c0a1f72cb2ddfdf392018b13a85cfa0170c",
+      "size_bytes": 241585
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf31_l2_0_seed2027.csv": {
+      "sha256": "db2be8510e09e0017fb9d76896187c0a1f72cb2ddfdf392018b13a85cfa0170c",
+      "size_bytes": 241585
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2026.csv": {
+      "sha256": "f7bf281ecc1ad9271d6d83ec8ba2443c0ac38de75411a4d1976110cd092f6d09",
+      "size_bytes": 241592
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr005_leaf31_l2_1_seed2027.csv": {
+      "sha256": "f7bf281ecc1ad9271d6d83ec8ba2443c0ac38de75411a4d1976110cd092f6d09",
+      "size_bytes": 241592
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2026.csv": {
+      "sha256": "3e8e5aa6930f8f244c585569d1d013b46a06d42e58b0fb98a5527c412afd195c",
+      "size_bytes": 241540
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf15_l2_0_seed2027.csv": {
+      "sha256": "3e8e5aa6930f8f244c585569d1d013b46a06d42e58b0fb98a5527c412afd195c",
+      "size_bytes": 241540
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2026.csv": {
+      "sha256": "2b1d7dc8f3be7c1eb60be6073956febadd40a10efb120077b51f516aaf2a13ac",
+      "size_bytes": 241538
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf15_l2_1_seed2027.csv": {
+      "sha256": "2b1d7dc8f3be7c1eb60be6073956febadd40a10efb120077b51f516aaf2a13ac",
+      "size_bytes": 241538
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2026.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf31_l2_0_seed2027.csv": {
+      "sha256": "9b7c826f0f4d42ba1ae8e54db601f7a075ac80d2b0bba4f4ce35b20c597126cb",
+      "size_bytes": 241588
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2026.csv": {
+      "sha256": "2cc7f5042b1636836d98d7f15e973eab731a44fed2556c34f96ea4a2f6445307",
+      "size_bytes": 241592
+    },
+    "experiments/model_selection/FD004/GBR/predictions/gbr_lr010_leaf31_l2_1_seed2027.csv": {
+      "sha256": "2cc7f5042b1636836d98d7f15e973eab731a44fed2556c34f96ea4a2f6445307",
+      "size_bytes": 241592
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf15_l2_0_seed2026.json": {
+      "sha256": "910581d0624c25e4f6e8c874171742f1e8833d32928bd119cccca5bd75e56b86",
+      "size_bytes": 2075
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf15_l2_0_seed2027.json": {
+      "sha256": "e71a8face682b236cc6dc120cfd421b51d39798adf045d38e8ac58365c811ee0",
+      "size_bytes": 2075
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf15_l2_1_seed2026.json": {
+      "sha256": "968ad0333dd82ad4a7bfcadb886183be72d51217c3638a7a3cd5b608498a59eb",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf15_l2_1_seed2027.json": {
+      "sha256": "acbd5679715ecd790b5928864e2aa92bf39cb6108e7220e66204f9d9944b9dd9",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf31_l2_0_seed2026.json": {
+      "sha256": "9faa31f9e093e298d2571976ecc36ffeb5d185cf8544d277abbbe704395fea2d",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf31_l2_0_seed2027.json": {
+      "sha256": "a798c20e63e9b6272908fdae41f946dcb24d4dd6d052d8174d447929471baf05",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf31_l2_1_seed2026.json": {
+      "sha256": "85f0f24c794f06b7876741795324cf8180f36effe24caf99076c1d643a6c1289",
+      "size_bytes": 2075
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr005_leaf31_l2_1_seed2027.json": {
+      "sha256": "d28c439fab424ef3cb7f97254eb3d03f253ea942db02c82c6cb3839ca6d299fc",
+      "size_bytes": 2076
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf15_l2_0_seed2026.json": {
+      "sha256": "454c3f9ec88455076a4f8b18c2c60d7af6f9335dd14941b1e37de183ed1bbcfc",
+      "size_bytes": 2074
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf15_l2_0_seed2027.json": {
+      "sha256": "7b32cb9e69725f9bbde160456583ea279e81bf2ca45eff59338b3246e1b19453",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf15_l2_1_seed2026.json": {
+      "sha256": "7b3596e12c3536d963eb8e56c19d824a8d1c3f7d94d01ace012882ed05347391",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf15_l2_1_seed2027.json": {
+      "sha256": "fe10283c5714cb496b986b273d8c524416e353b946ea51c7db59cce81ada90b0",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf31_l2_0_seed2026.json": {
+      "sha256": "390e8b6b09019771feb6f714eaa53a1a675be3f1362225c69a4b6f4a9807ad86",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf31_l2_0_seed2027.json": {
+      "sha256": "591fadac2669080d859518bd469e4c2b622f27ff00d4910212a5d438a37903a7",
+      "size_bytes": 2072
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf31_l2_1_seed2026.json": {
+      "sha256": "8ab9e5b22983a1287229b661e57a4eb070e439f42be140eca4a14d4e1290b9da",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD004/GBR/runs/gbr_lr010_leaf31_l2_1_seed2027.json": {
+      "sha256": "1fe8d0e6436bee187225cd129697604663e2563a601c847b522bb8e78cba0672",
+      "size_bytes": 2073
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h32_lr0003_seed2026.pt": {
+      "sha256": "5b1e65b831f214f44febc94d47cb129fc553894c91e1c445a9a4d7d08534e6ef",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h32_lr0003_seed2027.pt": {
+      "sha256": "c0a731b36e5e1c39a6ef34c9f2568cfb2c94e7be38aec80d15418103815c2724",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h32_lr0010_seed2026.pt": {
+      "sha256": "49b9d37d3ed4f097da110bf89c83553fd43ecd1581aa5d6cd8f792ce5adc6de5",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h32_lr0010_seed2027.pt": {
+      "sha256": "71ff0a21e0e2fb5a26219137c5ce5f1397429d5c78d28e0a18e34320dd21f435",
+      "size_bytes": 30049
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h64_lr0003_seed2026.pt": {
+      "sha256": "a554a33087cc2d475b20326b261231236f47b0dc9841c1651560a2b801603c20",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h64_lr0003_seed2027.pt": {
+      "sha256": "5cb162cc10b4caa4073c4f959e39cb4262fcebfef0475a16651f7a00456afaea",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h64_lr0010_seed2026.pt": {
+      "sha256": "a5f39da638d934ac7805abe881875a645bfc535420cc141119ce4a89f6195488",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD004/LSTM/checkpoints/lstm_h64_lr0010_seed2027.pt": {
+      "sha256": "851858dda274be5917be3202e28b628eae2b0a6a667bd615d1182ee75e2a2905",
+      "size_bytes": 89057
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h32_lr0003_seed2026.csv": {
+      "sha256": "350fecf3b9e714994eb4e97c9cab1b1e72f5082d5265e83fefcf10bfa72562d0",
+      "size_bytes": 238708
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h32_lr0003_seed2027.csv": {
+      "sha256": "f44614d7fdc7de3b22088e4d55ae79bc9cccdd95c7fee87e4bc5d4398b2f160a",
+      "size_bytes": 238685
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h32_lr0010_seed2026.csv": {
+      "sha256": "aed430e82c9115fa843c3da512963024314c31c6fb1c060aa2d7ffcee6b2052d",
+      "size_bytes": 241580
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h32_lr0010_seed2027.csv": {
+      "sha256": "95132514408cd0f92c508e4e828ec4973120bb39945299e60e3dd260f9a64c98",
+      "size_bytes": 241550
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h64_lr0003_seed2026.csv": {
+      "sha256": "40a6f6ddcbbbe979ee719d21573aba0766d1a89879396f3534cb02dcaa5c42e0",
+      "size_bytes": 241459
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h64_lr0003_seed2027.csv": {
+      "sha256": "f4264fe4d2bbe8be6eadb7f4d8bb010dce25ce8bb6e00d62e8e3e0d6523a568f",
+      "size_bytes": 241609
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h64_lr0010_seed2026.csv": {
+      "sha256": "9bc72d07b0a4777c7a920143c58f1b8b1661bb8e655b09c5dfe326107ef2b9da",
+      "size_bytes": 241640
+    },
+    "experiments/model_selection/FD004/LSTM/predictions/lstm_h64_lr0010_seed2027.csv": {
+      "sha256": "2c6e5a17a0eb0fa74bdbe2001d5772bfb482d004c91b9cdda229470d9db1876c",
+      "size_bytes": 241789
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h32_lr0003_seed2026.json": {
+      "sha256": "0c7e2dcab2b5d0b23c9c144b7ede14be0540c826a8fbbefaacd2f5b1935762ee",
+      "size_bytes": 2175
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h32_lr0003_seed2027.json": {
+      "sha256": "ffc133de384a7e1996f52c16104f7b21a9672f4e44285369aa7c52d59bf61204",
+      "size_bytes": 2175
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h32_lr0010_seed2026.json": {
+      "sha256": "1f1b83a1b9735ef3cded8268869134f441177f7ff3894d0a037a49d7de7e9b18",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h32_lr0010_seed2027.json": {
+      "sha256": "d415281a3da390eb07f2c6efa9ad590c3cb6291e0e2cbc9f4fcc67e311a34d87",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h64_lr0003_seed2026.json": {
+      "sha256": "44f012c726597e1d0f50a8209578b5e4129b66b027f3fd63f506169e8c563c5e",
+      "size_bytes": 2173
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h64_lr0003_seed2027.json": {
+      "sha256": "1d88f06c19d8e08112509e154ec40db0af58c48ecf32b6a3a895a2c93b06e831",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h64_lr0010_seed2026.json": {
+      "sha256": "1a4a1ae9409ba1fc1d64142ccb35f5a8769d7d5f31b04f0ccc043a4a135efec1",
+      "size_bytes": 2172
+    },
+    "experiments/model_selection/FD004/LSTM/runs/lstm_h64_lr0010_seed2027.json": {
+      "sha256": "f346da7c8b0fa1f343115345fc90e5c5e809addcbee5b4c3977f1a498248778f",
+      "size_bytes": 2169
+    },
+    "experiments/model_selection/FD004/gbr_selection.json": {
+      "sha256": "beb8d5995bbe6e6825368195de472bbb38fbd9b4528d4e21fecd997eebb3f3b2",
+      "size_bytes": 9477
+    },
+    "experiments/model_selection/FD004/lstm_selection.json": {
+      "sha256": "1a5af34cdaab0c69af62ba0ee6586c7efd41843ca2909dd36a8d43a543e36fdd",
+      "size_bytes": 5976
+    },
+    "experiments/preprocessing/FD001/preprocessor.json": {
+      "sha256": "6f88491a46e2a0b5f8955df85a71e991f1cffc600c5e8becb713a1520b1e1c0a",
+      "size_bytes": 4237
+    },
+    "experiments/preprocessing/FD002/preprocessor.json": {
+      "sha256": "cef04b8dafc4c9f53aba7c6bcb0bc67fc981540abdafadc76fafa314684d856c",
+      "size_bytes": 18573
+    },
+    "experiments/preprocessing/FD004/preprocessor.json": {
+      "sha256": "fdfa4c0284c38554f8b8026c27c71f56ebd9c157a47f9acd2baf9ae34cbe0502",
+      "size_bytes": 18546
+    },
+    "research/research_design/step06_validation_pilot_summary.json": {
+      "sha256": "3f86537bec5c7f0db718e6d248ddb780c447f253c1ecd5e91d5fd08ea184e523",
+      "size_bytes": 3794
+    }
+  },
+  "protected_files_count": 724,
+  "schema_version": "step08-repair-baseline-v1"
+}

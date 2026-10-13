@@ -29,10 +29,12 @@ from intellitwin.models.registry import (
     EXPECTED_SEEDS,
     load_frozen_base_model,
 )
+from intellitwin.provenance import get_git_info
 from intellitwin.uncertainty.artifacts import (
     INTERVAL_PREDICTION_COLUMNS,
     POINT_PREDICTION_COLUMNS,
     serialize_calibrator_artifact,
+    to_repo_relative_path_posix,
     write_atomic_csv,
     write_atomic_json,
 )
@@ -45,17 +47,6 @@ from intellitwin.uncertainty.schema import (
     SUPPORTED_METHODS,
     CandidateConfig,
 )
-
-
-def get_git_info() -> tuple[str, bool]:
-    """Retrieve git HEAD SHA and dirty status."""
-    try:
-        sha = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode("utf-8").strip()
-        status = subprocess.check_output(["git", "status", "--porcelain"]).decode("utf-8").strip()
-        dirty = len(status) > 0
-        return sha, dirty
-    except Exception:
-        return "unknown", False
 
 
 def verify_selection_freeze_committed(selection_freeze_path: Path) -> str:
@@ -421,7 +412,9 @@ def main() -> None:
                         "selected_candidate_id": winning_cand.candidate_id
                         if method_id == METHOD_DECISION_AWARE
                         else None,
-                        "calibrator_artifact_path": art_path.relative_to(Path(".")).as_posix(),
+                        "calibrator_artifact_path": to_repo_relative_path_posix(
+                            art_path, base_dir=Path(".").resolve()
+                        ),
                         "artifact_sha256": art_hash,
                         "checkpoint_sha256": ckpt_hash,
                         "preprocessor_sha256": prep_hash,

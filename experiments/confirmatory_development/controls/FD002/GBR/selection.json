@@ -1,0 +1,164 @@
+{
+  "cost_scenario": {
+    "c_fail": 5.0,
+    "c_pm": 1.0,
+    "c_waste": 0.2,
+    "r_equal": 20.0,
+    "scenario_id": "primary_reference"
+  },
+  "dataset": "FD002",
+  "environment": {
+    "command_args": [
+      "scripts/run_step09_control_selection.py",
+      "--allow-dirty"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-13T18:28:06.574795+00:00"
+  },
+  "git_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
+  "git_dirty": true,
+  "input_hashes": {
+    "calibrator_decision_aware_hcp_seed_2026": "cf1af2b9f4f974e5200224ab4bdf3160cea47ae36ed24ff3af0f5b386b64050e",
+    "calibrator_decision_aware_hcp_seed_2027": "40fb01e50d9ae5de093193d23c1462547581c8c9537856a9861dcb6b2c2ed1e0",
+    "calibrator_decision_aware_hcp_seed_2028": "c4e3c417f4dae0e8c29b2664b9605cc278baa1e9d82ad072e819361f0dfa9b79",
+    "calibrator_decision_aware_hcp_seed_2029": "ace24199c5421f02010dbe8a6b4e5e253337f634692fde4803ab3a5f4b06b521",
+    "calibrator_decision_aware_hcp_seed_2030": "2c823826bc28e5cc3e6ab4d5851c13013c91528039625a4b64c2f2adad617114",
+    "calibrator_global_hcp_seed_2026": "4a4738091b586f5dddc63b3319fdf792bcee15e86e3c7bad037eb9758bf7b023",
+    "calibrator_global_hcp_seed_2027": "d8d989f880a51798b4c61408d5699ffbb4020a491c274614321b8dacd210edd1",
+    "calibrator_global_hcp_seed_2028": "05021844ed6c413c292e5e96c0caf1859d608971405b59ed68574cf2b9702fdd",
+    "calibrator_global_hcp_seed_2029": "95c88f52d6d048cb88802855792531aad10de4662a2e6c66dc44d8711fa64b2e",
+    "calibrator_global_hcp_seed_2030": "92a1bba3500ff010c7ebc3bec4cf5aa92c0eb1587427fc5abd724ed6be493c06",
+    "calibrator_regime_hcp_seed_2026": "b45e3c20a5532d45242e4d14f4135e3fc3d87059121eea82ad5d1ed3786f6d32",
+    "calibrator_regime_hcp_seed_2027": "bbedfb8f87e59136fea7bcdd5fca81e4335b811e02d89004e6934c5c8a2c33c4",
+    "calibrator_regime_hcp_seed_2028": "8b0f96264b56b35e2de64c3ac4e584a6e1087a825cb9dc23205325d8fb3f3fae",
+    "calibrator_regime_hcp_seed_2029": "ab8c90fe07df2347dddb41ef6d48e765a7d345ba9ede517076512d83abc39e68",
+    "calibrator_regime_hcp_seed_2030": "6761b0dd31e1084227ec5b604203d1fcf44f571673416d6a817b7675461994ba",
+    "pred_cache_seed_2026": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+    "pred_cache_seed_2027": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+    "pred_cache_seed_2028": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+    "pred_cache_seed_2029": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+    "pred_cache_seed_2030": "51a100eaf5912c0e8d67ccf1cb85ae990321afde7fded8d8230c3ea509c66908",
+    "split_manifest": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41"
+  },
+  "model_family": "GBR",
+  "notice": "Selected strictly on FD002 validation engines across 5 seeds. Unbiased test estimates will be obtained during confirmatory evaluation.",
+  "proposed_target_mpiw": 111.47487562643208,
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "selected_controls": {
+    "earlier_intervention": {
+      "achieved_mpiw": 119.49305962459299,
+      "boundary_selection": true,
+      "control_family": "earlier_intervention",
+      "interval_source": "regime_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 14.899999999999999,
+        "mean_wasted_rul": 69.5,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 69.5
+      },
+      "parameter_name": "h",
+      "parameter_value": 1
+    },
+    "matched_width_interval": {
+      "achieved_mpiw": 111.22016471457295,
+      "boundary_selection": false,
+      "control_family": "matched_width_interval",
+      "interval_source": "global_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 13.992307692307692,
+        "mean_wasted_rul": 64.96153846153847,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 64.96153846153847
+      },
+      "parameter_name": "lambda",
+      "parameter_value": 0.92,
+      "target_mpiw": 111.47487562643208,
+      "width_diff": 0.2547109118591351,
+      "width_matched_verified": true
+    },
+    "point_safety_margin": {
+      "boundary_selection": false,
+      "control_family": "point_safety_margin",
+      "interval_source": "regime_hcp",
+      "metrics": {
+        "failure_rate": 0.11538461538461539,
+        "fleet_early_pm_rate": 0.038461538461538464,
+        "mean_cost": 2.7461538461538457,
+        "mean_wasted_rul": 6.423076923076923,
+        "pm_only_early_pm_rate": 0.043478260869565216,
+        "pm_rate": 0.8846153846153846,
+        "pm_wasted_rul_mean": 7.260869565217392
+      },
+      "parameter_name": "m",
+      "parameter_value": 5
+    },
+    "widened_interval": {
+      "achieved_mpiw": 119.49305962459299,
+      "boundary_selection": true,
+      "control_family": "widened_interval",
+      "interval_source": "regime_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 14.899999999999999,
+        "mean_wasted_rul": 69.5,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 69.5
+      },
+      "parameter_name": "lambda",
+      "parameter_value": 1.0
+    }
+  },
+  "status": "DEVELOPMENT_ONLY",
+  "validation_engine_count": 26,
+  "validation_engines": [
+    9,
+    16,
+    21,
+    25,
+    30,
+    51,
+    54,
+    75,
+    94,
+    95,
+    96,
+    98,
+    128,
+    133,
+    157,
+    169,
+    191,
+    205,
+    219,
+    224,
+    236,
+    237,
+    243,
+    248,
+    249,
+    256
+  ]
+}

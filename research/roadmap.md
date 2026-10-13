@@ -14,8 +14,8 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 complete (ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
-| **Phase 6** | Decision-Aware Conformal Calibration Development | Next Up (Step 8) | Develop and evaluate condition-adaptive conformal calibration method |
-| **Phase 7** | Uncertainty and Maintenance Decision Experiments | Planned | Conformal prediction, interval calibration, DSS validation |
+| **Phase 6** | Decision-Aware Conformal Calibration Development | Completed | Step 8 calibration matrix, validation selection, and reverified audit (ADR-021, ADR-022) |
+| **Phase 7** | Uncertainty and Maintenance Decision Experiments (Step 9) | In Progress (Pre-Test Frozen) | Pre-test confirmatory protocol freeze, matched controls, stratified bootstrap, decision evaluation (ADR-023) |
 | **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
 | **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
 | **Phase 10** | Final Validation and Reproducibility Release | Planned | End-to-end audit, artifact release, environment pinning |
@@ -163,19 +163,23 @@ This document outlines the master research and development roadmap for the Intel
 
 ---
 
-### Phase 7: Uncertainty and Maintenance Decision Experiments
-- **Status**: Planned
-- **Objective**: Evaluate decision-aware conformal prediction intervals and uncertainty-aware maintenance decision policies inside the frozen sequential maintenance simulator across Experiments A through D (RQ1–RQ4).
+### Phase 7: Uncertainty and Maintenance Decision Experiments (Step 9 Preparation & Confirmatory Evaluation)
+- **Status**: In Progress (Step 9 / Phase 7 pre-test confirmatory preparation, control selection, and protocol freeze complete; official held-out test execution NOT STARTED; confirmatory RQ1–RQ4 outcomes PENDING)
+- **Objective**: Implement confirmatory evaluation machinery, freeze matched-conservatism benchmark controls on validation data, lock the complete pre-test evaluation protocol, and subsequently evaluate conformal prediction intervals and maintenance decision policies inside the frozen simulator across Experiments A through D (RQ1–RQ4).
 - **Expected Deliverables**:
-  - UQ implementation under `src/intellitwin/uncertainty/`.
-  - Decision support module under `src/intellitwin/decision/`.
-  - Coverage (PICP) and interval width (MPIW) empirical validation.
-  - Decision policy comparative cost/risk analysis against static thresholds.
+  - Pre-test confirmatory evaluation protocol and configuration (`research/research_design/step09_confirmatory_protocol.md`, `step09_confirmatory_config.json`).
+  - Production evaluation and statistical inference modules (`src/intellitwin/evaluation/`).
+  - Validation-selected benchmark control models for RQ3 (`src/intellitwin/decision/controls.py`, `experiments/confirmatory_development/controls/`).
+  - Pre-test freeze manifest and audit (`experiments/confirmatory_development/protocol_freeze.json`, `pretest_audit.json`).
+  - Validation-only smoke evaluation records labeled `DEVELOPMENT_SMOKE_ONLY`.
+  - Future held-out test predictions, simulation traces, stratified bootstrap draws, and IUT decision outcomes.
 - **Acceptance Criteria**:
-  - Conformal or Bayesian prediction intervals achieve target nominal coverage.
-  - Maintenance policies demonstrate risk-bounded operational advantages.
-- **Dependencies**: Phase 6.
-- **Research Observations to Record**: Calibration error, width-coverage trade-offs, catastrophic failure penalty reductions.
+  - Completion requires valid execution, reproducibility, and honest reporting.
+  - Completion must NOT require favorable hypotheses, target coverage achievement, or demonstrated "risk-bounded operational advantages."
+  - All confirmatory hypothesis decisions (Supported, Unsupported, Inconclusive) strictly follow the frozen Bonferroni / IUT decision rules.
+  - Confirmatory test outcomes remain strictly PENDING until held-out test execution.
+- **Dependencies**: Phase 6 / Step 8.
+- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke completed; confirmatory test execution remains not started.
 
 ---
 

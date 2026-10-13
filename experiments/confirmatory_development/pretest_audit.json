@@ -1,0 +1,19 @@
+{
+  "audit_timestamp_utc": "2026-10-13T18:34:18.979797+00:00",
+  "gates": {
+    "base_model_registry_present": true,
+    "calibrator_count_is_90": true,
+    "control_selection_present": true,
+    "registry_paths_posix": true,
+    "step08_repair_baseline_present": true,
+    "step08_repair_verification_present": true,
+    "zero_test_artifacts": true
+  },
+  "git_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
+  "git_dirty": true,
+  "held_out_execution_status": "NOT_STARTED",
+  "overall_status": "PASS",
+  "protocol_version": "step09-v1",
+  "rq_outcomes_status": "PENDING",
+  "schema_version": "step09-audit-v1"
+}

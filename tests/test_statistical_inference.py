@@ -1,57 +1,27 @@
-"""Tests for statistical inference protocol and bootstrap missing-group bounds logic."""
+"""Tests for statistical inference protocol, decision logic, and bootstrap methods."""
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
-
-def compute_replicate_worst_group_bounds(
-    available_errors: list[float] | dict[str, float],
-    missing_group_count: int,
-    nominal_coverage: float = 0.90,
-) -> tuple[float, float]:
-    """Compute conservative lower and upper bounds on worst-group coverage error for a replicate.
-
-    Rule:
-    If |G_available^(b)| > 0:
-        WorstErr_lower^(b) = max over available groups of Err^(b)(g)
-    else:
-        WorstErr_lower^(b) = 0.0
-
-    Then:
-    If |G_missing^(b)| > 0:
-        WorstErr_upper^(b) = max(WorstErr_lower^(b), 0.90)
-    else:
-        WorstErr_upper^(b) = WorstErr_lower^(b)
-    """
-    if isinstance(available_errors, dict):
-        vals = list(available_errors.values())
-    else:
-        vals = list(available_errors)
-
-    if len(vals) > 0:
-        worst_err_lower = max(vals)
-    else:
-        worst_err_lower = 0.0
-
-    if missing_group_count > 0:
-        worst_err_upper = max(worst_err_lower, nominal_coverage)
-    else:
-        worst_err_upper = worst_err_lower
-
-    return (worst_err_lower, worst_err_upper)
-
-
-def propagate_delta_error_bounds(
-    baseline_bounds: tuple[float, float],
-    proposed_bounds: tuple[float, float],
-) -> tuple[float, float]:
-    """Propagate worst-case bounds for Delta_error = WorstErr_baseline - WorstErr_proposed."""
-    b_lower, b_upper = baseline_bounds
-    p_lower, p_upper = proposed_bounds
-    delta_lower = b_lower - p_upper
-    delta_upper = b_upper - p_lower
-    return (delta_lower, delta_upper)
+from intellitwin.evaluation.bootstrap import (
+    generate_stratified_bootstrap_draws,
+    load_partition_quartile_strata,
+)
+from intellitwin.evaluation.decisions import (
+    DecisionStatus,
+    RQStatus,
+    aggregate_rq_decision,
+    evaluate_failure_safeguard,
+    evaluate_improvement,
+    evaluate_noninferiority,
+)
+from intellitwin.evaluation.metrics import (
+    compute_interval_score,
+    compute_replicate_worst_group_bounds,
+    propagate_delta_error_bounds,
+)
 
 
 def test_no_groups_missing() -> None:
@@ -105,9 +75,118 @@ def test_deterministic_result_for_identical_inputs() -> None:
 
 def test_delta_error_bound_propagation() -> None:
     """Verify conservative subtraction propagation for Delta_error."""
-    # Baseline has [0.05, 0.05], Proposed has [0.02, 0.90] (some group missing in proposed)
     b_bounds = (0.05, 0.05)
     p_bounds = (0.02, 0.90)
     d_lower, d_upper = propagate_delta_error_bounds(b_bounds, p_bounds)
-    assert d_lower == pytest.approx(0.05 - 0.90)  # -0.85
-    assert d_upper == pytest.approx(0.05 - 0.02)  # +0.03
+    assert d_lower == pytest.approx(0.05 - 0.90)
+    assert d_upper == pytest.approx(0.05 - 0.02)
+
+
+def test_decision_improvement_rules() -> None:
+    """Verify improvement hypothesis decisions."""
+    # Pass: lower bound > margin
+    assert evaluate_improvement(0.25, 0.50, margin=0.20) == DecisionStatus.PASS
+
+    # Fail: upper bound < margin
+    assert evaluate_improvement(0.05, 0.15, margin=0.20) == DecisionStatus.FAIL
+
+    # Indeterminate: CI spans margin
+    assert evaluate_improvement(0.15, 0.25, margin=0.20) == DecisionStatus.INDETERMINATE
+
+    # Boundary equality is indeterminate
+    assert evaluate_improvement(0.20, 0.30, margin=0.20) == DecisionStatus.INDETERMINATE
+    assert evaluate_improvement(0.10, 0.20, margin=0.20) == DecisionStatus.INDETERMINATE
+
+    # Degenerate zero-width interval is indeterminate
+    assert evaluate_improvement(0.25, 0.25, margin=0.20) == DecisionStatus.INDETERMINATE
+
+
+def test_decision_noninferiority_rules() -> None:
+    """Verify noninferiority / ceiling hypothesis decisions."""
+    # Pass: upper bound < margin
+    assert evaluate_noninferiority(0.01, 0.04, margin=0.05) == DecisionStatus.PASS
+
+    # Fail: lower bound > margin
+    assert evaluate_noninferiority(0.06, 0.08, margin=0.05) == DecisionStatus.FAIL
+
+    # Indeterminate: CI spans margin
+    assert evaluate_noninferiority(0.03, 0.07, margin=0.05) == DecisionStatus.INDETERMINATE
+
+    # Boundary equality is indeterminate
+    assert evaluate_noninferiority(0.02, 0.05, margin=0.05) == DecisionStatus.INDETERMINATE
+    assert evaluate_noninferiority(0.05, 0.08, margin=0.05) == DecisionStatus.INDETERMINATE
+
+    # Degenerate zero-width interval is indeterminate
+    assert evaluate_noninferiority(0.03, 0.03, margin=0.05) == DecisionStatus.INDETERMINATE
+
+
+def test_failure_safeguard() -> None:
+    """Verify observed failure safeguard logic."""
+    # Strict improvement passes
+    assert (
+        evaluate_failure_safeguard(observed_proposed_failures=2, observed_baseline_failures=5)
+        == DecisionStatus.PASS
+    )
+    # Equality passes
+    assert (
+        evaluate_failure_safeguard(observed_proposed_failures=5, observed_baseline_failures=5)
+        == DecisionStatus.PASS
+    )
+    # Increase fails
+    assert (
+        evaluate_failure_safeguard(observed_proposed_failures=6, observed_baseline_failures=5)
+        == DecisionStatus.FAIL
+    )
+
+
+def test_iut_rq_decision_aggregation() -> None:
+    """Verify Intersection-Union Testing aggregation."""
+    # All PASS -> SUPPORTED
+    all_pass = [DecisionStatus.PASS, DecisionStatus.PASS, DecisionStatus.PASS]
+    assert aggregate_rq_decision(all_pass) == RQStatus.SUPPORTED
+
+    # Any FAIL -> UNSUPPORTED (even if some PASS)
+    with_fail = [DecisionStatus.PASS, DecisionStatus.FAIL, DecisionStatus.PASS]
+    assert aggregate_rq_decision(with_fail) == RQStatus.UNSUPPORTED
+
+    # None FAIL, any INDETERMINATE -> INCONCLUSIVE
+    with_indet = [DecisionStatus.PASS, DecisionStatus.INDETERMINATE, DecisionStatus.PASS]
+    assert aggregate_rq_decision(with_indet) == RQStatus.INCONCLUSIVE
+
+    # Empty list raises ValueError
+    with pytest.raises(ValueError):
+        aggregate_rq_decision([])
+
+
+def test_stratified_bootstrap_draws_properties() -> None:
+    """Verify deterministic draws, multiplicity retention, and stratum stratification."""
+    # Use FD002 validation engines (26 engines)
+    valid_engs = list(range(1, 27))
+    strata = load_partition_quartile_strata("FD002", valid_engs)
+    assert len(strata) == 4
+    draws = generate_stratified_bootstrap_draws("FD002", valid_engs, n_replicates=50)
+
+    assert draws.shape == (50, 26)
+
+    # Multiplicity check: duplicate engines should appear in resampled rows
+    has_duplicates = any(len(set(row)) < 26 for row in draws)
+    assert has_duplicates, "Stratified bootstrap must retain duplicate multiplicity."
+
+    # Repeat call produces bit-for-bit identical draws
+    draws2 = generate_stratified_bootstrap_draws("FD002", valid_engs, n_replicates=50)
+    assert np.array_equal(draws, draws2)
+
+
+def test_winkler_interval_score_calculation() -> None:
+    """Verify interval score calculation on known test vectors."""
+    y = np.array([50.0, 10.0, 90.0])
+    lower = np.array([20.0, 20.0, 20.0])
+    upper = np.array([80.0, 80.0, 80.0])
+
+    # alpha = 0.10 -> 2/alpha = 20
+    # Point 0: 50 in [20, 80] -> score = 60
+    # Point 1: 10 < 20 -> score = 60 + 20 * (20 - 10) = 60 + 200 = 260
+    # Point 2: 90 > 80 -> score = 60 + 20 * (90 - 80) = 60 + 200 = 260
+    scores = compute_interval_score(y, lower, upper, nominal_coverage=0.90)
+    expected = np.array([60.0, 260.0, 260.0])
+    assert np.allclose(scores, expected)
