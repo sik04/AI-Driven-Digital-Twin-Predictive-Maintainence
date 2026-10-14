@@ -1,0 +1,166 @@
+{
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-config-v1",
+  "dataset_matrix": {
+    "confirmatory_datasets": [
+      "FD001",
+      "FD002",
+      "FD004"
+    ],
+    "excluded_datasets": [
+      "FD003"
+    ]
+  },
+  "model_matrix": {
+    "model_families": [
+      "GBR",
+      "LSTM"
+    ],
+    "seeds": [
+      2026,
+      2027,
+      2028,
+      2029,
+      2030
+    ]
+  },
+  "methods": {
+    "primary_methods": [
+      "global_hcp",
+      "regime_hcp",
+      "decision_aware_hcp"
+    ],
+    "proposed_method": "decision_aware_hcp",
+    "baselines": [
+      "global_hcp",
+      "regime_hcp"
+    ]
+  },
+  "coverages": {
+    "confirmatory_primary": 0.9,
+    "descriptive_secondary": [
+      0.8,
+      0.95
+    ],
+    "all_coverages": [
+      0.8,
+      0.9,
+      0.95
+    ]
+  },
+  "maintenance_policy": {
+    "primary_policy": "lower_bound_one_cycle_policy",
+    "rule": "MAINTAIN_NOW iff lower_rul <= 1.0, else CONTINUE",
+    "decision_window": "endpoints 30 through T-1",
+    "evaluation_window": "endpoints 30 through T"
+  },
+  "cost_scenarios": {
+    "primary_reference": {
+      "c_fail": 5.0,
+      "c_pm": 1.0,
+      "c_waste": 0.2,
+      "r_equal": 20.0,
+      "role": "confirmatory_decision"
+    },
+    "failure_sensitive": {
+      "c_fail": 10.0,
+      "c_pm": 1.0,
+      "c_waste": 0.2,
+      "r_equal": 45.0,
+      "role": "descriptive_sensitivity"
+    },
+    "waste_sensitive": {
+      "c_fail": 5.0,
+      "c_pm": 1.0,
+      "c_waste": 0.4,
+      "r_equal": 10.0,
+      "role": "descriptive_sensitivity"
+    }
+  },
+  "configuration_counts": {
+    "primary_method_configurations": 810,
+    "control_configurations": 120,
+    "total_matrix_configurations": 930
+  },
+  "controls_rq3": {
+    "dataset": "FD002",
+    "nominal_coverage": 0.9,
+    "named_controls": [
+      "matched_width_interval",
+      "widened_interval",
+      "point_safety_margin",
+      "earlier_intervention"
+    ],
+    "selection_scope": "FD002 validation partition across 5 seeds jointly",
+    "selected_parameters": {
+      "GBR": {
+        "matched_width_interval": {
+          "interval_source": "global_hcp",
+          "parameter_name": "lambda",
+          "parameter_value": 0.92
+        },
+        "widened_interval": {
+          "interval_source": "regime_hcp",
+          "parameter_name": "lambda",
+          "parameter_value": 1.0
+        },
+        "point_safety_margin": {
+          "interval_source": "regime_hcp",
+          "parameter_name": "m",
+          "parameter_value": 5
+        },
+        "earlier_intervention": {
+          "interval_source": "regime_hcp",
+          "parameter_name": "h",
+          "parameter_value": 1
+        }
+      },
+      "LSTM": {
+        "matched_width_interval": {
+          "interval_source": "regime_hcp",
+          "parameter_name": "lambda",
+          "parameter_value": 0.9
+        },
+        "widened_interval": {
+          "interval_source": "global_hcp",
+          "parameter_name": "lambda",
+          "parameter_value": 1.0
+        },
+        "point_safety_margin": {
+          "interval_source": "regime_hcp",
+          "parameter_name": "m",
+          "parameter_value": 4
+        },
+        "earlier_intervention": {
+          "interval_source": "global_hcp",
+          "parameter_name": "h",
+          "parameter_value": 1
+        }
+      }
+    }
+  },
+  "statistical_inference": {
+    "bootstrap_replicates": 10000,
+    "rng_algorithm": "PCG64",
+    "seed_sequence_formula": "[2026, 6, dataset_number]",
+    "quantile_interpolation": "linear",
+    "decision_quantile_interval": [
+      0.00625,
+      0.99375
+    ],
+    "descriptive_quantile_interval": [
+      0.025,
+      0.975
+    ],
+    "subgroup_min_engines": 10
+  },
+  "hypothesis_margins": {
+    "delta_cost_margin_scu": 0.2,
+    "delta_error_margin": 0.01,
+    "max_absolute_coverage_error": 0.05,
+    "mpiw_noninferiority_margin_cycles": 1.0,
+    "interval_score_noninferiority_margin_cycles": 1.0,
+    "robustness_cost_harm_margin_scu": -0.2,
+    "robustness_error_harm_margin": -0.01
+  }
+}

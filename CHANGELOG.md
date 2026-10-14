@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Completed Step 8 Corrective Verification, Provenance Repair, and Step 9 Pre-Test Confirmatory Freeze under ADR-022 and ADR-023:
+  - Migrated calibration registry to canonical POSIX `/` separators, verified 100% bit-for-bit non-path equality, and implemented secure repository-relative path resolver `resolve_repo_relative_path` in `src/intellitwin/uncertainty/artifacts.py`.
+  - Strengthened `load_frozen_calibrator` with schema, bundle count, finite threshold, legal regime, and dependency SHA-256 validation. Added CI tests ensuring all 90 calibrators load cleanly on Windows and Linux.
+  - Implemented `src/intellitwin/uncertainty/verification.py` providing independent content-level audit for cache completeness (cycles 30..T), LOEO selection reconstruction, and rational quantiles.
+  - Implemented execution provenance in `src/intellitwin/provenance.py` enforcing initial clean working trees and immutable atomic persistence.
+  - Implemented production evaluation machinery under `src/intellitwin/evaluation/` (`schema.py`, `validation.py`, `metrics.py`, `bootstrap.py`, `decisions.py`, `artifacts.py`).
+  - Implemented and selected 4 prespecified benchmark controls (`matched_width_interval`, `widened_interval`, `point_safety_margin`, `earlier_intervention`) on FD002 validation engines across 5 seeds jointly under `src/intellitwin/decision/controls.py`.
+  - Executed validation smoke evaluation across all 6 cells, coverages, scenarios, and controls labeled `DEVELOPMENT_SMOKE_ONLY`.
+  - Assembled and audited pre-test protocol freeze in `experiments/confirmatory_development/protocol_freeze.json` and `pretest_audit.json`.
+  - Corrected Step 8 documentation tables and mathematical statements via automated renderer `scripts/render_step08_completion.py --check`.
+  - Added Windows Python 3.11 job to GitHub Actions CI workflow with LF line-ending preservation.
 - Completed Step 8 Decision-Aware Conformal Calibration and independent verification audit under ADR-021:
   - Designed and implemented engine-weighted hierarchical conformal calibration modules in `src/intellitwin/uncertainty/` (`scores.py`, `quantiles.py`, `calibration.py`, `metrics.py`, `selection.py`, `artifacts.py`, `schema.py`).
   - Implemented exact engine-weighted empirical and hierarchical quantiles with finite mass $F(q) = \frac{1}{m+1}\sum \frac{\text{count}}{n_i}$, mass $\frac{1}{m+1}$ at $+\infty$, and exact boundary verification via `fractions.Fraction`.

@@ -664,3 +664,86 @@ This log documents formal architectural, methodological, and research governance
   - Prepares the calibrated models for Phase 7 / Step 9 confirmatory maintenance evaluation.
 - **Follow-up Review Date / Trigger**:
   - Completion of Step 8 final calibration fitting and independent verification audit.
+
+---
+
+### ADR-022: Step 8 Corrective Verification, Platform Portability, and Execution Provenance Repair
+- **Date**: 2026-10-13
+- **Status**: Accepted (Amends ADR-021)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-directed corrective audit and provenance repair mandate following discovery of platform-specific registry path delimiters and historical dirty execution records.
+- **Context and Motivation**:
+  - Two operational defects and several documentation discrepancies were identified in Step 8:
+    1. Cross-Platform Delimiters: `experiments/calibration/calibration_registry.json` contained Windows backslashes (`\\`), causing deserialization failures in Linux CI.
+    2. Verification Scoping: The original audit checked file existence and winning candidate IDs but did not independently verify underlying prediction cache trajectory completeness (cycles 30..T), full candidate evidence tables, or rational quantile thresholds against an independent reference.
+    3. Historical Provenance: Historical execution reports recorded `git_dirty = true` without tracking exact input artifact hashes or initial environment state.
+    4. Documentation Numbers: Reported selection table values in `step08_calibration_completion.md` diverged from verified artifacts, and mathematical explanations of $\beta < 0$ and finite support required rigorous correction.
+  - Scientific integrity mandate: Preserved scientific selections and fitted numerical artifacts must NOT be retrained, refitted, or modified.
+- **Decisions**:
+  1. **Canonical POSIX Path Delimiters & Portable Resolver**:
+     - Migrated `calibration_registry.json` to canonical forward slashes (`/`). All non-path fields and SHA-256 references verified 100% bit-for-bit identical.
+     - Implemented `resolve_repo_relative_path` in `src/intellitwin/uncertainty/artifacts.py`, resolving strictly relative to the repository root and rejecting absolute, Windows drive-qualified, UNC, or path-traversing inputs.
+     - Strengthened `load_frozen_calibrator` to validate schemas, protocols, non-negative thresholds, legal regimes, candidate parameter agreement, and all dependency SHA-256 hashes.
+     - Confirmed all 90 committed calibrators load cleanly and pass every check on both Linux and Windows.
+  2. **Baseline Artifact Preservation**:
+     - Generated `experiments/audits/step08_repair_baseline.json` recording baseline commit `f1edce7fdf48b45513ff90a680da49701451d9cb` and SHA-256 hashes of all 724 protected artifacts across base models, preprocessing, splits, calibration selection, point predictions, and fitted calibrators.
+     - Historical execution reports and audit files remain untouched; new clean verification output is written to `experiments/audits/step08_repair_verification.json`.
+  3. **Deep Content Verification Architecture**:
+     - Added `src/intellitwin/uncertainty/verification.py` providing independent verification helpers:
+       - Cache completeness: engine IDs equal split partitions, cycles run strictly 30..T, non-negative finite predictions, correct true RUL labels.
+       - Selection freeze reconstruction: full 9-candidate LOEO evidence tables, metrics, and deterministic tie-breaking reconstructed from cached predictions.
+       - Independent rational quantiles: separate reference quantile calculator using sorted weighted scores and exact `fractions.Fraction` checks.
+       - Saved interval reconstruction: joins prediction caches and fitted thresholds to reconstruct all saved interval CSVs and metrics within $10^{-10}$ tolerance.
+  4. **Strict Execution Provenance**:
+     - Implemented `src/intellitwin/provenance.py` enforcing clean git working trees at execution entry (`allow_dirty = False` default), recording complete package versions, platform, device, command arguments, and UTC timestamps.
+  5. **Documentation and Mathematical Corrections**:
+     - Corrected Selection Freeze table values to match verified artifacts (FD001 GBR cost 3.44, FD001 LSTM cost 3.684, FD002 GBR cost 5.0, FD002 LSTM cost 4.5846, FD004 GBR cost 8.16, FD004 LSTM cost 8.3488).
+     - Corrected $\beta < 0$ asymmetry explanation: holding parameters fixed, $\beta < 0$ increases $b(p)$ and decreases $a(p)$, shifting lower and upper bounds upward; observed decision utility reflects empirical quantile refitting.
+     - Corrected finite support rules: global $m/(m+1) \ge \text{nominal coverage}$ requires minimum $m \ge 4, 9, 19$; regime routing requires minimum $m_g \ge 10$ contributing engines.
+     - Created `scripts/render_step08_completion.py` with `--check` mode.
+- **Expected Implications**:
+  - Step 8 is fully corrected, hardened for cross-platform execution, and verified with zero scientific regressions.
+- **Follow-up Review Date / Trigger**:
+  - Pre-test confirmatory protocol freeze (Step 9 / ADR-023).
+
+---
+
+### ADR-023: Step 9 / Phase 7 Pre-Test Confirmatory Protocol Freeze and Matched-Control Selection
+- **Date**: 2026-10-13
+- **Status**: Accepted
+- **Protocol Identifier**: `step09-v1`
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-issued implementation instruction establishing the pre-test confirmatory evaluation protocol, matched-conservatism control parameter grids, and production statistical inference engine.
+- **Context and Motivation**:
+  - With Step 7 base predictors and Step 8 conformal calibrators frozen and reverified, Phase 7 / Step 9 establishes the confirmatory evaluation machinery.
+  - To preserve scientific validity under the preregistration standard, all experimental matrices, control parameter selections, statistical inference pipelines, and output contracts must be frozen before preparing or inspecting held-out test data.
+- **Decisions**:
+  1. **Primary Experiment Matrix**:
+     - Datasets: FD001, FD002, FD004.
+     - Models: GBR, LSTM (seeds 2026..2030).
+     - Methods: `global_hcp`, `regime_hcp`, `decision_aware_hcp`.
+     - Coverages: 90% (confirmatory primary), 80% and 95% (descriptive sensitivity).
+     - Cost Scenarios: `primary_reference` (confirmatory primary), `failure_sensitive` and `waste_sensitive` (descriptive sensitivity).
+     - Total Configurations: exactly 810 method/seed/coverage/scenario cells.
+  2. **Prespecified Benchmark Control Families (RQ3)**:
+     - Selected strictly on FD002 validation engines across 5 seeds jointly under `primary_reference` scenario at 90% nominal coverage:
+       - A. `matched_width_interval`: $\lambda \in \{0.01..4.00, 5, 6, 8, 12, 16\}$, minimizing absolute difference from proposed validation MPIW.
+       - B. `widened_interval`: $\lambda \in \{1.00..4.00, 5, 6, 8, 12, 16\}$, minimizing validation maintenance cost with $\lambda \ge 1.0$.
+       - C. `point_safety_margin`: $m \in \{0..250\}$ cycles, policy `MAINTAIN_NOW` iff $p \le 1 + m$.
+       - D. `earlier_intervention`: $h \in \{1..251\}$ cycles, policy `MAINTAIN_NOW` iff $L \le h$.
+     - Both interval sources (`global_hcp` and `regime_hcp`) evaluated; tie-breaking rules strictly applied.
+     - Control parameter selections frozen in `experiments/confirmatory_development/controls/`.
+  3. **Production Statistical Inference Engine**:
+     - Stratified engine-cluster bootstrap with 10,000 replicates using PCG64 PRNG seeded by `[2026, 6, dataset_number]`.
+     - Quartiles fixed from manifests; draws preserve duplicate multiplicity and are shared across all comparisons within each dataset.
+     - Linear quantile interpolation: descriptive intervals $[0.025, 0.975]$, decision intervals $[0.00625, 0.99375]$.
+     - Conservative missing-group bounds propagation ($[0, 0.90]$ per absent group).
+     - Bonferroni / Intersection-Union Testing decision aggregator (`evaluate_improvement`, `evaluate_noninferiority`, `evaluate_failure_safeguard`, `aggregate_rq_decision`).
+  4. **Strict Pre-Test Anti-Leakage Boundary**:
+     - No test/held_out windows prepared or processed in this PR.
+     - Validation smoke execution outputs labeled `DEVELOPMENT_SMOKE_ONLY`.
+     - Confirmatory RQ1–RQ4 outcomes remain strictly PENDING.
+- **Expected Implications**:
+  - Pre-test confirmatory preparation is complete and frozen.
+- **Follow-up Review Date / Trigger**:
+  - Official held-out test evaluation execution (Phase 7 execution stage).

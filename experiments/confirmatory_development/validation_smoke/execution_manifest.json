@@ -1,0 +1,32 @@
+{
+  "artifacts_generated": [
+    "engine_seed_outcomes.csv",
+    "cell_summary.csv",
+    "bootstrap_draws_FD001.npz",
+    "bootstrap_draws_FD002.npz",
+    "bootstrap_draws_FD004.npz"
+  ],
+  "bootstrap_replicates": 10000,
+  "environment": {
+    "command_args": [
+      "scripts/run_step09_validation_smoke.py",
+      "--allow-dirty"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-13T18:29:03.102122+00:00"
+  },
+  "git_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
+  "git_dirty": true,
+  "notice": "All outputs generated on validation engines only. Confirmatory test results remain strictly pending.",
+  "protocol_version": "step09-v1",
+  "status": "DEVELOPMENT_SMOKE_ONLY"
+}

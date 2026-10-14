@@ -1,0 +1,152 @@
+{
+  "checks_actually_run": [
+    "registry_completeness",
+    "prediction_cache_integrity",
+    "selection_freeze_reconstruction",
+    "threshold_and_interval_reconstruction",
+    "scoped_isolation"
+  ],
+  "checks_not_run": [
+    "checkpoint_prediction_reproduction"
+  ],
+  "current_reconstruction": {
+    "environment": {
+      "command_args": [
+        "scripts/audit_step08_calibration.py"
+      ],
+      "device": "cpu",
+      "packages": {
+        "numpy": "2.5.3",
+        "pandas": "3.0.6",
+        "pyyaml": "6.0.3",
+        "scikit_learn": "1.9.1",
+        "torch": "2.14.1+cpu"
+      },
+      "platform": "Windows-10-10.0.19045-SP0",
+      "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+      "timestamp_utc": "2026-10-13T18:56:09.983301+00:00"
+    },
+    "git_commit": "7691f95712e77084024f8788762503cdaee169e6",
+    "git_dirty": false
+  },
+  "details": {
+    "isolation": {
+      "scoped_dirs_audited": [
+        "C:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/experiments/base_models",
+        "C:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/experiments/calibration",
+        "C:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/experiments/model_selection"
+      ],
+      "status": "PASS"
+    },
+    "prediction_caches": {
+      "calibration_FD001": {
+        "engine_count": 20,
+        "status": "PASS",
+        "total_rows": 3691
+      },
+      "calibration_FD002": {
+        "engine_count": 52,
+        "status": "PASS",
+        "total_rows": 9272
+      },
+      "calibration_FD004": {
+        "engine_count": 50,
+        "status": "PASS",
+        "total_rows": 10658
+      },
+      "validation_FD001": {
+        "engine_count": 10,
+        "status": "PASS",
+        "total_rows": 1760
+      },
+      "validation_FD002": {
+        "engine_count": 26,
+        "status": "PASS",
+        "total_rows": 4669
+      },
+      "validation_FD004": {
+        "engine_count": 25,
+        "status": "PASS",
+        "total_rows": 5201
+      }
+    },
+    "quantiles_and_intervals": {
+      "max_metric_diff": 0.0,
+      "max_threshold_diff": 5.684341886080802e-14,
+      "status": "PASS"
+    },
+    "registry": {
+      "status": "PASS",
+      "total_coverage_bundles": 270,
+      "total_entries": 90
+    },
+    "selection_freeze": {
+      "FD001_GBR": {
+        "marginal_picp": 0.8975045508438553,
+        "mean_cost": 3.4400000000000004,
+        "mpiw": 75.05844429373408,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      },
+      "FD001_LSTM": {
+        "marginal_picp": 0.8968217505792628,
+        "mean_cost": 3.6839999999999997,
+        "mpiw": 79.09841576010184,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      },
+      "FD002_GBR": {
+        "marginal_picp": 0.8984348915915569,
+        "mean_cost": 5.0,
+        "mpiw": 91.79056074729799,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      },
+      "FD002_LSTM": {
+        "marginal_picp": 0.8983361585687839,
+        "mean_cost": 4.584615384615384,
+        "mpiw": 93.84388730934528,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      },
+      "FD004_GBR": {
+        "marginal_picp": 0.8964426944735081,
+        "mean_cost": 8.160000000000002,
+        "mpiw": 133.1258009775464,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      },
+      "FD004_LSTM": {
+        "marginal_picp": 0.8964736037103336,
+        "mean_cost": 8.3488,
+        "mpiw": 132.98781152814573,
+        "selected_candidate_id": "gamma2_betam1",
+        "selection_status": "feasible_optimal",
+        "status": "EXACT_MATCH"
+      }
+    }
+  },
+  "failures": [],
+  "historical_provenance_context": {
+    "historical_audit_git_dirty": true,
+    "historical_audit_path": "experiments/calibration/audit_report.json",
+    "historical_baseline_commit": "f1edce7858c9748b6ee92e7c4f4a3b7849e7b235",
+    "notice": "Current reconstruction cannot retroactively establish that historical dirty run was clean; historical report preserved unchanged."
+  },
+  "overall_status": "PASS",
+  "protocol_version": "step08-v1",
+  "results": {
+    "checkpoint_prediction_reproduction": "NOT RUN",
+    "prediction_cache_integrity": "PASS",
+    "registry_completeness": "PASS",
+    "scoped_isolation": "PASS",
+    "selection_freeze_reconstruction": "PASS",
+    "threshold_and_interval_reconstruction": "PASS"
+  },
+  "schema_version": "step08-repair-verification-v1"
+}

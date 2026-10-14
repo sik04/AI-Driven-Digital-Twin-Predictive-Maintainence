@@ -2,8 +2,8 @@
 
 - **Protocol Version**: `step08-v1`
 - **Schema Version**: `step08-calibrator-v1`
-- **Status**: Frozen (Execution Pending)
-- **Governing ADR**: ADR-021 in `research/decision_log.md`
+- **Status**: Completed & Reverified (Protocol step08-v1; ADR-021 & ADR-022)
+- **Governing ADR**: ADR-021 and ADR-022 in `research/decision_log.md`
 - **Target Subsystem**: `src/intellitwin/uncertainty/`, `src/intellitwin/decision/`
 - **Scope**: Multi-dataset, two-family, five-seed conformal calibration matrix (3 datasets x 2 families x 5 seeds x 3 methods = 90 calibrator bundles; 270 coverage configurations).
 
@@ -58,6 +58,11 @@ where $\beta = \beta_{\text{code}} \ln(2)$ with $\beta_{\text{code}} \in \{-1, 0
 - **Score Inversion / Prediction Interval**:
   $$L = \max\left(0, p - q_g \cdot a(p)\right), \quad U = p + q_g \cdot b(p)$$
   where $q_g$ is the regime-specific hierarchical threshold (with global fallback $q_{\text{global}}$).
+- **Asymmetry Mechanics ($\beta < 0$)**: Holding $p$, $q$, and $\gamma$ fixed, when $\beta < 0$:
+  - $a(p)$ decreases, and $b(p)$ increases.
+  - The lower bound $L = \max(0, p - q \cdot a(p))$ rises or remains at zero after clipping.
+  - The upper bound $U = p + q \cdot b(p)$ rises.
+  - This mathematical fact does not justify claiming earlier preventive maintenance or protection against late failure; refitted $q$ affects empirical comparisons between candidates, and observed outcomes must be reported from measured results.
 - **Identity Candidate Equivalence**: When $\gamma = 0$ and $\beta_{\text{code}} = 0$, $a(p) = 1$ and $b(p) = 1$, yielding $\text{score}(p, y) = |y - p|$. Thus, candidate `gamma0_beta0` reproduces `regime_hcp` numerically.
 - **Reference Scales**: The constants $125$ and $20$ are prespecified reference scales ($125$ is the standard training RUL cap scale; $20$ is the characteristic end-of-life decision transition scale). The $20$-cycle scale is not a maintenance threshold or an asserted optimal replacement cycle.
 

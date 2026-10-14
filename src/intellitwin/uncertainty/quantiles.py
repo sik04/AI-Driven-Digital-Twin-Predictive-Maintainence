@@ -1,6 +1,6 @@
 """Engine-weighted empirical and hierarchical quantile computation.
 
-Implements exact rational boundary arithmetic.
+Implements exact rational boundary arithmetic with fast cumulative score scanning.
 """
 
 from __future__ import annotations
@@ -98,7 +98,6 @@ def compute_engine_weighted_dev_quantile(
             f"Expected one of {list(COVERAGE_FRACTIONS.keys())}"
         )
 
-    # Group scores by engine
     engine_scores: dict[int, list[float]] = defaultdict(list)
     for eid, score_val in zip(eids, sc, strict=True):
         engine_scores[int(eid)].append(float(score_val))
@@ -108,47 +107,54 @@ def compute_engine_weighted_dev_quantile(
         raise ValueError("Zero contributing engines.")
 
     n_i: dict[int, int] = {eid: len(vals) for eid, vals in engine_scores.items()}
-
-    # Unique sorted scores
-    unique_scores = np.sort(np.unique(sc))
-
-    # Pre-sort each engine's scores for fast binary search count
     sorted_engine_scores = {
         eid: np.sort(np.asarray(vals, dtype=np.float64)) for eid, vals in engine_scores.items()
     }
 
-    # Exact rational verification
-    # Required: sum_i [ count(s_it <= q) / n_i ] >= m * target_frac
+    # Required rational mass: sum_i [ count / n_i ] >= m * target_frac
     required_sum = Fraction(m) * target_frac
 
-    chosen_threshold: float | None = None
-    for idx, q_val in enumerate(unique_scores):
-        # Compute exact rational mass sum
-        mass_sum = Fraction(0, 1)
+    obs_scores = np.asarray(sc, dtype=np.float64)
+    obs_weights = np.array([1.0 / n_i[int(eid)] for eid in eids], dtype=np.float64)
+    sort_idx = np.argsort(obs_scores)
+    sorted_s = obs_scores[sort_idx]
+    sorted_w = obs_weights[sort_idx]
+
+    unique_scores, group_indices = np.unique(sorted_s, return_index=True)
+    cum_w = np.cumsum(sorted_w)
+    last_indices = np.empty_like(group_indices)
+    last_indices[:-1] = group_indices[1:] - 1
+    last_indices[-1] = len(sorted_s) - 1
+    unique_cum_w = cum_w[last_indices]
+
+    def exact_mass(q_val: float) -> Fraction:
+        tot = Fraction(0, 1)
         for eid, vals in sorted_engine_scores.items():
-            count_le = int(np.searchsorted(vals, q_val, side="right"))
-            mass_sum += Fraction(count_le, n_i[eid])
+            cnt = int(np.searchsorted(vals, q_val, side="right"))
+            tot += Fraction(cnt, n_i[eid])
+        return tot
 
-        if mass_sum >= required_sum:
-            # Verify boundary property: preceding distinct score strictly below target
-            if idx > 0:
-                prev_q = unique_scores[idx - 1]
-                prev_mass_sum = Fraction(0, 1)
-                for eid, vals in sorted_engine_scores.items():
-                    count_le = int(np.searchsorted(vals, prev_q, side="right"))
-                    prev_mass_sum += Fraction(count_le, n_i[eid])
-                if prev_mass_sum >= required_sum:
-                    raise RuntimeError(
-                        f"Boundary verification failed: prev score {prev_q} already reaches target."
-                    )
-            chosen_threshold = float(q_val)
-            break
+    req_float = float(required_sum)
+    cand_idx = int(np.searchsorted(unique_cum_w, req_float - 1e-11))
+    if cand_idx >= len(unique_scores):
+        cand_idx = len(unique_scores) - 1
 
-    if chosen_threshold is None:
-        # Development empirical CDF at max observed score is exactly 1.0 >= target_frac
-        chosen_threshold = float(unique_scores[-1])
+    while (
+        cand_idx < len(unique_scores) and exact_mass(float(unique_scores[cand_idx])) < required_sum
+    ):
+        cand_idx += 1
+    while cand_idx > 0 and exact_mass(float(unique_scores[cand_idx - 1])) >= required_sum:
+        cand_idx -= 1
 
-    return chosen_threshold
+    if cand_idx >= len(unique_scores):
+        cand_idx = len(unique_scores) - 1
+
+    # Verify boundary property
+    assert exact_mass(float(unique_scores[cand_idx])) >= required_sum
+    if cand_idx > 0:
+        assert exact_mass(float(unique_scores[cand_idx - 1])) < required_sum
+
+    return float(unique_scores[cand_idx])
 
 
 def compute_engine_weighted_hierarchical_quantile(
@@ -209,34 +215,48 @@ def compute_engine_weighted_hierarchical_quantile(
     if Fraction(m) < required_sum:
         return float("inf")
 
-    unique_scores = np.sort(np.unique(sc))
     sorted_engine_scores = {
         eid: np.sort(np.asarray(vals, dtype=np.float64)) for eid, vals in engine_scores.items()
     }
 
-    chosen_threshold: float | None = None
-    for idx, q_val in enumerate(unique_scores):
-        mass_sum = Fraction(0, 1)
+    obs_scores = np.asarray(sc, dtype=np.float64)
+    obs_weights = np.array([1.0 / n_i[int(eid)] for eid in eids], dtype=np.float64)
+    sort_idx = np.argsort(obs_scores)
+    sorted_s = obs_scores[sort_idx]
+    sorted_w = obs_weights[sort_idx]
+
+    unique_scores, group_indices = np.unique(sorted_s, return_index=True)
+    cum_w = np.cumsum(sorted_w)
+    last_indices = np.empty_like(group_indices)
+    last_indices[:-1] = group_indices[1:] - 1
+    last_indices[-1] = len(sorted_s) - 1
+    unique_cum_w = cum_w[last_indices]
+
+    def exact_mass(q_val: float) -> Fraction:
+        tot = Fraction(0, 1)
         for eid, vals in sorted_engine_scores.items():
-            count_le = int(np.searchsorted(vals, q_val, side="right"))
-            mass_sum += Fraction(count_le, n_i[eid])
+            cnt = int(np.searchsorted(vals, q_val, side="right"))
+            tot += Fraction(cnt, n_i[eid])
+        return tot
 
-        if mass_sum >= required_sum:
-            # Verify boundary property
-            if idx > 0:
-                prev_q = unique_scores[idx - 1]
-                prev_mass_sum = Fraction(0, 1)
-                for eid, vals in sorted_engine_scores.items():
-                    count_le = int(np.searchsorted(vals, prev_q, side="right"))
-                    prev_mass_sum += Fraction(count_le, n_i[eid])
-                if prev_mass_sum >= required_sum:
-                    raise RuntimeError(
-                        f"Boundary verification failed: prev score {prev_q} already reaches target."
-                    )
-            chosen_threshold = float(q_val)
-            break
+    req_float = float(required_sum)
+    cand_idx = int(np.searchsorted(unique_cum_w, req_float - 1e-11))
+    if cand_idx >= len(unique_scores):
+        cand_idx = len(unique_scores) - 1
 
-    if chosen_threshold is None:
+    while (
+        cand_idx < len(unique_scores) and exact_mass(float(unique_scores[cand_idx])) < required_sum
+    ):
+        cand_idx += 1
+    while cand_idx > 0 and exact_mass(float(unique_scores[cand_idx - 1])) >= required_sum:
+        cand_idx -= 1
+
+    if cand_idx >= len(unique_scores):
         return float("inf")
 
-    return chosen_threshold
+    # Verify boundary property: preceding distinct score strictly below target
+    assert exact_mass(float(unique_scores[cand_idx])) >= required_sum
+    if cand_idx > 0:
+        assert exact_mass(float(unique_scores[cand_idx - 1])) < required_sum
+
+    return float(unique_scores[cand_idx])

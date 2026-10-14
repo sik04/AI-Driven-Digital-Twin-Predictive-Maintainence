@@ -93,3 +93,14 @@ For conformal calibration reproducibility under `step08-v1`:
 2. **Exact Rational Threshold Verification**: Floating-point threshold candidate boundaries are verified via exact rational arithmetic using `fractions.Fraction`.
 3. **Selection Freeze Gate**: Calibration candidate parameters are selected strictly on validation engines and frozen in Git before final calibrators are fitted on calibration engines.
 4. **Independent Audit Script**: `scripts/audit_step08_calibration.py` independently verifies registry artifact hashes, reconstructs selection winners, refits numerical thresholds from prediction caches, and reproduces point predictions directly from frozen model checkpoints.
+
+---
+
+## 7. Pre-Test Confirmatory Protocol and Control Freeze (Step 9 / Phase 7)
+
+For confirmatory evaluation preparation under `step09-v1`:
+1. **Validation-Only Matched-Control Selection**: Four prespecified benchmark controls (`matched_width_interval`, `widened_interval`, `point_safety_margin`, `earlier_intervention`) are parameterized exclusively on FD002 validation engines across all five model seeds jointly under `primary_reference` cost scenario at 90% nominal coverage. Calibration-engine prediction caches and outcomes are strictly blinded during control selection.
+2. **Stratified Engine-Cluster Bootstrap**: 10,000 engine-cluster bootstrap replicates per dataset generated using PCG64 PRNG seeded deterministically by `SeedSequence([2026, 6, dataset_number])`. Lifetime-quartile stratum counts are preserved from split manifests, duplicate-engine multiplicity is retained, and identical draws are reused across all models, seeds, and methods within each dataset.
+3. **Rigorous Decision Rules**: Bonferroni / Intersection-Union Testing (IUT) rules evaluate improvement, noninferiority, and empirical failure safeguards. Degenerate zero-width decision intervals and exact boundary equality are classified as Indeterminate. Any single failed required component renders the RQ Unsupported.
+4. **Strict Execution Provenance & Immutability**: All execution scripts capture HEAD commit SHA, initial clean worktree status, and complete environment dependencies at invocation entry via `src/intellitwin/provenance.py`. Writers enforce atomic, immutable artifact creation (`write_immutable_json`, `write_immutable_csv`), failing on conflicting overwrite attempts.
+5. **Anti-Leakage Barrier**: Confirmatory held-out test windows are not prepared, processed, or inspected during development. All pre-test smoke outputs are explicitly labeled `DEVELOPMENT_SMOKE_ONLY`, and confirmatory RQ1–RQ4 conclusions remain strictly PENDING until official test execution.
