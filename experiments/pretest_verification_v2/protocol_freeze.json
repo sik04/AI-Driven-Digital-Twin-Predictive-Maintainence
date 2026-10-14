@@ -1,0 +1,384 @@
+{
+  "bindings": {
+    "base_model_registry_sha256": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
+    "baseline_manifest_sha256": "1e12ad8845ef3c811cb9df8018df0290f241e061386fdfad0a86a321c9b1ce35",
+    "calibrator_registry_sha256": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
+    "control_reconstruction_sha256": "3fe91090831174cb4c4ec356df0ba70d3b898aab735de8335d55361c84b2ef86",
+    "control_selection_FD002_GBR_sha256": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d",
+    "control_selection_FD002_LSTM_sha256": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7",
+    "source_hashes": {
+      "src/intellitwin/decision/controls.py": "f4a7babd2e8a2cc345276cae7948e8870f8af9db3e46fc631b1504834a6f2769",
+      "src/intellitwin/evaluation/artifacts.py": "091ba3e17df90dace87a68ec5e5b7e47f5fe886b8b6f615d9859113a0308ee23",
+      "src/intellitwin/evaluation/bootstrap.py": "3fcd9e460a521efe29de056e92c9cdf8dc1935e00a1edaba3c3a0f072deae29a",
+      "src/intellitwin/evaluation/decisions.py": "7f68be3d7f500f6a06a3cea14530f24e4407e3ed2cf12653f50a753bd8fb6b35",
+      "src/intellitwin/evaluation/inference.py": "38a4e136ab1d060db2900256617a9b1c13885a5871075631fe156fdcacac408b",
+      "src/intellitwin/evaluation/metrics.py": "ad7171e00a5d4d47788da426e84164deb387eff95068df1ef99b28d461bd8584",
+      "src/intellitwin/evaluation/runner.py": "04f3b88d80d104e32856ae7f20f6bf2bb688a6c90b53f3f1832c84d05628f68f",
+      "src/intellitwin/evaluation/schema.py": "a5f5618063501782f2982e357199bb8634b98d96d389e112b811e35c6838ce90",
+      "src/intellitwin/evaluation/validation.py": "09a05e2b79fc44d156b031f9d97ee54566a41658ea41f14c32402d7903fbd8e2",
+      "src/intellitwin/evaluation/verification.py": "299dafdf88ae1c7fe2bc566b80b562d3c1e4c92f9cdb5d148e471bc9ce95559f",
+      "src/intellitwin/provenance.py": "5d781f41df324236bd0e7ae4bfb7253c61fc758ce8ff73a2b20af8d4890c09c7",
+      "src/intellitwin/uncertainty/verification.py": "31933d24e8cc9f09de4b940a03fc4fbf7541118bf25f255e331c9cf0cf885b04"
+    },
+    "splits_and_quartiles": {
+      "data/splits/fd001_engine_split_seed_2026.json": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+      "data/splits/fd002_engine_split_seed_2026.json": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+      "data/splits/fd002_lifetime_quartile_provenance.json": "10e80c73ef6af621aff7194f24b71374a98d91aae84d1500c51d3195a331f33a",
+      "data/splits/fd004_engine_split_seed_2026.json": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2"
+    },
+    "step08_full_audit_sha256": "a7234fd2bbc911cd5c667af950013c70c12925beee9ccfb08ff01faeec9d508d",
+    "step08_selection_freeze_sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0",
+    "validation_smoke_execution_manifest_sha256": "98a6a29b907aa5aad727cdd81d48bc0a2e34f5f7681d767718e37a9ca148fcef"
+  },
+  "confirmatory_configuration": {
+    "config_path": "research/research_design/step09_confirmatory_config.json",
+    "config_sha256": "b56ff30c9214282a3cac55b94b0e2205001b0c5d6ea9ff6c5db5cb8a4774a76f",
+    "payload": {
+      "configuration_counts": {
+        "control_configurations": 120,
+        "primary_method_configurations": 810,
+        "total_matrix_configurations": 930
+      },
+      "controls_rq3": {
+        "dataset": "FD002",
+        "named_controls": [
+          "matched_width_interval",
+          "widened_interval",
+          "point_safety_margin",
+          "earlier_intervention"
+        ],
+        "nominal_coverage": 0.9,
+        "selected_parameters": {
+          "GBR": {
+            "earlier_intervention": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "h",
+              "parameter_value": 1
+            },
+            "matched_width_interval": {
+              "interval_source": "global_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 0.92
+            },
+            "point_safety_margin": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "m",
+              "parameter_value": 5
+            },
+            "widened_interval": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 1.0
+            }
+          },
+          "LSTM": {
+            "earlier_intervention": {
+              "interval_source": "global_hcp",
+              "parameter_name": "h",
+              "parameter_value": 1
+            },
+            "matched_width_interval": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 0.9
+            },
+            "point_safety_margin": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "m",
+              "parameter_value": 4
+            },
+            "widened_interval": {
+              "interval_source": "global_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 1.0
+            }
+          }
+        },
+        "selection_scope": "FD002 validation partition across 5 seeds jointly"
+      },
+      "cost_scenarios": {
+        "failure_sensitive": {
+          "c_fail": 10.0,
+          "c_pm": 1.0,
+          "c_waste": 0.2,
+          "r_equal": 45.0,
+          "role": "descriptive_sensitivity"
+        },
+        "primary_reference": {
+          "c_fail": 5.0,
+          "c_pm": 1.0,
+          "c_waste": 0.2,
+          "r_equal": 20.0,
+          "role": "confirmatory_decision"
+        },
+        "waste_sensitive": {
+          "c_fail": 5.0,
+          "c_pm": 1.0,
+          "c_waste": 0.4,
+          "r_equal": 10.0,
+          "role": "descriptive_sensitivity"
+        }
+      },
+      "coverages": {
+        "all_coverages": [
+          0.8,
+          0.9,
+          0.95
+        ],
+        "confirmatory_primary": 0.9,
+        "descriptive_secondary": [
+          0.8,
+          0.95
+        ]
+      },
+      "dataset_matrix": {
+        "confirmatory_datasets": [
+          "FD001",
+          "FD002",
+          "FD004"
+        ],
+        "excluded_datasets": [
+          "FD003"
+        ]
+      },
+      "hypothesis_margins": {
+        "delta_cost_margin_scu": 0.2,
+        "delta_error_margin": 0.01,
+        "interval_score_noninferiority_margin_cycles": 1.0,
+        "max_absolute_coverage_error": 0.05,
+        "mpiw_noninferiority_margin_cycles": 1.0,
+        "robustness_cost_harm_margin_scu": -0.2,
+        "robustness_error_harm_margin": -0.01
+      },
+      "maintenance_policy": {
+        "decision_window": "endpoints 30 through T-1",
+        "evaluation_window": "endpoints 30 through T",
+        "primary_policy": "lower_bound_one_cycle_policy",
+        "rule": "MAINTAIN_NOW iff lower_rul <= 1.0, else CONTINUE"
+      },
+      "methods": {
+        "baselines": [
+          "global_hcp",
+          "regime_hcp"
+        ],
+        "primary_methods": [
+          "global_hcp",
+          "regime_hcp",
+          "decision_aware_hcp"
+        ],
+        "proposed_method": "decision_aware_hcp"
+      },
+      "model_matrix": {
+        "model_families": [
+          "GBR",
+          "LSTM"
+        ],
+        "seeds": [
+          2026,
+          2027,
+          2028,
+          2029,
+          2030
+        ]
+      },
+      "protocol_version": "step09-v1",
+      "schema_version": "step09-config-v1",
+      "statistical_inference": {
+        "bootstrap_replicates": 10000,
+        "decision_quantile_interval": [
+          0.00625,
+          0.99375
+        ],
+        "descriptive_quantile_interval": [
+          0.025,
+          0.975
+        ],
+        "quantile_interpolation": "linear",
+        "rng_algorithm": "PCG64",
+        "seed_sequence_formula": "[2026, 6, dataset_number]",
+        "subgroup_min_engines": 10
+      }
+    }
+  },
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T11:20:54.377966+00:00"
+  },
+  "freeze_timestamp_utc": "2026-10-14T11:20:56.416483+00:00",
+  "git_dirty": false,
+  "held_out_status": {
+    "confirmatory_conclusions": "PENDING",
+    "execution_status": "NOT_STARTED",
+    "test_windows_prepared": false
+  },
+  "matrix_counts": {
+    "bootstrap_replicates": 10000,
+    "cell_summary_rows": 186,
+    "control_configurations": 120,
+    "outcome_rows": 19590,
+    "primary_configurations": 810,
+    "total_configurations": 930
+  },
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-freeze-v2",
+  "selected_controls": {
+    "GBR": {
+      "earlier_intervention": {
+        "achieved_mpiw": 119.49305962459299,
+        "boundary_selection": true,
+        "control_family": "earlier_intervention",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 14.899999999999999,
+          "mean_wasted_rul": 69.5,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 69.5
+        },
+        "parameter_name": "h",
+        "parameter_value": 1
+      },
+      "matched_width_interval": {
+        "achieved_mpiw": 111.22016471457295,
+        "boundary_selection": false,
+        "control_family": "matched_width_interval",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 13.992307692307692,
+          "mean_wasted_rul": 64.96153846153847,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 64.96153846153847
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 0.92,
+        "target_mpiw": 111.47487562643208,
+        "width_diff": 0.2547109118591351,
+        "width_matched_verified": true
+      },
+      "point_safety_margin": {
+        "boundary_selection": false,
+        "control_family": "point_safety_margin",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.11538461538461539,
+          "fleet_early_pm_rate": 0.038461538461538464,
+          "mean_cost": 2.7461538461538457,
+          "mean_wasted_rul": 6.423076923076923,
+          "pm_only_early_pm_rate": 0.043478260869565216,
+          "pm_rate": 0.8846153846153846,
+          "pm_wasted_rul_mean": 7.260869565217392
+        },
+        "parameter_name": "m",
+        "parameter_value": 5
+      },
+      "widened_interval": {
+        "achieved_mpiw": 119.49305962459299,
+        "boundary_selection": true,
+        "control_family": "widened_interval",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 14.899999999999999,
+          "mean_wasted_rul": 69.5,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 69.5
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 1.0
+      }
+    },
+    "LSTM": {
+      "earlier_intervention": {
+        "achieved_mpiw": 120.65230484693909,
+        "boundary_selection": true,
+        "control_family": "earlier_intervention",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 18.052307692307696,
+          "mean_wasted_rul": 85.26153846153846,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 85.26153846153846
+        },
+        "parameter_name": "h",
+        "parameter_value": 1
+      },
+      "matched_width_interval": {
+        "achieved_mpiw": 110.1206237005312,
+        "boundary_selection": false,
+        "control_family": "matched_width_interval",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 16.39846153846154,
+          "mean_wasted_rul": 76.9923076923077,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 76.99230769230769
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 0.9,
+        "target_mpiw": 110.06243104300574,
+        "width_diff": 0.05819265752545277,
+        "width_matched_verified": true
+      },
+      "point_safety_margin": {
+        "boundary_selection": false,
+        "control_family": "point_safety_margin",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.08461538461538462,
+          "fleet_early_pm_rate": 0.0,
+          "mean_cost": 2.3846153846153846,
+          "mean_wasted_rul": 5.230769230769231,
+          "pm_only_early_pm_rate": 0.0,
+          "pm_rate": 0.9153846153846155,
+          "pm_wasted_rul_mean": 5.714285714285714
+        },
+        "parameter_name": "m",
+        "parameter_value": 4
+      },
+      "widened_interval": {
+        "achieved_mpiw": 120.65230484693909,
+        "boundary_selection": true,
+        "control_family": "widened_interval",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 18.052307692307696,
+          "mean_wasted_rul": 85.26153846153846,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 85.26153846153846
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 1.0
+      }
+    }
+  },
+  "source_execution_commit": "84b7e19e75be4ddd63a4c15b76ae1f19a64c0b07",
+  "status": "PRETEST_FROZEN"
+}

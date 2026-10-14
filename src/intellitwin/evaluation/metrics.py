@@ -29,9 +29,24 @@ def compute_interval_score(
     if alpha <= 0.0 or alpha >= 1.0:
         raise ValueError(f"nominal_coverage must be strictly in (0, 1), got {nominal_coverage}")
 
-    width = upper - lower
-    penalty_lower = np.maximum(0.0, lower - y_true) * (2.0 / alpha)
-    penalty_upper = np.maximum(0.0, y_true - upper) * (2.0 / alpha)
+    y_arr = np.asarray(y_true, dtype=np.float64)
+    low_arr = np.asarray(lower, dtype=np.float64)
+    upp_arr = np.asarray(upper, dtype=np.float64)
+
+    if not (len(y_arr) == len(low_arr) == len(upp_arr)):
+        raise ValueError("Length mismatch in compute_interval_score inputs.")
+    if (
+        not np.all(np.isfinite(y_arr))
+        or not np.all(np.isfinite(low_arr))
+        or not np.all(np.isfinite(upp_arr))
+    ):
+        raise ValueError("Non-finite values encountered in compute_interval_score.")
+    if np.any(low_arr > upp_arr):
+        raise ValueError("Inverted interval bounds detected: lower > upper.")
+
+    width = upp_arr - low_arr
+    penalty_lower = np.maximum(0.0, low_arr - y_arr) * (2.0 / alpha)
+    penalty_upper = np.maximum(0.0, y_arr - upp_arr) * (2.0 / alpha)
     res = np.asarray(width + penalty_lower + penalty_upper, dtype=np.float64)
     return res
 
@@ -42,13 +57,31 @@ def compute_equal_engine_metric(
     unit_col: str = "unit",
     seed_col: str = "seed",
 ) -> float:
-    """Compute equal-engine-weighted metric averaged across 5 seeds per engine.
+    """Compute equal-engine-weighted metric averaged across seeds per engine.
 
     Order of aggregation:
-    1. Average within (unit, seed)
-    2. Average across 5 seeds for each engine
-    3. Average equally across all engines
+    1. Verify completeness of seeds across all engines (no silent dropping)
+    2. Average within (unit, seed)
+    3. Average across seeds for each engine
+    4. Average equally across all engines
     """
+    if metric_col not in df.columns:
+        raise KeyError(f"Metric column '{metric_col}' not found in DataFrame.")
+
+    vals = df[metric_col].to_numpy(dtype=float)
+    if not np.all(np.isfinite(vals)):
+        raise ValueError(f"Non-finite values encountered in metric column '{metric_col}'.")
+
+    if seed_col in df.columns:
+        counts_per_unit = df.groupby(unit_col)[seed_col].nunique()
+        expected_seed_count = int(counts_per_unit.max())
+        if not (counts_per_unit == expected_seed_count).all():
+            bad_units = counts_per_unit[counts_per_unit != expected_seed_count].index.tolist()
+            raise ValueError(
+                f"Incomplete seed observations detected for engines: {bad_units}; "
+                f"all engines must have {expected_seed_count} seeds."
+            )
+
     unit_seed = df.groupby([unit_col, seed_col])[metric_col].mean().reset_index()
     engine_avgs = unit_seed.groupby(unit_col)[metric_col].mean()
     return float(engine_avgs.mean())
@@ -57,11 +90,14 @@ def compute_equal_engine_metric(
 def compute_equal_engine_rmse(
     df: pd.DataFrame,
     pred_col: str = "prediction",
-    target_col: str = "rul_target",
+    target_col: str = "rul_true",
     unit_col: str = "unit",
     seed_col: str = "seed",
 ) -> float:
-    """Compute equal-engine RMSE by aggregating squared errors before taking the square root."""
+    """Compute equal-engine RMSE by aggregating squared errors before taking the square root.
+
+    Default target_col is 'rul_true'. Capped-target RMSE ('rul_target') is secondary.
+    """
     df_temp = df.copy()
     sq_col = "_sq_err"
     df_temp[sq_col] = (df_temp[pred_col] - df_temp[target_col]) ** 2
@@ -90,6 +126,7 @@ def compute_subgroup_coverage_and_errors(
         'abs_error': float,
         'engine_count': int,
         'is_eligible': bool,
+        'is_missing': bool,
     }
     """
     results: dict[str, dict[str, Any]] = {}
@@ -102,15 +139,18 @@ def compute_subgroup_coverage_and_errors(
                 grp, metric_col=covered_col, unit_col=unit_col, seed_col=seed_col
             )
             err = abs(cov - nominal_coverage)
+            missing = False
         else:
             cov = float("nan")
             err = float("nan")
+            missing = True
 
         results[group_id] = {
             "coverage": cov,
             "abs_error": err,
             "engine_count": n_engs,
             "is_eligible": is_eligible,
+            "is_missing": missing,
         }
     return results
 
@@ -135,9 +175,15 @@ def compute_replicate_worst_group_bounds(
         WorstErr_upper^(b) = WorstErr_lower^(b)
     """
     if isinstance(available_errors, dict):
-        vals = [v for v in available_errors.values() if np.isfinite(v)]
+        for k, v in available_errors.items():
+            if not np.isfinite(v):
+                raise ValueError(f"Non-finite subgroup error encountered for group '{k}': {v}")
+        vals = list(available_errors.values())
     else:
-        vals = [v for v in available_errors if np.isfinite(v)]
+        for i, v in enumerate(available_errors):
+            if not np.isfinite(v):
+                raise ValueError(f"Non-finite subgroup error encountered at index {i}: {v}")
+        vals = list(available_errors)
 
     if len(vals) > 0:
         worst_err_lower = float(max(vals))
@@ -159,6 +205,8 @@ def propagate_delta_error_bounds(
     """Propagate worst-case bounds for Delta_error = WorstErr_baseline - WorstErr_proposed."""
     b_lower, b_upper = baseline_bounds
     p_lower, p_upper = proposed_bounds
-    delta_lower = b_lower - p_upper
-    delta_upper = b_upper - p_lower
+    if b_lower > b_upper or p_lower > p_upper:
+        raise ValueError("Inverted bounds detected in propagate_delta_error_bounds.")
+    delta_lower = float(b_lower - p_upper)
+    delta_upper = float(b_upper - p_lower)
     return (delta_lower, delta_upper)

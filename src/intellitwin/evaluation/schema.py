@@ -90,6 +90,7 @@ ALL_RQ3_CONTROLS: Final[tuple[str, ...]] = (
     CONTROL_SAFETY_MARGIN,
     CONTROL_EARLIER_INTERVENTION,
 )
+CONTROL_ALL_FOUR: Final[tuple[str, ...]] = ALL_RQ3_CONTROLS
 
 # Confirmatory Thresholds & Margins (Frozen under ADR-018 / Step 6 Contract)
 DELTA_COST_MARGIN_SCU: Final[float] = 0.20

@@ -54,7 +54,7 @@ To test Research Question 3 (RQ3)—whether proposed benefits stem from decision
    - Derives bounds from frozen baseline source: $q = U_{\text{source}} - p$, $L_\lambda = \max(0, p - \lambda q)$, $U_\lambda = p + \lambda q$.
    - Search grid: $\lambda = k/100$ for $k=1,\dots,400$ plus $\{5, 6, 8, 12, 16\}$.
    - Target: Proposed method's engine-weighted, 5-seed-averaged validation MPIW.
-   - Selected candidate minimizes $| \text{MPIW}(\lambda) - \text{MPIW}_{\text{target}} |$. Tie-breaking minimizes cost, then smaller $\lambda$, then `global_hcp` before `regime_hcp`.
+   - Selected candidate minimizes $| \text{MPIW}(\lambda) - \text{MPIW}_{\text{target}} |$ within $10^{-8}$ of the minimum error. Tie-breaking retains candidates with mean cost within $10^{-8}$ of minimum cost, then smaller $\lambda$, then `global_hcp` before `regime_hcp`.
    - Verified parameter selections: GBR $\lambda=0.92$ (`global_hcp`); LSTM $\lambda=0.90$ (`regime_hcp`).
 2. **`widened_interval`** (Interval-control family, Representative B):
    - Uses same formulation with $\lambda \ge 1.0$: $\lambda = k/100$ for $k=100,\dots,400$ plus $\{5, 6, 8, 12, 16\}$.

@@ -1,0 +1,165 @@
+{
+  "cost_scenario": {
+    "c_fail": 5.0,
+    "c_pm": 1.0,
+    "c_waste": 0.2,
+    "r_equal": 20.0,
+    "scenario_id": "primary_reference"
+  },
+  "dataset": "FD002",
+  "environment": {
+    "command_args": [
+      "scripts/run_step09_control_selection.py",
+      "--output-dir",
+      "C:\\Users\\Mayank\\.gemini\\antigravity-ide\\brain\\2caa3339-fbca-463b-873a-723d9fdacec0\\scratch\\pretest_v2_staging\\controls"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T10:38:17.411489+00:00"
+  },
+  "git_commit": "854dbdf42577540c49eb141bc50c86c1c7e529b2",
+  "git_dirty": false,
+  "input_hashes": {
+    "calibrator_decision_aware_hcp_seed_2026": "bba93040a44f85507cee8f57594d3943cd374cd097413daca8f404084db66460",
+    "calibrator_decision_aware_hcp_seed_2027": "ee0ffd9b3b2d3c4acf4942a24cc1d3433010353e9744e5fcefeb182a48c50616",
+    "calibrator_decision_aware_hcp_seed_2028": "62938cc30a6777904453acf926bed655b42155b402e510b954333ddf3fa21dd6",
+    "calibrator_decision_aware_hcp_seed_2029": "47fc6584ea7b38d4daf93c66259ee8317cc77dc6a04642dd2d6167da13252793",
+    "calibrator_decision_aware_hcp_seed_2030": "1c23fc88fe9db2ae417dcba12b8e6d4df58a9821de2bb8dc43bafb07fd24c79f",
+    "calibrator_global_hcp_seed_2026": "c3323f2bedefde6e377fdb1ebdf5487341992095b5f56779a7d31cb8ada27adf",
+    "calibrator_global_hcp_seed_2027": "c5abaa9715c78256a3047ec0df0b0d656d305bb7c5313f84c19e2c5e32dcd755",
+    "calibrator_global_hcp_seed_2028": "79903d9513a703cdc4dfbd60626dd9be17d844d29897c7167300dea5e51807ef",
+    "calibrator_global_hcp_seed_2029": "4feea38d515ff5e9cc1fd061aa51059999bea4f420401a1fa485457412489674",
+    "calibrator_global_hcp_seed_2030": "981b3f34a177fe79a6b20aa168c085297479cbd4f1a41b3008ecad20f7ae0169",
+    "calibrator_regime_hcp_seed_2026": "db2c0afa35c4c0ba254fd467518bd80090ec35148b6c9fd7e6c48e32dbbc38fb",
+    "calibrator_regime_hcp_seed_2027": "3cd9fd071ef1e6dd46592b0096664b2cb214451b63b4a4a4260901c2a360b252",
+    "calibrator_regime_hcp_seed_2028": "3240dbf251e6175c37573e7faa75880c620fa14ad33879e09475c52551a09a48",
+    "calibrator_regime_hcp_seed_2029": "35d217ad1ff711bf9401b7f9a4e91ce8c7b7f25b646c29474545a323cda07a2b",
+    "calibrator_regime_hcp_seed_2030": "cde556d4a57abc61ee213724f652bf0cc2cb08e1c0c784692ce3b788ebd8b06d",
+    "pred_cache_seed_2026": "28ad8e3067a80663cc2f55cf5a25a1967483cc1a8d1958f15b3510c4fa0d7cea",
+    "pred_cache_seed_2027": "399111f4d6423d98e2de27c479ffc32d543b62b6f7812d32ae4b2afcaef8fed6",
+    "pred_cache_seed_2028": "d9d000ec7061dd3a077bccab220c44740e01596ebd9a092a152b0038609b3a2f",
+    "pred_cache_seed_2029": "8178dc7954bfad7087f1609a049f9c98c3b53e7dc7a398a6917a0337bd6a1e39",
+    "pred_cache_seed_2030": "b06174d45de0b71b1c1fd2112030febf838080e87f68f5acd6ec22f98846f85b",
+    "split_manifest": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41"
+  },
+  "model_family": "LSTM",
+  "notice": "Selected strictly on FD002 validation engines across 5 seeds. Unbiased test estimates will be obtained during confirmatory evaluation.",
+  "proposed_target_mpiw": 110.06243104300574,
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "selected_controls": {
+    "earlier_intervention": {
+      "achieved_mpiw": 120.65230484693909,
+      "boundary_selection": true,
+      "control_family": "earlier_intervention",
+      "interval_source": "global_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 18.052307692307696,
+        "mean_wasted_rul": 85.26153846153846,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 85.26153846153846
+      },
+      "parameter_name": "h",
+      "parameter_value": 1
+    },
+    "matched_width_interval": {
+      "achieved_mpiw": 110.1206237005312,
+      "boundary_selection": false,
+      "control_family": "matched_width_interval",
+      "interval_source": "regime_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 16.39846153846154,
+        "mean_wasted_rul": 76.9923076923077,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 76.99230769230769
+      },
+      "parameter_name": "lambda",
+      "parameter_value": 0.9,
+      "target_mpiw": 110.06243104300574,
+      "width_diff": 0.05819265752545277,
+      "width_matched_verified": true
+    },
+    "point_safety_margin": {
+      "boundary_selection": false,
+      "control_family": "point_safety_margin",
+      "interval_source": "regime_hcp",
+      "metrics": {
+        "failure_rate": 0.08461538461538462,
+        "fleet_early_pm_rate": 0.0,
+        "mean_cost": 2.3846153846153846,
+        "mean_wasted_rul": 5.230769230769231,
+        "pm_only_early_pm_rate": 0.0,
+        "pm_rate": 0.9153846153846155,
+        "pm_wasted_rul_mean": 5.714285714285714
+      },
+      "parameter_name": "m",
+      "parameter_value": 4
+    },
+    "widened_interval": {
+      "achieved_mpiw": 120.65230484693909,
+      "boundary_selection": true,
+      "control_family": "widened_interval",
+      "interval_source": "global_hcp",
+      "metrics": {
+        "failure_rate": 0.0,
+        "fleet_early_pm_rate": 1.0,
+        "mean_cost": 18.052307692307696,
+        "mean_wasted_rul": 85.26153846153846,
+        "pm_only_early_pm_rate": 1.0,
+        "pm_rate": 1.0,
+        "pm_wasted_rul_mean": 85.26153846153846
+      },
+      "parameter_name": "lambda",
+      "parameter_value": 1.0
+    }
+  },
+  "status": "DEVELOPMENT_ONLY",
+  "validation_engine_count": 26,
+  "validation_engines": [
+    9,
+    16,
+    21,
+    25,
+    30,
+    51,
+    54,
+    75,
+    94,
+    95,
+    96,
+    98,
+    128,
+    133,
+    157,
+    169,
+    191,
+    205,
+    219,
+    224,
+    236,
+    237,
+    243,
+    248,
+    249,
+    256
+  ]
+}

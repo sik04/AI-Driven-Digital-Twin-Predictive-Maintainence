@@ -53,20 +53,45 @@ def validate_trajectory(
     """Validate that an engine trajectory satisfies complete chronological requirements.
 
     Requirements:
+    - Rejects booleans, non-integral numbers, invalid shapes, and inconsistent lengths.
+    - Requires lower and upper bounds together if provided.
     - Terminal cycle T > 30.
     - Endpoints run strictly from cycle 30 through T with step 1.
     - No missing cycles, no duplicate cycles.
     - Predictions are finite and non-negative.
-    - Regimes are legal (1..6).
+    - Regimes are legal (1..6) and match trajectory length.
     - If lower/upper bounds provided: 0 <= lower <= prediction <= upper.
     - If rul_true provided: rul_true == T - cycle.
     """
-    if terminal_cycle <= 30:
+    if isinstance(unit, (bool, np.bool_)) or not isinstance(unit, (int, np.integer)):
+        raise TrajectoryValidationError(
+            f"Invalid engine ID {unit}: must be integer, not boolean or non-integral"
+        )
+    if int(unit) <= 0:
+        raise TrajectoryValidationError(f"Invalid engine ID {unit}: must be positive integer")
+
+    if isinstance(terminal_cycle, (bool, np.bool_)) or not isinstance(
+        terminal_cycle, (int, np.integer)
+    ):
+        raise TrajectoryValidationError(f"Invalid terminal cycle {terminal_cycle}: must be integer")
+    if int(terminal_cycle) <= 30:
         raise TrajectoryValidationError(f"Engine {unit} has terminal cycle {terminal_cycle} <= 30.")
 
-    cyc_arr = np.asarray(cycles, dtype=int)
+    cyc_raw = np.asarray(cycles)
+    if cyc_raw.ndim != 1:
+        raise TrajectoryValidationError(f"Cycles array must be 1D, got shape {cyc_raw.shape}")
+
+    for c in cyc_raw:
+        if isinstance(c, (bool, np.bool_)):
+            raise TrajectoryValidationError(f"Engine {unit} cycle element {c} is a boolean")
+        if not np.isfinite(c) or (
+            isinstance(c, (float, np.floating)) and not float(c).is_integer()
+        ):
+            raise TrajectoryValidationError(f"Engine {unit} cycle element {c} is not an integer")
+
+    cyc_arr = cyc_raw.astype(int)
     n = len(cyc_arr)
-    expected_cycles = np.arange(30, terminal_cycle + 1, dtype=int)
+    expected_cycles = np.arange(30, int(terminal_cycle) + 1, dtype=int)
 
     if n != len(expected_cycles):
         raise TrajectoryValidationError(
@@ -79,26 +104,44 @@ def validate_trajectory(
             f"Engine {unit} cycles do not match contiguous 30..{terminal_cycle} sequence."
         )
 
-    pred_arr = np.asarray(predictions, dtype=float)
-    if len(pred_arr) != n:
+    pred_raw = np.asarray(predictions)
+    if pred_raw.ndim != 1:
+        raise TrajectoryValidationError(f"Predictions array must be 1D, got shape {pred_raw.shape}")
+    if len(pred_raw) != n:
         raise TrajectoryValidationError(
-            f"Engine {unit} prediction count {len(pred_arr)} != cycle count {n}."
+            f"Engine {unit} prediction count {len(pred_raw)} != cycle count {n}."
         )
+    pred_arr = pred_raw.astype(float)
     if not np.all(np.isfinite(pred_arr)):
         raise TrajectoryValidationError(f"Engine {unit} contains non-finite predictions.")
     if np.any(pred_arr < 0.0):
         raise TrajectoryValidationError(f"Engine {unit} contains negative predictions.")
 
-    for r in regimes:
+    reg_raw = np.asarray(regimes)
+    if reg_raw.ndim != 1 or len(reg_raw) != n:
+        raise TrajectoryValidationError(
+            f"Engine {unit} regime count {len(reg_raw)} != cycle count {n}."
+        )
+    for r in reg_raw:
         normalize_regime_id(r)
 
+    # Require both lower and upper bounds together
+    if (lower_bounds is None) != (upper_bounds is None):
+        raise TrajectoryValidationError(
+            f"Engine {unit}: lower_bounds and upper_bounds must both be provided or both be None."
+        )
+
     if lower_bounds is not None and upper_bounds is not None:
-        low_arr = np.asarray(lower_bounds, dtype=float)
-        upp_arr = np.asarray(upper_bounds, dtype=float)
-        if len(low_arr) != n or len(upp_arr) != n:
+        low_raw = np.asarray(lower_bounds)
+        upp_raw = np.asarray(upper_bounds)
+        if low_raw.ndim != 1 or upp_raw.ndim != 1:
+            raise TrajectoryValidationError("Interval bound arrays must be 1D.")
+        if len(low_raw) != n or len(upp_raw) != n:
             raise TrajectoryValidationError(
-                f"Engine {unit} interval bound lengths do not match trajectory length."
+                f"Engine {unit} interval bound lengths do not match trajectory length {n}."
             )
+        low_arr = low_raw.astype(float)
+        upp_arr = upp_raw.astype(float)
         if not np.all(np.isfinite(low_arr)) or not np.all(np.isfinite(upp_arr)):
             raise TrajectoryValidationError(f"Engine {unit} intervals contain non-finite values.")
         if np.any(low_arr < -1e-9):
@@ -113,8 +156,15 @@ def validate_trajectory(
             )
 
     if rul_trues is not None:
-        true_arr = np.asarray(rul_trues, dtype=float)
-        expected_true = (terminal_cycle - cyc_arr).astype(float)
+        true_raw = np.asarray(rul_trues)
+        if true_raw.ndim != 1 or len(true_raw) != n:
+            raise TrajectoryValidationError(
+                f"Engine {unit} rul_trues count {len(true_raw)} != cycle count {n}."
+            )
+        if not np.all(np.isfinite(true_raw)):
+            raise TrajectoryValidationError(f"Engine {unit} rul_trues contains non-finite values.")
+        true_arr = true_raw.astype(float)
+        expected_true = (int(terminal_cycle) - cyc_arr).astype(float)
         if not np.allclose(true_arr, expected_true, atol=1e-5):
             raise TrajectoryValidationError(f"Engine {unit} true RUL does not match T - cycle.")
 

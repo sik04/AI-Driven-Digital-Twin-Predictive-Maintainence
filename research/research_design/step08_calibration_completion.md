@@ -131,14 +131,22 @@ Validation coverage exceeds 95% due to finite-sample hierarchical quantile conse
 
 ## 6. Verification and Provenance Audit Results
 
-The updated Step 8 audit (`scripts/audit_step08_calibration.py`) executed clean reconstruction and verification:
-1. **Artifact Integrity**: PASS (all 90 calibrator JSON files load and match registered SHA-256 hashes).
-2. **Selection Reconstruction**: PASS (exact match of selected winner `gamma2_betam1` and full candidate evidence for all 6 cells from cached validation predictions).
-3. **Threshold Numerical Reconstruction**: PASS (re-fitted thresholds from calibration prediction caches matched saved artifacts within strict numerical tolerance $\Delta \le 1.0 \times 10^{-10}$).
-4. **Validation Metric Reconstruction**: PASS (recomputed validation interval metrics matched saved `metrics.json` within $\Delta \le 1.0 \times 10^{-10}$).
-5. **Scoped Data Isolation**: PASS (verified zero train or test engines appear in any Step 8 artifact; verified split partition disjointness scoped to Step 7/8).
-6. **Prediction Reproduction**: PASS (re-executed inference of all 30 frozen models on raw calibration and validation partitions; matched caches within $\Delta \le 5.0 \times 10^{-7} \le 1.0 \times 10^{-4}$).
-7. **Provenance & Baseline Preservation**: Recorded under ADR-022. Baseline manifest: `experiments/audits/step08_repair_baseline.json`. Clean verification report: `experiments/audits/step08_repair_verification.json`.
+### 6.1 Historical Defect Discovery and Repair (ADR-024)
+During pre-test readiness verification, an independent audit identified that the prior Step 8 repair report (`experiments/audits/step08_repair_verification.json`) recorded `checkpoint_prediction_reproduction = NOT RUN` while reporting `overall_status = PASS`. Additionally, the historical baseline commit SHA was recorded with a typo (`f1edce7858c9748b6ee92e7c4f4a3b7849e7b235` instead of `f1edce7fdf48b45513ff90a680da49701451d9cb`).
+
+Under **ADR-024**, official full-audit mode was executed requiring all verification checks, including CPU inference reproduction from raw C-MAPSS text files across all 60 model/partition checks.
+
+### 6.2 Full Official Verification Gate Results
+The official full audit (`experiments/pretest_verification_v2/step08_full_audit.json`) executed cleanly from a clean working tree (`git_dirty = false`, `device = cpu`):
+1. **Registry Completeness**: **PASS** (all 90 calibrator bundles load, conform to schema, and match registered SHA-256 hashes).
+2. **Prediction Cache Integrity**: **PASS** (trajectories run strictly cycles 30..T with non-negative finite predictions and correct true RUL labels).
+3. **Selection Freeze Reconstruction**: **PASS** (full candidate evidence tables, metrics, and deterministic tie-breaking for all 6 cells reconstruct exactly from cached validation predictions).
+4. **Threshold and Interval Reconstruction**: **PASS** (re-fitted hierarchical quantiles match saved artifacts within numerical tolerance $\Delta \le 1.0 \times 10^{-10}$).
+5. **Scoped Isolation**: **PASS** (strictly zero held-out test engines or official test files accessed).
+6. **Checkpoint Prediction Reproduction**: **PASS** (re-executed CPU inference for all 30 frozen models on raw validation and calibration partitions across batches of 256; joined on `(unit, endpoint_cycle)` with verified terminal cycles $T$ and preprocessor regimes; maximum absolute prediction error is $0.0 \le 1.0 \times 10^{-4}$ cycles across all 60 model/partition checks).
+7. **Overall Status**: **PASS** (every mandatory check executed and passed).
+
+Historical reports are preserved unchanged and formally superseded in `experiments/pretest_verification_v2/supersession.json`.
 
 *(Note: Automated verification confirms numerical reproducibility and code correctness against specified schemas; it is an automated verification suite, not an independent human review).*
 

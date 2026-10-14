@@ -700,26 +700,75 @@ def verify_all_calibrator_quantiles_and_intervals(
     }
 
 
+RAW_TRAIN_HASHES: dict[str, str] = {
+    "FD001": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+    "FD002": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+    "FD004": "27ef6160b6a1dcb2613a88de9c239f763b223f02cdc41dc5cdedc5dc189b6218",
+}
+
+
 def reproduce_checkpoint_predictions(
     base_dir: Path | str = ".",
     raw_data_dir: Path | str = "data/raw/cmapss",
 ) -> dict[str, Any]:
-    """Reproduce all 30 base model predictions on validation and calibration partitions."""
+    """Reproduce all 30 base model predictions on validation and calibration partitions.
+
+    Requirements:
+    - Verifies raw training data file SHA-256 hashes.
+    - Filters to validation or calibration membership before preprocessing.
+    - Uses frozen preprocessing and frozen checkpoints.
+    - Runs CPU inference in batches of 256.
+    - Verifies 30 models on validation and 30 on calibration (60 model/partition checks).
+    - Joins reproduced and saved predictions by (unit, endpoint_cycle).
+    - Rejects missing, extra, or duplicate keys.
+    - Verifies true terminal cycles and labels against raw permitted-partition trajectories.
+    - Compares regime labels against frozen-preprocessor outputs.
+    - Asserts maximum absolute prediction error <= 1e-4.
+    - Consistently passes base_dir through all nested loaders.
+    """
     base = Path(base_dir).resolve()
     from intellitwin.data.calibration_pipeline import prepare_partition_windows
     from intellitwin.models.registry import load_frozen_base_model
+
+    # 1. Verify raw file source hashes
+    for ds in EXPECTED_DATASETS:
+        raw_file = resolve_repo_relative_path(base, Path(raw_data_dir) / f"train_{ds}.txt")
+        if not raw_file.exists():
+            raise FileNotFoundError(f"Raw C-MAPSS training file missing: {raw_file}")
+        h = compute_sha256(raw_file)
+        if h != RAW_TRAIN_HASHES[ds]:
+            raise ValueError(
+                f"Raw source hash mismatch for {raw_file}: {h} != {RAW_TRAIN_HASHES[ds]}"
+            )
 
     diff_records: list[dict[str, Any]] = []
 
     for ds in EXPECTED_DATASETS:
         for partition in ("validation", "calibration"):
+            # Load raw partition windows via frozen preprocessor
             windows = prepare_partition_windows(
                 dataset_name=ds,
                 partition_name=partition,
                 raw_data_dir=raw_data_dir,
+                base_dir=base,
             )
             w_flat = windows.flatten_for_gbr()
             w_seq = windows.X_sequence
+
+            # Load raw run-to-failure data to independently verify terminal cycles
+            raw_txt = resolve_repo_relative_path(base, Path(raw_data_dir) / f"train_{ds}.txt")
+            df_raw = load_cmapss_run_to_failure(
+                path=raw_txt,
+                dataset_name=ds,
+                expected_engine_count=EXPECTED_ENGINE_COUNTS[ds],
+            )
+            split_p = resolve_repo_relative_path(
+                base, f"data/splits/{ds.lower()}_engine_split_seed_2026.json"
+            )
+            split_manifest = load_split_manifest(split_p)
+            allowed_units = set(split_manifest.get_partition(partition))
+            raw_part = df_raw[df_raw["unit"].isin(allowed_units)]
+            raw_lifetimes = {int(u): int(grp["cycle"].max()) for u, grp in raw_part.groupby("unit")}
 
             for fam in EXPECTED_FAMILIES:
                 for seed in EXPECTED_SEEDS:
@@ -732,13 +781,19 @@ def reproduce_checkpoint_predictions(
                     X_in = w_flat if fam == "GBR" else w_seq
 
                     # Batch size 256 CPU inference
-                    preds_list = []
+                    preds_list: list[np.ndarray[Any, Any]] = []
                     batch_size = 256
                     n_samples = len(X_in)
                     for i in range(0, n_samples, batch_size):
                         batch = X_in[i : i + batch_size]
                         preds_list.append(model.predict(batch))
                     re_preds = np.concatenate(preds_list)
+
+                    if not np.all(np.isfinite(re_preds)):
+                        raise ValueError(
+                            f"Non-finite prediction encountered during reproduction of "
+                            f"{ds}_{fam}_seed{seed}"
+                        )
 
                     cache_p = (
                         base
@@ -750,10 +805,71 @@ def reproduce_checkpoint_predictions(
                         / fam
                         / f"seed_{seed}.csv"
                     )
-                    df_saved = pd.read_csv(cache_p)
-                    saved_preds = df_saved["prediction"].to_numpy()
+                    df_saved = pd.read_csv(cache_p, float_precision="round_trip")
 
-                    max_abs_diff = float(np.max(np.abs(re_preds - saved_preds)))
+                    df_re = pd.DataFrame(
+                        {
+                            "unit": windows.engine_ids,
+                            "endpoint_cycle": windows.endpoint_cycles,
+                            "re_pred": re_preds,
+                            "re_rul_true": windows.rul_true,
+                            "re_regime": windows.regimes,
+                            "re_stage": windows.lifecycle_stages,
+                        }
+                    )
+
+                    # Reject duplicate keys in either source
+                    if df_saved.duplicated(subset=["unit", "endpoint_cycle"]).any():
+                        raise ValueError(f"Duplicate keys found in saved cache {cache_p}")
+                    if df_re.duplicated(subset=["unit", "endpoint_cycle"]).any():
+                        raise ValueError(
+                            f"Duplicate keys generated in reproduction for {ds}_{fam}_seed{seed}"
+                        )
+
+                    # Join on (unit, endpoint_cycle)
+                    merged = pd.merge(
+                        df_saved,
+                        df_re,
+                        on=["unit", "endpoint_cycle"],
+                        how="outer",
+                        indicator=True,
+                    )
+                    if (merged["_merge"] != "both").any():
+                        missing_keys = merged[merged["_merge"] != "both"][
+                            ["unit", "endpoint_cycle", "_merge"]
+                        ].to_dict(orient="records")
+                        raise ValueError(
+                            f"Key mismatch between reproduced and saved predictions in "
+                            f"{cache_p}: {missing_keys}"
+                        )
+
+                    # Verify true terminal cycles and labels against raw permitted trajectories
+                    for row in merged.itertuples():
+                        u = int(row.unit)
+                        c = int(row.endpoint_cycle)
+                        T = raw_lifetimes[u]
+                        expected_true = float(T - c)
+                        if abs(float(row.rul_true) - expected_true) > 1e-6:
+                            raise ValueError(
+                                f"Label mismatch against raw lifetime for unit {u} "
+                                f"cycle {c} in {cache_p}"
+                            )
+                        if abs(float(row.re_rul_true) - expected_true) > 1e-6:
+                            raise ValueError(
+                                f"Reproduced label mismatch for unit {u} cycle {c} in {cache_p}"
+                            )
+
+                    # Verify regime labels against frozen-preprocessor outputs
+                    if not (merged["regime"] == merged["re_regime"]).all():
+                        raise ValueError(f"Regime label mismatch in {cache_p}")
+
+                    # Numerical difference check
+                    saved_preds = merged["prediction"].to_numpy(dtype=np.float64)
+                    re_preds_matched = merged["re_pred"].to_numpy(dtype=np.float64)
+                    if not np.all(np.isfinite(saved_preds)):
+                        raise ValueError(f"Non-finite saved predictions in {cache_p}")
+
+                    max_abs_diff = float(np.max(np.abs(re_preds_matched - saved_preds)))
                     diff_records.append(
                         {
                             "dataset": ds,
