@@ -1,0 +1,47 @@
+% Conformal Calibration Mathematical Formulations and Fallback Rules
+% Authoritative Sources: src/intellitwin/uncertainty/scores.py, src/intellitwin/uncertainty/quantiles.py,
+%                        src/intellitwin/uncertainty/calibration.py, research/research_design/step08_calibration_specification.md
+% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+
+\subsection*{Point Predictions and Decision-Aware Asymmetric Nonconformity}
+Let $\RULpred = \max(0, \hat{y})$ denote the non-negative evaluated point prediction in operational cycles, and let $\RULtrue$ denote the true uncapped Remaining Useful Life. The asymmetric decision-aware nonconformity score scales deviations according to state-dependent factors:
+\begin{align}
+\sigmap &= \left(1 + \frac{\RULpred}{125}\right)^\gamma, \\
+\zp &= \exp\left(-\frac{\RULpred}{20}\right), \\
+\ap &= \sigmap \exp(\beta \zp), \\
+\bp &= \sigmap \exp(-\beta \zp),
+\end{align}
+where $\gamma \in \{0, 1, 2\}$ controls variance expansion with life horizon, and $\beta \in \{-\ln 2, 0, +\ln 2\}$ governs risk asymmetry. The nonconformity score is defined as:
+\begin{equation}
+\text{score}(\RULpred, \RULtrue) = \max\left(\frac{\RULpred - \RULtrue}{\ap}, \frac{\RULtrue - \RULpred}{\bp}, 0\right).
+\end{equation}
+Inverting this score with respect to a fitted threshold $q$ produces prediction interval bounds:
+\begin{equation}
+\LowerBound = \max(0, \RULpred - q \cdot \ap), \quad \UpperBound = \RULpred + q \cdot \bp.
+\end{equation}
+Standard global and condition-aware baselines evaluate absolute residuals $|y - p|$ (corresponding to $\gamma=0, \beta=0, a(p)=1, b(p)=1$), yielding symmetric bounds $[ \max(0, p - q), p + q ]$.
+
+The hyperparameter grid spans 9 candidate pairs ($\gamma \in \{0, 1, 2\}$, $\beta \in \{-\ln 2, 0, +\ln 2\}$). Across all six experimental cells, hyperparameter selection on validation engines uniquely selected the configuration \texttt{gamma2\_betam1} ($\gamma = 2$, $\beta = -\ln 2$).
+
+\subsection*{Hierarchical Engine-Weighted Final Calibration Distribution}
+In final conformal calibration on reserved calibration engines, each finite observation endpoint $(i, t)$ within contributing engine $i$ receives an exact rational weight. For $m$ contributing engines with $n_i$ valid temporal windows each, the final hierarchical calibration distribution satisfies:
+\begin{equation}
+F_{\text{final}}(q) = \frac{1}{m+1} \sum_{i=1}^m \left[ \frac{1}{n_i} \sum_{t} \mathbf{1}_{\{\text{score}_{it} \le q\}} \right].
+\end{equation}
+Each finite endpoint carries probability mass $\frac{1}{(m+1)n_i}$. The total finite mass across all contributing calibration engines is exactly $\frac{m}{m+1}$, with the remaining probability mass $\frac{1}{m+1}$ placed at $+\infty$. The calibrated threshold $q^*$ is the infimum score satisfying $F_{\text{final}}(q) \ge 1 - \alpha$. If no finite score reaches $1 - \alpha$, $q^* = +\infty$. (In contrast, the normalized development empirical distribution used during leave-one-engine-out validation selection applies standard $\frac{1}{m}$ weighting).
+
+\subsection*{Regime Stratification and Deterministic Fallback Rules}
+For regime-stratified calibration, $m_g$ denotes the count of distinct engines providing observations in regime cluster $g \in \{\text{C1}, \dots, \text{C6}\}$, and $n_{ig}$ denotes the eligible window count of engine $i$ within regime $g$. A flight regime possesses sufficient calibration support if and only if:
+\begin{equation}
+m_g \ge \max\left(10, \left\lceil \frac{1}{\alpha} \right\rceil - 1\right).
+\end{equation}
+Evaluating this criterion across nominal coverage levels dictates:
+\begin{itemize}
+    \item 80\% coverage ($\alpha = 0.20$): Requires $m_g \ge \max(10, 5 - 1) = 10$ distinct engines.
+    \item 90\% coverage ($\alpha = 0.10$): Requires $m_g \ge \max(10, 10 - 1) = 10$ distinct engines.
+    \item 95\% coverage ($\alpha = 0.05$): Requires $m_g \ge \max(10, 20 - 1) = 19$ distinct engines.
+\end{itemize}
+If regime $g$ fails this threshold, the framework deterministically falls back to the pooled global threshold $q^*_{\text{global}}$ fitted for the exact same calibration method and coverage level, formally logging the fallback event.
+
+\subsection*{Mathematical Impact of Negative $\beta$}
+At fixed point prediction $\RULpred$, threshold $q$, and exponent $\gamma$, negative $\beta$ decreases $\ap$ relative to $\beta=0$ and increases $\bp$. Consequently, the lower bound $\LowerBound = \max(0, \RULpred - q \ap)$ is nondecreasing, and the upper bound $\UpperBound = \RULpred + q \bp$ is nondecreasing. This algebraic property does not establish improved maintenance utility or earlier intervention; calibration thresholds $q$ are refitted on asymmetrically scaled scores, altering the empirical score distribution. Maintenance decision efficacy must therefore be established through sequential simulation.

@@ -13,14 +13,6 @@ The framework enforces rigorous methodological safeguards to preserve empirical 
 \end{enumerate}
 
 \subsection{Current Status and Verification Gates}
-At the current stage of project execution, the theoretical formulation, data pipelines, base model training protocols, and statistical evaluation machinery have been fully specified, audited, and frozen. Empirical results on the held-out test splits remain blinded and pending final experimental execution by the development team. 
+At the current stage of project execution (pinned to commit \texttt{bb9e34579343881a831e3f052608ee15e183df76}), the theoretical formulation, data pipelines, base model training protocols, and statistical evaluation machinery have been fully specified, audited, and frozen. Pretest verification artifacts (\texttt{step08\_full\_audit.json} and \texttt{pretest\_audit.json}) confirm that all 60 base-model validation and calibration partition evaluations reproduce with zero maximum difference ($0.0$), establishing \texttt{PRETEST\_READY} status. The baseline inventory comprises 652 tracked, protected Git artifacts and 72 local-only historical search checkpoints.
 
-The planned progression toward publication comprises:
-\begin{itemize}
-    \item \textbf{UPD-01}: Verification of pretest reproduction audits and environment fixes.
-    \item \textbf{UPD-02 \& UPD-03}: Batch execution of held-out prediction, interval calibration, and discrete-event maintenance simulations.
-    \item \textbf{UPD-04}: Formal computation of cluster-bootstrap confidence intervals and execution of Intersection-Union Test decision rules for RQ1--RQ4.
-    \item \textbf{UPD-06 \& UPD-07}: Integration of the replay-based digital twin demonstrator and independent clean-environment reproducibility verification.
-\end{itemize}
-
-Upon completion of these verification gates, the resulting empirical evidence will be integrated directly into this document following the established 10-step protocol.
+The software is an academic research prototype evaluating an offline, trace-driven simulation replay engine; it makes no claim of production readiness, aircraft certification, physical hardware integration, or independently established end-to-end operational reproducibility. Empirical results on held-out test splits remain blinded and \texttt{NOT\_STARTED}, with confirmatory research question outcomes \texttt{PENDING}. Upon completion of official held-out evaluation, verified empirical results will be incorporated into this document.

@@ -97,7 +97,7 @@
 - **Visual Design**: Forest plot with horizontal error bars:
   - Outer thin bar: 98.75% confirmatory decision interval (Bonferroni $\alpha = 0.0125$).
   - Inner thick bar: 95% descriptive confidence interval.
-  - Central marker: Median bootstrap point estimate.
+  - Central marker: Observed paired contrast from the evaluation output.
   - Vertical red dashed lines: Frozen practical-effect thresholds ($+0.20$ SCU for cost, $+0.01$ for error reduction, $-0.20$ for non-harm).
   - Explicit outcome badges indicating `Supported`, `Unsupported`, or `Inconclusive`.
 - **Required Inputs**: Bootstrap quantiles from `src/intellitwin/evaluation/bootstrap.py` under `UPD-04`.

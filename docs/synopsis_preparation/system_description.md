@@ -2,7 +2,7 @@
 
 **Document Version**: `1.0`  
 **Governing Standard**: Strict demarcation between implemented production research modules and planned demonstration features  
-**Source Commit**: `224c741f5f3da19821a708e0a6da417d4810e9da`  
+**Source Commit Reviewed**: `bb9e34579343881a831e3f052608ee15e183df76` (Historical initial draft: `224c741f5f3da19821a708e0a6da417d4810e9da`)  
 **Target Codebase**: `src/intellitwin/`
 
 ---
@@ -19,34 +19,38 @@ The term "Digital Twin" has been broadly used in engineering literature to encom
 
 ## 2. Implemented Subsystems and Code Architecture
 
-The implemented codebase resides in `src/intellitwin/` and is organized into six functional modules:
+The implemented codebase resides in `src/intellitwin/` and is organized into authoritative functional modules:
 
 ```text
 src/intellitwin/
 ├── __init__.py                # Package version and metadata
 ├── provenance.py              # Cryptographic execution provenance and environment logging
 ├── data/                      # Data curation, regime clustering, and windowing
-│   ├── loader.py              # C-MAPSS dataset parser and schema validator
-│   ├── preprocessor.py        # Training-only robust scaling and zero-variance pruning
-│   ├── regime.py              # K-Means operational regime clustering (k=6)
-│   └── window.py              # Causal sliding-window generator (W=30, stride=1, no padding)
+│   ├── schema.py              # C-MAPSS dataset schema, column definitions, and validation
+│   ├── preprocessing.py       # Training-only z-score normalization and regime-aware scaling
+│   └── windowing.py           # Causal sliding-window generator (W=30, stride=1, no padding)
 ├── models/                    # Point prognostic predictors
-│   ├── base.py                # Abstract base model contract
-│   ├── gbr.py                 # Scikit-learn HistGradientBoostingRegressor wrapper
-│   └── lstm.py                # PyTorch unidirectional LSTM architecture and trainer
+│   ├── gbr.py                 # sklearn HistGradientBoostingRegressor wrapper and grid specs
+│   ├── lstm.py                # PyTorch unidirectional LSTM architecture and trainer
+│   └── metrics.py             # Point prediction error metrics (RMSE, MAE, asymmetric score)
 ├── uncertainty/               # Conformal calibration machinery
-│   ├── calibrator.py          # Abstract calibrator contract
-│   ├── conformal.py           # HierarchicalConformalCalibrator with exact rational quantiles
-│   └── scores.py              # Asymmetric decision-aware nonconformity score functions
+│   ├── scores.py              # Nonconformity score functions (symmetric absolute and decision-aware)
+│   ├── quantiles.py           # Exact engine-weighted rational quantile computation
+│   ├── calibration.py         # Hierarchical conformal calibration engine (global, regime, decision-aware)
+│   └── selection.py           # Leave-one-engine-out validation candidate selection
 ├── decision/                  # Maintenance decision logic
-│   └── policies.py            # lower_bound_one_cycle_policy and baseline policy rules
+│   ├── policies.py            # lower_bound_one_cycle_policy and baseline policy contracts
+│   └── controls.py            # RQ3 matched-conservatism control parameterizations
 ├── simulator/                 # Sequential maintenance simulation engine
 │   ├── engine.py              # Discrete-event MaintenanceSimulator replay engine
-│   └── cost.py                # MaintenanceCostModel supporting SCU cost scenarios
+│   └── costs.py               # MaintenanceCostModel supporting SCU cost scenarios
 └── evaluation/                # Confirmatory statistical inference
-    ├── metrics.py             # PICP, MPIW, Winkler score, coverage error, and cost metrics
+    ├── schema.py              # Evaluation result data structures and serialization contracts
+    ├── metrics.py             # PICP, MPIW, Winkler score, coverage error, and cost accounting
     ├── bootstrap.py           # Stratified engine-cluster bootstrap with PCG64 PRNG
-    └── decision_rules.py      # Bonferroni FWER and Intersection-Union Testing aggregator
+    ├── inference.py           # Multiplicity adjustment and decision interval estimation
+    ├── decisions.py           # Bonferroni FWER and Intersection-Union Testing decision aggregator
+    └── runner.py              # End-to-end evaluation orchestration pipeline
 ```
 
 ### 2.1 Cryptographic Execution Provenance (`src/intellitwin/provenance.py`)
@@ -55,35 +59,38 @@ To guarantee end-to-end scientific traceability under ADR-022:
 - `Git Dirty Checking`: Refuses execution of official audit or confirmatory runs if uncommitted modifications or untracked files are detected.
 
 ### 2.2 Data and Preprocessing Subsystem (`src/intellitwin/data/`)
-- Strict C-MAPSS loader enforcing the 17-feature schema (3 operational settings + 14 degradation sensors).
-- Preprocessing fit strictly on training engines; frozen medians and scales applied to calibration, validation, and test engines.
-- Causal temporal windowing constructing 30-cycle windows ($t-29 \dots t$) with stride 1. No padding ensures every prediction is backed by 30 true operational cycles.
-- Outputs dual data representations: 2D sequential tensors $(30, 17)$ for LSTM and flattened 1D vectors $(510,)$ for GBR.
+- Preprocessing uses training-only z-score normalization: $x_{\text{normalized}} = (x - \mu_{\text{train}}) / s_{\text{train}}$, where means and population standard deviations are estimated with `ddof=0`, and $s_{\text{train}} = 1.0$ if $\sigma_{\text{train}} = 0$.
+- Preserves the frozen 17-feature selection order: `setting1, setting2, setting3, s2, s3, s4, s7, s8, s9, s11, s12, s13, s14, s15, s17, s20, s21`.
+- For FD002 and FD004, operating settings are standardized on training data and clustered into $k=6$ operating regimes via K-Means ($k=6, \text{random\_state}=2026, \text{n\_init}=10$), preserving lexicographic centroid ordering ($C_1$–$C_6$). Sensor normalization parameters are fitted within training regimes. Preprocessing occurs before window construction.
+- Causal temporal windowing constructs 30-cycle causal windows ($t-29 \dots t$) with stride 1 without crossing engine boundaries. No padding ensures every prediction is backed by 30 true operational cycles.
+- Outputs dual data representations: 2D sequential tensors $(30, 17)$ for LSTM and flattened 1D vectors $(510,)$ in C-order for GBR.
 
 ### 2.3 Base Prognostic Model Subsystem (`src/intellitwin/models/`)
-- Encapsulates point-prediction architectures adhering to a common interface (`fit`, `predict`).
-- GBR: High-capacity tree-based gradient boosting operating over flattened 510-dimensional causal windows.
-- LSTM: Deep recurrent neural network operating over sequential 30-step tensors, utilizing dropout regularization and early stopping on validation RMSE.
-- Enforces non-negative point-prediction post-processing ($\hat{y} \ge 0.0$).
+- GBR: `sklearn.ensemble.HistGradientBoostingRegressor` operating over flattened 510-dimensional causal vectors. Selected winning configurations: `gbr_lr010_leaf15_l2_0` on FD001; `gbr_lr010_leaf31_l2_0` on FD002 and FD004.
+- LSTM: One unidirectional recurrent layer (`input_size=17, hidden_size=64, num_layers=1, batch_first=True, bidirectional=False, dropout=0.0`), extracting the final sequence step, followed by `nn.Dropout(p=0.20)` and `nn.Linear(64, 1)`. Selected configuration: `lstm_h64_lr0010`. Early stopping uses validation uncapped-RUL RMSE.
+- Enforces non-negative point-prediction post-processing ($p = \max(0.0, \; \text{raw\_prediction})$) without upper clipping at 125 cycles.
 
 ### 2.4 Conformal Uncertainty Subsystem (`src/intellitwin/uncertainty/`)
-- Implements `HierarchicalConformalCalibrator`:
-  - Computes exact rational nonconformity weights balancing mass equally across contributing engines ($w_{it} = \frac{1}{m \cdot n_i}$).
-  - Enforces Lee et al. (2023) hierarchical boundary mass bounding finite scores by $\frac{m}{m+1}$ and assigning remaining mass to $+\infty$.
-  - Supports global thresholding (`global_hcp`), regime-stratified thresholding (`regime_hcp`), and proposed decision-aware asymmetric thresholding (`decision_aware_hcp`).
-  - Implements fallback routing to global thresholds when an operating regime contains fewer than $m_g$ calibration engines.
+- Implements exact rational nonconformity quantile solver:
+  - In final calibration with $m$ contributing engines, finite score endpoints carry mass $\frac{1}{(m+1)n_i}$.
+  - Total finite probability mass is $\frac{m}{m+1}$, with the remaining $\frac{1}{m+1}$ placed at $+\infty$.
+  - Threshold $q$ is the smallest observed score whose cumulative probability reaches $1 - \alpha$.
+  - Implements fallback routing to global thresholds when an operating regime contains fewer than $m_g \ge \max(10, \lceil 1/\alpha \rceil - 1)$ calibration engines (10 for 80%/90%, 19 for 95%).
+  - Supports global baseline (`global_hcp`), regime baseline (`regime_hcp`), and proposed decision-aware asymmetric calibration (`decision_aware_hcp`: $\sigma(p)=(1+p/125)^\gamma, z(p)=\exp(-p/20), a(p)=\sigma(p)\exp(\beta z(p)), b(p)=\sigma(p)\exp(-\beta z(p))$, candidate `gamma2_betam1`).
 
 ### 2.5 Sequential Maintenance Simulator (`src/intellitwin/simulator/`)
 - Implements `MaintenanceSimulator`: a deterministic, trace-driven discrete-event simulation engine.
 - Replays qualified engine operational cycles from cycle 30 to cycle $T_i - 1$.
-- Evaluates the policy `MAINTAIN_NOW` iff $L(t) \le 1.0$.
-- Terminates trajectory immediately upon maintenance trigger, recording cycle $t_{\text{stop}}$, wasted useful life $W = T_i - t_{\text{stop}}$, and simulated cost units.
-- Evaluates in-service failure if an engine reaches cycle $T_i$ without maintaining, recording failure cost $C_{\text{FAIL}}$.
+- Evaluates the policy `MAINTAIN_NOW` iff $L(t) \le 1.0$ cycle.
+- Preventive maintenance occurs immediately upon decision and terminates the episode (zero intervention lead time).
+- If maintenance occurs at $t < T_i$: $\text{Cost} = C_{\text{PM}} + C_{\text{WASTE}} \cdot (T_i - t)$ and $W = T_i - t$.
+- If an engine reaches terminal cycle $T_i$ without maintaining: in-service failure occurs, recording $\text{Cost} = C_{\text{FAIL}}$ and $W=0$.
+- Offline prediction interval evaluation includes cycles 30 through $T_i$ independently of policy stopping.
 
 ### 2.6 Statistical Inference Engine (`src/intellitwin/evaluation/`)
 - Executes 10,000 stratified engine-cluster bootstrap resamples with replacement.
-- Stratifies draws by original split lifetime quartiles ($Q_1$–$Q_4$).
-- Evaluates empirical 98.75% decision intervals and 95% descriptive intervals using linear quantile interpolation.
+- Stratifies draws by original split lifetime quartiles ($Q_1$–$Q_4$) using PCG64 PRNG (`SeedSequence([2026, 6, dataset_number])`).
+- Evaluates empirical 98.75% decision intervals (Bonferroni FWER control $\alpha = 0.0125$) and 95% descriptive intervals using linear quantile interpolation.
 - Recomputes worst-group error dynamically in each replicate across eligible subgroups ($\ge 10$ engines).
 - Propagates conservative missing-group bounds ($[0.0, 0.90]$ per absent group).
 - Aggregates component outcomes under intersection-union testing into three-way decision classifications (`Supported`, `Unsupported`, `Inconclusive`).

@@ -1,7 +1,7 @@
 # Completion Checklist: Documentation Preparation vs. Research Execution
 
 **Document Version**: `1.0`  
-**Commit Audited**: `224c741f5f3da19821a708e0a6da417d4810e9da`  
+**Commit Audited**: `bb9e34579343881a831e3f052608ee15e183df76` (Historical initial baseline: `224c741f5f3da19821a708e0a6da417d4810e9da`)  
 **Governing Standard**: Distinguish documentation preparation completed from scientific research completed.  
 **Allowed States**: `DONE` | `PARTIAL` | `BLOCKED` | `PENDING_DEVELOPMENT`
 
@@ -38,15 +38,15 @@
 | **Phase 4** | Initial Manuscript Outline & Strategy | `paper/outline.md` | `DONE` | Superseded by current comprehensive drafts |
 | **Phase 5** | 30 Base Predictor Matrix & Frozen Checkpoints | `experiments/base_models/model_registry.json` | `DONE` | Frozen under ADR-020 (30 checkpoints verified) |
 | **Phase 6** | 90 Calibrator Bundles & Selection Freeze | `experiments/calibration/calibration_registry.json` | `DONE` | Frozen under ADR-021 (`gamma2_betam1` selected) |
-| **Phase 6 Audit** | Step 8 Corrective Audit & Reproduction | `experiments/pretest_verification_v2/` | `PENDING_DEVELOPMENT` | Tracked under `UPD-01`; checkpoint reproduction `NOT RUN` in v1 |
-| **Phase 7 (Pre-test)**| Confirmatory Protocol & Matched-Control Freeze | `experiments/confirmatory_development/protocol_freeze.json` | `DONE` | Frozen under ADR-023 (smoke test executed) |
+| **Phase 6 Audit** | Step 8 Corrective Audit & Reproduction | `experiments/pretest_verification_v2/step08_full_audit.json` | `DONE` | Committed in PR #25 (commit `bb9e345`). All 6 checks run; 60 reproductions on validation and calibration with max diff 0.0; pretest audit reports PASS and PRETEST_READY; 652 tracked protected artifacts verified. |
+| **Phase 7 (Pre-test)**| Confirmatory Protocol & Matched-Control Freeze | `experiments/pretest_verification_v2/protocol_freeze.json` | `DONE` | Frozen under ADR-023; controls reconstructed and verified |
 | **Phase 7 (Test)** | Official Held-out Test Data Preparation & Evaluation | `experiments/confirmatory_evaluation/` | `PENDING_DEVELOPMENT` | Strictly not started; prevents data leakage |
 | **Phase 7 (RQs)** | Confirmatory Statistical Decision Intervals (RQ1–RQ4) | Held-out bootstrap results | `PENDING_DEVELOPMENT` | Tracked under `UPD-02`, `UPD-03`, `UPD-04` |
-| **Phase 8** | Ablation & Robustness Analyses (Secondary Scenarios) | Secondary coverage & cost logs | `PENDING_DEVELOPMENT` | Tracked under `UPD-05` |
+| **Phase 8** | Descriptive Sensitivity Analyses (Secondary Scenarios) | Secondary coverage & cost logs | `PENDING_DEVELOPMENT` | Tracked under `UPD-05` (descriptive sensitivities, not ablations) |
 | **Phase 9** | Demonstrator GUI & Interactive Simulation Realization | Demonstrator code & telemetry replay UI | `PENDING_DEVELOPMENT` | Tracked under `UPD-06` |
 | **Phase 10** | Clean-Environment Verification & Release Audit | Independent reproduction log | `PENDING_DEVELOPMENT` | Tracked under `UPD-07` |
 | **Phase 11** | Final Manuscript Polishing & Publication Submission | Final approved manuscript & thesis | `PENDING_DEVELOPMENT` | Tracked under `UPD-08`, `UPD-09` |
-| **Phase 12** | Open-Science Archival & Public Artifact Release | Zenodo DOI & public GitHub release | `PENDING_DEVELOPMENT` | Awaits manuscript acceptance |
+| **Phase 12** | Open-Science Archival & Public Artifact Release | Zenodo DOI & public GitHub release | `PENDING_DEVELOPMENT` | Awaits project completion; journal acceptance is not a prerequisite for release |
 
 ---
 

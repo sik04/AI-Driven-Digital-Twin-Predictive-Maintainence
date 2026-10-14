@@ -30,87 +30,134 @@ FD004 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
 \end{table}
 
 \section{Conformal Interval Calibration Evaluation}
-Conformal prediction intervals are evaluated at nominal confidence level $1-\alpha = 0.90$ across methods: uncalibrated baseline (Gaussian heuristic), Global HCP, Regime-Stratified HCP, and Decision-Aware HCP. Metrics comprise engine-weighted empirical coverage ($\text{Cov}$), mean interval width ($\bar{W}$), and Winkler interval score ($\text{IS}_{0.10}$). Table~\ref{tab:thesis_calibration_performance} summarizes the evaluation grid.
+Conformal prediction intervals are evaluated at nominal confidence level $1-\alpha = 0.90$ across all 3 datasets $\times$ 2 models $\times$ 3 registered calibration methods (18 cells). Metrics comprise engine-weighted empirical coverage ($\text{Cov}$), mean interval width ($\bar{W}$), and Winkler interval score ($\text{IS}_{0.10}$). Table~\ref{tab:thesis_calibration_performance} summarizes the evaluation grid.
 
 \begin{table}[htbp]
 \centering
-\caption{Interval Calibration Performance at Nominal $90\%$ Confidence Level on Held-Out Test Splits}
+\caption{Primary Interval Calibration Performance at Nominal $90\%$ Confidence Level on Held-Out Test Splits ($3 \times 2 \times 3 = 18$ cells)}
 \label{tab:thesis_calibration_performance}
 \begin{tabular}{lllccc}
 \toprule
 \textbf{Dataset} & \textbf{Model} & \textbf{Method} & \textbf{Empirical Cov. (\%)} & \textbf{Mean Width} & \textbf{Winkler Score} \\
 \midrule
-FD001 & GBR & Uncalibrated Baseline & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD001 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD001 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR  & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR  & Regime HCP (\texttt{regime\_hcp})\textsuperscript{*} & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR  & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-FD002 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Regime HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Regime HCP (\texttt{regime\_hcp})\textsuperscript{*} & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-FD002 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Regime HCP (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-FD004 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD004 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
-FD004 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Regime HCP (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD004 & GBR  & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & GBR  & Regime HCP (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & GBR  & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD004 & LSTM & Global HCP (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Regime HCP (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Decision-Aware HCP (\texttt{decision\_aware\_hcp}) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \bottomrule
 \end{tabular}
+\begin{flushleft}
+\footnotesize \textsuperscript{*}On FD001 (single operating condition), \texttt{regime\_hcp} operates with a single regime partition identical to global calibration.
+\end{flushleft}
 \end{table}
 
 \section{Sequential Maintenance Policy Outcomes}
-Downstream maintenance outcomes under the primary economic scenario ($C_{\text{preventive}}=10$, $C_{\text{unplanned}}=100$, lead-time $L_{\text{lead}}=2$) are reported in Table~\ref{tab:thesis_maintenance_outcomes}. Metrics include mean maintenance cost per engine ($\bar{C}$), unplanned failure proportion ($P_{\text{fail}}$), and mean wasted operational life ($\bar{U}$).
+Downstream maintenance outcomes under the primary economic scenario (\texttt{primary\_reference}: $\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$ SCU; $L(t) \le 1.0$ cycle trigger) are reported in Table~\ref{tab:thesis_maintenance_outcomes} across the 18 primary method cells plus 8 pre-registered control configurations on FD002 (total 26 evaluation rows). Metrics include mean maintenance cost per engine ($\bar{C}$), fleet failure rate ($P_{\text{fail}}$), and mean wasted operational life ($\bar{W}$).
 
 \begin{table}[htbp]
 \centering
-\caption{Sequential Maintenance Policy Outcomes on Held-Out Test Engines ($C_{\text{prev}}=10, C_{\text{unplanned}}=100, L_{\text{lead}}=2$)}
+\caption{Sequential Maintenance Policy Outcomes on Held-Out Test Engines (\texttt{primary\_reference}: $\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$ SCU; 26 rows)}
 \label{tab:thesis_maintenance_outcomes}
 \begin{tabular}{lllccc}
 \toprule
-\textbf{Dataset} & \textbf{Model} & \textbf{Policy Strategy} & \textbf{Cost / Engine} & \textbf{Failures (\%)} & \textbf{Wasted Life} \\
+\textbf{Dataset} & \textbf{Model} & \textbf{Policy / Calibration Strategy} & \textbf{Cost (SCU)} & \textbf{Failures (\%)} & \textbf{Wasted Life} \\
 \midrule
-FD002 & GBR & Uncalibrated Point Policy & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Point Safety Margin (+10) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Matched-Width Interval    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Widened Interval ($1.25\times$) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Earlier Intervention (+15)& \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Global HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Regime HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
-FD002 & GBR & Decision-Aware HCP Bound  & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+\multicolumn{6}{l}{\textit{Panel A: Primary Registered Calibration Methods (18 Cells)}} \\
+\midrule
+FD001 & GBR  & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR  & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR  & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & LSTM & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & GBR  & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & GBR  & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & GBR  & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Global HCP Lower Bound (\texttt{global\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Regime HCP Lower Bound (\texttt{regime\_hcp})             & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Decision-Aware Lower Bound (\texttt{decision\_aware\_hcp})& \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+\multicolumn{6}{l}{\textit{Panel B: Pre-Registered Matched Controls on FD002 (8 Cells)}} \\
+\midrule
+FD002 & GBR  & Matched-Width Interval (\texttt{global\_hcp}, $\lambda=0.92$) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Widened Interval (\texttt{regime\_hcp}, $\lambda=1.00$)       & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Point Safety Margin ($p \le 1 + 5$)                          & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR  & Earlier Intervention (\texttt{regime\_hcp}, $h=1$)           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Matched-Width Interval (\texttt{regime\_hcp}, $\lambda=0.90$) & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Widened Interval (\texttt{global\_hcp}, $\lambda=1.00$)       & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Point Safety Margin ($p \le 1 + 4$)                          & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Earlier Intervention (\texttt{global\_hcp}, $h=1$)           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \bottomrule
 \end{tabular}
+\begin{flushleft}
+\footnotesize For \texttt{point\_safety\_margin}, prediction interval width and conformal coverage metrics are designated \texttt{NOT\_APPLICABLE}.
+\end{flushleft}
 \end{table}
 
 \section{Hypothesis Decisions (RQ1--RQ4)}
-Confirmatory statistical inference is conducted via 10,000 paired engine-level cluster bootstrap resamples. Table~\ref{tab:thesis_hypothesis_matrix} presents the formal decision matrix with Bonferroni-corrected $98.75\%$ confidence intervals.
+Confirmatory statistical inference is conducted via 10,000 paired engine-level cluster bootstrap resamples. Table~\ref{tab:thesis_hypothesis_matrix} presents the formal decision matrix with Bonferroni-corrected $98.75\%$ confidence intervals under the pre-registered Intersection-Union Test logic (ADR-018).
 
 \begin{table}[htbp]
 \centering
-\caption{Pre-Registered Confirmatory Hypothesis Decisions and Statistical Contrasts}
+\caption{Pre-Registered Confirmatory Hypothesis Decision Rules and Outcome Contrasts (ADR-018)}
 \label{tab:thesis_hypothesis_matrix}
-\begin{tabular}{lllccc}
+\begin{tabular}{lp{4.2cm}p{5.0cm}ccc}
 \toprule
-\textbf{Hypothesis} & \textbf{Contrast Metric} & \textbf{Decision Rule / Threshold} & \textbf{Estimate} & \textbf{98.75\% CI} & \textbf{Final Decision} \\
+\textbf{Research Question} & \textbf{Contrast Metric \& Scope} & \textbf{Pre-Registered Thresholds (98.75\% CI)} & \textbf{Point Est.} & \textbf{98.75\% CI} & \textbf{Status} \\
 \midrule
-\textbf{H1 (Coverage)} & $\text{Cov}(\text{HCP}) - 0.90$ & $\text{CI}_{\text{lower}} \ge 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
-\textbf{H2 (Cost)}     & $(\bar{C}_{\text{point}} - \bar{C}_{\text{HCP}})/\bar{C}_{\text{point}}$ & $\text{CI}_{\text{lower}} \ge 0.05 \land \Delta_{\text{fail}} \le 0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
-\textbf{H3 (Controls)} & $\bar{C}_{\text{ctrl}} - \bar{C}_{\text{HCP}}$ & $\text{CI}_{\text{lower}} > 0 \lor (\Delta C \ge 0 \land \Delta_{\text{fail}} \le 0)$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
-\textbf{H4 (Regimes)}  & $\text{Cov}_{\text{worst}}(\text{Regime}) - \text{Cov}_{\text{worst}}(\text{Global})$ & $\text{CI}_{\text{lower}} > 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{RQ1 (Utility \& Coverage)} & Cost improvement vs.\ \texttt{global\_hcp} and \texttt{regime\_hcp} on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$; coverage errors $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+\textbf{RQ2 (Subgroup Reliability)} & Worst-group coverage error contrast for regimes ($C_1$--$C_6$) and stages on FD002 & $\Deltaerror > 0.01$; worst error $< 0.05$; $\Dwidth < 1.0$; $\Dscore < 1.0$ cycle & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+\textbf{RQ3 (Control Attribution)} & Cost improvement vs.\ each of the 4 matched controls on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$ over every control; coverage $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+\textbf{RQ4 (Generalization)} & Balanced 6-cell evaluation matrix ($w_k=1/6$ each) across FD001, FD002, FD004 & Aggregate: $\Deltacost > 0.20, \Deltaerror > 0.01$; Cell non-harm: $\Deltacost > -0.20, \Deltaerror > -0.01$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \bottomrule
 \end{tabular}
+\begin{flushleft}
+\footnotesize Decision rules: An RQ is decided as \texttt{Supported} iff all required component conditions pass at the 98.75\% level, \texttt{Unsupported} if any condition fails, and otherwise \texttt{Inconclusive}.
+\end{flushleft}
 \end{table}
 
 \section{Methodological Discussion}
 \subsection{Conservatism, Asymmetric Penalties, and Negative $\beta$}
-The asymmetry parameter $\beta = -\ln 2 \approx -0.6931$ modulates the nonconformity scaling factors $a(p_t) = \exp(-\beta \cdot p_t)$ and $b(p_t) = \exp(\beta \cdot p_t)$. For negative $\beta$, as estimated failure probability $p_t$ increases, $a(p_t)$ decreases below $1$, contracting the lower distance and shifting the unclipped lower bound $L_t$ upward. 
-
-However, as established in the project's statistical protocol, negative $\beta$ does not mathematically guarantee earlier maintenance across all operational trajectories. Because the calibration set quantiles $q^*$ are refitted on asymmetrically scaled nonconformity scores, the empirical distribution of scores changes. Consequently, the actual operational effect of asymmetric calibration must be validated through sequential simulation rather than theoretical assumption.
+The scaling functions are defined by:
+\begin{align}
+\sigma(p) &= \left(1 + \frac{p}{125}\right)^\gamma, \quad z(p) = \exp\left(-\frac{p}{20}\right) \\
+a(p) &= \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))
+\end{align}
+At fixed $p$, $q$, and $\gamma$, negative $\beta$ decreases $a(p)$ relative to $\beta=0$ and increases $b(p)$. The lower bound $L = \max(0, p - q_g a(p))$ is nondecreasing and the upper bound $U = p + q_g b(p)$ is nondecreasing. We do not claim $a < 1$ or $b > 1$ for every $p$, as the $\sigma(p)$ factor also influences their magnitude. Furthermore, this mathematical fact does not establish improved maintenance utility or earlier intervention; nonconformity thresholds $q^*$ are fitted separately and utility must be evaluated empirically in sequential simulation.
 
 \subsection{Interpreting Potential Hypothesis Outcomes}
 The pre-registered protocol explicitly pre-commits to objective interpretation:
 \begin{itemize}
-    \item \textbf{Supported}: Lower confidence bounds strictly exceed practical-effect margins, confirming that conformal calibration provides operational value beyond heuristic baselines.
-    \item \textbf{Inconclusive}: Statistical power is insufficient to resolve the practical margin, cataloging the result as requiring larger fleet sample sizes.
-    \item \textbf{Unsupported}: Practical thresholds are breached or safety constraints violated, directly falsifying the hypothesis and concluding that simpler baselines suffice.
+    \item \textbf{Supported}: All required component conditions pass at the 98.75\% decision interval level, demonstrating statistically significant and practically meaningful superiority.
+    \item \textbf{Inconclusive}: No condition fails, but at least one decision interval spans the practical threshold boundary, or inference is degenerate. In this case, no definitive superiority claim is made, and the result is cataloged as requiring expanded engine sample sizes.
+    \item \textbf{Unsupported}: Any required component condition fails (e.g., upper CI below margin, lower CI above ceiling, or fleet failure rate increases). This outcome indicates that the pre-registered criteria were not supported under the specified experiment.
 \end{itemize}
+Final empirical conclusions remain pending held-out evaluation.

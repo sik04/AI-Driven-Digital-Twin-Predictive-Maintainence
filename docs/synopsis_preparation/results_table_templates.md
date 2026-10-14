@@ -44,28 +44,36 @@
 | **FD002** | GBR (`gbr_lr010_leaf31_l2_0`) | 52 | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | LSTM (`lstm_h64_lr0010`) | 52 | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD004** | GBR (`gbr_lr010_leaf31_l2_0`) | 50 | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **FD004** | LSTM (`lstm_h64_lr0010`) | 50 | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | LSTM (`lstm_h64_lr0010`) | 50 | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMEN## Table T4: Primary Prediction Interval Coverage, Width, and Quality by Calibration Method (90% Nominal)
 
----
+*Target Milestone: `UPD-02`. Complete 18-row primary evaluation matrix across all 3 datasets, 2 model architectures, and 3 registered calibration methods on held-out test partitions. All values remain PENDING.*
 
-## Table T4: Coverage, Width, and Interval Score by Calibration Method (90% Nominal)
-
-*Target Milestone: `UPD-02`. Evaluated at 90% nominal coverage on held-out test engines across 5 seeds.*
-
-| Dataset | Model | Calibration Method | Marginal PICP (%) | Marginal Error $E$ | MPIW (cycles) | Winkler Interval Score | Optimistic Miss Rate ($y < L$) | Pessimistic Miss Rate ($y > U$) | Status |
+| Dataset | Model Architecture | Calibration Method | Marginal PICP (%) | Marginal Error $E$ | MPIW (cycles) | Winkler Interval Score | Optimistic Miss ($y < L$) | Pessimistic Miss ($y > U$) | Status |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **FD001** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **FD002** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 
 ---
 
 ## Table T5: Operating Regime & Lifecycle Stage Subgroup Reliability Auditing (FD002 Test)
 
-*Target Milestone: `UPD-02` / `UPD-04`. Evaluated across eligible subgroups ($\ge 10$ engines).*
+*Target Milestone: `UPD-02` / `UPD-04`. Evaluated across eligible subgroups ($\ge 10$ distinct engines).*
 
 | Subgroup Family | Subgroup Identifier | Engine Count ($N_g$) | Eligibility ($\ge 10$) | `global_hcp` Coverage | `regime_hcp` Coverage | `decision_aware_hcp` Coverage | `decision_aware` Error $E(g)$ | Missing Bounds Used | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
@@ -83,37 +91,49 @@
 
 ---
 
-## Table T6: Sequential Maintenance Simulation Outcomes (FD002 Primary Reference)
+## Table T6: Primary Sequential Maintenance Simulation Outcomes (All 18 Matrix Cells)
 
-*Target Milestone: `UPD-03`. Evaluated under $C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$ SCU per engine.*
+*Target Milestone: `UPD-03`. Complete 18-row maintenance simulation outcomes evaluated under $C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$ SCU per engine. All values remain PENDING.*
 
-| Model | Calibration Method | Mean Cost per Engine (SCU) | Observed Failure Rate (%) | Fleet PM Rate (%) | Mean Wasted RUL ($W$, cycles) | Inefficient Early PM Rate (Fleet) | Inefficient Early PM Rate (PM-Only) | Status |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| Dataset | Model Architecture | Calibration Method | Mean Cost per Engine (SCU) | Observed Failure Rate (%) | Fleet PM Rate (%) | Mean Wasted RUL ($W$, cycles) | Inefficient Early PM (Fleet) | Status |
+| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **FD001** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD001** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD002** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **GBR** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `global_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `regime_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **FD004** | **LSTM** | `decision_aware_hcp` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 
 ---
 
 ## Table T7: RQ3 Matched-Conservatism Control Comparisons (FD002 Test)
 
-*Target Milestone: `UPD-03` / `UPD-04`. Evaluates decision-value attribution against four pre-specified controls.*
+*Target Milestone: `UPD-03` / `UPD-04`. Evaluates decision-value attribution against four pre-specified controls across three families on FD002 test engines. Point-policy undefined quantities are explicitly marked NOT_APPLICABLE.*
 
 | Base Model | Evaluated Method / Control Configuration | Control Family | Frozen Parameter | Mean Cost (SCU) | Observed Failures (%) | Mean Wasted RUL (cycles) | Cost Contrast vs Proposed ($\Delta_{\text{cost}}$) | 98.75% Decision CI $[\text{CI}_{\text{lower}}, \text{CI}_{\text{upper}}]$ | Condition Pass Status |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **GBR** | `decision_aware_hcp` | Proposed | $\gamma=2, \beta=-1$ | `PENDING` | `PENDING` | `PENDING` | Baseline ($0.0$) | N/A | Reference |
-| **GBR** | `matched_width_interval` | Widened Interval | $\lambda = 0.92$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **GBR** | `widened_interval` | Widened Interval | $\lambda = 1.00$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **GBR** | `decision_aware_hcp` | Proposed Reference | $\gamma=2, \beta=-1$ | `PENDING` | `PENDING` | `PENDING` | Baseline ($0.0$) | N/A | Reference |
+| **GBR** | `matched_width_interval` | Widened Interval | `global_hcp`, $\lambda = 0.92$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **GBR** | `widened_interval` | Widened Interval | `regime_hcp`, $\lambda = 1.00$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **GBR** | `point_safety_margin` | Point Margin | $m = 5$ cycles | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **GBR** | `earlier_intervention` | Early Policy | $h = 1$ cycle | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `decision_aware_hcp` | Proposed | $\gamma=2, \beta=-1$ | `PENDING` | `PENDING` | `PENDING` | Baseline ($0.0$) | N/A | Reference |
-| **LSTM** | `matched_width_interval` | Widened Interval | $\lambda = 0.90$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `widened_interval` | Widened Interval | $\lambda = 1.00$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **GBR** | `earlier_intervention` | Early Policy | `regime_hcp`, $h = 1$ cycle | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **LSTM** | `decision_aware_hcp` | Proposed Reference | $\gamma=2, \beta=-1$ | `PENDING` | `PENDING` | `PENDING` | Baseline ($0.0$) | N/A | Reference |
+| **LSTM** | `matched_width_interval` | Widened Interval | `regime_hcp`, $\lambda = 0.90$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **LSTM** | `widened_interval` | Widened Interval | `global_hcp`, $\lambda = 1.00$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **LSTM** | `point_safety_margin` | Point Margin | $m = 4$ cycles | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
-| **LSTM** | `earlier_intervention` | Early Policy | $h = 1$ cycle | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
+| **LSTM** | `earlier_intervention` | Early Policy | `global_hcp`, $h = 1$ cycle | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 
 ---
 
@@ -122,7 +142,7 @@
 *Target Milestone: `UPD-04`. Evaluated via 10,000 stratified cluster-bootstrap resamples under Bonferroni FWER control ($\alpha = 0.0125$).*
 
 | Research Question | Evaluated Metric & Contrast Direction | Baseline / Comparator | Practical Margin | 95% Descriptive CI | 98.75% Decision CI | Failure Safeguard ($\Delta_{\text{fail}} \le 0$) | Coverage Safeguard ($E < 0.05$) | Final IUT Decision Classification |
-| :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| :--- | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
 | **RQ1 (GBR)** | Cost Contrast $\Delta_{\text{cost}}$ (SCU) | `global_hcp` | $> 0.20$ SCU | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **RQ1 (GBR)** | Cost Contrast $\Delta_{\text{cost}}$ (SCU) | `regime_hcp` | $> 0.20$ SCU | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
 | **RQ1 (LSTM)** | Cost Contrast $\Delta_{\text{cost}}$ (SCU) | `global_hcp` | $> 0.20$ SCU | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING_EXPERIMENT` |
@@ -139,22 +159,22 @@
 
 ---
 
-## Table T9: Sensitivity Scenarios and Secondary Coverage Levels
+## Table T9: Descriptive Sensitivity Scenarios and Secondary Coverage Levels
 
-*Target Milestone: `UPD-05`. Evaluated on FD002 test engines across secondary configurations.*
+*Target Milestone: `UPD-05`. Evaluated on FD002 test engines across pre-registered secondary configurations. These scenarios are descriptive sensitivity analyses, not component ablations.*
 
 | Scenario / Coverage Condition | Parameter Specification | `global_hcp` Cost (SCU) | `regime_hcp` Cost (SCU) | `decision_aware` Cost (SCU) | Contrast $\Delta_{\text{cost}}$ | Observed Failures | Analysis Designation | Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :--- | :--- |
-| **Failure-Sensitive Cost** | $C_{\text{FAIL}}=10.0, C_{\text{PM}}=1.0, C_{\text{WASTE}}=0.20$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Secondary Sensitivity | `PENDING_EXPERIMENT` |
-| **Waste-Sensitive Cost** | $C_{\text{FAIL}}=5.0, C_{\text{PM}}=1.0, C_{\text{WASTE}}=0.40$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Secondary Sensitivity | `PENDING_EXPERIMENT` |
-| **80% Nominal Coverage** | Target: $1 - \alpha = 0.80$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Secondary Sensitivity | `PENDING_EXPERIMENT` |
-| **95% Nominal Coverage** | Target: $1 - \alpha = 0.95$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Secondary Sensitivity | `PENDING_EXPERIMENT` |
+| **Failure-Sensitive Cost** | $C_{\text{FAIL}}=10.0, C_{\text{PM}}=1.0, C_{\text{WASTE}}=0.20$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Descriptive Sensitivity | `PENDING_EXPERIMENT` |
+| **Waste-Sensitive Cost** | $C_{\text{FAIL}}=5.0, C_{\text{PM}}=1.0, C_{\text{WASTE}}=0.40$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Descriptive Sensitivity | `PENDING_EXPERIMENT` |
+| **80% Nominal Coverage** | Target: $1 - \alpha = 0.80$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Descriptive Sensitivity | `PENDING_EXPERIMENT` |
+| **95% Nominal Coverage** | Target: $1 - \alpha = 0.95$ | `PENDING` | `PENDING` | `PENDING` | `PENDING` | `PENDING` | Descriptive Sensitivity | `PENDING_EXPERIMENT` |
 
 ---
 
 ## Table T10: Reproducibility and Verification Audit Matrix
 
-*Tracks verification status across research deliverables against commit `224c741`.*
+*Tracks committed audit findings across research deliverables up to reviewed main commit `bb9e345` (PR #25).*
 
 | Audit Item | Scope / Files Audited | Verification Criterion | Audit Evidence Artifact | Result Status | Notes |
 | :--- | :--- | :--- | :--- | :---: | :--- |
@@ -162,6 +182,6 @@
 | **Base Model Reproduction** | Seed 2026 across all 6 cells | Exact numerical prediction match | `experiments/audits/step07_prediction_reproduction.json` | `PASS` | GBR 0.0000; LSTM reproducible |
 | **Calibration Registry** | 90 calibrator bundles (270 coverage sets) | POSIX path format & bundle loading | `experiments/calibration/calibration_registry.json` | `PASS` | Cross-platform Linux/Windows verified |
 | **Candidate Selection Freeze**| Validation selection across 6 cells | Leave-one-engine-out exact match | `experiments/calibration/selection/selection_freeze.json` | `PASS` | `gamma2_betam1` frozen under ADR-021 |
-| **Step 8 Deep Verification** | 724 protected calibration files | Byte-for-byte SHA-256 match | `experiments/audits/step08_repair_verification.json` | `PASS` | Checkpoint reproduction: NOT RUN |
-| **Pre-Test Confirmatory Freeze**| Step 9 evaluation scripts & controls | Hash freeze & zero test artifacts | `experiments/confirmatory_development/pretest_audit.json` | `PASS` | Confirmatory test execution: NOT STARTED |
-| **Corrected Pretest Audit v2**| Checkpoint prediction reproduction | Clean working tree execution | `experiments/pretest_verification_v2/` | `PENDING` | Tracked under `UPD-01` |
+| **Step 8 Full Audit v2** | 60 model/partition reproductions | Maximum prediction difference 0.0 | `experiments/pretest_verification_v2/step08_full_audit.json` | `PASS` | All 6 checks run; partitions: VALIDATION & CALIBRATION |
+| **Pre-Test Confirmatory Freeze**| Step 9 evaluation scripts & controls | Hash freeze & zero test artifacts | `experiments/pretest_verification_v2/pretest_audit.json` | `PASS` | Pretest status: PRETEST_READY; test execution: NOT_STARTED |
+| **Protected Artifact Baseline**| Tracked Git vs local search files | 652 tracked protected artifacts | `experiments/pretest_verification_v2/baseline_manifest.json` | `PASS` | 652 git-tracked verified; 72 local-only search checkpoints |` | Tracked under `UPD-01` |

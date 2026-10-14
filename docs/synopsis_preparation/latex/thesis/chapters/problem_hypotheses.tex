@@ -27,22 +27,31 @@ y_{i,t}^{\text{train}} = \min(y_{i,t}, R_{\text{max}}).
 In calibration, validation, and held-out test evaluations, the target remains strictly uncapped ($y_{i,t}$) to evaluate true physical end-of-life accuracy.
 
 \section{Sequential Maintenance Decision Problem}
-At each cycle $t \ge w$, the prognostic digital twin generates a point estimate $\hat{y}_{i,t} = f(\mathbf{H}_{i,t})$ and a calibrated lower prediction bound $L_{i,t}(\alpha)$. The maintenance policy $\pi$ issues a binary replacement command $a_{i,t} \in \{0, 1\}$:
+At each cycle $t \ge w$, the prognostic digital twin generates a point estimate $p_{i,t} \ge 0$ and a calibrated lower prediction bound $L_{i,t}$. The maintenance policy $\pi$ evaluates whether to maintain immediately:
 \begin{equation}
 a_{i,t} = \begin{cases} 
-1 & \text{if } L_{i,t}(\alpha) \le \tau_{\text{lead}}, \\
-0 & \text{otherwise},
+\text{MAINTAIN\_NOW} & \text{if } L_{i,t} \le 1.0\text{ cycle}, \\
+\text{CONTINUE} & \text{otherwise},
 \end{cases}
 \end{equation}
-where $\tau_{\text{lead}} \in \mathbb{N}$ denotes the mandatory maintenance planning lead-time.
+Actions occur at cycles $t \in [30, T_i - 1]$. Preventive maintenance occurs immediately upon trigger and terminates the episode; there is no intervention lead time.
 
-If replacement is triggered at cycle $t_{\text{maint}} \le T_i - \tau_{\text{lead}}$, scheduled preventive overhaul is executed at cycle $t_{\text{maint}} + \tau_{\text{lead}}$, incurring cost $C_{\text{preventive}}$ and leaving wasted operational life $U_i = T_i - (t_{\text{maint}} + \tau_{\text{lead}})$. If $t$ reaches $T_i$ without scheduled intervention, catastrophic unplanned failure occurs, incurring penalty $C_{\text{unplanned}} \gg C_{\text{preventive}}$ with zero wasted life ($U_i = 0$).
+If replacement is triggered at cycle $t < T_i$, scheduled preventive maintenance occurs immediately, incurring cost $\CPM$ and leaving unused (wasted) operational life $W_i = T_i - t$. If the engine reaches its true terminal cycle $T_i$ without scheduled maintenance, in-service failure occurs, incurring penalty $\CFAIL$ with wasted life $W_i = 0$.
 
 The total simulated maintenance cost for engine $i$ is given by:
 \begin{equation}
-C_i(\pi) = C_{\text{preventive}} \cdot \mathbf{1}_{\{\text{preventive}\}} + C_{\text{unplanned}} \cdot \mathbf{1}_{\{\text{unplanned}\}} + C_{\text{waste}} \cdot U_i.
+\Cost_i = \begin{cases}
+\CPM + \CWASTE \cdot (T_i - t) & \text{if maintenance occurs at } t < T_i, \\
+\CFAIL & \text{if failure occurs at } t = T_i.
+\end{cases}
 \end{equation}
-The operational objective is to minimize the fleet-wide mean maintenance cost per engine $\bar{C}(\pi) = \frac{1}{N} \sum_{i=1}^N C_i(\pi)$ while strictly bounding the fleet failure rate $P_{\text{fail}}(\pi) = \frac{1}{N} \sum_{i=1}^N \mathbf{1}_{\{\text{unplanned}, i\}}$.
+The study specifies three synthetic economic scenarios:
+\begin{itemize}
+  \item \textbf{\texttt{primary\_reference}}: $\CPM = 1.0~\SCU, \CFAIL = 5.0~\SCU, \CWASTE = 0.20~\SCU/\text{cycle}$.
+  \item \textbf{\texttt{failure\_sensitive}}: $\CPM = 1.0~\SCU, \CFAIL = 10.0~\SCU, \CWASTE = 0.20~\SCU/\text{cycle}$.
+  \item \textbf{\texttt{waste\_sensitive}}: $\CPM = 1.0~\SCU, \CFAIL = 5.0~\SCU, \CWASTE = 0.40~\SCU/\text{cycle}$.
+\end{itemize}
+Offline interval evaluation includes all qualified endpoints $30$ through $T_i$, independently of policy stopping. The equality values (20, 45, and 10 cycles) compare preventive-plus-waste cost with failure cost, and do not represent policy decision thresholds.
 
 \section{Authoritative Research Hypotheses}
 The research questions, null and alternative hypotheses, primary outcome metrics, practical-effect thresholds, and statistical decision rules are permanently locked under Architecture Decision Record ADR-018. The authoritative specification is reproduced in its entirety below.
