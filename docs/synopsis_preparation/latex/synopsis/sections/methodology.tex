@@ -1,0 +1,36 @@
+\section{Proposed Methodology}
+
+\subsection{Causal Sliding Windows and Dataset Partitioning}
+Evaluations span C-MAPSS FD001 (100 engines), FD002 (260 engines), and FD004 (249 engines). Splits are constructed strictly at the engine level: approx.\ 50\% training, 20\% calibration, 10\% validation, and 20\% held-out testing (Table~\ref{tab:splits}). 
+
+Sensor preprocessing (17 features: 3 operational settings and 14 non-constant sensors) is fit exclusively on training data. Causal sliding windows of length $W = 30$ cycles with stride 1 and strictly no padding are extracted. Point predictors consume identical chronological information: sequential tensors of shape $(30, 17)$ for LSTM and flattened vectors of shape $(510,)$ for GBR. Training targets are capped at 125 cycles ($y_{\text{train}} = \min(125, T-t)$), while calibration nonconformity scores and evaluation metrics are computed strictly against true uncapped remaining life $y_{\text{true}} = T - t$.
+
+\subsection{Exact Engine-Weighted Conformal Calibration}
+To account for unequal engine trajectory lengths, each endpoint $(i, t)$ within calibration engine $i$ receives mass $w_{it} = \frac{1}{m \cdot n_i}$, where $m$ is the number of contributing calibration engines. Following Lee et al.~\cite{lee2023hierarchical}, the hierarchical empirical distribution bounds finite mass by $\frac{m}{m+1}$, placing remaining mass $\frac{1}{m+1}$ at $+\infty$:
+\begin{equation}
+\quantfinal(q) = \frac{1}{m + 1} \sum_{i=1}^m \frac{1}{n_i} \sum_{t=1}^{n_i} \mathbb{I}(s_{it} \le q)
+\end{equation}
+Thresholds $q^*$ are computed via exact rational arithmetic using fractions. If an operating regime contains fewer than $m_g = 10$ calibration engines, execution falls back automatically to the global threshold.
+
+\subsection{Decision-Aware Asymmetric Nonconformity Score}
+The proposed method (\texttt{decision\_aware\_hcp}) modulates scaling and asymmetry as a function of point prediction $p$:
+\begin{align}
+\sigma(p) &= \left(1 + \frac{p}{125}\right)^\gamma, \quad z(p) = \exp\left(-\frac{p}{20}\right) \\
+a(p) &= \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))
+\end{align}
+where $\gamma \in \{0, 1, 2\}$ and $\beta = \betacode \ln(2)$ with $\betacode \in \{-1, 0, 1\}$.
+The nonconformity score and inverted prediction interval are:
+\begin{equation}
+\text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)
+\end{equation}
+\begin{equation}
+L = \max\left(0, \; p - q_g \cdot a(p)\right), \quad U = p + q_g \cdot b(p)
+\end{equation}
+At fixed $p, q, \gamma$, negative $\beta$ decreases $a(p)$ by half and doubles $b(p)$ as $p \to 0$, reducing the subtracted lower-side margin. In validation candidate selection, configuration \texttt{gamma2\_betam1} was frozen across all 6 cells under ADR-021.
+
+\subsection{Sequential Maintenance Simulator}
+A discrete-event simulation engine replays engine cycles from $t=30$ to $T-1$, executing the pre-registered policy:
+\begin{equation}
+\text{Action}(t) = \begin{cases} \text{MAINTAIN\_NOW}, & \text{if } L(t) \le 1.0 \\ \text{CONTINUE}, & \text{otherwise} \end{cases}
+\end{equation}
+Under the \texttt{primary\_reference} scenario, preventive replacement incurs $\CPM = 1.0~\SCU$, unplanned in-service failure at cycle $T$ incurs $\CFAIL = 5.0~\SCU$, and wasted life incurs $\CWASTE = 0.20~\SCU$ per unused cycle.

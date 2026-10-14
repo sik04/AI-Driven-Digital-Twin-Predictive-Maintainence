@@ -1,0 +1,63 @@
+\chapter{Experimental Design and Confirmatory Protocol}
+\label{chap:experimental_design}
+
+\section{Benchmark Datasets and Stratification}
+The empirical evaluation of IntelliTwin is conducted across three sub-datasets of the NASA C-MAPSS turbofan engine degradation benchmark \cite{saxena2008damage}:
+\begin{enumerate}
+    \item \textbf{FD001}: Single operating condition (sea level), single failure mode (high-pressure compressor degradation), comprising 100 complete run-to-failure engine units.
+    \item \textbf{FD002}: Six operating flight conditions, single failure mode (HPC degradation), comprising 260 engine units.
+    \item \textbf{FD004}: Six operating flight conditions, two concurrent failure modes (HPC and fan degradation), comprising 249 engine units.
+\end{enumerate}
+
+\section{Engine-Level Disjoint Partitioning}
+To prevent data leakage across temporal cycles, engine trajectories are partitioned into disjoint splits using master seed $2026$ prior to any data preprocessing:
+\begin{itemize}
+    \item \textbf{FD001} (100 engines): 50 training (50\%), 20 calibration (20\%), 10 validation (10\%), and 20 held-out test engines (20\%).
+    \item \textbf{FD002} (260 engines): 130 training (50\%), 52 calibration (20\%), 26 validation (10\%), and 52 held-out test engines (20\%), stratified across engine lifetime quartiles ($Q_1$--$Q_4$).
+    \item \textbf{FD004} (249 engines): 124 training (50\%), 50 calibration (20\%), 25 validation (10\%), and 50 held-out test engines (20\%).
+\end{itemize}
+Across the complete benchmark suite, 304 engines are allocated to training, 122 to calibration, 61 to validation, and 122 to final held-out confirmatory evaluation (total 609 engines).
+
+\section{Experimental Cells and Replications}
+The experimental matrix comprises a $3 \times 2$ grid (6 experimental cells):
+\begin{equation}
+\{\text{FD001}, \text{FD002}, \text{FD004}\} \times \{\text{GBR}, \text{LSTM}\}.
+\end{equation}
+To account for stochasticity in neural network weight initialization and gradient boosting data subsampling, each cell is trained across five pre-registered random seeds:
+\begin{equation}
+\mathcal{S} = \{2026, 2027, 2028, 2029, 2030\}.
+\end{equation}
+This produces 30 base model checkpoints and 90 conformal calibrator bundles.
+
+\section{Matched-Conservatism Control Baselines}
+To isolate the operational decision value of calibrated uncertainty from trivial policy over-conservatism (RQ3), we formulate four named controls across three distinct baseline families:
+\begin{enumerate}
+    \item \textbf{Heuristic Interval Family}:
+    \begin{itemize}
+        \item \emph{Matched-Width Interval} (\texttt{matched\_width\_interval}): A symmetric heuristic interval $\hat{y}_t \pm \bar{w}$ where $\bar{w}$ matches the validation Mean Prediction Interval Width (MPIW) of the calibrated conformal interval within $\le 1.0$ cycle.
+        \item \emph{Widened Interval} (\texttt{widened\_interval}): An expanded heuristic interval with width $1.25 \times \bar{w}$.
+    \end{itemize}
+    \item \textbf{Point Safety Margin Family}:
+    \begin{itemize}
+        \item \emph{Point Safety Margin} (\texttt{point\_safety\_margin}): A point prediction trigger shifted downward by a fixed safety margin $m$: replace when $\hat{y}_t \le \tau_{\text{lead}} + m$.
+    \end{itemize}
+    \item \textbf{Earlier Fixed Policy Family}:
+    \begin{itemize}
+        \item \emph{Earlier Intervention} (\texttt{earlier\_intervention}): A threshold inflation policy triggering replacement when $\hat{y}_t \le \tau_{\text{early}} = \tau_{\text{lead}} + 15$ cycles.
+    \end{itemize}
+\end{enumerate}
+
+\section{Statistical Inference Protocol and Decision Rules}
+Confirmatory hypothesis testing is executed strictly via paired engine-level cluster bootstrap resampling:
+\begin{itemize}
+    \item \textbf{Cluster Unit}: The independent statistical unit is the physical engine unit ($i \in \{1, \dots, N\}$). Individual cycles within an engine trajectory are never resampled independently.
+    \item \textbf{Bootstrap Replicates}: $B = 10{,}000$ paired bootstrap samples are drawn with replacement, stratified by engine lifetime quartiles ($Q_1$--$Q_4$).
+    \item \textbf{Equal Engine Weighting}: All fleet metrics (coverage, width, cost, failure rate) are computed with equal weighting per engine unit.
+    \item \textbf{Missing-Group Bound Propagation}: If a bootstrap resample lacks representation for a specific flight regime cluster ($\ge 10$ engines required for eligibility), worst-case bounds ($[0.0, 1.0]$ for coverage, $[0.0, \infty)$ for width) are propagated conservatively.
+    \item \textbf{Multiplicity Correction}: Family-wise error rate across the four primary research questions is controlled via Bonferroni correction:
+    \begin{equation}
+    \alpha_{\text{conf}} = \frac{0.05}{4} = 0.0125.
+    \end{equation}
+    Confirmatory decision rules utilize $98.75\%$ two-sided percentile confidence intervals (empirical percentiles $0.625\%$ and $99.375\%$).
+    \item \textbf{Intersection-Union Test (IUT)}: A hypothesis is decided as \textbf{Supported} if and only if all pre-registered criteria (practical margin, coverage ceiling, failure safeguard) pass at the $98.75\%$ level. If any condition fails, the hypothesis is decided as \textbf{Unsupported}; if the confidence interval spans the threshold boundary, the outcome is cataloged as \textbf{Inconclusive}.
+\end{itemize}

@@ -1,0 +1,50 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{cite}
+\usepackage{hyperref}
+
+\input{../shared/notation.tex}
+
+\begin{document}
+
+\title{IntelliTwin: Decision-Aware, Condition-Adaptive Conformal Calibration for Turbofan Remaining Useful Life Prognostics \\
+\large \vspace{0.3em} \textbf{Research synopsis --- working draft; final results pending}}
+
+\author{
+  \IEEEauthorblockN{Mayank Singh}
+  \IEEEauthorblockA{\textit{Software \& Execution Lead} \\
+  IntelliTwin Research Initiative}
+  \and
+  \IEEEauthorblockN{Shiksha Pandey}
+  \IEEEauthorblockA{\textit{Theory \& Writing Lead} \\
+  IntelliTwin Research Initiative}
+  \and
+  \IEEEauthorblockN{Ruchi Gupta}
+  \IEEEauthorblockA{\textit{Methodology \& Governance} \\
+  IntelliTwin Research Initiative}
+}
+
+\maketitle
+
+\begin{abstract}
+This research synopsis outlines the theoretical motivation, technical architecture, and confirmatory evaluation framework of the IntelliTwin initiative. The study investigates whether decision-aware, condition-adaptive conformal calibration can improve sequential maintenance utility while preserving reliable prediction-interval coverage for turbofan engine remaining useful life (RUL) estimation. We present the frozen experimental methodology, multi-regime dataset partitioning, base predictor matrix, exact rational engine-weighted quantiles, and 10,000-draw cluster-bootstrap evaluation protocol locked under Architecture Decision Record ADR-018. Confirmatory empirical results on held-out test data remain pending experimental execution.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Predictive maintenance, remaining useful life, conformal prediction, hierarchical inference, decision-aware calibration, digital twins, turbofan engines.
+\end{IEEEkeywords}
+
+\input{sections/introduction.tex}
+\input{sections/problem_objectives.tex}
+\input{sections/related_work.tex}
+\input{sections/methodology.tex}
+\input{sections/evaluation.tex}
+\input{sections/status_results.tex}
+\input{sections/limitations_conclusion.tex}
+
+\bibliographystyle{IEEEtran}
+\bibliography{../../references_verified}
+
+\end{document}

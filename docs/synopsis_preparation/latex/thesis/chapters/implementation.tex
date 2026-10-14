@@ -1,0 +1,41 @@
+\chapter{Software Architecture and Implementation}
+\label{chap:implementation}
+
+\section{System Architecture and Package Structure}
+The IntelliTwin framework is implemented as a modular, production-grade Python package (\texttt{intellitwin}) structured to guarantee strict segregation of concerns, end-to-end provenance tracking, and complete scientific reproducibility. The core package is organized into dedicated sub-packages:
+
+\begin{itemize}
+    \item \texttt{intellitwin.data}: Implements C-MAPSS dataset loaders, feature qualification routines, robust min-max scaling fitted strictly on training splits, and causal sliding window generators. Enforces immutable engine-level partitioning based on pre-generated split manifests.
+    \item \texttt{intellitwin.models}: Implements scikit-learn/LightGBM wrappers for Gradient Boosted Regressors (GBR) and PyTorch modules for recurrent Long Short-Term Memory (LSTM) networks. Standardizes model serialization, inference pipelines, and CPU execution verification.
+    \item \texttt{intellitwin.uncertainty}: Implements inductive split-conformal calibrators, exact engine-weighted quantile computation, operating-regime clustering, and asymmetric nonconformity scaling ($\beta = -\ln 2$). Enforces fallback rules for rare flight conditions.
+    \item \texttt{intellitwin.simulator}: Implements the discrete-event sequential maintenance simulator, modeling continuous degradation progression, logistical planning lead-times, preventive overhauls, and catastrophic in-flight failure penalties.
+    \item \texttt{intellitwin.decision}: Contains maintenance decision policy classes, executing rule-based triggers on point predictions, heuristic safety margins, and conformal lower bounds.
+    \item \texttt{intellitwin.evaluation}: Contains cluster-bootstrap statistical inference engines, metric calculators (RMSE, MAE, coverage, MPIW, Winkler score, maintenance cost, failure rates), and the automated Intersection-Union Test (IUT) evaluation logic.
+    \item \texttt{intellitwin.provenance}: Manages cryptographically verifiable SHA-256 artifact hashing, git commit tracking, random seed verification, and hardware environment profiling.
+\end{itemize}
+
+\section{Registry Architecture and Frozen Artifacts}
+To maintain strict governance over research artifacts, all model checkpoints, calibrator bundles, and experimental parameters are tracked via immutable JSON registries:
+\begin{enumerate}
+    \item \textbf{Base Model Registry} (\texttt{experiments/base\_models/model\_registry.json}): Catalogs the 30 base model checkpoints across 6 experimental cells (FD001, FD002, FD004 $\times$ GBR, LSTM) and 5 official seeds ($2026$--$2030$), including file paths, model architecture specifications, training metrics, and SHA-256 hashes.
+    \item \textbf{Calibration Registry} (\texttt{experiments/calibration/calibration\_registry.json}): Documents 90 fitted conformal calibrator bundles covering global, regime-stratified, and decision-aware variants.
+    \item \textbf{Selection Freeze} (\texttt{experiments/calibration/selection/selection\_freeze.json}): Records the hyperparameter configuration selected strictly on validation engine splits (\texttt{gamma2\_betam1}) and frozen prior to held-out test evaluation.
+    \item \textbf{Protocol Freeze} (\texttt{experiments/confirmatory\_development/protocol\_freeze.json}): Formally locks the evaluation parameters, cost constants, seed sequences, bootstrap sample counts ($10{,}000$), and decision thresholds for confirmatory testing.
+\end{enumerate}
+
+\section{Provenance Tracking and Auditability}
+Every experimental execution generates a comprehensive audit trail capturing:
+\begin{itemize}
+    \item Host operating system, CPU model, memory capacity, and Python interpreter version;
+    \item Exact software environment state via frozen \texttt{pip} dependency specifications;
+    \item Git commit hash of the working tree and uncommitted file status;
+    \item Explicit pseudo-random number generator (PRNG) state and seed sequences;
+    \item Input data file SHA-256 digests and output artifact checksums.
+\end{itemize}
+
+\section{Demarcation of Implemented Modules vs. Planned UI}
+To maintain rigorous scientific boundaries, we explicitly demarcate implemented research components from planned presentation features:
+\begin{itemize}
+    \item \textbf{Implemented Research Core}: All data ingestion, feature qualification, base model training, conformal calibration, discrete-event maintenance simulation, and bootstrap inference modules are fully implemented, tested, and audited in \texttt{src/intellitwin/}.
+    \item \textbf{Planned Demonstrator UI}: An interactive web-based dashboard for replaying engine degradation trajectories and visualizing simulated fleet maintenance schedules is planned for final presentation integration (tracked under \texttt{UPD-06}). The demonstrator will operate strictly in offline replay mode and does not represent real-time physical engine telemetry integration.
+\end{itemize}

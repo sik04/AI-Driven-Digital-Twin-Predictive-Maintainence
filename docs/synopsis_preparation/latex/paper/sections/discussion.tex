@@ -1,0 +1,30 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Methodological Implications for Turbofan Prognostics}
+The core inquiry of the IntelliTwin framework is whether distribution-free uncertainty quantification provides measurable, operational value to industrial decision-makers beyond standard point prognostics or ad-hoc safety margins. Traditional prognostic paradigms focus almost exclusively on minimizing cycle-level error metrics (e.g., RMSE or asymmetric scoring functions). However, in mission-critical applications such as aviation gas turbine maintenance, cycle-level accuracy does not translate directly into operational cost efficiency. A maintenance policy driven by an uncalibrated point predictor is structurally vulnerable to overestimation errors, where an engine is allowed to operate beyond its physical failure boundary, incurring catastrophic unplanned replacement penalties.
+
+By establishing finite-sample marginal coverage guarantees via split-conformal inference, IntelliTwin provides decision-makers with a mathematically principled lower bound $L_t(\alpha)$. Nevertheless, conformal guarantees hold marginally across the calibration exchangeability distribution. In sequential degradation processes, temporal autocorrelation and operating regime transitions can cause local conditional coverage to deviate significantly from the nominal $1-\alpha$ rate.
+
+\subsection{Conservatism, Asymmetric Penalties, and Negative $\beta$}
+A critical methodological contribution of this work is the formalization of asymmetric, decision-aware conformal calibration. In maintenance scheduling, the cost asymmetry between unplanned catastrophic failure ($C_{\text{unplanned}}=100$) and scheduled preventive overhaul ($C_{\text{preventive}}=10$) dictates that underestimating RUL (which leads to premature replacement) is substantially less hazardous than overestimating RUL (which leads to in-flight shutdown or catastrophic component damage).
+
+The asymmetry parameter $\beta = -\ln 2 \approx -0.6931$ modulates the nonconformity score scaling factors:
+\begin{equation}
+a(p_t) = \exp(-\beta \cdot p_t), \quad b(p_t) = \exp(\beta \cdot p_t).
+\end{equation}
+For negative $\beta$, as failure probability $p_t$ increases, $a(p_t)$ decreases below $1$, while $b(p_t)$ increases above $1$. At fixed nonconformity thresholds, this asymmetric scaling contracts the lower distance and expands the upper distance, shifting the unclipped lower bound $L_t$ upward. However, as established in the project's statistical protocol, negative $\beta$ does not mathematically guarantee earlier maintenance across all operational trajectories. Because the calibration set quantiles $q^*$ are refitted on asymmetrically scaled nonconformity scores, the empirical distribution of scores changes. Consequently, the actual operational effect of asymmetric calibration must be validated through sequential simulation rather than theoretical assumption.
+
+\subsection{Regime Stratification and Subgroup Reliability}
+In complex operational environments such as C-MAPSS FD002 and FD004, turbofans traverse six distinct operating flight regimes characterized by substantial variations in altitude (0--40,000 ft), Mach number (0--0.84), and throttle resolver angle. Global conformal calibration aggregates residuals across all regimes, which can mask severe local undercoverage in rare or highly stressed operating conditions.
+
+Regime-stratified HCP explicitly conditions nonconformity scores on the active flight regime cluster $k \in \{1,\dots,6\}$. While this guarantees conditional coverage asymptotically as calibration sample sizes per regime grow large, finite-sample calibration across rare regimes introduces higher quantile variance. When a rare regime has fewer than the required sample threshold ($N_k < 100$), the framework executes a deterministic fallback to the pooled global nonconformity quantile, ensuring that the resulting prediction intervals remain well-defined and conservative.
+
+\subsection{Interpreting Potential Hypothesis Outcomes}
+The pre-registered statistical protocol explicitly defines decision rules for three potential outcomes across all four hypotheses:
+\begin{itemize}
+    \item \textbf{Supported}: The lower confidence bound of the contrast metric strictly exceeds the pre-registered practical margin, demonstrating statistically significant and practically meaningful superiority.
+    \item \textbf{Inconclusive}: The confidence interval spans the decision boundary, or statistical power is insufficient to confirm or refute the practical margin. In this case, no definitive superiority claim is made, and the result is cataloged as requiring expanded engine sample sizes.
+    \item \textbf{Unsupported}: The upper confidence bound falls below the required threshold, or the safety constraint is violated (e.g., failure rate increases). This outcome directly falsifies the hypothesis, indicating that conformal calibration does not provide the anticipated decision benefit over simpler baselines.
+\end{itemize}
+By enforcing strict pre-registered boundaries and reporting all comparisons transparently, the research framework eliminates publication bias and ensures that conclusions are dictated entirely by empirical evidence.

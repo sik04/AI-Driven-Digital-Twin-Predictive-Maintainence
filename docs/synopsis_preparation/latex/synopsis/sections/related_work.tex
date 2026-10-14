@@ -1,0 +1,10 @@
+\section{Related Work and Positioning}
+
+\subsection{Prognostic Models and Asymmetric Penalties}
+Prognostic modeling for aero-engines widely benchmarked on C-MAPSS~\cite{saxena2008damage} encompasses deep architectures including recurrent neural networks and gradient-boosted decision trees. While the C-MAPSS scoring metric penalizes overestimation ($d > 0$) more severely than underestimation ($d < 0$), base models are typically trained under symmetric loss functions.
+
+\subsection{Conformal Uncertainty Quantification}
+Conformal prediction~\cite{javanmardi2023conformal} provides distribution-free marginal guarantees. Conformalized Quantile Regression (CQR) has been applied to aero-engines by Diao et al.~\cite{diao2026turbofan} and Robinson~\cite{robinson2026riskaware}. However, standard split conformal methods assume observation exchangeability. In degradation trajectories, observations are clustered within engines; Lee, Barber, and Willett~\cite{lee2023hierarchical} established hierarchical conformal inference, bounding finite probability mass by $\frac{m}{m+1}$ and balancing mass equally across groups to ensure valid coverage on unseen clusters.
+
+\subsection{Subgroup Diagnostics and Maintenance Utility}
+Auditing localized reliability under operating-regime shifts~\cite{yang2026empirical} and lifecycle degradation stages~\cite{benabdennour2026grouped} demonstrates that marginal coverage frequently conceals localized failure in high-stress regimes. Concurrently, utility-directed conformal prediction~\cite{cortesgomez2025utility} demonstrated the benefits of decision-aware nonconformity scores. IntelliTwin unites hierarchical engine-weighted conformal inference with asymmetric decision-aware score functions evaluated in sequential maintenance simulation.

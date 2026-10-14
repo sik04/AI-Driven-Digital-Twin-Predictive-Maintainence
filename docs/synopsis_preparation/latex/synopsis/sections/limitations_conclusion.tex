@@ -1,0 +1,12 @@
+\section{Limitations, Threats to Validity, and Conclusion}
+
+\subsection{Research Limitations}
+\begin{enumerate}
+  \item \textbf{Benchmark Simulation}: Evaluations are conducted on synthetic NASA C-MAPSS data where degradation is monotonic. Operational aircraft engines experience maintenance reversibility and non-engine sensor faults not captured in the benchmark.
+  \item \textbf{Synthetic Economic Scenarios}: The Simulated Cost Units ($\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$) represent study-defined benchmark preferences, not empirical airline accounting constants.
+  \item \textbf{Conformal Theory Boundaries}: Conformal calibration guarantees marginal exchangeable coverage. It does not provide theoretical guarantees of exact pointwise conditional coverage or sequential stopping-time coverage.
+  \item \textbf{No Physical Integration}: The framework evaluates an offline, trace-driven simulation replay engine; no physical engine hardware coupling exists.
+\end{enumerate}
+
+\subsection{Conclusion and Next Milestones}
+IntelliTwin establishes an end-to-end, scientifically reproducible research architecture linking prognostic neural networks, hierarchical conformal calibration, and sequential maintenance simulation. All methodology, base models, calibrator bundles, and evaluation contracts are completely frozen and audited. Upon completion of the official held-out test evaluation, verified empirical results will be incorporated to resolve RQ1--RQ4.

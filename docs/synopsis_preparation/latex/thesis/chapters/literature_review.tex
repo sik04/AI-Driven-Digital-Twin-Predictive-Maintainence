@@ -1,0 +1,59 @@
+\chapter{Literature Review and Related Work}
+\label{chap:literature_review}
+
+\section{Introduction to the Literature Landscape}
+Prognostics and Health Management (PHM) for mission-critical aeromechanical assets has evolved dramatically over the past two decades. The progression from classical physics-based fatigue models to modern data-driven deep learning architectures reflects increasing sensor telemetry availability and algorithmic sophistication. However, the operational adoption of data-driven Remaining Useful Life (RUL) predictors in aviation maintenance scheduling remains severely constrained by two fundamental deficiencies: the absence of rigorous, distribution-free uncertainty quantification, and the disconnect between cycle-level regression accuracy and downstream maintenance decision utility.
+
+This chapter presents a structured synthesis of the literature across five thematic pillars:
+\begin{enumerate}
+    \item Turbofan Remaining Useful Life (RUL) prediction paradigms;
+    \item Uncertainty quantification and conformal calibration;
+    \item Operating regime heterogeneity and subgroup reliability;
+    \item Maintenance decision theory and conservatism controls;
+    \item The specific research gap addressed by the IntelliTwin framework.
+\end{enumerate}
+
+\section{Pillar 1: Turbofan Remaining Useful Life Prediction}
+The foundational benchmark for data-driven turbofan degradation research is the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset introduced by Saxena et al.~\cite{saxena2008damage}. C-MAPSS models thermodynamic degradation in commercial turbofans under varying flight profiles, providing run-to-failure trajectories for high-pressure compressor and fan deterioration.
+
+Early algorithmic approaches focused on classical machine learning, such as Support Vector Regression (SVR), Random Forests, and Gradient Boosted Decision Trees (GBDT) \cite{huang2021survey}. With the deep learning paradigm shift, recurrent neural architectures became the prevailing standard. Zheng et al.~\cite{zheng2017long} demonstrated that Long Short-Term Memory (LSTM) networks effectively capture long-range temporal dependencies in multivariate degradation telemetry. Subsequent advancements incorporated Temporal Convolutional Networks (TCNs) \cite{chen2022data}, attention mechanisms \cite{diao2026turbofan}, and Transformer encoders.
+
+However, across the turbofan prognostics literature, model evaluation has remained almost universally confined to symmetric error metrics, specifically Root Mean Squared Error (RMSE) and Mean Absolute Error (MAE), or ad-hoc asymmetric exponential scoring functions \cite{saxena2008damage}. These point-prediction paradigms fail to provide decision-makers with confidence bounds necessary for safety-critical maintenance dispatch.
+
+\section{Pillar 2: Uncertainty Quantification and Conformal Prediction}
+To address the limitations of point estimates, various uncertainty quantification (UQ) methodologies have been explored in PHM:
+\begin{itemize}
+    \item \textbf{Bayesian Neural Networks (BNNs)}: Employ Monte Carlo dropout or variational inference to estimate weight posterior distributions. While theoretically principled, BNNs impose heavy computational overheads and rely heavily on prior distribution specifications.
+    \item \textbf{Quantile Regression}: Estimates conditional quantiles directly via the pinball loss. However, quantile regression provides no finite-sample coverage guarantees and is vulnerable to quantile crossing under non-stationary degradation.
+    \item \textbf{Conformal Prediction}: Conformal prediction theory, pioneered by Vovk et al.~\cite{vovk2005algorithmic} and modernized by Angelopoulos and Bates \cite{angelopoulos2021gentle}, offers a rigorous alternative. By evaluating nonconformity scores on a reserved, exchangeable calibration dataset, inductive split-conformal inference constructs prediction intervals guaranteed to satisfy valid finite-sample marginal coverage:
+    \begin{equation}
+    P(Y_{n+1} \in \mathcal{C}(X_{n+1})) \ge 1 - \alpha.
+    \end{equation}
+\end{itemize}
+
+Recently, Javanmardi et al.~\cite{javanmardi2023conformal} and Yang et al.~\cite{yang2026empirical} explored conformal prediction for industrial prognostics. However, standard split-conformal methods assume exchangeability, which is challenged by non-stationary degradation trajectories and multi-regime flight envelopes.
+
+\section{Pillar 3: Operating Regime Heterogeneity and Subgroup Reliability}
+In real-world aviation operations, engines traverse diverse flight regimes (climb, cruise, descent, sea-level take-off). In C-MAPSS sub-datasets FD002 and FD004, six discrete operating regimes induce severe sensor non-stationarity.
+
+When conformal calibration is applied globally across a pooled calibration split, the resulting marginal guarantee $1-\alpha$ guarantees only aggregate coverage across the entire dataset. Lee et al.~\cite{lee2023hierarchical} and Benabdennour et al.~\cite{benabdennour2026grouped} demonstrated that global calibration frequently yields severe conditional undercoverage in rare or high-stress operational clusters. While hierarchical conformal prediction (HCP) allows conditioning on group indicators, naive partitioning across small subgroup samples can induce catastrophic quantile variance. Establishing structured fallback protocols for sparse clusters is essential for industrial viability.
+
+\section{Pillar 4: Maintenance Decisions and Conservatism Controls}
+The ultimate objective of prognostic modeling is to inform maintenance scheduling. In operational fleet logistics, an asymmetric cost structure prevails:
+\begin{equation}
+C_{\text{unplanned}} \gg C_{\text{preventive}}.
+\end{equation}
+Overestimating RUL allows an engine to operate until catastrophic functional failure, incurring heavy safety penalties, whereas underestimating RUL merely causes premature scheduled replacement, forfeiting a fraction of usable life \cite{saxena2008damage, robinson2026riskaware}.
+
+Cortes-Gomez et al.~\cite{cortesgomez2025utility} introduced utility-directed conformal calibration, while Robinson et al.~\cite{robinson2026riskaware} explored risk-aware RUL bounds. However, an unresolved question in the literature is whether observed maintenance cost reductions stem from genuine uncertainty calibration or merely from trivial over-conservatism (i.e., triggering maintenance earlier regardless of prediction accuracy). Resolving this attribution requires evaluating calibrated intervals against rigorously matched-width heuristic baselines, widened intervals, and fixed safety margins.
+
+\section{Pillar 5: The IntelliTwin Synthesis and Research Gap}
+Despite the individual advancements cataloged above, no prior study has simultaneously established:
+\begin{enumerate}
+    \item Complete engine-level data leakage isolation without cycle-level shuffling;
+    \item Condition-stratified conformal calibration with deterministic fallback for rare flight regimes;
+    \item Asymmetric nonconformity scaling aligned with maintenance cost structures;
+    \item End-to-end discrete-event maintenance simulation evaluating sequential fleet utility;
+    \item Attribution testing against matched-conservatism controls under pre-registered cluster-bootstrap statistical protocols.
+\end{enumerate}
+IntelliTwin directly resolves this research gap through an open, reproducible, and pre-registered experimental framework.

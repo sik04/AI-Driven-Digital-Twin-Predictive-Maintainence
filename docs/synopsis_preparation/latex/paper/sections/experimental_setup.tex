@@ -1,0 +1,70 @@
+\section{Experimental Setup}
+\label{sec:experimental_setup}
+
+\subsection{Benchmark Datasets and Engine-Level Partitions}
+\label{subsec:datasets_splits}
+We evaluate IntelliTwin on three benchmark sub-datasets from the NASA C-MAPSS turbofan engine degradation simulation suite \cite{saxena2008damage}:
+\begin{enumerate}
+    \item \textbf{FD001}: Single sea-level operating condition, single failure mode (high-pressure compressor degradation), comprising 100 run-to-failure engine trajectories.
+    \item \textbf{FD002}: Six diverse operating flight conditions, single failure mode (HPC degradation), comprising 260 engine trajectories.
+    \item \textbf{FD004}: Six diverse operating flight conditions, two concurrent failure modes (HPC and fan degradation), comprising 249 engine trajectories.
+\end{enumerate}
+
+To prevent temporal and engine-level data leakage, partitioning is strictly executed at the engine level using a fixed master seed ($2026$) prior to any data preprocessing (50\% training, 20\% calibration, 10\% validation, 20\% held-out test):
+\begin{itemize}
+    \item \textbf{FD001} (100 engines): 50 training (50\%), 20 calibration (20\%), 10 validation (10\%), and 20 held-out test engines (20\%).
+    \item \textbf{FD002} (260 engines): 130 training (50\%), 52 calibration (20\%), 26 validation (10\%), and 52 held-out test engines (20\%), stratified across engine lifetime quartiles to balance short, medium, and long-life engine profiles across splits.
+    \item \textbf{FD004} (249 engines): 124 training (50\%), 50 calibration (20\%), 25 validation (10\%), and 50 held-out test engines (20\%).
+\end{itemize}
+Across all three datasets, 304 engines are allocated to training, 122 to calibration, 61 to validation, and 122 to final held-out testing (total 609 engines).
+
+\subsection{Feature Space and Causal Windowing}
+The raw engine streams comprise 3 operational settings and 21 sensor measurements per operational cycle. In accordance with training-only qualification protocols, seven sensor channels showing zero or near-zero variance across operating cycles are excluded, yielding a standardized $17$-dimensional feature vector $\mathbf{x}_t \in \mathbb{R}^{17}$ (3 operational settings and 14 informative sensor channels). Robust min-max scaling is fitted strictly on training engines.
+
+Temporal trajectories are windowed with an exact causal horizon of $w=30$ cycles, unit stride ($s=1$), and strict avoidance of zero-padding. Consequently, model predictions initiate exclusively at cycle $t=30$. In training splits, target RUL is capped at $R_{\text{max}}=125$ cycles to reflect early healthy operational regimes where degradation is physically negligible. In calibration, validation, and held-out test splits, RUL is preserved uncapped to evaluate true physical end-of-life trajectories.
+
+\subsection{Base Degradation Predictors}
+We investigate two standard, distinct algorithmic paradigms operating on identical 30-cycle causal information horizons:
+\begin{enumerate}
+    \item \textbf{Gradient Boosted Regressor (GBR)}: LightGBM ensemble operating on flattened $30 \times 17 = 510$-dimensional causal feature vectors.
+    \item \textbf{Long Short-Term Memory (LSTM)}: Recurrent neural network architecture processing sequential $30 \times 17$ temporal tensors.
+\end{enumerate}
+This yields a $3 \times 2$ experimental matrix (6 experimental cells): FD001-GBR, FD001-LSTM, FD002-GBR, FD002-LSTM, FD004-GBR, and FD004-LSTM. To capture training stochasticity, each cell is trained across five random seeds ($2026, 2027, 2028, 2029, 2030$), producing 30 frozen base model checkpoints in the registry.
+
+\subsection{Calibration Variants and Control Baselines}
+On the reserved calibration engine splits, we evaluate three conformal calibration variants:
+\begin{itemize}
+    \item \textbf{Global HCP} (\texttt{global\_hcp}): Standard split-conformal calibration with engine-weighted empirical quantiles.
+    \item \textbf{Regime-Stratified HCP} (\texttt{regime\_hcp}): Cluster-conditional nonconformity scaling and quantile fitting conditioned on operating regime $k \in \{1,\dots,6\}$.
+    \item \textbf{Decision-Aware HCP} (\texttt{decision\_aware\_hcp}): Asymmetric nonconformity scaling parameterized by risk aversion parameter $\beta = -\ln 2$, penalizing RUL overestimation.
+\end{itemize}
+
+To rigorously address RQ3, we evaluate four named controls across three distinct baseline families:
+\begin{enumerate}
+    \item \textbf{Heuristic Interval Family}:
+    \begin{itemize}
+        \item \emph{Matched-Width Interval}: Symmetric heuristic interval centered at $\hat{y}_t$ with constant half-width matched to the mean half-width of the calibrated HCP interval.
+        \item \emph{Widened Interval}: Heuristic interval expanded by $1.25\times$ the matched half-width.
+    \end{itemize}
+    \item \textbf{Point Safety Margin Family}:
+    \begin{itemize}
+        \item \emph{Point Safety Margin}: Point prediction trigger shifted downward by a fixed margin $\Delta = 10$ cycles: replace when $\hat{y}_t \le \tau + \Delta$.
+    \end{itemize}
+    \item \textbf{Earlier Fixed Policy Family}:
+    \begin{itemize}
+        \item \emph{Earlier Intervention}: Direct threshold inflation: replace when $\hat{y}_t \le \tau_{\text{early}} = \tau + 15$ cycles.
+    \end{itemize}
+\end{enumerate}
+
+\subsection{Maintenance Simulation and Cost Scenarios}
+Sequential policy execution is evaluated on unseen test engine trajectories using the discrete-event simulator. The primary economic scenario specifies $C_{\text{preventive}} = 10$, $C_{\text{unplanned}} = 100$ (cost ratio $10:1$), and lead-time $L_{\text{lead}} = 2$ cycles. Robustness is assessed across sensitivity scenarios spanning cost ratios $5:1$ ($C_{\text{unplanned}}=50$), $20:1$ ($C_{\text{unplanned}}=200$), and varying lead-time horizons ($L_{\text{lead}} \in \{0, 5\}$).
+
+\subsection{Statistical Inference and Decision Protocol}
+To evaluate confirmatory hypotheses H1--H4 without distributional assumptions, we apply paired engine-level cluster bootstrap inference:
+\begin{itemize}
+    \item \textbf{Resampling Unit}: Complete engine trajectories are resampled with replacement ($B = 10{,}000$ resamples) preserving internal temporal correlations.
+    \item \textbf{Weighting}: Equal weighting per engine is applied across all metrics.
+    \item \textbf{Missing-Group Bound Propagation}: If a bootstrap sample lacks representation for a specific operational cluster, worst-case bounds ($[0, 1]$ for coverage, $[0, \infty)$ for width) are propagated.
+    \item \textbf{Family-Wise Error Rate}: Confirmatory decision confidence intervals are computed at $98.75\%$ two-sided level ($\alpha_{\text{conf}} = 0.0125$) implementing Bonferroni correction across the four primary research questions.
+    \item \textbf{Intersection-Union Test (IUT)}: To decide \texttt{Supported}, \texttt{Unsupported}, or \texttt{Inconclusive}, the lower/upper bounds of the confidence intervals must strictly satisfy the pre-registered practical margin thresholds $\delta_{\text{cov}} = 0.00$, $\delta_{\text{cost}} = 0.05$, and safety constraint $\Delta_{\text{fail}} \le 0$.
+\end{itemize}

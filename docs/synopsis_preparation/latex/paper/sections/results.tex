@@ -1,0 +1,106 @@
+\section{Results and Confirmatory Evaluation}
+\label{sec:results}
+
+\begin{quote}
+\itshape
+\textbf{Status Notice:} The empirical evaluations reported in this section represent the pre-registered reporting templates for the confirmatory evaluation. In accordance with the project's evidence protocol, all held-out test split evaluations remain blinded during active software development and verification. Empirical entries are designated \texttt{PENDING} awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
+\end{quote}
+
+\subsection{Base Degradation Prediction Performance}
+\label{subsec:point_results}
+Point predictive performance is evaluated across the six experimental cells on the held-out test engine splits. Root Mean Squared Error ($\text{RMSE}$) and Mean Absolute Error ($\text{MAE}$) are computed with equal engine weighting across all test engines. Table~\ref{tab:point_prediction_results} outlines the reporting structure.
+
+\begin{table}[htbp]
+\centering
+\caption{Point Prediction Accuracy on Held-Out Test Engines (Mean $\pm$ Std across 5 Seeds)}
+\label{tab:point_prediction_results}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Dataset} & \textbf{Architecture} & \textbf{RMSE (cycles)} & \textbf{MAE (cycles)} \\
+\midrule
+FD001 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD001 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\midrule
+FD002 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD002 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\midrule
+FD004 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD004 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Marginal and Conditional Interval Calibration}
+\label{subsec:calibration_results}
+Conformal prediction intervals are evaluated at nominal confidence level $1-\alpha = 0.90$ across methods: uncalibrated baseline (Gaussian heuristic), Global HCP, Regime-Stratified HCP, and Decision-Aware HCP. Metrics comprise engine-weighted empirical coverage ($\text{Cov}$), mean interval width ($\bar{W}$), and Winkler interval score ($\text{IS}_{0.10}$). Table~\ref{tab:calibration_performance} summarizes the evaluation grid.
+
+\begin{table*}[htbp]
+\centering
+\caption{Interval Calibration Performance at Nominal $90\%$ Confidence Level on Held-Out Test Splits}
+\label{tab:calibration_performance}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Dataset} & \textbf{Base Model} & \textbf{Calibration Method} & \textbf{Empirical Cov. (\%)} & \textbf{Mean Width (cycles)} & \textbf{Winkler Score} \\
+\midrule
+FD001 & GBR & Uncalibrated Baseline & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD002 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Regime HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD002 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD004 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Sequential Maintenance Decision Outcomes}
+\label{subsec:maintenance_results}
+Downstream maintenance outcomes under the primary economic scenario ($C_{\text{preventive}}=10$, $C_{\text{unplanned}}=100$, lead-time $L_{\text{lead}}=2$) are reported in Table~\ref{tab:maintenance_outcomes}. Metrics include mean maintenance cost per engine ($\bar{C}$), unplanned failure proportion ($P_{\text{fail}}$), and mean wasted operational life ($\bar{U}$).
+
+\begin{table*}[htbp]
+\centering
+\caption{Sequential Maintenance Policy Outcomes on Held-Out Test Engines ($C_{\text{prev}}=10, C_{\text{unplanned}}=100, L_{\text{lead}}=2$)}
+\label{tab:maintenance_outcomes}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Dataset} & \textbf{Model} & \textbf{Policy Strategy} & \textbf{Cost / Engine} & \textbf{Failures (\%)} & \textbf{Wasted Life (cycles)} \\
+\midrule
+FD002 & GBR & Uncalibrated Point Policy & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Point Safety Margin (+10) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Matched-Width Interval    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Widened Interval ($1.25\times$) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Earlier Intervention (+15)& \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Global HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Regime HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Decision-Aware HCP Bound  & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Hypothesis Decision Outcomes (RQ1--RQ4)}
+\label{subsec:hypothesis_decisions}
+Confirmatory statistical inference is conducted via 10,000 paired engine-level cluster bootstrap resamples. Table~\ref{tab:hypothesis_decision_matrix} presents the formal decision matrix with Bonferroni-corrected $98.75\%$ confidence intervals.
+
+\begin{table*}[htbp]
+\centering
+\caption{Pre-Registered Confirmatory Hypothesis Decisions and Statistical Contrasts}
+\label{tab:hypothesis_decision_matrix}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Hypothesis} & \textbf{Contrast Metric} & \textbf{Decision Rule / Threshold} & \textbf{Estimate} & \textbf{98.75\% CI} & \textbf{Final Decision} \\
+\midrule
+\textbf{H1 (Coverage)} & $\text{Cov}(\text{HCP}) - 0.90$ & $\text{CI}_{\text{lower}} \ge 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H2 (Cost)}     & $(\bar{C}_{\text{point}} - \bar{C}_{\text{HCP}})/\bar{C}_{\text{point}}$ & $\text{CI}_{\text{lower}} \ge 0.05 \land \Delta_{\text{fail}} \le 0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H3 (Controls)} & $\bar{C}_{\text{ctrl}} - \bar{C}_{\text{HCP}}$ & $\text{CI}_{\text{lower}} > 0 \lor (\Delta C \ge 0 \land \Delta_{\text{fail}} \le 0)$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H4 (Regimes)}  & $\text{Cov}_{\text{worst}}(\text{Regime}) - \text{Cov}_{\text{worst}}(\text{Global})$ & $\text{CI}_{\text{lower}} > 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\bottomrule
+\end{tabular}
+\end{table*}
