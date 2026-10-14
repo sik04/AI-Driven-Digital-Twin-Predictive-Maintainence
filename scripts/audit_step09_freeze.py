@@ -24,6 +24,8 @@ def audit_pretest_evidence(
     verification_dir: Path | str = "experiments/pretest_verification_v2",
     base_dir: Path | str = ".",
     allow_dirty: bool = False,
+    git_info: tuple[str, bool] | None = None,
+    env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Perform content-level verification of all pre-test readiness evidence.
 
@@ -36,8 +38,12 @@ def audit_pretest_evidence(
     if not v_dir.is_absolute():
         v_dir = (base / v_dir).resolve()
 
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
-    env_meta = capture_environment_metadata(device="cpu")
+    if git_info is not None:
+        git_sha, git_dirty = git_info
+    else:
+        git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
+    if env_meta is None:
+        env_meta = capture_environment_metadata(device="cpu")
 
     checks: dict[str, Any] = {}
     missing_items: list[str] = []
@@ -190,6 +196,8 @@ def build_protocol_freeze(
     verification_dir: Path | str = "experiments/pretest_verification_v2",
     base_dir: Path | str = ".",
     allow_dirty: bool = False,
+    git_info: tuple[str, bool] | None = None,
+    env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Assemble all cryptographic bindings into protocol_freeze.json after evidence passes."""
     if evidence_report.get("overall_status") != "PASS":
@@ -203,8 +211,12 @@ def build_protocol_freeze(
     if not v_dir.is_absolute():
         v_dir = (base / v_dir).resolve()
 
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
-    env_meta = capture_environment_metadata(device="cpu")
+    if git_info is not None:
+        git_sha, git_dirty = git_info
+    else:
+        git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
+    if env_meta is None:
+        env_meta = capture_environment_metadata(device="cpu")
 
     # 1. Confirmatory protocol config
     config_p = resolve_repo_relative_path(
@@ -313,6 +325,8 @@ def verify_saved_freeze(
     freeze_path: Path | str,
     base_dir: Path | str = ".",
     allow_dirty: bool = False,
+    git_info: tuple[str, bool] | None = None,
+    env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Independently verify saved protocol freeze and generate pretest_audit.json."""
     base = Path(base_dir).resolve()
@@ -323,8 +337,12 @@ def verify_saved_freeze(
     if not f_path.exists():
         raise FileNotFoundError(f"Protocol freeze missing: {f_path}")
 
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
-    env_meta = capture_environment_metadata(device="cpu")
+    if git_info is not None:
+        git_sha, git_dirty = git_info
+    else:
+        git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
+    if env_meta is None:
+        env_meta = capture_environment_metadata(device="cpu")
 
     with open(f_path, encoding="utf-8") as f:
         freeze_data = json.load(f)
@@ -417,12 +435,19 @@ def main() -> None:
     print(f"Verification Directory: {v_dir}")
     print("=" * 80)
 
+    # Capture provenance once at process entry
+    git_sha, git_dirty = get_git_info(allow_dirty=args.allow_dirty, repo_root=base)
+    env_meta = capture_environment_metadata(device="cpu")
+    git_info = (git_sha, git_dirty)
+
     # 1. Audit evidence
     print("\nPhase 1: Auditing pre-test evidence...")
     evidence_report = audit_pretest_evidence(
         verification_dir=v_dir,
         base_dir=base,
         allow_dirty=args.allow_dirty,
+        git_info=git_info,
+        env_meta=env_meta,
     )
     print(f"  Evidence Audit Status: {evidence_report['overall_status']}")
     if evidence_report["overall_status"] != "PASS":
@@ -438,6 +463,8 @@ def main() -> None:
         verification_dir=v_dir,
         base_dir=base,
         allow_dirty=args.allow_dirty,
+        git_info=git_info,
+        env_meta=env_meta,
     )
     freeze_p = v_dir / "protocol_freeze.json"
     write_immutable_json(freeze_p, freeze_data, overwrite=False)
@@ -449,6 +476,8 @@ def main() -> None:
         freeze_path=freeze_p,
         base_dir=base,
         allow_dirty=args.allow_dirty,
+        git_info=git_info,
+        env_meta=env_meta,
     )
     audit_p = v_dir / "pretest_audit.json"
     write_immutable_json(audit_p, audit_data, overwrite=False)
