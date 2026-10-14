@@ -572,6 +572,7 @@ def verify_validation_smoke_matrix(
 
     # Verify failure safeguard counts against outcomes
     failure_mismatches: list[str] = []
+    primary_cov_float = coverage_to_float(PRIMARY_CANONICAL_COVERAGE)
     for r in df_comp.itertuples():
         if r.evidence_kind == "observed_failure":
             prop_cnt = int(
@@ -579,7 +580,7 @@ def verify_validation_smoke_matrix(
                     (df_outcomes["dataset"] == r.dataset)
                     & (df_outcomes["model_family"] == r.model_family)
                     & (df_outcomes["method_or_control_id"] == "decision_aware_hcp")
-                    & (df_outcomes["nominal_coverage"] == PRIMARY_CANONICAL_COVERAGE)
+                    & np.isclose(df_outcomes["nominal_coverage"], primary_cov_float)
                     & (df_outcomes["scenario_id"] == PRIMARY_COST_SCENARIO)
                 ]["failed"].sum()
             )
@@ -588,7 +589,7 @@ def verify_validation_smoke_matrix(
                     (df_outcomes["dataset"] == r.dataset)
                     & (df_outcomes["model_family"] == r.model_family)
                     & (df_outcomes["method_or_control_id"] == r.comparator)
-                    & (df_outcomes["nominal_coverage"] == PRIMARY_CANONICAL_COVERAGE)
+                    & np.isclose(df_outcomes["nominal_coverage"], primary_cov_float)
                     & (df_outcomes["scenario_id"] == PRIMARY_COST_SCENARIO)
                 ]["failed"].sum()
             )

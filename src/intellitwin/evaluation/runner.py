@@ -1208,34 +1208,6 @@ def run_full_validation_smoke(
             dataset_stats_arrays[d][f"{d}_{f}_{base_id}_cost_improvement"] for d, f in cells
         ]
         agg_delta_cost = np.mean(cell_cost_contrasts, axis=0)  # shape (B,)
-        rq4_stats_dict[f"aggregate_{base_id}_cost_improvement"] = agg_delta_cost
-
-        ci_95 = compute_bootstrap_ci(agg_delta_cost, quantiles=DESCRIPTIVE_QUANTILES)
-        ci_dec = compute_bootstrap_ci(agg_delta_cost, quantiles=DECISION_QUANTILES)
-
-        contrast_records.append(
-            {
-                "contrast_id": f"RQ4_aggregate_{base_id}_cost_improvement",
-                "dataset": "ALL_6_CELLS",
-                "model_family": "BOTH",
-                "comparator": base_id,
-                "metric": "aggregate_delta_cost",
-                "mean": float(np.mean(agg_delta_cost)),
-                "median": float(np.median(agg_delta_cost)),
-                "ci_95_low": ci_95[0],
-                "ci_95_high": ci_95[1],
-                "ci_decision_low": ci_dec[0],
-                "ci_decision_high": ci_dec[1],
-                "margin": 0.20,
-                "status": "DEVELOPMENT_SMOKE_ONLY",
-            }
-        )
-
-        # Aggregate Cost Contrast
-        cell_cost_contrasts = [
-            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_cost_improvement"] for d, f in cells
-        ]
-        agg_delta_cost = np.mean(cell_cost_contrasts, axis=0)  # shape (B,)
         rq4_stats_dict[f"agg_{base_id}_cost_improvement"] = agg_delta_cost
         rq4_stats_dict[f"aggregate_{base_id}_cost_improvement"] = agg_delta_cost
 
