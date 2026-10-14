@@ -21,7 +21,7 @@
       "data/splits/fd004_engine_split_seed_2026.json": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2"
     },
     "step08_repair_baseline_sha256": "fe14316de848fb08b2150cacf582c88334b2a2e9ccf90e10f5d08fb170f32c99",
-    "step08_repair_verification_sha256": "afb7d78504acb1e80b612274885d5b66daed2fc62ea35f0d0763721fe10135d8",
+    "step08_repair_verification_sha256": "ff4b2a92dae9a42e7f4bd913f09885d8a5f33c98e79cb93a8d5b37c8b1d7a2fb",
     "step08_selection_freeze_sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0"
   },
   "confirmatory_configuration": {
@@ -196,8 +196,7 @@
   },
   "environment": {
     "command_args": [
-      "scripts/audit_step09_freeze.py",
-      "--allow-dirty"
+      "scripts/audit_step09_freeze.py"
     ],
     "device": "cpu",
     "packages": {
@@ -209,10 +208,10 @@
     },
     "platform": "Windows-10-10.0.19045-SP0",
     "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-    "timestamp_utc": "2026-10-14T06:46:40.732271+00:00"
+    "timestamp_utc": "2026-10-14T07:18:11.747292+00:00"
   },
-  "freeze_timestamp_utc": "2026-10-14T06:46:40.822650+00:00",
-  "git_dirty": true,
+  "freeze_timestamp_utc": "2026-10-14T07:18:11.843756+00:00",
+  "git_dirty": false,
   "held_out_status": {
     "confirmatory_conclusions": "PENDING",
     "execution_status": "NOT_STARTED",
@@ -371,6 +370,6 @@
       }
     }
   },
-  "source_execution_commit": "26e657a7962a8848e9ff560a863a9aa9a3436fb9",
+  "source_execution_commit": "3572213ecefd8dd3fd908e3658b9c911f8535c2a",
   "status": "PRETEST_FROZEN"
 }
