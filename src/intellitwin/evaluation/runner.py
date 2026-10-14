@@ -932,6 +932,9 @@ def run_full_validation_smoke(
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_marginal_coverage_error"] = (
                 rep_marg_cov_err
             )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_marginal_coverage_error"] = (
+                rep_marg_cov_err
+            )
 
             # Subgroup errors for proposed method
             prop_reg_low, prop_reg_up = compute_subgroup_bounds(
@@ -943,6 +946,12 @@ def run_full_validation_smoke(
             )
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_lower"] = prop_reg_low
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_upper"] = prop_reg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_lower"] = (
+                prop_reg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_upper"] = (
+                prop_reg_up
+            )
 
             prop_stg_low, prop_stg_up = compute_subgroup_bounds(
                 multiplicity_matrix=M,
@@ -953,6 +962,12 @@ def run_full_validation_smoke(
             )
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_lower"] = prop_stg_low
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_upper"] = prop_stg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_lower"] = (
+                prop_stg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_upper"] = (
+                prop_stg_up
+            )
 
             # Contrasts against baselines
             for base_id in ("global_hcp", "regime_hcp"):
