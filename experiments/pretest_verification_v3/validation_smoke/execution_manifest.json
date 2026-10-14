@@ -1,0 +1,59 @@
+{
+  "artifact_hashes": {
+    "bootstrap_draws_FD001": "8c8f6a4ca76b0fb660ace977126c91809e4c6a0025c2a4949897f8830949a297",
+    "bootstrap_draws_FD002": "818d11252f676747afd8471c5bca5c5aa1006d548869e5995c39e9051dfb5a33",
+    "bootstrap_draws_FD004": "e0cf7d075d366faca7b121867ae03158e890d56935a3b04bb5d111c22eeec169",
+    "bootstrap_statistics_FD001": "33a5d92b6b0ba8158e0927f7dc72c85be529a55df1d127c848369202b6e36636",
+    "bootstrap_statistics_FD002": "744a1a4531ef2bbe1285e20c48e4cf6dba7fb3f0989a9be0a67ce13cbc00bd63",
+    "bootstrap_statistics_FD004": "2889f45188205995b9b41ac100cb41325ddf802c184f5cefef3af801a2c7a8bf",
+    "bootstrap_statistics_RQ4": "9171da5e9f2cefa9cfb8d0e55eedd3e37c269716c94b73d08b4daa1da7ec12dc",
+    "cell_summary_csv": "3cc8a859d9e5d7c9be16a7e913e523c881dd36f92b86735544445113b80253d7",
+    "component_evidence_csv": "e60d655fbebfd86e4c8144ec0e0cca533d3bee3e5054e9269bc8c9d3748a2421",
+    "contrast_intervals_csv": "dce74da43ece8834565d7aaa1dcba994195d388aca0574a1ef17400cab8e6328",
+    "decision_traces_csv": "0db95d1e487a77d2f0a62632a68f9e0c870e6534988c77b98ae07f837adf051e",
+    "engine_metrics_csv": "b0461ff1b5282ec4acb6ae876b91dfaeb240434dbb8479518d2d75bef73da5fe",
+    "engine_seed_outcomes_csv": "2316f59a165ea2aa72d513d0509894e13198fb42ffa71b259db8aa829aebf53c",
+    "interval_predictions_csv": "b14aba2e3cb8cf0061115a819fc4a63c4c000909b21c966fd3c6ae74f543638f",
+    "point_predictions_csv": "8072d570cebe9cb550011b0879ca90bc63fa2635f3fdc1b4c5861e35e9a006e6",
+    "subgroup_metrics_csv": "10e9a8daca739ea22e342c6814c5b4b45248c7e50d34199281ee4b168827e9b7"
+  },
+  "counts": {
+    "bootstrap_replicates": 10000,
+    "component_evidence_rows": 152,
+    "control_configurations": 120,
+    "control_outcome_rows": 3120,
+    "control_summary_rows": 24,
+    "primary_configurations": 810,
+    "primary_outcome_rows": 16470,
+    "primary_summary_rows": 162,
+    "total_configurations": 930,
+    "total_outcome_rows": 19590,
+    "total_summary_rows": 186
+  },
+  "environment": {
+    "command_args": [
+      "scripts/run_step09_validation_smoke.py",
+      "--output-dir",
+      "experiments/pretest_verification_v3/validation_smoke",
+      "--n-bootstrap",
+      "10000"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T16:07:37.342782+00:00"
+  },
+  "git_dirty": false,
+  "notice": "All outcomes and intervals in this directory are developmental validation smoke diagnostics only. No held-out test data was accessed or evaluated. Confirmatory hypothesis decisions remain strictly PENDING.",
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-smoke-manifest-v2",
+  "source_execution_commit": "83cd276d8cd89ffef032c6a2da10752d64e43289",
+  "status": "DEVELOPMENT_SMOKE_ONLY"
+}

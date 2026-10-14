@@ -1,0 +1,13 @@
+{
+  "status": "FAIL",
+  "overall_match": false,
+  "failing_reasons": [
+    "Missing required smoke files: ['component_evidence.csv']"
+  ],
+  "checks": {
+    "required_files_present": false,
+    "missing_files": [
+      "component_evidence.csv"
+    ]
+  }
+}
