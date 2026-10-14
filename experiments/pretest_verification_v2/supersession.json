@@ -1,0 +1,70 @@
+{
+  "environment": {
+    "command_args": [
+      "scripts/build_supersession.py",
+      "--output-path",
+      "experiments/pretest_verification_v2/supersession.json"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T10:55:31.326865+00:00"
+  },
+  "git_dirty": false,
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-supersession-v1",
+  "source_execution_commit": "8ffde9bd336f943e4f744f0794b8e87fbde94fe4",
+  "superseded_count": 7,
+  "superseded_records": [
+    {
+      "historical_path": "experiments/audits/step08_repair_baseline.json",
+      "historical_sha256": "fe14316de848fb08b2150cacf582c88334b2a2e9ccf90e10f5d08fb170f32c99",
+      "reason_superseded": "Recorded incorrect historical baseline commit SHA (f1edce7858c9748b6ee92e7c4f4a3b7849e7b235 instead of actual f1edce7fdf48b45513ff90a680da49701451d9cb), and conflated git-tracked protected artifacts with 72 local-only untracked model selection checkpoints without distinguishing public repository availability.",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/baseline_manifest.json"
+    },
+    {
+      "historical_path": "experiments/audits/step08_repair_verification.json",
+      "historical_sha256": "ff4b2a92dae9a42e7f4bd913f09885d8a5f33c98e79cb93a8d5b37c8b1d7a2fb",
+      "reason_superseded": "Recorded checkpoint_prediction_reproduction = NOT RUN while claiming overall_status = PASS. Full Step 8 verification requires official execution of raw checkpoint prediction CPU reproduction across 60 model/partition checks with absolute error <= 1e-4.",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/step08_full_audit.json"
+    },
+    {
+      "historical_path": "experiments/confirmatory_development/controls/FD002/GBR/selection.json",
+      "historical_sha256": "b471fb6b68fd946facf08540e0783e2256fa57f88980c0c31a5b2e1ce9b93eb0",
+      "reason_superseded": "Executed with --allow-dirty (recording git_dirty=true) and used rounded tolerance buckets rather than the locked minimum-relative tie-breaking rule (<= minimum + 1e-8).",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/controls/FD002/GBR/selection.json"
+    },
+    {
+      "historical_path": "experiments/confirmatory_development/controls/FD002/LSTM/selection.json",
+      "historical_sha256": "86e8c201507e604d597a3095bf477ca299b9524a66a67438499db1b8c3b83231",
+      "reason_superseded": "Executed with --allow-dirty (recording git_dirty=true) and used rounded tolerance buckets rather than the locked minimum-relative tie-breaking rule (<= minimum + 1e-8).",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/controls/FD002/LSTM/selection.json"
+    },
+    {
+      "historical_path": "experiments/confirmatory_development/validation_smoke/execution_manifest.json",
+      "historical_sha256": "b1cdafdda99ca3894dd4beeec8d97158ca49dd4f75d9439a21e234311ef063a7",
+      "reason_superseded": "Executed with --allow-dirty (recording git_dirty=true), evaluated only 810 primary configurations without evaluating the 120 control configurations, generated bootstrap draws without applying them to calculate replicate statistics or confidence intervals, and omitted point predictions, interval predictions, and decision traces.",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/validation_smoke/execution_manifest.json"
+    },
+    {
+      "historical_path": "experiments/confirmatory_development/protocol_freeze.json",
+      "historical_sha256": "2272da2d0122fccf3f97f6ae5235a8bc814a8a5210f1b06970133f92916d7ead",
+      "reason_superseded": "Bound superseded Step 8 and smoke artifacts, excluded audit files from dirty-state checks, and assembled the freeze before content-level evidence verification.",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/protocol_freeze.json"
+    },
+    {
+      "historical_path": "experiments/confirmatory_development/pretest_audit.json",
+      "historical_sha256": "604fd15c37ffd74b24103f2633b09f51f88bdde5f5bfbae4b984e09482997cd0",
+      "reason_superseded": "Shallow file-presence check that did not verify configuration matrix counts, outcome rows, trace simulations, replicate arrays, or confidence interval reconstructions.",
+      "replacement_evidence_path": "experiments/pretest_verification_v2/pretest_audit.json"
+    }
+  ],
+  "timestamp_utc": "2026-10-14T10:55:31.326865+00:00"
+}
