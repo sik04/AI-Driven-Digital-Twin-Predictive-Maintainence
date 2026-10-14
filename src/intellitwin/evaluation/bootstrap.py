@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from collections.abc import Collection, Sequence
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -79,7 +80,7 @@ def generate_stratified_bootstrap_draws(
     partition_engines: Collection[int],
     base_dir: Path | str = ".",
     n_replicates: int = BOOTSTRAP_REPLICATES,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """Generate deterministic stratified engine-cluster bootstrap draws.
 
     Rules:
@@ -118,7 +119,7 @@ def generate_stratified_bootstrap_draws(
 
 
 def compute_bootstrap_ci(
-    replicate_values: np.ndarray | Sequence[float],
+    replicate_values: np.ndarray[Any, Any] | Sequence[float],
     quantiles: tuple[float, float] = DECISION_QUANTILES,
 ) -> tuple[float, float]:
     """Compute bootstrap quantile interval using linear interpolation."""
@@ -132,8 +133,8 @@ def compute_bootstrap_ci(
 
 
 def compute_conservative_bounded_ci(
-    lower_bounds: np.ndarray | Sequence[float],
-    upper_bounds: np.ndarray | Sequence[float],
+    lower_bounds: np.ndarray[Any, Any] | Sequence[float],
+    upper_bounds: np.ndarray[Any, Any] | Sequence[float],
     quantiles: tuple[float, float] = DECISION_QUANTILES,
 ) -> tuple[float, float]:
     """Compute conservative confidence interval across replicates with bounded uncertainties."""

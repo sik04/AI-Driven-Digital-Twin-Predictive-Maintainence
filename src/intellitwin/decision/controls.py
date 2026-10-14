@@ -261,15 +261,15 @@ class FastTrajectory:
     unit_idx: int
     seed_idx: int
     failure_cycle: int
-    obs_cycles: np.ndarray
-    obs_predictions: np.ndarray
-    obs_q_global: np.ndarray
-    obs_q_regime: np.ndarray
-    obs_lower_global: np.ndarray
-    obs_lower_regime: np.ndarray
-    all_predictions: np.ndarray
-    all_q_global: np.ndarray
-    all_q_regime: np.ndarray
+    obs_cycles: np.ndarray[Any, Any]
+    obs_predictions: np.ndarray[Any, Any]
+    obs_q_global: np.ndarray[Any, Any]
+    obs_q_regime: np.ndarray[Any, Any]
+    obs_lower_global: np.ndarray[Any, Any]
+    obs_lower_regime: np.ndarray[Any, Any]
+    all_predictions: np.ndarray[Any, Any]
+    all_q_global: np.ndarray[Any, Any]
+    all_q_regime: np.ndarray[Any, Any]
 
 
 def _eval_candidate_sim(
@@ -277,7 +277,7 @@ def _eval_candidate_sim(
     n_units: int,
     n_seeds: int,
     scenario: CostScenario,
-    get_cond: Callable[[FastTrajectory], np.ndarray],
+    get_cond: Callable[[FastTrajectory], np.ndarray[Any, Any]],
 ) -> dict[str, float]:
     costs = np.zeros((n_units, n_seeds), dtype=float)
     failed_arr = np.zeros((n_units, n_seeds), dtype=float)
@@ -350,31 +350,37 @@ def _eval_candidate_mpiw(
     return float(np.mean(np.mean(widths, axis=1)))
 
 
-def _make_matched_condition(src: str, lam: float) -> Callable[[FastTrajectory], np.ndarray]:
-    def cond(t: FastTrajectory) -> np.ndarray:
+def _make_matched_condition(
+    src: str, lam: float
+) -> Callable[[FastTrajectory], np.ndarray[Any, Any]]:
+    def cond(t: FastTrajectory) -> np.ndarray[Any, Any]:
         q = t.obs_q_global if src == "global_hcp" else t.obs_q_regime
         return np.maximum(0.0, t.obs_predictions - lam * q) <= INTERVENTION_THRESHOLD_CYCLES
 
     return cond
 
 
-def _make_widened_condition(src: str, lam: float) -> Callable[[FastTrajectory], np.ndarray]:
-    def cond(t: FastTrajectory) -> np.ndarray:
+def _make_widened_condition(
+    src: str, lam: float
+) -> Callable[[FastTrajectory], np.ndarray[Any, Any]]:
+    def cond(t: FastTrajectory) -> np.ndarray[Any, Any]:
         q = t.obs_q_global if src == "global_hcp" else t.obs_q_regime
         return np.maximum(0.0, t.obs_predictions - lam * q) <= INTERVENTION_THRESHOLD_CYCLES
 
     return cond
 
 
-def _make_safety_condition(m: float | int) -> Callable[[FastTrajectory], np.ndarray]:
-    def cond(t: FastTrajectory) -> np.ndarray:
+def _make_safety_condition(m: float | int) -> Callable[[FastTrajectory], np.ndarray[Any, Any]]:
+    def cond(t: FastTrajectory) -> np.ndarray[Any, Any]:
         return t.obs_predictions <= (1.0 + m)
 
     return cond
 
 
-def _make_earlier_condition(src: str, h: float | int) -> Callable[[FastTrajectory], np.ndarray]:
-    def cond(t: FastTrajectory) -> np.ndarray:
+def _make_earlier_condition(
+    src: str, h: float | int
+) -> Callable[[FastTrajectory], np.ndarray[Any, Any]]:
+    def cond(t: FastTrajectory) -> np.ndarray[Any, Any]:
         low = t.obs_lower_global if src == "global_hcp" else t.obs_lower_regime
         return low <= float(h)
 

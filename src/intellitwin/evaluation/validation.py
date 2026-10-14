@@ -42,13 +42,13 @@ def normalize_regime_id(regime: Any) -> int:
 
 def validate_trajectory(
     unit: int,
-    cycles: np.ndarray | list[int],
-    predictions: np.ndarray | list[float],
-    regimes: np.ndarray | list[Any],
+    cycles: np.ndarray[Any, Any] | list[int],
+    predictions: np.ndarray[Any, Any] | list[float],
+    regimes: np.ndarray[Any, Any] | list[Any],
     terminal_cycle: int,
-    lower_bounds: np.ndarray | list[float] | None = None,
-    upper_bounds: np.ndarray | list[float] | None = None,
-    rul_trues: np.ndarray | list[float] | None = None,
+    lower_bounds: np.ndarray[Any, Any] | list[float] | None = None,
+    upper_bounds: np.ndarray[Any, Any] | list[float] | None = None,
+    rul_trues: np.ndarray[Any, Any] | list[float] | None = None,
 ) -> None:
     """Validate that an engine trajectory satisfies complete chronological requirements.
 

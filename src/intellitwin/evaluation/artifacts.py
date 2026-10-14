@@ -185,7 +185,7 @@ SCHEMA_RQ_COMPONENT_DECISIONS: Final[tuple[str, ...]] = (
 
 def save_bootstrap_draws_npz(
     path: Path | str,
-    draws: np.ndarray,
+    draws: np.ndarray[Any, Any],
     dataset: str,
     column_order: Sequence[int],
     replicate_count: int,
@@ -210,7 +210,7 @@ def save_bootstrap_draws_npz(
     )
 
 
-def load_bootstrap_draws_npz(path: Path | str) -> tuple[np.ndarray, dict[str, Any]]:
+def load_bootstrap_draws_npz(path: Path | str) -> tuple[np.ndarray[Any, Any], dict[str, Any]]:
     """Load bootstrap draws without pickle."""
     p = Path(path).resolve()
     with np.load(p, allow_pickle=False) as data:

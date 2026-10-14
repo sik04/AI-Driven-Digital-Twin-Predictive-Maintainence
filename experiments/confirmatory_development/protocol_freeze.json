@@ -5,13 +5,13 @@
     "control_selection_FD002_GBR_sha256": "b471fb6b68fd946facf08540e0783e2256fa57f88980c0c31a5b2e1ce9b93eb0",
     "control_selection_FD002_LSTM_sha256": "86e8c201507e604d597a3095bf477ca299b9524a66a67438499db1b8c3b83231",
     "evaluation_source_hashes": {
-      "src/intellitwin/decision/controls.py": "2369808f46f3871b0acf09b37a0c20e9db3a96b2b5b46f71cc6643079d761a46",
-      "src/intellitwin/evaluation/artifacts.py": "1b6ffcba9ce2eb8e66f3ddd80fcff088ef7a74025ecaa886e0da641b0ec8935e",
-      "src/intellitwin/evaluation/bootstrap.py": "76e94205bd8f581a598a10a5eb1f94a2583aa3d80fc3582a6cb3c125bd4427fc",
+      "src/intellitwin/decision/controls.py": "abebaf4648d1deb816032bf45bf8da86c3770cf47fb888950ab9478a9bc8b8d4",
+      "src/intellitwin/evaluation/artifacts.py": "091ba3e17df90dace87a68ec5e5b7e47f5fe886b8b6f615d9859113a0308ee23",
+      "src/intellitwin/evaluation/bootstrap.py": "f36f1fb2308cee9f5759a3daae5111cf5c7beec5c2f4e439cf16119d1d98f94a",
       "src/intellitwin/evaluation/decisions.py": "095d8ce6cd83c56d57b01a8827fd272e3a3f5fcf0a5ab1e5a94970f03a99b1e3",
-      "src/intellitwin/evaluation/metrics.py": "4b84dfff63e470d067b8c19d05e6249578d5744d31212a7043f88815a86d76f4",
+      "src/intellitwin/evaluation/metrics.py": "214fab9a34557757b670f1f0e889630890346487aa289b671a2d2a33bd4555d5",
       "src/intellitwin/evaluation/schema.py": "a1a397b83a145afe54e839b406a52811f96c740010e8d06d8cb72538c7f9f7b7",
-      "src/intellitwin/evaluation/validation.py": "1fbfb079d1b731eb3bc53ab98accb50af6ffe2eae93b04935be1d2cbcd7a2aa5",
+      "src/intellitwin/evaluation/validation.py": "6a29391d861cd819503cd2a2f984d785766d5afc394d8e43b7672314a2c6891a",
       "src/intellitwin/provenance.py": "8a18e19125f9e662dff62f218dc5da3f3b3a4c88e11d3e8eabaf230da7cf93ec"
     },
     "splits_and_quartiles": {
@@ -196,7 +196,8 @@
   },
   "environment": {
     "command_args": [
-      "scripts/audit_step09_freeze.py"
+      "scripts/audit_step09_freeze.py",
+      "--allow-dirty"
     ],
     "device": "cpu",
     "packages": {
@@ -208,10 +209,10 @@
     },
     "platform": "Windows-10-10.0.19045-SP0",
     "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-    "timestamp_utc": "2026-10-13T19:04:56.531666+00:00"
+    "timestamp_utc": "2026-10-14T06:46:40.732271+00:00"
   },
-  "freeze_timestamp_utc": "2026-10-13T19:04:56.583188+00:00",
-  "git_dirty": false,
+  "freeze_timestamp_utc": "2026-10-14T06:46:40.822650+00:00",
+  "git_dirty": true,
   "held_out_status": {
     "confirmatory_conclusions": "PENDING",
     "execution_status": "NOT_STARTED",
@@ -370,6 +371,6 @@
       }
     }
   },
-  "source_execution_commit": "7691f95712e77084024f8788762503cdaee169e6",
+  "source_execution_commit": "26e657a7962a8848e9ff560a863a9aa9a3436fb9",
   "status": "PRETEST_FROZEN"
 }

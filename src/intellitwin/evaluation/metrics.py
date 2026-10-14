@@ -15,11 +15,11 @@ from intellitwin.evaluation.schema import (
 
 
 def compute_interval_score(
-    y_true: np.ndarray,
-    lower: np.ndarray,
-    upper: np.ndarray,
+    y_true: np.ndarray[Any, Any],
+    lower: np.ndarray[Any, Any],
+    upper: np.ndarray[Any, Any],
     nominal_coverage: float = PRIMARY_NOMINAL_COVERAGE,
-) -> np.ndarray:
+) -> np.ndarray[Any, Any]:
     """Compute per-endpoint Winkler interval score.
 
     Score = (U - L) + (2 / alpha) * (L - y) * I(y < L) + (2 / alpha) * (y - U) * I(y > U)
