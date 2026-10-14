@@ -213,6 +213,8 @@ def verify_validation_smoke_matrix(
         stats_file = s_dir / f"bootstrap_statistics_{ds}.npz"
         data = np.load(stats_file, allow_pickle=False)
         for key in data.files:
+            if key == "__metadata__":
+                continue
             arr = data[key]
             if len(arr) != 10000:
                 stats_valid = False

@@ -57,15 +57,17 @@ def audit_pretest_evidence(
         with open(s8_audit_p, encoding="utf-8") as f:
             s8_data = json.load(f)
         s8_status = s8_data.get("overall_status")
-        raw_repro = s8_data.get("raw_checkpoint_reproduction", {})
-        raw_passed = raw_repro.get("passing_checks_count") == 60
-        max_err = raw_repro.get("max_absolute_error", 1.0)
+        raw_repro = s8_data.get("details", {}).get(
+            "checkpoint_prediction_reproduction",
+            s8_data.get("raw_checkpoint_reproduction", {}),
+        )
+        checks_count = raw_repro.get("models_verified", raw_repro.get("passing_checks_count", 0))
+        max_err = float(raw_repro.get("max_diff_overall", raw_repro.get("max_absolute_error", 1.0)))
+        raw_passed = (checks_count == 60) and (max_err <= 1e-4)
         checks["step08_full_audit"] = {
-            "status": "PASS"
-            if (s8_status == "PASS" and raw_passed and max_err <= 1e-4)
-            else "FAIL",
+            "status": "PASS" if (s8_status == "PASS" and raw_passed) else "FAIL",
             "overall_status": s8_status,
-            "raw_reproduction_checks_passed": raw_repro.get("passing_checks_count"),
+            "raw_reproduction_checks_passed": checks_count,
             "raw_reproduction_expected": 60,
             "raw_reproduction_max_absolute_error": max_err,
         }
