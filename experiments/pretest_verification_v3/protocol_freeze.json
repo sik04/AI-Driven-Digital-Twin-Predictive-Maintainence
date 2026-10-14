@@ -2,7 +2,7 @@
   "bindings": {
     "base_model_registry_sha256": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
     "calibrator_registry_sha256": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
-    "content_verification_sha256": "84e7e3fb34da847c1d683b895d6d90cde4b5317018681d9f9e3aeec76f41ac1c",
+    "content_verification_sha256": "4df88269b059310bf729e4f730933941791c01d8ea529a2885dd8e4a7e370b6a",
     "control_reconstruction_sha256": "3fe91090831174cb4c4ec356df0ba70d3b898aab735de8335d55361c84b2ef86",
     "control_selection_FD002_GBR_sha256": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d",
     "control_selection_FD002_LSTM_sha256": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7",
@@ -35,7 +35,7 @@
       "subgroup_metrics.csv": "10e9a8daca739ea22e342c6814c5b4b45248c7e50d34199281ee4b168827e9b7"
     },
     "source_hashes": {
-      "scripts/audit_step09_freeze.py": "b5e931a7549f5f6d5ca8e0572fb7fc405b63ba86435fc9b4ac68205e6690706a",
+      "scripts/audit_step09_freeze.py": "0d8646ad964da67817b4bf70b843cd98b34c2f7fc2209957f8a77a16e25a1c80",
       "scripts/run_step09_validation_smoke.py": "4ff266431e0ad108d23dbb139339d16e1aae104385d85d0ecf5c872ad2db836a",
       "src/intellitwin/decision/controls.py": "f4a7babd2e8a2cc345276cae7948e8870f8af9db3e46fc631b1504834a6f2769",
       "src/intellitwin/evaluation/artifacts.py": "091ba3e17df90dace87a68ec5e5b7e47f5fe886b8b6f615d9859113a0308ee23",
@@ -365,7 +365,8 @@
       "scripts/audit_step09_freeze.py",
       "--verification-dir",
       "experiments/pretest_verification_v3",
-      "--rebuild"
+      "--rebuild",
+      "--allow-dirty"
     ],
     "device": "cpu",
     "packages": {
@@ -377,10 +378,10 @@
     },
     "platform": "Windows-10-10.0.19045-SP0",
     "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-    "timestamp_utc": "2026-10-14T16:36:45.359988+00:00"
+    "timestamp_utc": "2026-10-14T16:40:04.381824+00:00"
   },
-  "freeze_timestamp_utc": "2026-10-14T16:36:50.764440+00:00",
-  "git_dirty": false,
+  "freeze_timestamp_utc": "2026-10-14T16:40:10.012505+00:00",
+  "git_dirty": true,
   "held_out_status": {
     "confirmatory_conclusions": "PENDING",
     "execution_status": "NOT_STARTED",
@@ -543,6 +544,6 @@
       }
     }
   },
-  "source_execution_commit": "f5d61273c05d7e6aff2ad7ba0f0a981857213b13",
+  "source_execution_commit": "4f834ade01c6295b917050153fa078aa155f7031",
   "status": "PRETEST_FROZEN"
 }

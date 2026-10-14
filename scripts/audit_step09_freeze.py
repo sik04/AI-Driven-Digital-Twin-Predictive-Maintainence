@@ -128,6 +128,7 @@ def audit_pretest_evidence(
     allow_dirty: bool = False,
     git_info: tuple[str, bool] | None = None,
     env_meta: dict[str, Any] | None = None,
+    overwrite: bool = False,
 ) -> dict[str, Any]:
     """Perform authoritative content-level verification of all pre-test readiness evidence."""
     base = Path(base_dir).resolve()
@@ -184,22 +185,23 @@ def audit_pretest_evidence(
     else:
         smoke_res = verify_validation_smoke_matrix(smoke_dir=smoke_dir, base_dir=base)
         checks["validation_smoke_verification"] = smoke_res
-        # Save content_verification.json report
+        # Save content_verification.json report if missing or overwrite requested
         content_rep_p = v_dir / "content_verification.json"
-        write_immutable_json(
-            content_rep_p,
-            {
-                "protocol_version": PROTOCOL_VERSION,
-                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
-                "git_commit": git_sha,
-                "git_dirty": git_dirty,
-                "status": smoke_res["status"],
-                "overall_match": smoke_res["overall_match"],
-                "failing_reasons": smoke_res["failing_reasons"],
-                "checks": smoke_res["checks"],
-            },
-            overwrite=True,
-        )
+        if not content_rep_p.exists() or overwrite:
+            write_immutable_json(
+                content_rep_p,
+                {
+                    "protocol_version": PROTOCOL_VERSION,
+                    "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                    "git_commit": git_sha,
+                    "git_dirty": git_dirty,
+                    "status": smoke_res["status"],
+                    "overall_match": smoke_res["overall_match"],
+                    "failing_reasons": smoke_res["failing_reasons"],
+                    "checks": smoke_res["checks"],
+                },
+                overwrite=True,
+            )
 
     # 4. Calibration Registry Transitive Integrity
     cal_reg_p = resolve_repo_relative_path(
@@ -580,6 +582,7 @@ def main() -> None:
         allow_dirty=args.allow_dirty,
         git_info=git_info,
         env_meta=env_meta,
+        overwrite=args.rebuild,
     )
     print(f"  Evidence Audit Status: {evidence_report['overall_status']}")
     if evidence_report["overall_status"] != "PASS":
