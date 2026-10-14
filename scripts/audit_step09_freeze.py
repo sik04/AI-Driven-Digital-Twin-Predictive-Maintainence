@@ -427,6 +427,11 @@ def main() -> None:
         action="store_true",
         help="Permit execution on dirty working tree (development runs only)",
     )
+    parser.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Force rebuilding protocol freeze and overwriting existing audit artifacts",
+    )
     args = parser.parse_args()
 
     v_dir = Path(args.verification_dir).resolve()
@@ -458,19 +463,25 @@ def main() -> None:
         print(f"ERROR: Cannot proceed with freeze. Overall status is {st}.")
         sys.exit(1)
 
-    # 2. Build protocol_freeze.json
-    print("\nPhase 2: Building protocol freeze...")
-    freeze_data = build_protocol_freeze(
-        evidence_report=evidence_report,
-        verification_dir=v_dir,
-        base_dir=base,
-        allow_dirty=args.allow_dirty,
-        git_info=git_info,
-        env_meta=env_meta,
-    )
     freeze_p = v_dir / "protocol_freeze.json"
-    write_immutable_json(freeze_p, freeze_data, overwrite=False)
-    print(f"  Saved protocol freeze to {freeze_p}")
+    audit_p = v_dir / "pretest_audit.json"
+
+    # 2. Build or verify protocol_freeze.json
+    print("\nPhase 2: Building protocol freeze...")
+    if freeze_p.exists() and not args.rebuild:
+        print(f"  Protocol freeze already exists at {freeze_p}")
+        print("  Skipping freeze rebuild (protocol is immutable; pass --rebuild to regenerate).")
+    else:
+        freeze_data = build_protocol_freeze(
+            evidence_report=evidence_report,
+            verification_dir=v_dir,
+            base_dir=base,
+            allow_dirty=args.allow_dirty,
+            git_info=git_info,
+            env_meta=env_meta,
+        )
+        write_immutable_json(freeze_p, freeze_data, overwrite=args.rebuild)
+        print(f"  Saved protocol freeze to {freeze_p}")
 
     # 3. Verify saved freeze and produce pretest_audit.json
     print("\nPhase 3: Verifying saved freeze and producing pretest audit...")
@@ -481,9 +492,11 @@ def main() -> None:
         git_info=git_info,
         env_meta=env_meta,
     )
-    audit_p = v_dir / "pretest_audit.json"
-    write_immutable_json(audit_p, audit_data, overwrite=False)
-    print(f"  Saved pretest audit to {audit_p}")
+    if not audit_p.exists() or args.rebuild:
+        write_immutable_json(audit_p, audit_data, overwrite=args.rebuild)
+        print(f"  Saved pretest audit to {audit_p}")
+    else:
+        print(f"  Verified against existing pretest audit at {audit_p}")
     print(f"  Overall Status: {audit_data['overall_status']}")
     print(f"  Pre-Test Readiness: {audit_data['pretest_readiness_status']}")
     print(f"  Held-Out Execution: {audit_data['held_out_execution_status']}")
