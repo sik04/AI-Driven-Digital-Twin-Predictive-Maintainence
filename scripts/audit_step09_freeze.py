@@ -300,26 +300,34 @@ def build_protocol_freeze(
         base, "experiments/calibration/selection/selection_freeze.json"
     )
 
-    # 4. Transitive Artifact Hashes (Checkpoints, Preprocessors, Calibrators)
     with open(model_reg_p, encoding="utf-8") as f:
         m_reg = json.load(f)
     checkpoint_hashes = {}
-    for entry in m_reg.get("checkpoints", {}).values():
-        p_rel = entry.get("checkpoint_path", "")
-        if p_rel:
-            checkpoint_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
+    if isinstance(m_reg, list):
+        for entry in m_reg:
+            p_rel = entry.get("checkpoint_path", "")
+            if p_rel:
+                checkpoint_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
+    elif isinstance(m_reg, dict):
+        for entry in m_reg.get("checkpoints", {}).values():
+            p_rel = entry.get("checkpoint_path", "")
+            if p_rel:
+                checkpoint_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
 
     with open(cal_reg_p, encoding="utf-8") as f:
         c_reg = json.load(f)
     calibrator_hashes = {}
-    preprocessor_hashes = {}
     for entry in c_reg.get("entries", {}).values():
         c_rel = entry.get("calibrator_artifact_path", "")
         if c_rel:
             calibrator_hashes[c_rel] = compute_sha256(resolve_repo_relative_path(base, c_rel))
-        p_rel = entry.get("preprocessor_path", "")
-        if p_rel:
-            preprocessor_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
+
+    preprocessor_hashes = {}
+    for ds in CONFIRMATORY_DATASETS:
+        p_rel = f"experiments/preprocessing/{ds}/preprocessor.json"
+        p_full = resolve_repo_relative_path(base, p_rel)
+        if p_full.exists():
+            preprocessor_hashes[p_rel] = compute_sha256(p_full)
 
     # 5. Selected Controls
     ctrl_recon_p = v_dir / "control_reconstruction.json"
