@@ -76,10 +76,10 @@
     "validation_partition_only": true
   },
   "failing_reasons": [],
-  "git_commit": "4886d8cdc7bb37b561783b4a5c0411a3c8f9f016",
-  "git_dirty": true,
+  "git_commit": "f5d61273c05d7e6aff2ad7ba0f0a981857213b13",
+  "git_dirty": false,
   "overall_match": true,
   "protocol_version": "step09-v1",
   "status": "PASS",
-  "timestamp_utc": "2026-10-14T16:14:19.269051+00:00"
+  "timestamp_utc": "2026-10-14T16:36:50.321862+00:00"
 }

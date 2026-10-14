@@ -2,7 +2,7 @@
   "bindings": {
     "base_model_registry_sha256": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
     "calibrator_registry_sha256": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
-    "content_verification_sha256": "342721c259576513e0ef0157f0656691308e8dd8f8667c317a718abd1be3e7e3",
+    "content_verification_sha256": "84e7e3fb34da847c1d683b895d6d90cde4b5317018681d9f9e3aeec76f41ac1c",
     "control_reconstruction_sha256": "3fe91090831174cb4c4ec356df0ba70d3b898aab735de8335d55361c84b2ef86",
     "control_selection_FD002_GBR_sha256": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d",
     "control_selection_FD002_LSTM_sha256": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7",
@@ -365,8 +365,7 @@
       "scripts/audit_step09_freeze.py",
       "--verification-dir",
       "experiments/pretest_verification_v3",
-      "--rebuild",
-      "--allow-dirty"
+      "--rebuild"
     ],
     "device": "cpu",
     "packages": {
@@ -378,10 +377,10 @@
     },
     "platform": "Windows-10-10.0.19045-SP0",
     "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-    "timestamp_utc": "2026-10-14T16:14:14.381103+00:00"
+    "timestamp_utc": "2026-10-14T16:36:45.359988+00:00"
   },
-  "freeze_timestamp_utc": "2026-10-14T16:14:19.769794+00:00",
-  "git_dirty": true,
+  "freeze_timestamp_utc": "2026-10-14T16:36:50.764440+00:00",
+  "git_dirty": false,
   "held_out_status": {
     "confirmatory_conclusions": "PENDING",
     "execution_status": "NOT_STARTED",
@@ -544,6 +543,6 @@
       }
     }
   },
-  "source_execution_commit": "4886d8cdc7bb37b561783b4a5c0411a3c8f9f016",
+  "source_execution_commit": "f5d61273c05d7e6aff2ad7ba0f0a981857213b13",
   "status": "PRETEST_FROZEN"
 }

@@ -1,6 +1,6 @@
 {
   "anti_leakage_passed": true,
-  "audit_timestamp_utc": "2026-10-14T16:14:35.259766+00:00",
+  "audit_timestamp_utc": "2026-10-14T16:37:00.896832+00:00",
   "bindings_passed": true,
   "content_verification_passed": true,
   "environment": {
@@ -8,8 +8,7 @@
       "scripts/audit_step09_freeze.py",
       "--verification-dir",
       "experiments/pretest_verification_v3",
-      "--rebuild",
-      "--allow-dirty"
+      "--rebuild"
     ],
     "device": "cpu",
     "packages": {
@@ -21,10 +20,10 @@
     },
     "platform": "Windows-10-10.0.19045-SP0",
     "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
-    "timestamp_utc": "2026-10-14T16:14:14.381103+00:00"
+    "timestamp_utc": "2026-10-14T16:36:45.359988+00:00"
   },
-  "git_commit": "4886d8cdc7bb37b561783b4a5c0411a3c8f9f016",
-  "git_dirty": true,
+  "git_commit": "f5d61273c05d7e6aff2ad7ba0f0a981857213b13",
+  "git_dirty": false,
   "held_out_execution_status": "NOT_STARTED",
   "matrix_counts": {
     "bootstrap_replicates": 10000,
@@ -37,7 +36,7 @@
   },
   "overall_status": "PASS",
   "pretest_readiness_status": "PRETEST_READY",
-  "protocol_freeze_sha256": "24f3a2de93d2258469b6f27ca543f3e9ab391be3b0c9b0f9dd341de546c1fa92",
+  "protocol_freeze_sha256": "81fa4af8db71da42197aafcdfc2789754e826c51c8fa73c5ac1ce7e4c6a63e6f",
   "protocol_version": "step09-v1",
   "rq_outcomes_status": "PENDING",
   "schema_version": "step09-audit-v3",
