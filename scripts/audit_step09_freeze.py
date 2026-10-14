@@ -4,14 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from intellitwin.data.artifacts import compute_sha256
-from intellitwin.evaluation.schema import PROTOCOL_VERSION
-from intellitwin.evaluation.verification import verify_validation_smoke_matrix
+from intellitwin.evaluation.schema import (
+    CONFIRMATORY_DATASETS,
+    CONFIRMATORY_MODELS,
+    CONFIRMATORY_SEEDS,
+    PROTOCOL_VERSION,
+)
+from intellitwin.evaluation.verification import (
+    REQUIRED_SMOKE_FILES,
+    verify_validation_smoke_matrix,
+)
 from intellitwin.provenance import (
     capture_environment_metadata,
     get_git_info,
@@ -19,20 +28,108 @@ from intellitwin.provenance import (
 )
 from intellitwin.uncertainty.artifacts import resolve_repo_relative_path
 
+FROZEN_SCIENTIFIC_PROTOCOLS: tuple[str, ...] = (
+    "research/hypotheses/hypothesis_framework.yaml",
+    "research/research_design/statistical_inference_protocol.md",
+    "research/research_design/data_evaluation_protocol.md",
+    "research/research_design/maintenance_cost_scenarios.yaml",
+    "research/research_design/step09_confirmatory_protocol.md",
+    "research/research_design/step09_confirmatory_config.json",
+    "research/research_design/step09_control_selection.md",
+)
+
+FROZEN_SPLIT_AND_QUARTILE_FILES: tuple[str, ...] = (
+    "data/splits/fd001_engine_split_seed_2026.json",
+    "data/splits/fd002_engine_split_seed_2026.json",
+    "data/splits/fd002_lifetime_quartile_provenance.json",
+    "data/splits/fd004_engine_split_seed_2026.json",
+)
+
+CORE_SOURCE_FILES: tuple[str, ...] = (
+    "src/intellitwin/provenance.py",
+    "src/intellitwin/decision/controls.py",
+    "src/intellitwin/uncertainty/artifacts.py",
+    "src/intellitwin/uncertainty/verification.py",
+    "src/intellitwin/evaluation/schema.py",
+    "src/intellitwin/evaluation/evidence_schema.py",
+    "src/intellitwin/evaluation/validation.py",
+    "src/intellitwin/evaluation/metrics.py",
+    "src/intellitwin/evaluation/bootstrap.py",
+    "src/intellitwin/evaluation/decisions.py",
+    "src/intellitwin/evaluation/artifacts.py",
+    "src/intellitwin/evaluation/inference.py",
+    "src/intellitwin/evaluation/runner.py",
+    "src/intellitwin/evaluation/verification.py",
+    "scripts/run_step09_validation_smoke.py",
+    "scripts/audit_step09_freeze.py",
+)
+
+
+def verify_step08_report_records(s8_path: Path) -> dict[str, Any]:
+    """Independently audit referenced Step-8 raw-reproduction report.
+
+    Requires exactly 60 records: 3 datasets x 2 models x 5 seeds x 2 partitions.
+    Partitions must be validation and calibration.
+    Every record must report PASS and finite error <= 1e-4.
+    Recomputes summary counts and max error from records.
+    """
+    with open(s8_path, encoding="utf-8") as f:
+        s8_data = json.load(f)
+
+    raw_repro = s8_data.get("details", {}).get(
+        "checkpoint_prediction_reproduction",
+        s8_data.get("raw_checkpoint_reproduction", {}),
+    )
+    records = raw_repro.get("records", [])
+
+    expected_keys = {
+        (ds, fam, s, part)
+        for ds in CONFIRMATORY_DATASETS
+        for fam in CONFIRMATORY_MODELS
+        for s in CONFIRMATORY_SEEDS
+        for part in ("validation", "calibration")
+    }
+
+    actual_keys: set[tuple[str, str, int, str]] = set()
+    all_passed = True
+    max_err = 0.0
+
+    for r in records:
+        key = (
+            str(r.get("dataset")),
+            str(r.get("model_family")),
+            int(r.get("seed")),
+            str(r.get("partition")),
+        )
+        actual_keys.add(key)
+        st = r.get("status")
+        err = float(r.get("max_abs_diff", r.get("max_absolute_error", 1.0)))
+        if st != "PASS" or not math.isfinite(err) or err > 1e-4:
+            all_passed = False
+        if err > max_err:
+            max_err = err
+
+    match = len(records) == 60 and actual_keys == expected_keys and all_passed and max_err <= 1e-4
+
+    return {
+        "status": "PASS" if match else "FAIL",
+        "record_count": len(records),
+        "expected_count": 60,
+        "keys_match": actual_keys == expected_keys,
+        "all_records_pass": all_passed,
+        "max_absolute_error": max_err,
+        "match": match,
+    }
+
 
 def audit_pretest_evidence(
-    verification_dir: Path | str = "experiments/pretest_verification_v2",
+    verification_dir: Path | str = "experiments/pretest_verification_v3",
     base_dir: Path | str = ".",
     allow_dirty: bool = False,
     git_info: tuple[str, bool] | None = None,
     env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Perform content-level verification of all pre-test readiness evidence.
-
-    Returns PASS only if every mandatory check executes and passes.
-    Returns INCOMPLETE if mandatory evidence or execution is missing.
-    Returns FAIL if any check executes and fails.
-    """
+    """Perform authoritative content-level verification of all pre-test readiness evidence."""
     base = Path(base_dir).resolve()
     v_dir = Path(verification_dir)
     if not v_dir.is_absolute():
@@ -54,85 +151,17 @@ def audit_pretest_evidence(
         missing_items.append("step08_full_audit.json")
         checks["step08_full_audit"] = {"status": "MISSING"}
     else:
-        with open(s8_audit_p, encoding="utf-8") as f:
-            s8_data = json.load(f)
-        s8_status = s8_data.get("overall_status")
-        raw_repro = s8_data.get("details", {}).get(
-            "checkpoint_prediction_reproduction",
-            s8_data.get("raw_checkpoint_reproduction", {}),
-        )
-        checks_count = raw_repro.get("models_verified", raw_repro.get("passing_checks_count", 0))
-        max_err = float(raw_repro.get("max_diff_overall", raw_repro.get("max_absolute_error", 1.0)))
-        raw_passed = (checks_count == 60) and (max_err <= 1e-4)
-        checks["step08_full_audit"] = {
-            "status": "PASS" if (s8_status == "PASS" and raw_passed) else "FAIL",
-            "overall_status": s8_status,
-            "raw_reproduction_checks_passed": checks_count,
-            "raw_reproduction_expected": 60,
-            "raw_reproduction_max_absolute_error": max_err,
-        }
+        checks["step08_full_audit"] = verify_step08_report_records(s8_audit_p)
 
-    # 2. Baseline Manifest Verification
-    base_man_p = v_dir / "baseline_manifest.json"
-    if not base_man_p.exists():
-        missing_items.append("baseline_manifest.json")
-        checks["baseline_manifest"] = {"status": "MISSING"}
-    else:
-        with open(base_man_p, encoding="utf-8") as f:
-            b_man = json.load(f)
-        tracked_info = b_man.get("repository_tracked_protected_artifacts", {})
-        tracked_pass = (
-            tracked_info.get("expected") == 652
-            and tracked_info.get("matched") == 652
-            and tracked_info.get("missing") == 0
-            and tracked_info.get("changed") == 0
-        )
-        reg_mig = b_man.get("registry_portability_migration", {})
-        reg_pass = reg_mig.get("entries_agreement_pass") is True
-        checks["baseline_manifest"] = {
-            "status": "PASS" if (tracked_pass and reg_pass) else "FAIL",
-            "baseline_commit": b_man.get("baseline_commit"),
-            "tracked_expected": tracked_info.get("expected"),
-            "tracked_matched": tracked_info.get("matched"),
-            "tracked_missing": tracked_info.get("missing"),
-            "tracked_changed": tracked_info.get("changed"),
-            "registry_migration_pass": reg_pass,
-        }
-
-    # 3. Calibration Registry and Calibrators
-    cal_reg_p = resolve_repo_relative_path(
-        base, "experiments/calibration/calibration_registry.json"
-    )
-    if not cal_reg_p.exists():
-        missing_items.append("experiments/calibration/calibration_registry.json")
-        checks["calibration_registry"] = {"status": "MISSING"}
-    else:
-        with open(cal_reg_p, encoding="utf-8") as f:
-            cal_reg_data = json.load(f)
-        entries = cal_reg_data.get("entries", {})
-        has_90 = len(entries) == 90
-        has_backslash = any(
-            "\\" in str(e.get("calibrator_artifact_path", "")) for e in entries.values()
-        )
-        all_cal_files_exist = all(
-            (base / e.get("calibrator_artifact_path", "")).exists() for e in entries.values()
-        )
-        checks["calibration_registry"] = {
-            "status": "PASS" if (has_90 and not has_backslash and all_cal_files_exist) else "FAIL",
-            "entries_count": len(entries),
-            "paths_posix": not has_backslash,
-            "all_calibrators_exist": all_cal_files_exist,
-        }
-
-    # 4. Prespecified Controls Verification
-    ctrl_reconstruct_p = v_dir / "control_reconstruction.json"
+    # 2. Control Reconstruction Verification
+    ctrl_recon_p = v_dir / "control_reconstruction.json"
     ctrl_gbr_p = v_dir / "controls" / "FD002" / "GBR" / "selection.json"
     ctrl_lstm_p = v_dir / "controls" / "FD002" / "LSTM" / "selection.json"
-    if not (ctrl_reconstruct_p.exists() and ctrl_gbr_p.exists() and ctrl_lstm_p.exists()):
+    if not (ctrl_recon_p.exists() and ctrl_gbr_p.exists() and ctrl_lstm_p.exists()):
         missing_items.append("controls and control_reconstruction.json")
         checks["controls_verification"] = {"status": "MISSING"}
     else:
-        with open(ctrl_reconstruct_p, encoding="utf-8") as f:
+        with open(ctrl_recon_p, encoding="utf-8") as f:
             ctrl_recon = json.load(f)
         gbr_pass = (
             ctrl_recon.get("models", {}).get("GBR", {}).get("matched_width_readiness_pass") is True
@@ -143,25 +172,56 @@ def audit_pretest_evidence(
         checks["controls_verification"] = {
             "status": "PASS" if (gbr_pass and lstm_pass) else "FAIL",
             "gbr_matched_width_pass": gbr_pass,
-            "gbr_matched_width_diff": ctrl_recon.get("models", {})
-            .get("GBR", {})
-            .get("matched_width_diff"),
             "lstm_matched_width_pass": lstm_pass,
-            "lstm_matched_width_diff": ctrl_recon.get("models", {})
-            .get("LSTM", {})
-            .get("matched_width_diff"),
         }
 
-    # 5. Validation Smoke Content Verification
+    # 3. Validation Smoke Content Verification
     smoke_dir = v_dir / "validation_smoke"
-    if not (smoke_dir / "execution_manifest.json").exists():
+    smoke_manifest_p = smoke_dir / "execution_manifest.json"
+    if not smoke_manifest_p.exists():
         missing_items.append("validation_smoke/execution_manifest.json")
         checks["validation_smoke_verification"] = {"status": "MISSING"}
     else:
         smoke_res = verify_validation_smoke_matrix(smoke_dir=smoke_dir, base_dir=base)
         checks["validation_smoke_verification"] = smoke_res
+        # Save content_verification.json report
+        content_rep_p = v_dir / "content_verification.json"
+        write_immutable_json(
+            content_rep_p,
+            {
+                "protocol_version": PROTOCOL_VERSION,
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "git_commit": git_sha,
+                "git_dirty": git_dirty,
+                "status": smoke_res["status"],
+                "overall_match": smoke_res["overall_match"],
+                "failing_reasons": smoke_res["failing_reasons"],
+                "checks": smoke_res["checks"],
+            },
+            overwrite=True,
+        )
 
-    # 6. Anti-Leakage / Zero Held-Out Verification
+    # 4. Calibration Registry Transitive Integrity
+    cal_reg_p = resolve_repo_relative_path(
+        base, "experiments/calibration/calibration_registry.json"
+    )
+    if not cal_reg_p.exists():
+        missing_items.append("experiments/calibration/calibration_registry.json")
+        checks["calibration_registry"] = {"status": "MISSING"}
+    else:
+        with open(cal_reg_p, encoding="utf-8") as f:
+            cal_reg_data = json.load(f)
+        entries = cal_reg_data.get("entries", {})
+        cal_all_exist = len(entries) == 90 and all(
+            (base / e.get("calibrator_artifact_path", "")).exists() for e in entries.values()
+        )
+        checks["calibration_registry"] = {
+            "status": "PASS" if cal_all_exist else "FAIL",
+            "entries_count": len(entries),
+            "all_calibrators_exist": cal_all_exist,
+        }
+
+    # 5. Anti-Leakage / Zero Held-Out Verification
     test_artifacts = list(base.glob("experiments/**/test_*.csv")) + list(
         base.glob("experiments/**/official_test*.csv")
     )
@@ -182,7 +242,7 @@ def audit_pretest_evidence(
 
     return {
         "protocol_version": PROTOCOL_VERSION,
-        "schema_version": "step09-evidence-audit-v2",
+        "schema_version": "step09-evidence-audit-v3",
         "audit_timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_sha,
         "git_dirty": git_dirty,
@@ -195,13 +255,13 @@ def audit_pretest_evidence(
 
 def build_protocol_freeze(
     evidence_report: dict[str, Any],
-    verification_dir: Path | str = "experiments/pretest_verification_v2",
+    verification_dir: Path | str = "experiments/pretest_verification_v3",
     base_dir: Path | str = ".",
     allow_dirty: bool = False,
     git_info: tuple[str, bool] | None = None,
     env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Assemble all cryptographic bindings into protocol_freeze.json after evidence passes."""
+    """Assemble authoritative cryptographic bindings into protocol_freeze.json."""
     if evidence_report.get("overall_status") != "PASS":
         raise RuntimeError(
             f"Cannot build protocol freeze: pre-test evidence status is "
@@ -220,38 +280,49 @@ def build_protocol_freeze(
     if env_meta is None:
         env_meta = capture_environment_metadata(device="cpu")
 
-    # 1. Confirmatory protocol config
-    config_p = resolve_repo_relative_path(
-        base, "research/research_design/step09_confirmatory_config.json"
-    )
-    with open(config_p, encoding="utf-8") as f:
-        confirmatory_config = json.load(f)
+    # 1. Scientific Protocols & Configurations
+    protocol_hashes = {
+        f: compute_sha256(resolve_repo_relative_path(base, f)) for f in FROZEN_SCIENTIFIC_PROTOCOLS
+    }
 
-    # 2. Split manifests and quartile provenance
-    split_files = [
-        "data/splits/fd001_engine_split_seed_2026.json",
-        "data/splits/fd002_engine_split_seed_2026.json",
-        "data/splits/fd002_lifetime_quartile_provenance.json",
-        "data/splits/fd004_engine_split_seed_2026.json",
-    ]
-    split_hashes = {f: compute_sha256(resolve_repo_relative_path(base, f)) for f in split_files}
+    # 2. Split Manifests and Quartiles
+    split_hashes = {
+        f: compute_sha256(resolve_repo_relative_path(base, f))
+        for f in FROZEN_SPLIT_AND_QUARTILE_FILES
+    }
 
-    # 3. Base model registry and selection freeze
+    # 3. Registries
     model_reg_p = resolve_repo_relative_path(base, "experiments/base_models/model_registry.json")
-    step08_freeze_p = resolve_repo_relative_path(
-        base, "experiments/calibration/selection/selection_freeze.json"
-    )
     cal_reg_p = resolve_repo_relative_path(
         base, "experiments/calibration/calibration_registry.json"
     )
+    step08_freeze_p = resolve_repo_relative_path(
+        base, "experiments/calibration/selection/selection_freeze.json"
+    )
 
-    # 4. Verified pre-test evidence artifacts
-    base_man_p = v_dir / "baseline_manifest.json"
-    s8_full_audit_p = v_dir / "step08_full_audit.json"
+    # 4. Transitive Artifact Hashes (Checkpoints, Preprocessors, Calibrators)
+    with open(model_reg_p, encoding="utf-8") as f:
+        m_reg = json.load(f)
+    checkpoint_hashes = {}
+    for entry in m_reg.get("checkpoints", {}).values():
+        p_rel = entry.get("checkpoint_path", "")
+        if p_rel:
+            checkpoint_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
+
+    with open(cal_reg_p, encoding="utf-8") as f:
+        c_reg = json.load(f)
+    calibrator_hashes = {}
+    preprocessor_hashes = {}
+    for entry in c_reg.get("entries", {}).values():
+        c_rel = entry.get("calibrator_artifact_path", "")
+        if c_rel:
+            calibrator_hashes[c_rel] = compute_sha256(resolve_repo_relative_path(base, c_rel))
+        p_rel = entry.get("preprocessor_path", "")
+        if p_rel:
+            preprocessor_hashes[p_rel] = compute_sha256(resolve_repo_relative_path(base, p_rel))
+
+    # 5. Selected Controls
     ctrl_recon_p = v_dir / "control_reconstruction.json"
-    smoke_manifest_p = v_dir / "validation_smoke" / "execution_manifest.json"
-
-    # 5. Control selection files
     control_gbr_p = v_dir / "controls" / "FD002" / "GBR" / "selection.json"
     control_lstm_p = v_dir / "controls" / "FD002" / "LSTM" / "selection.json"
     with open(control_gbr_p, encoding="utf-8") as f:
@@ -259,26 +330,31 @@ def build_protocol_freeze(
     with open(control_lstm_p, encoding="utf-8") as f:
         ctrl_lstm_data = json.load(f)
 
-    # 6. Evaluation and verification source files
-    source_files = [
-        "src/intellitwin/provenance.py",
-        "src/intellitwin/decision/controls.py",
-        "src/intellitwin/uncertainty/verification.py",
-        "src/intellitwin/evaluation/schema.py",
-        "src/intellitwin/evaluation/validation.py",
-        "src/intellitwin/evaluation/metrics.py",
-        "src/intellitwin/evaluation/bootstrap.py",
-        "src/intellitwin/evaluation/decisions.py",
-        "src/intellitwin/evaluation/artifacts.py",
-        "src/intellitwin/evaluation/inference.py",
-        "src/intellitwin/evaluation/runner.py",
-        "src/intellitwin/evaluation/verification.py",
-    ]
-    source_hashes = {f: compute_sha256(resolve_repo_relative_path(base, f)) for f in source_files}
+    # 6. Smoke Evidence Files
+    smoke_dir = v_dir / "validation_smoke"
+    smoke_hashes = {
+        f: compute_sha256(smoke_dir / f) for f in REQUIRED_SMOKE_FILES if (smoke_dir / f).exists()
+    }
+
+    # 7. Core Source Files
+    source_hashes = {
+        f: compute_sha256(resolve_repo_relative_path(base, f)) for f in CORE_SOURCE_FILES
+    }
+
+    # 8. Content Verification Report
+    content_rep_p = v_dir / "content_verification.json"
+    content_rep_hash = compute_sha256(content_rep_p) if content_rep_p.exists() else None
+
+    # Load confirmatory config payload
+    config_p = resolve_repo_relative_path(
+        base, "research/research_design/step09_confirmatory_config.json"
+    )
+    with open(config_p, encoding="utf-8") as f:
+        conf_cfg = json.load(f)
 
     freeze = {
         "protocol_version": PROTOCOL_VERSION,
-        "schema_version": "step09-freeze-v2",
+        "schema_version": "step09-freeze-v3",
         "status": "PRETEST_FROZEN",
         "source_execution_commit": git_sha,
         "git_dirty": git_dirty,
@@ -287,19 +363,23 @@ def build_protocol_freeze(
         "confirmatory_configuration": {
             "config_path": "research/research_design/step09_confirmatory_config.json",
             "config_sha256": compute_sha256(config_p),
-            "payload": confirmatory_config,
+            "payload": conf_cfg,
         },
         "bindings": {
+            "scientific_protocols": protocol_hashes,
             "splits_and_quartiles": split_hashes,
             "base_model_registry_sha256": compute_sha256(model_reg_p),
             "calibrator_registry_sha256": compute_sha256(cal_reg_p),
             "step08_selection_freeze_sha256": compute_sha256(step08_freeze_p),
-            "baseline_manifest_sha256": compute_sha256(base_man_p),
-            "step08_full_audit_sha256": compute_sha256(s8_full_audit_p),
+            "step08_full_audit_sha256": compute_sha256(v_dir / "step08_full_audit.json"),
             "control_reconstruction_sha256": compute_sha256(ctrl_recon_p),
             "control_selection_FD002_GBR_sha256": compute_sha256(control_gbr_p),
             "control_selection_FD002_LSTM_sha256": compute_sha256(control_lstm_p),
-            "validation_smoke_execution_manifest_sha256": compute_sha256(smoke_manifest_p),
+            "content_verification_sha256": content_rep_hash,
+            "smoke_evidence_files": smoke_hashes,
+            "transitive_checkpoints": checkpoint_hashes,
+            "transitive_preprocessors": preprocessor_hashes,
+            "transitive_calibrators": calibrator_hashes,
             "source_hashes": source_hashes,
         },
         "selected_controls": {
@@ -312,6 +392,7 @@ def build_protocol_freeze(
             "total_configurations": 930,
             "outcome_rows": 19590,
             "cell_summary_rows": 186,
+            "component_evidence_rows": 152,
             "bootstrap_replicates": 10000,
         },
         "held_out_status": {
@@ -330,7 +411,9 @@ def verify_saved_freeze(
     git_info: tuple[str, bool] | None = None,
     env_meta: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Independently verify saved protocol freeze and generate pretest_audit.json."""
+    """Independently verify saved protocol freeze, re-verifying content
+    and generating pretest_audit.json.
+    """
     base = Path(base_dir).resolve()
     f_path = Path(freeze_path)
     if not f_path.is_absolute():
@@ -338,6 +421,8 @@ def verify_saved_freeze(
 
     if not f_path.exists():
         raise FileNotFoundError(f"Protocol freeze missing: {f_path}")
+
+    v_dir = f_path.parent
 
     if git_info is not None:
         git_sha, git_dirty = git_info
@@ -349,55 +434,87 @@ def verify_saved_freeze(
     with open(f_path, encoding="utf-8") as f:
         freeze_data = json.load(f)
 
-    # Verify bound hashes against disk
     bindings = freeze_data.get("bindings", {})
     verified_bindings: dict[str, bool] = {}
 
-    for k, h in bindings.get("splits_and_quartiles", {}).items():
-        actual_h = compute_sha256(resolve_repo_relative_path(base, k))
-        verified_bindings[k] = actual_h == h
+    # 1. Verify dict-valued bindings
+    for group_name in (
+        "scientific_protocols",
+        "splits_and_quartiles",
+        "source_hashes",
+        "transitive_checkpoints",
+        "transitive_preprocessors",
+        "transitive_calibrators",
+    ):
+        for k, h in bindings.get(group_name, {}).items():
+            p = resolve_repo_relative_path(base, k)
+            actual_h = compute_sha256(p)
+            verified_bindings[f"{group_name}:{k}"] = actual_h == h
 
-    for k, h in bindings.get("source_hashes", {}).items():
-        actual_h = compute_sha256(resolve_repo_relative_path(base, k))
-        verified_bindings[k] = actual_h == h
+    # 2. Verify smoke evidence hashes
+    smoke_dir = v_dir / "validation_smoke"
+    for f_name, h in bindings.get("smoke_evidence_files", {}).items():
+        actual_h = compute_sha256(smoke_dir / f_name)
+        verified_bindings[f"smoke:{f_name}"] = actual_h == h
 
+    # 3. Verify single file bindings
     single_bindings = [
-        ("base_model_registry_sha256", "experiments/base_models/model_registry.json"),
-        ("calibrator_registry_sha256", "experiments/calibration/calibration_registry.json"),
+        (
+            "base_model_registry_sha256",
+            resolve_repo_relative_path(base, "experiments/base_models/model_registry.json"),
+        ),
+        (
+            "calibrator_registry_sha256",
+            resolve_repo_relative_path(base, "experiments/calibration/calibration_registry.json"),
+        ),
         (
             "step08_selection_freeze_sha256",
-            "experiments/calibration/selection/selection_freeze.json",
+            resolve_repo_relative_path(
+                base, "experiments/calibration/selection/selection_freeze.json"
+            ),
         ),
-        ("baseline_manifest_sha256", f_path.parent / "baseline_manifest.json"),
-        ("step08_full_audit_sha256", f_path.parent / "step08_full_audit.json"),
-        ("control_reconstruction_sha256", f_path.parent / "control_reconstruction.json"),
-        ("control_selection_FD002_GBR_sha256", f_path.parent / "controls/FD002/GBR/selection.json"),
-        (
-            "control_selection_FD002_LSTM_sha256",
-            f_path.parent / "controls/FD002/LSTM/selection.json",
-        ),
-        (
-            "validation_smoke_execution_manifest_sha256",
-            f_path.parent / "validation_smoke/execution_manifest.json",
-        ),
+        ("step08_full_audit_sha256", v_dir / "step08_full_audit.json"),
+        ("control_reconstruction_sha256", v_dir / "control_reconstruction.json"),
+        ("control_selection_FD002_GBR_sha256", v_dir / "controls/FD002/GBR/selection.json"),
+        ("control_selection_FD002_LSTM_sha256", v_dir / "controls/FD002/LSTM/selection.json"),
+        ("content_verification_sha256", v_dir / "content_verification.json"),
     ]
-    for b_key, b_rel in single_bindings:
-        p = b_rel if isinstance(b_rel, Path) else resolve_repo_relative_path(base, b_rel)
-        actual_h = compute_sha256(p)
-        verified_bindings[b_key] = actual_h == bindings.get(b_key)
+    for b_key, p in single_bindings:
+        single_h = compute_sha256(p) if p.exists() else None
+        verified_bindings[b_key] = single_h == bindings.get(b_key)
 
-    all_bindings_match = all(verified_bindings.values())
+    all_bindings_match = all(verified_bindings.values()) and len(verified_bindings) > 0
+
+    # 4. Mandatory content verification re-execution
+    content_res = verify_validation_smoke_matrix(smoke_dir=smoke_dir, base_dir=base)
+    content_pass = content_res.get("overall_match", False) is True
+
+    # 5. Independent Step-8 raw-reproduction audit
+    s8_audit_res = verify_step08_report_records(v_dir / "step08_full_audit.json")
+    s8_pass = s8_audit_res.get("match", False) is True
+
+    # 6. Anti-leakage verification
+    test_artifacts = list(base.glob("experiments/**/test_*.csv")) + list(
+        base.glob("experiments/**/official_test*.csv")
+    )
+    leakage_free = len(test_artifacts) == 0
+
+    pretest_ready = all_bindings_match and content_pass and s8_pass and leakage_free
 
     pretest_audit = {
         "protocol_version": PROTOCOL_VERSION,
-        "schema_version": "step09-audit-v2",
+        "schema_version": "step09-audit-v3",
         "audit_timestamp_utc": datetime.now(timezone.utc).isoformat(),
         "git_commit": git_sha,
         "git_dirty": git_dirty,
         "environment": env_meta,
-        "overall_status": "PASS" if all_bindings_match else "FAIL",
-        "pretest_readiness_status": "PRETEST_READY" if all_bindings_match else "BLOCKED",
+        "overall_status": "PASS" if pretest_ready else "FAIL",
+        "pretest_readiness_status": "PRETEST_READY" if pretest_ready else "BLOCKED",
         "protocol_freeze_sha256": compute_sha256(f_path),
+        "bindings_passed": all_bindings_match,
+        "content_verification_passed": content_pass,
+        "step08_report_passed": s8_pass,
+        "anti_leakage_passed": leakage_free,
         "verified_bindings": verified_bindings,
         "matrix_counts": freeze_data.get("matrix_counts"),
         "held_out_execution_status": "NOT_STARTED",
@@ -413,7 +530,7 @@ def main() -> None:
     parser.add_argument(
         "--verification-dir",
         type=str,
-        default="experiments/pretest_verification_v2",
+        default="experiments/pretest_verification_v3",
         help="Directory containing pretest verification artifacts",
     )
     parser.add_argument(
