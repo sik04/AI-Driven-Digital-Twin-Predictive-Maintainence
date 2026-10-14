@@ -1,0 +1,51 @@
+\section{Problem Formulation and Hypotheses}
+\label{sec:problem_formulation}
+
+\subsection{Trajectory Formulation and Dual-Horizon Targets}
+Let $i \in \{1, \dots, N\}$ denote an engine unit, and let $t \in \{1, \dots, T_i\}$ denote operational flight cycles, where $T_i$ is the cycle of total failure. At each cycle $t$, an engine produces raw telemetry $x_{it} \in \mathbb{R}^{17}$ comprising 3 operating settings and 14 qualified degradation sensors.
+
+Causal sliding windows of length $W = 30$ cycles with stride 1 and strictly no padding are extracted:
+\begin{equation}
+X_{it} = [x_{i, t-29}, \; x_{i, t-28}, \; \dots, \; x_{it}] \in \mathbb{R}^{30 \times 17}
+\end{equation}
+Qualified inference endpoints are $V_i = \{30, 31, \dots, T_i\}$, yielding $n_i = T_i - 29$ valid predictions.
+
+Under ADR-012, two distinct target horizons are formalized:
+\begin{align}
+\cappedRUL(t) &= \min\left(125, \; T_i - t\right) \quad \text{(Capped Training Target)} \\
+\trueRUL(t) &= T_i - t \quad \text{(Uncapped Evaluation \& Calibration Target)}
+\end{align}
+Base models are optimized on $\cappedRUL$ to prevent overfitting on early-life sensor plateaus. Calibration nonconformity scores and downstream maintenance simulations evaluate true uncapped longevity $\trueRUL$.
+
+\subsection{Conformal Prediction Intervals}
+Given a base predictor point estimate $p_{it} = \max(0.0, \; \hat{y}(X_{it}))$, a conformal calibrator constructs a prediction interval:
+\begin{equation}
+C(X_{it}) = [L_{it}, \; U_{it}]
+\end{equation}
+such that empirical marginal coverage satisfies $\mathbb{P}(\trueRUL \in C(X)) \ge 1 - \alpha$. In this study, nominal coverage is set to 90\% ($\alpha = 0.10$), with secondary sensitivities at 80\% and 95\%.
+
+\subsection{The Pre-Registered Hypothesis Framework (ADR-018)}
+The study evaluates four pre-registered hypotheses governed by the following decision logic:
+\begin{itemize}
+  \item \textbf{RQ1 (Maintenance Utility)}:
+    \begin{align*}
+      H_{0,1}&: \Deltacost \le 0.20~\SCU \text{ or } E_{\text{coverage}} \ge 0.05 \text{ or } \Deltafail > 0.0 \\
+      H_{1,1}&: \Deltacost > 0.20~\SCU \text{ and } E_{\text{coverage}} < 0.05 \text{ and } \Deltafail \le 0.0
+    \end{align*}
+    evaluated against \texttt{global\_hcp} and \texttt{regime\_hcp} under \texttt{primary\_reference} on FD002.
+  \item \textbf{RQ2 (Subgroup Reliability)}:
+    \begin{align*}
+      H_{0,2}&: \Deltaerror \le 0.01 \text{ or } \Dwidth \ge 1.0 \text{ or } \Dscore \ge 1.0 \\
+      H_{1,2}&: \Deltaerror > 0.01 \text{ and } \Dwidth < 1.0 \text{ and } \Dscore < 1.0
+    \end{align*}
+    evaluated across operating regimes ($C_1$--$C_6$) and lifecycle stages (Early/Mid/Late).
+  \item \textbf{RQ3 (Decision-Value Attribution)}:
+    \begin{equation}
+      H_{1,3}: \Deltacost > 0.20~\SCU \text{ over \textbf{all four} prespecified matched controls}
+    \end{equation}
+  \item \textbf{RQ4 (Generalization \& Non-Harm)}:
+    \begin{equation}
+      H_{1,4}: \Deltacost^{\text{agg}} > 0.20~\SCU, \; \Deltaerror^{\text{agg}} > 0.01, \text{ and no cell harm}
+    \end{equation}
+    evaluated across the balanced 6-cell matrix (FD001, FD002, FD004 $\times$ GBR, LSTM).
+\end{itemize}

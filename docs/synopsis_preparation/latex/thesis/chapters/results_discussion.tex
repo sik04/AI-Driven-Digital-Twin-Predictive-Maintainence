@@ -1,0 +1,116 @@
+\chapter{Results and Discussion}
+\label{chap:results_discussion}
+
+\begin{quote}
+\itshape
+\textbf{Status Notice:} The empirical evaluations and analytical tables reported in this chapter represent the pre-registered reporting templates for the confirmatory evaluation. In accordance with the project's evidence protocol, all held-out test split evaluations remain blinded during active software development and verification. Empirical entries are designated \texttt{PENDING} awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
+\end{quote}
+
+\section{Point Degradation Predictor Evaluation}
+Point prediction accuracy on the held-out test engine splits is evaluated using Root Mean Squared Error ($\text{RMSE}$) and Mean Absolute Error ($\text{MAE}$) computed with equal weighting across test engines. Table~\ref{tab:thesis_point_prediction} outlines the evaluation structure.
+
+\begin{table}[htbp]
+\centering
+\caption{Point Prediction Performance on Held-Out Test Engines (Mean $\pm$ Std across 5 Seeds)}
+\label{tab:thesis_point_prediction}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Dataset} & \textbf{Architecture} & \textbf{RMSE (cycles)} & \textbf{MAE (cycles)} \\
+\midrule
+FD001 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD001 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\midrule
+FD002 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD002 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\midrule
+FD004 & GBR  & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+FD004 & LSTM & \textit{PENDING (UPD-02)} & \textit{PENDING (UPD-02)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Conformal Interval Calibration Evaluation}
+Conformal prediction intervals are evaluated at nominal confidence level $1-\alpha = 0.90$ across methods: uncalibrated baseline (Gaussian heuristic), Global HCP, Regime-Stratified HCP, and Decision-Aware HCP. Metrics comprise engine-weighted empirical coverage ($\text{Cov}$), mean interval width ($\bar{W}$), and Winkler interval score ($\text{IS}_{0.10}$). Table~\ref{tab:thesis_calibration_performance} summarizes the evaluation grid.
+
+\begin{table}[htbp]
+\centering
+\caption{Interval Calibration Performance at Nominal $90\%$ Confidence Level on Held-Out Test Splits}
+\label{tab:thesis_calibration_performance}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Dataset} & \textbf{Model} & \textbf{Method} & \textbf{Empirical Cov. (\%)} & \textbf{Mean Width} & \textbf{Winkler Score} \\
+\midrule
+FD001 & GBR & Uncalibrated Baseline & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD001 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD002 & GBR & Global HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Regime HCP            & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Decision-Aware HCP    & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD002 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\midrule
+FD004 & LSTM & Global HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Regime HCP           & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+FD004 & LSTM & Decision-Aware HCP   & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Sequential Maintenance Policy Outcomes}
+Downstream maintenance outcomes under the primary economic scenario ($C_{\text{preventive}}=10$, $C_{\text{unplanned}}=100$, lead-time $L_{\text{lead}}=2$) are reported in Table~\ref{tab:thesis_maintenance_outcomes}. Metrics include mean maintenance cost per engine ($\bar{C}$), unplanned failure proportion ($P_{\text{fail}}$), and mean wasted operational life ($\bar{U}$).
+
+\begin{table}[htbp]
+\centering
+\caption{Sequential Maintenance Policy Outcomes on Held-Out Test Engines ($C_{\text{prev}}=10, C_{\text{unplanned}}=100, L_{\text{lead}}=2$)}
+\label{tab:thesis_maintenance_outcomes}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Dataset} & \textbf{Model} & \textbf{Policy Strategy} & \textbf{Cost / Engine} & \textbf{Failures (\%)} & \textbf{Wasted Life} \\
+\midrule
+FD002 & GBR & Uncalibrated Point Policy & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Point Safety Margin (+10) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Matched-Width Interval    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Widened Interval ($1.25\times$) & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Earlier Intervention (+15)& \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Global HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Regime HCP Lower Bound    & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+FD002 & GBR & Decision-Aware HCP Bound  & \textit{PENDING (UPD-03)} & \textit{PENDING} & \textit{PENDING} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Hypothesis Decisions (RQ1--RQ4)}
+Confirmatory statistical inference is conducted via 10,000 paired engine-level cluster bootstrap resamples. Table~\ref{tab:thesis_hypothesis_matrix} presents the formal decision matrix with Bonferroni-corrected $98.75\%$ confidence intervals.
+
+\begin{table}[htbp]
+\centering
+\caption{Pre-Registered Confirmatory Hypothesis Decisions and Statistical Contrasts}
+\label{tab:thesis_hypothesis_matrix}
+\begin{tabular}{lllccc}
+\toprule
+\textbf{Hypothesis} & \textbf{Contrast Metric} & \textbf{Decision Rule / Threshold} & \textbf{Estimate} & \textbf{98.75\% CI} & \textbf{Final Decision} \\
+\midrule
+\textbf{H1 (Coverage)} & $\text{Cov}(\text{HCP}) - 0.90$ & $\text{CI}_{\text{lower}} \ge 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H2 (Cost)}     & $(\bar{C}_{\text{point}} - \bar{C}_{\text{HCP}})/\bar{C}_{\text{point}}$ & $\text{CI}_{\text{lower}} \ge 0.05 \land \Delta_{\text{fail}} \le 0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H3 (Controls)} & $\bar{C}_{\text{ctrl}} - \bar{C}_{\text{HCP}}$ & $\text{CI}_{\text{lower}} > 0 \lor (\Delta C \ge 0 \land \Delta_{\text{fail}} \le 0)$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\textbf{H4 (Regimes)}  & $\text{Cov}_{\text{worst}}(\text{Regime}) - \text{Cov}_{\text{worst}}(\text{Global})$ & $\text{CI}_{\text{lower}} > 0.00$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING (UPD-04)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Methodological Discussion}
+\subsection{Conservatism, Asymmetric Penalties, and Negative $\beta$}
+The asymmetry parameter $\beta = -\ln 2 \approx -0.6931$ modulates the nonconformity scaling factors $a(p_t) = \exp(-\beta \cdot p_t)$ and $b(p_t) = \exp(\beta \cdot p_t)$. For negative $\beta$, as estimated failure probability $p_t$ increases, $a(p_t)$ decreases below $1$, contracting the lower distance and shifting the unclipped lower bound $L_t$ upward. 
+
+However, as established in the project's statistical protocol, negative $\beta$ does not mathematically guarantee earlier maintenance across all operational trajectories. Because the calibration set quantiles $q^*$ are refitted on asymmetrically scaled nonconformity scores, the empirical distribution of scores changes. Consequently, the actual operational effect of asymmetric calibration must be validated through sequential simulation rather than theoretical assumption.
+
+\subsection{Interpreting Potential Hypothesis Outcomes}
+The pre-registered protocol explicitly pre-commits to objective interpretation:
+\begin{itemize}
+    \item \textbf{Supported}: Lower confidence bounds strictly exceed practical-effect margins, confirming that conformal calibration provides operational value beyond heuristic baselines.
+    \item \textbf{Inconclusive}: Statistical power is insufficient to resolve the practical margin, cataloging the result as requiring larger fleet sample sizes.
+    \item \textbf{Unsupported}: Practical thresholds are breached or safety constraints violated, directly falsifying the hypothesis and concluding that simpler baselines suffice.
+\end{itemize}

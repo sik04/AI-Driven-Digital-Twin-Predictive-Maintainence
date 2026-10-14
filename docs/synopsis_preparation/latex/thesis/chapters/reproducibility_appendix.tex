@@ -1,0 +1,55 @@
+\chapter{Reproducibility Protocol and Artifact Registry}
+\label{chap:reproducibility}
+
+\section{Replication Charter and Codebase Structure}
+The IntelliTwin framework is engineered for complete scientific reproducibility. All code, configuration files, dataset split manifests, and audit reports are version-controlled in the official repository:
+\begin{center}
+\url{https://github.com/sik04/AI-Driven-Digital-Twin-Predictive-Maintainence}
+\end{center}
+The canonical reference commit for all methodology, architecture decisions, and frozen parameters described in this dissertation is:
+\begin{center}
+\texttt{224c741f5f3da19821a708e0a6da417d4810e9da}
+\end{center}
+
+\section{Software Environment and Dependencies}
+The framework is verified on Python 3.10+ (64-bit). The production environment requires the following core dependencies:
+\begin{itemize}
+    \item \texttt{numpy} $\ge 1.24.0$ (backed by \texttt{PCG64} PRNG);
+    \item \texttt{scipy} $\ge 1.10.0$;
+    \item \texttt{pandas} $\ge 2.0.0$;
+    \item \texttt{scikit-learn} $\ge 1.2.0$;
+    \item \texttt{lightgbm} $\ge 4.0.0$;
+    \item \texttt{torch} $\ge 2.0.0$;
+    \item \texttt{pyyaml} $\ge 6.0$.
+\end{itemize}
+
+\section{Execution Commands and Audit Pipelines}
+The repository includes automated execution and auditing scripts to verify data pipelines, model registries, and calibration bundles:
+\begin{enumerate}
+    \item \textbf{Data Pipeline Verification}:
+\begin{verbatim}
+python -m pytest tests/test_data_pipeline.py
+\end{verbatim}
+    \item \textbf{Base Model Registry Audit}:
+\begin{verbatim}
+python scripts/audit_step07_models.py
+\end{verbatim}
+    \item \textbf{Conformal Calibration Audit}:
+\begin{verbatim}
+python scripts/audit_step08_calibration.py
+\end{verbatim}
+    \item \textbf{Pre-Test Confirmatory Freeze Verification}:
+\begin{verbatim}
+python scripts/audit_step09_freeze.py
+\end{verbatim}
+    \item \textbf{Smoke Test Execution}:
+\begin{verbatim}
+python scripts/run_step09_validation_smoke.py
+\end{verbatim}
+\end{enumerate}
+
+\section{Demarcation of Clean-Environment Verification}
+\begin{quote}
+\itshape
+\textbf{Reproducibility Notice:} In accordance with research integrity standards, independent clean-environment reproducibility (executing complete model retraining and calibration fitting from raw data in an isolated container) has not yet been executed by this agent. Clean-environment verification is formally tracked as an independent release gate under \texttt{UPD-07}.
+\end{quote}

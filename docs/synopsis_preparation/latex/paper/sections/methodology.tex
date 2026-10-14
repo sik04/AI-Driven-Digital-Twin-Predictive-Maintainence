@@ -1,0 +1,71 @@
+\section{Proposed Methodology}
+\label{sec:methodology}
+
+\subsection{Data Pipeline, Preprocessing, and Leakage Controls}
+The empirical pipeline processes C-MAPSS subsets FD001, FD002, and FD004 (totaling 609 engines). All data partitioning is executed strictly at the independent engine cluster level: approximately 50\% training, 20\% calibration, 10\% validation, and 20\% held-out test engines (manifests preserved in \texttt{data/splits/}).
+
+A locked 17-feature schema is enforced under ADR-013: 3 operational flight settings (altitude, Mach number, throttle resolver angle) and 14 informative degradation sensors (pruning 7 sensors exhibiting zero or near-zero variance). All preprocessor scaling parameters (medians and interquartile ranges) and K-Means operational regime cluster centroids ($K=6$) are fit strictly on the training partition; calibration, validation, and test engines are transformed using frozen training scalers.
+
+Causal temporal windowing extracts chronological sequences of length $W=30$ cycles with stride 1 and strictly no padding. To ensure fair architectural comparison under an identical temporal information horizon, the LSTM receives sequential tensors of shape $(30, 17)$, while the GBR receives flattened 510-dimensional vectors ($30 \times 17$).
+
+\subsection{Frozen Base Predictor Matrix}
+Under ADR-019 and ADR-020, two point-predictor model families were optimized on validation data across seeds 2026--2027 and trained across five official research seeds (\texttt{2026, 2027, 2028, 2029, 2030}):
+\begin{itemize}
+  \item \textbf{Histogram Gradient Boosting Regressor (GBR)}: Scikit-learn \texttt{HistGradientBoostingRegressor} operating on flattened 510-dim vectors. Winning configurations: \texttt{gbr\_lr010\_leaf15\_l2\_0} for FD001 (RMSE 28.42 cycles), and \texttt{gbr\_lr010\_leaf31\_l2\_0} for FD002 (RMSE 34.66 cycles) and FD004 (RMSE 48.83 cycles). Execution is fully deterministic across seeds ($\sigma_{\text{RMSE}} = 0.0000$).
+  \item \textbf{Unidirectional LSTM}: PyTorch LSTM ($H=64$, dropout $0.20$, learning rate $\eta = 0.0010$) with early stopping on validation uncapped RMSE. Winning configuration: \texttt{lstm\_h64\_lr0010} across all datasets (Validation RMSE: FD001 = 30.08, FD002 = 35.25, FD004 = 48.25 cycles; seed standard deviation $\sigma \le 0.36$ cycles).
+\end{itemize}
+All 30 checkpoints are hashed and immutably indexed in \texttt{experiments/base\_models/model\_registry.json}.
+
+\subsection{Hierarchical Engine-Weighted Conformal Calibration}
+Standard pooled conformal prediction introduces survivor bias in industrial run-to-failure telemetry because long-lived engines contribute more sliding windows than short-lived units. To establish finite-sample guarantees for unseen engines, IntelliTwin implements hierarchical engine-weighted quantiles following Lee, Barber, and Willett~\cite{lee2023hierarchical}.
+
+Let $m$ denote the number of calibration engines contributing valid endpoints, where engine $i$ contains $n_i = T_i - 29$ valid endpoints. Each individual endpoint $(i, t)$ receives an exact mass:
+\begin{equation}
+w_{it} = \frac{1}{m \cdot n_i}
+\end{equation}
+ensuring that every engine contributes exactly $\frac{1}{m}$ of total finite weight. Total finite probability mass is bounded by $\frac{m}{m+1}$, with the remaining $\frac{1}{m+1}$ probability mass assigned to $+\infty$:
+\begin{equation}
+\quantfinal(q) = \frac{1}{m + 1} \sum_{i=1}^m \frac{1}{n_i} \sum_{t=1}^{n_i} \mathbb{I}(s_{it} \le q)
+\end{equation}
+The conformal threshold $q^*$ for nominal coverage $1 - \alpha$ is the smallest score satisfying $\quantfinal(q^*) \ge 1 - \alpha$. If no finite score satisfies this condition, $q^* = +\infty$. Quantiles are computed using exact rational arithmetic (\texttt{fractions.Fraction}).
+
+\subsection{Formulations of Evaluated Conformal Methods}
+Let $p \ge 0$ denote the base point prediction, $y = \trueRUL \ge 0$ denote uncapped ground-truth RUL, and $g \in \{C_1, \dots, C_6\}$ denote the observed operational regime.
+
+\subsubsection{Global Hierarchical Conformal Prediction (\texttt{global\_hcp})}
+Uses symmetric absolute residuals:
+\begin{equation}
+s(p, y) = |y - p|
+\end{equation}
+A single global threshold $q_{\text{global}}$ is fitted, yielding:
+\begin{equation}
+L = \max(0, \; p - q_{\text{global}}), \quad U = p + q_{\text{global}}
+\end{equation}
+
+\subsubsection{Condition-Aware Hierarchical Conformal Prediction (\texttt{regime\_hcp})}
+Uses symmetric absolute residuals, fitting separate regime-specific thresholds $q_g$ for each operating regime $g$:
+\begin{equation}
+L = \max(0, \; p - q_g), \quad U = p + q_g
+\end{equation}
+If regime $g$ contains fewer than $m_g = \max(10, \lceil 1/\alpha \rceil - 1)$ calibration engines, execution falls back automatically to $q_{\text{global}}$ with logging.
+
+\subsubsection{Proposed Decision-Aware Asymmetric Conformal Prediction (\texttt{decision\_aware\_hcp})}
+Modulates interval width and asymmetry near the critical end-of-life decision boundary:
+\begin{align}
+\sigma(p) &= \left(1 + \frac{p}{125}\right)^\gamma, \quad z(p) = \exp\left(-\frac{p}{20}\right) \\
+a(p) &= \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))
+\end{align}
+where $\gamma \in \{0, 1, 2\}$ is the scaling exponent and $\beta = \betacode \ln(2)$ with $\betacode \in \{-1, 0, 1\}$ governs asymmetry. The nonconformity score and inverted interval are:
+\begin{equation}
+\text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)
+\end{equation}
+\begin{equation}
+L = \max\left(0, \; p - q_g \cdot a(p)\right), \quad U = p + q_g \cdot b(p)
+\end{equation}
+
+\subsection{Mathematical Mechanics of Negative Beta ($\beta < 0$)}
+When $\betacode = -1$ ($\beta = -\ln 2 \approx -0.693147$), as $p \to 0$ near end of life ($z(p) \to 1$), $a(p)$ is halved ($\sigma(p) \cdot 0.5$) while $b(p)$ is doubled ($\sigma(p) \cdot 2.0$). 
+
+\textit{Critical Mathematical Fact:} Holding $p$, $q$, and $\gamma$ fixed, negative $\beta$ decreases the lower-side scale $a(p)$ and increases the upper-side scale $b(p)$, which causes the unclipped lower bound $p - q_g \cdot a(p)$ to \textbf{rise} (or remain at zero after clipping). This mathematical fact does not justify claiming earlier replacement or guaranteed failure protection; refitted empirical nonconformity thresholds $q^*$ differ between candidates, and true operational utility must be measured directly through sequential maintenance simulation.
+
+In leave-one-engine-out validation selection across seeds 2026--2030, candidate \texttt{gamma2\_betam1} ($\gamma=2, \betacode=-1$) was selected as the optimal feasible configuration across all six mandatory cells and frozen under ADR-021.

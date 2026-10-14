@@ -1,0 +1,15 @@
+\section{Research Problem and Objectives}
+
+\subsection{Research Problem Formulation}
+Existing literature separately evaluates conformal uncertainty calibration, operating-condition diagnostics, and uncertainty-aware maintenance scheduling. What remains insufficiently established is a Remaining Useful Life (RUL) prediction methodology that jointly adapts uncertainty calibration to operating conditions and downstream sequential replacement consequences while preserving reliable interval coverage.
+
+Our study investigates whether decision-aware, condition-adaptive conformal calibration can improve sequential maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.
+
+\subsection{Formal Research Questions}
+In accordance with the frozen research protocol (ADR-018), four pre-registered questions are evaluated:
+\begin{itemize}
+  \item \textbf{RQ1 (Sequential Maintenance Utility \& Coverage)}: Can the proposed calibration method improve sequential maintenance utility by at least $0.20~\SCU$ per engine over both global and standard condition-aware calibration while maintaining absolute coverage errors below $0.05$ on C-MAPSS FD002?
+  \item \textbf{RQ2 (Conditional Subgroup Reliability)}: Can the proposed method improve worst-group coverage error by at least $0.01$ across operating regimes and degradation stages without worsening mean prediction interval width or Winkler score by $1.0$~cycle or more?
+  \item \textbf{RQ3 (Decision-Value Attribution)}: Are observed maintenance utility gains attributable to decision-aware calibration rather than trivial over-conservatism, demonstrated by outperforming four prespecified matched-conservatism control configurations across three families?
+  \item \textbf{RQ4 (Robustness \& Generalization)}: Does the proposed method retain its maintenance and calibration benefits across an evaluation matrix of six mandatory cells (FD001, FD002, FD004 $\times$ GBR, LSTM) without material harm in any individual cell?
+\end{itemize}

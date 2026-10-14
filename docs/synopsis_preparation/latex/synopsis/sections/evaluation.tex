@@ -1,0 +1,14 @@
+\section{Experimental Evaluation Protocol}
+
+\subsection{Statistical Uncertainty and Engine-Level Resampling}
+To account for trajectory autocorrelation, all comparative inferences use paired engine-cluster bootstrap resampling with replacement ($B = 10{,}000$ resamples) stratified by lifetime quartiles ($Q_1$--$Q_4$). The pseudo-random number generator is \texttt{PCG64} seeded via \texttt{SeedSequence([2026, 6, dataset\_number])}.
+
+Multiplicity control across the four research questions is enforced at $\alpha_{\text{fam}} = 0.05 / 4 = 0.0125$ via Bonferroni correction, yielding **98.75\% decision intervals** ($\alpha = [0.00625, 0.99375]$). In accordance with intersection-union testing (IUT), full support for an RQ requires every single component condition to clear its boundary at the 98.75\% decision level.
+
+\subsection{Frozen Decision Rules and Practical Margins}
+\begin{itemize}
+  \item \textbf{RQ1 (Utility \& Coverage)}: Lower CI of $\Deltacost > 0.20~\SCU$ per engine vs.\ both \texttt{global\_hcp} and \texttt{regime\_hcp}; upper CI of marginal, worst-regime, and worst-stage coverage errors $< 0.05$; observed fleet failure rate increase $\Deltafail \le 0.0$.
+  \item \textbf{RQ2 (Subgroup Reliability)}: Lower CI of $\Deltaerror > 0.01$ vs.\ both baselines across operating regimes ($C_1$--$C_6$) and lifecycle stages (Early/Mid/Late); upper CI of worst-group error $< 0.05$; upper CI of MPIW and interval score expansion $\Dwidth, \Dscore < 1.0$~cycle.
+  \item \textbf{RQ3 (Decision-Value Attribution)}: Lower CI of $\Deltacost > 0.20~\SCU$ over \textbf{all four} prespecified matched-conservatism controls across three families (matched width, widened interval, point safety margin, earlier intervention) selected on validation engines under ADR-023.
+  \item \textbf{RQ4 (Generalization)}: Weighted aggregate lower CI of $\Deltacost > 0.20~\SCU$ and $\Deltaerror > 0.01$, combined with cell-level non-harm bounds ($\Deltacost > -0.20~\SCU$, $\Deltaerror > -0.01$) across all six mandatory evaluation cells.
+\end{itemize}

@@ -1,0 +1,67 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{cite}
+
+% Shared notation macros
+\input{../shared/notation.tex}
+
+\begin{document}
+
+\title{IntelliTwin: Asymmetric, Condition-Adaptive Conformal Prediction for Industrial Turbofan Predictive Maintenance\\
+\thanks{This research draft reflects pre-registered methodology and protocol specifications frozen under commit \texttt{224c741f5f3da19821a708e0a6da417d4810e9da}. Held-out experimental results are blinded and pending completion of experimental verification gates (UPD-02, UPD-03, UPD-04).}
+}
+
+\author{
+\IEEEauthorblockN{Mayank Singh}
+\IEEEauthorblockA{\textit{Software Development \& Experimental Verification} \\
+IntelliTwin Research Initiative \\
+Email: \textit{pending-institutional-records}}
+\and
+\IEEEauthorblockN{Shiksha Pandey}
+\IEEEauthorblockA{\textit{Theoretical Formulation \& Methodology} \\
+IntelliTwin Research Initiative \\
+Email: \textit{pending-institutional-records}}
+\and
+\IEEEauthorblockN{Ruchi Gupta}
+\IEEEauthorblockA{\textit{Research Supervision \& Evaluation Review} \\
+IntelliTwin Research Initiative \\
+Email: \textit{pending-institutional-records}}
+}
+
+\maketitle
+
+\begin{abstract}
+Predictive maintenance for industrial gas turbine engines requires timely, risk-calibrated replacement decisions to prevent catastrophic in-flight failures while minimizing premature overhaul costs. Conventional Remaining Useful Life (RUL) prognostic systems rely on point regression models that optimize cycle-level accuracy metrics without quantifying predictive uncertainty or aligning with asymmetric maintenance cost structures. 
+
+In this work, we present \textbf{IntelliTwin}, a framework integrating data-driven base predictors (Gradient Boosted Regressors and Long Short-Term Memory networks) with hierarchical, decision-aware conformal prediction. IntelliTwin enforces strict engine-level disjoint data partitioning, causal temporal windowing ($w=30$, stride 1), equal engine weighting across all evaluations, and condition-stratified conformal calibration. By incorporating an asymmetric loss parameter ($\beta = -\ln 2$), the framework modulates nonconformity scores to reflect the severe cost penalties of component failure relative to preventive replacement. 
+
+We formalize an experimental evaluation protocol across NASA C-MAPSS sub-datasets FD001, FD002, and FD004, comparing calibrated lower bounds against four distinct matched-conservatism baselines across three families. Statistical significance is evaluated via paired engine-cluster bootstrap inference ($B=10{,}000$) with pre-registered practical-effect margins and Bonferroni family-wise error rate control ($98.75\%$ confirmatory confidence intervals). 
+
+\textit{Provisional Status Statement:} This document represents the pre-registered methodology and evaluation structure; empirical evaluation on the held-out test splits remains pending experimental execution under stable update gates UPD-02, UPD-03, and UPD-04.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Predictive Maintenance, Conformal Prediction, Remaining Useful Life, Turbofan Engines, Digital Twin, Asymmetric Loss, C-MAPSS.
+\end{IEEEkeywords}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/problem_formulation}
+\input{sections/methodology}
+\input{sections/experimental_setup}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{../../references_verified}
+
+\end{document}

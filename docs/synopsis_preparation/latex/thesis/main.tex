@@ -1,0 +1,113 @@
+\documentclass[12pt,a4paper,oneside]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+% Shared notation macros
+\input{../shared/notation.tex}
+
+\onehalfspacing
+
+\begin{document}
+
+% -------------------------------------------------------------
+% Title Page
+% -------------------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{1.5cm}
+
+{\Huge \bfseries IntelliTwin: Asymmetric, Condition-Adaptive Conformal Prediction for Industrial Turbofan Predictive Maintenance\par}
+
+\vspace{1.5cm}
+{\Large \bfseries Research Dissertation — Comprehensive Working Draft\par}
+\vspace{0.5cm}
+{\large Pre-Registered Methodology and Experimental Protocol (Frozen Commit \texttt{224c741})\par}
+\vspace{0.3cm}
+{\itshape Final Empirical Results Blinded Pending Experimental Execution (Gates UPD-02, UPD-03, UPD-04)\par}
+
+\vspace{2.0cm}
+{\large \textbf{Authors:}\par}
+\vspace{0.3cm}
+{\Large Mayank Singh, Shiksha Pandey, Ruchi Gupta\par}
+\vspace{0.5cm}
+{\large IntelliTwin Research Initiative\par}
+
+\vspace{2.5cm}
+{\large \textbf{Institutional Specification:}\par}
+\vspace{0.2cm}
+{\itshape Degree, Department, Faculty, and University affiliations are designated \texttt{PENDING\_INSTITUTIONAL\_SPECIFICATION} awaiting formal administrative assignment.\par}
+
+\vfill
+{\large October 2026\par}
+\end{titlepage}
+
+% -------------------------------------------------------------
+% Declarations & Certificate Placeholders
+% -------------------------------------------------------------
+\pagenumbering{roman}
+\setcounter{page}{2}
+
+\chapter*{Institutional Declaration and Submission Notice}
+\begin{quote}
+\itshape
+\textbf{Administrative Status Notice:} In accordance with research documentation governance, all statutory declarations, certificates of originality, supervisor approval certificates, and institutional degree award specifications remain explicitly designated \texttt{PENDING\_INSTITUTIONAL\_SPECIFICATION}. No signatures, supervisor approvals, or institutional endorsements have been fabricated.
+
+This volume represents an evidence-linked, pre-registered academic dissertation draft establishing the theoretical foundation, methodological architecture, calibration pipelines, and confirmatory statistical protocols.
+\end{quote}
+
+\chapter*{Abstract}
+Predictive maintenance for safety-critical aviation assets requires balancing the catastrophic safety and financial hazards of unplanned in-flight engine failures against the economic waste of premature component retirement. Conventional prognostic models focus on minimizing cycle-level Remaining Useful Life (RUL) regression errors without quantifying predictive uncertainty or accommodating asymmetric maintenance loss functions.
+
+In this dissertation, we develop and formalize \textbf{IntelliTwin}, an end-to-end framework integrating data-driven degradation predictors (Gradient Boosted Regressors and recurrent Long Short-Term Memory networks) with hierarchical, decision-aware conformal prediction. The framework enforces strict engine-level disjoint data partitioning (304 training, 122 calibration, 61 validation, and 122 held-out test engines across NASA C-MAPSS sub-datasets FD001, FD002, and FD004), causal sliding temporal windows ($w=30$, stride 1), exact rational engine-weighted empirical quantiles, and condition-stratified conformal calibration with deterministic fallback rules. Nonconformity scoring incorporates an asymmetric loss parameter ($\beta = -\ln 2$) that penalizes dangerous RUL overestimation.
+
+Downstream operational utility is evaluated through discrete-event fleet maintenance simulation. To determine whether observed cost benefits stem from calibrated uncertainty rather than simple over-conservatism, IntelliTwin is evaluated against four named controls across three baseline families (matched-width heuristic intervals, widened intervals, point safety margins, and earlier fixed interventions). Confirmatory hypothesis testing is governed by paired engine-level cluster bootstrap inference ($B = 10{,}000$) with pre-registered practical-effect margins and Bonferroni family-wise error rate control ($98.75\%$ confidence intervals).
+
+\textit{Provisional Status Notice:} The empirical entries reported on held-out test splits are currently blinded awaiting completion of software verification and experimental execution gates (UPD-02, UPD-03, UPD-04).
+
+% -------------------------------------------------------------
+% Contents, Figures, Tables
+% -------------------------------------------------------------
+\tableofcontents
+\listoffigures
+\listoftables
+
+% -------------------------------------------------------------
+% Main Chapters
+% -------------------------------------------------------------
+\clearpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{chapters/introduction}
+\input{chapters/literature_review}
+\input{chapters/problem_hypotheses}
+\input{chapters/methodology}
+\input{chapters/implementation}
+\input{chapters/experimental_design}
+\input{chapters/results_discussion}
+\input{chapters/limitations_conclusion}
+
+% -------------------------------------------------------------
+% Appendices
+% -------------------------------------------------------------
+\appendix
+\input{chapters/reproducibility_appendix}
+
+% -------------------------------------------------------------
+% Bibliography
+% -------------------------------------------------------------
+\clearpage
+\bibliographystyle{IEEEtran}
+\bibliography{../../references_verified}
+
+\end{document}

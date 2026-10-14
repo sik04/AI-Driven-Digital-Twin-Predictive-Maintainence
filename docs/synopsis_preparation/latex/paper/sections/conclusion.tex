@@ -1,0 +1,26 @@
+\section{Conclusion and Future Work}
+\label{sec:conclusion}
+
+\subsection{Summary of Methodological Framework}
+In this investigation, we formulated and pre-registered the IntelliTwin prognostic and predictive maintenance framework. Designed to address the critical gap between cycle-level machine learning accuracy and downstream operational cost in industrial turbofan fleets, IntelliTwin couples gradient boosted and recurrent deep learning base predictors with hierarchical, decision-aware conformal calibration. 
+
+The framework enforces rigorous methodological safeguards to preserve empirical validity:
+\begin{enumerate}
+    \item \textbf{Strict Leakage Isolation}: Complete engine-level disjoint partitioning (train, calibration, validation, held-out test) executed prior to feature scaling or causal windowing ($w=30$, stride 1, no padding).
+    \item \textbf{Equal Engine Weighting}: Evaluation metrics and conformal quantiles are computed with equal weighting per engine trajectory, eliminating length bias inherent in pooled cycle-level evaluations.
+    \item \textbf{Principled Baseline Controls}: Evaluation against four named control strategies across three distinct families (matched-width heuristic intervals, widened intervals, point safety margins, and earlier fixed interventions) to isolate the true economic value of calibrated uncertainty.
+    \item \textbf{Pre-Registered Statistical Inference}: Family-wise error rate control via Bonferroni-corrected $98.75\%$ confidence intervals generated through $10{,}000$ paired engine-level cluster bootstrap resamples.
+\end{enumerate}
+
+\subsection{Current Status and Verification Gates}
+At the current stage of project execution, the theoretical formulation, data pipelines, base model training protocols, and statistical evaluation machinery have been fully specified, audited, and frozen. Empirical results on the held-out test splits remain blinded and pending final experimental execution by the development team. 
+
+The planned progression toward publication comprises:
+\begin{itemize}
+    \item \textbf{UPD-01}: Verification of pretest reproduction audits and environment fixes.
+    \item \textbf{UPD-02 \& UPD-03}: Batch execution of held-out prediction, interval calibration, and discrete-event maintenance simulations.
+    \item \textbf{UPD-04}: Formal computation of cluster-bootstrap confidence intervals and execution of Intersection-Union Test decision rules for RQ1--RQ4.
+    \item \textbf{UPD-06 \& UPD-07}: Integration of the replay-based digital twin demonstrator and independent clean-environment reproducibility verification.
+\end{itemize}
+
+Upon completion of these verification gates, the resulting empirical evidence will be integrated directly into this document following the established 10-step protocol.

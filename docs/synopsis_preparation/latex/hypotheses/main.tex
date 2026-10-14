@@ -1,0 +1,54 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{enumitem}
+
+\input{../shared/notation.tex}
+
+\title{\textbf{IntelliTwin Authoritative Hypothesis Appendix and Statistical Evaluation Contract}}
+\author{Mayank Singh \and Shiksha Pandey \and Ruchi Gupta}
+\date{October 14, 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This standalone document provides the authoritative, frozen hypothesis definitions, primary outcome metrics, comparators, numerical practical-effect margins, statistical resampling protocols, and decision logic for the IntelliTwin research project. All criteria were locked under Architecture Decision Record ADR-018 on October 11, 2026, and expanded under ADR-023 on October 13, 2026. This document serves as the immutable reference contract against which all subsequent confirmatory experimental evaluations on held-out test data will be audited and decided.
+\end{abstract}
+
+\vspace{0.5em}
+\noindent\textbf{Source Commit Audited:} \texttt{224c741f5f3da19821a708e0a6da417d4810e9da} \\
+\textbf{Authoritative Canonical Sources:}
+\begin{itemize}[noitemsep,topsep=0pt]
+  \item Structured YAML Registry: \url{research/hypotheses/hypothesis_framework.yaml}
+  \item Statistical Inference Protocol: \url{research/research_design/statistical_inference_protocol.md}
+  \item Confirmatory Evaluation Protocol: \url{research/research_design/step09_confirmatory_protocol.md}
+  \item Matched Control Specification: \url{research/research_design/step09_control_selection.md}
+  \item Architectural Decision Records: \texttt{ADR-018}, \texttt{ADR-021}, \texttt{ADR-023} in \url{research/decision_log.md}
+\end{itemize}
+
+\vspace{0.5em}
+\noindent\textbf{Notice on Protocol Precedence:} In the event of any typographical or formatting discrepancy between this LaTeX rendering and the structured YAML / markdown specifications in the repository, the structured YAML registry (\texttt{hypothesis\_framework.yaml}) and statistical protocol (\texttt{statistical\_inference\_protocol.md}) serve as the governing sources of truth.
+
+\bigskip
+\hrule
+\bigskip
+
+\input{../shared/hypotheses.tex}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Document Control and Verification Notes}
+\begin{itemize}[noitemsep]
+  \item \textbf{Status}: Frozen for Confirmatory Evaluation.
+  \item \textbf{Confirmatory Held-Out Test Execution}: Strictly NOT STARTED.
+  \item \textbf{Scientific Outcomes}: PENDING EXPERIMENT (Tracked under \texttt{UPD-02}, \texttt{UPD-03}, \texttt{UPD-04}).
+\end{itemize}
+
+\end{document}

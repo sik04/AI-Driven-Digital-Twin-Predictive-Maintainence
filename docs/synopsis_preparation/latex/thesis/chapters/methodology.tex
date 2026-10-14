@@ -1,0 +1,96 @@
+\chapter{Methodology}
+\label{chap:methodology}
+
+\section{Methodological Architecture Overview}
+The IntelliTwin methodological framework links machine learning degradation modeling, distribution-free uncertainty calibration, and sequential decision simulation into a cohesive prognostic pipeline. The pipeline operates under three immutable architectural principles:
+\begin{enumerate}
+    \item \textbf{Causal Temporal Isolation}: Predictions condition strictly on past operational history within a 30-cycle causal horizon; zero-padding and future lookahead are strictly precluded.
+    \item \textbf{Engine-Level Disjoint Calibration}: Conformal nonconformity scores are computed exclusively on dedicated, reserved calibration engine trajectories that share no engine identities with training or held-out test splits.
+    \item \textbf{Asymmetric Cost Alignment}: Nonconformity metrics penalize dangerous RUL overestimation more severely than premature maintenance indications.
+\end{enumerate}
+
+\section{Data Preprocessing and Causal Windowing}
+\subsection{Feature Space Construction}
+From the raw C-MAPSS telemetry streams, seven invariant sensor channels showing zero or near-zero variance across operating regimes are permanently removed during training-only qualification:
+\begin{itemize}
+    \item Excluded sensors: $s_1$ (total temperature at fan inlet), $s_5$ (total pressure at LPC outlet), $s_6$ (total pressure at HPC outlet), $s_{10}$ (engine pressure ratio), $s_{16}$ (bypass ratio), $s_{18}$ (demanded fan speed), and $s_{19}$ (demanded corrected fan speed).
+\end{itemize}
+The retained 14 sensor signals alongside 3 operational settings constitute the $17$-dimensional cycle state vector $\mathbf{x}_{i,t} \in \mathbb{R}^{17}$. Min-max scaling parameters $\boldsymbol{\mu}_{\text{min}}, \boldsymbol{\mu}_{\text{max}} \in \mathbb{R}^{17}$ are fitted strictly on training engine splits and applied out-of-sample to calibration, validation, and test splits:
+\begin{equation}
+\tilde{\mathbf{x}}_{i,t} = \frac{\mathbf{x}_{i,t} - \boldsymbol{\mu}_{\text{min}}}{\boldsymbol{\mu}_{\text{max}} - \boldsymbol{\mu}_{\text{min}}}.
+\end{equation}
+
+\subsection{Causal Windowing Protocol}
+Temporal feature matrices are formed via rolling causal windows of duration $w = 30$ operational cycles with stride $s = 1$:
+\begin{equation}
+\mathbf{W}_{i,t} = [\tilde{\mathbf{x}}_{i, t-29}, \tilde{\mathbf{x}}_{i, t-28}, \dots, \tilde{\mathbf{x}}_{i,t}] \in \mathbb{R}^{30 \times 17}, \quad t \ge 30.
+\end{equation}
+To maintain rigorous physical validity, windows are formed exclusively within continuous engine trajectories; windows never span across engine boundaries, and cycles $t < 30$ are unpredicted.
+
+\section{Base Degradation Predictors}
+We examine two distinct algorithmic paradigms receiving identical 30-cycle information horizons:
+\begin{enumerate}
+    \item \textbf{Gradient Boosted Regressor (GBR)}: A LightGBM tree ensemble operating on the flattened feature vector:
+    \begin{equation}
+    \mathbf{v}_{i,t} = \operatorname{vec}(\mathbf{W}_{i,t}) \in \mathbb{R}^{510}.
+    \end{equation}
+    Hyperparameters (tree depth, learning rate, minimum leaf split) were selected during Phase 5 validation.
+    \item \textbf{Long Short-Term Memory (LSTM)}: A two-layer recurrent neural network architecture processing the temporal sequence $\mathbf{W}_{i,t} \in \mathbb{R}^{30 \times 17}$. Hidden state dynamics capture progressive degradation accumulation over time.
+\end{enumerate}
+
+To ensure complete empirical replicability and isolate model training variance, five random seeds ($2026, 2027, 2028, 2029, 2030$) are executed for each architecture across all three C-MAPSS sub-datasets (FD001, FD002, FD004), yielding 30 frozen base model checkpoints in the registry.
+
+\section{Conformal Calibration Formulation}
+\subsection{Engine-Weighted Quantile Computation}
+Standard split-conformal inference pools calibration residuals across all observation cycles, implicitly assigning greater statistical weight to longer-lived engines. To prevent survivor bias and enforce equal contribution across asset units, IntelliTwin defines an exact engine-weighted empirical distribution.
+
+Let $\mathcal{D}_{\text{cal}} = \{(\mathbf{W}_{i,t}, y_{i,t}) : i \in \mathcal{E}_{\text{cal}}, t \in [w, T_i]\}$ denote the reserved calibration dataset containing $|\mathcal{E}_{\text{cal}}| = M$ engines. Each observation $(i,t)$ receives a normalized rational weight:
+\begin{equation}
+w_{i,t} = \frac{1}{M \cdot (T_i - w + 1)}.
+\end{equation}
+The empirical cumulative distribution function of nonconformity scores $\alpha_{i,t}$ is given by:
+\begin{equation}
+\hat{F}_{\text{cal}}(s) = \sum_{(i,t) \in \mathcal{D}_{\text{cal}}} w_{i,t} \cdot \mathbf{1}_{\{\alpha_{i,t} \le s\}}.
+\end{equation}
+For a specified significance level $\alpha \in (0, 1)$, the conformal quantile $q^*$ is computed as:
+\begin{equation}
+q^*(\alpha) = \inf \left\{ s \in \mathbb{R} : \hat{F}_{\text{cal}}(s) \ge \frac{\lceil (M+1)(1-\alpha) \rceil}{M} \right\}.
+\end{equation}
+
+\subsection{Conformal Calibration Variants}
+We formalize three conformal calibration variants:
+\begin{enumerate}
+    \item \textbf{Global HCP (\texttt{global\_hcp})}: Evaluates absolute residual nonconformity:
+    \begin{equation}
+    \alpha_{i,t} = |y_{i,t} - \hat{y}_{i,t}|.
+    \end{equation}
+    The resulting prediction interval on test engine $j$ is symmetric:
+    \begin{equation}
+    \mathcal{C}_{\text{global}}(\mathbf{W}_{j,t}) = [\hat{y}_{j,t} - q^*, \hat{y}_{j,t} + q^*].
+    \end{equation}
+
+    \item \textbf{Regime-Stratified HCP (\texttt{regime\_hcp})}: Conditions nonconformity scoring on operating regime cluster $k(t) \in \{1, \dots, 6\}$:
+    \begin{equation}
+    \alpha_{i,t}^{(k)} = |y_{i,t} - \hat{y}_{i,t}| \quad \text{for } \mathbf{x}_{i,t} \in \mathcal{R}_k.
+    \end{equation}
+    To prevent high quantile variance in sparse flight conditions, if regime $k$ contains fewer than $N_{\text{min}} = 100$ calibration observations, the framework executes a deterministic fallback to the pooled global nonconformity quantile $q^*_{\text{global}}$.
+
+    \item \textbf{Decision-Aware HCP (\texttt{decision\_aware\_hcp})}: Incorporates asymmetric penalty scaling governed by parameter $\beta = -\ln 2$:
+    \begin{equation}
+    \alpha_{i,t} = \begin{cases}
+    \frac{\hat{y}_{i,t} - y_{i,t}}{a(p_{i,t})} & \text{if } y_{i,t} \le \hat{y}_{i,t} \text{ (overestimation)}, \\
+    \frac{y_{i,t} - \hat{y}_{i,t}}{b(p_{i,t})} & \text{if } y_{i,t} > \hat{y}_{i,t} \text{ (underestimation)},
+    \end{cases}
+    \end{equation}
+    where $p_{i,t} = \sigma((\tau_{\text{crit}} - \hat{y}_{i,t})/\gamma)$ represents the estimated cycle failure probability, and scaling factors satisfy:
+    \begin{equation}
+    a(p_{i,t}) = \exp(-\beta \cdot p_{i,t}), \quad b(p_{i,t}) = \exp(\beta \cdot p_{i,t}).
+    \end{equation}
+    The resulting asymmetric prediction interval on test observations is:
+    \begin{equation}
+    \mathcal{C}_{\text{asym}}(\mathbf{W}_{j,t}) = [\hat{y}_{j,t} - q^* \cdot a(p_{j,t}), \hat{y}_{j,t} + q^* \cdot b(p_{j,t})].
+    \end{equation}
+\end{enumerate}
+
+\section{Discrete-Event Maintenance Simulation}
+The sequential maintenance policy executes step-by-step across unseen test engine trajectories. At cycle $t$, if the lower prediction bound satisfies $L_{j,t}(\alpha) \le \tau_{\text{lead}}$, a scheduled maintenance order is issued. The engine operates for $\tau_{\text{lead}} = 2$ cycles to simulate logistical dispatch, and is overhauled at $t + \tau_{\text{lead}}$. If the engine reaches its true physical failure cycle $T_j$ before the scheduled overhaul completes, an in-flight catastrophic failure is recorded.

@@ -1,0 +1,48 @@
+\chapter{Introduction}
+\label{chap:introduction}
+
+\section{Industrial Context and Problem Statement}
+Aviation and industrial turbofan engines are complex aeromechanical systems that operate under extreme thermo-mechanical stresses, severe vibrational loads, and dynamically varying flight envelopes \cite{saxena2008damage}. In contemporary fleet operations, ensuring operational reliability while managing lifecycle maintenance expenditures represents a paramount economic and safety challenge. Unplanned in-flight engine shutdowns, emergency diversions, and catastrophic component structural failures impose severe safety risks and immense financial costs, frequently exceeding scheduled maintenance overhauls by orders of magnitude \cite{chen2022data}.
+
+Historically, commercial aviation maintenance relied predominantly on conservative time-based preventative policies, replacing subassemblies at predetermined flight-hour or cycle milestones regardless of actual physical health \cite{zheng2017long}. While safe, this schedule-driven paradigm leads to premature replacement of functional hardware, wasting significant operational life. 
+
+With the emergence of Internet of Things (IoT) sensor telemetry and high-capacity flight data recorders, Condition-Based Maintenance (CBM) and Predictive Maintenance (PdM) paradigms have become foundational to next-generation aviation operations. These paradigms seek to predict the Remaining Useful Life (RUL) of critical components dynamically from multivariate sensor streams, enabling opportunistic scheduling before physical failure occurs \cite{huang2021survey}.
+
+\section{The Prognostic-to-Decision Gap}
+Despite significant advances in deep learning for degradation modeling, an acute methodological gap persists between cycle-level machine learning accuracy and downstream operational utility:
+\begin{enumerate}
+    \item \textbf{Cycle-Level Error Optimization}: Point regression architectures—such as Long Short-Term Memory (LSTM) networks, Temporal Convolutional Networks (TCNs), and Gradient Boosted Regressors (GBRs)—are conventionally trained to minimize symmetric cycle-level loss functions such as Mean Squared Error (MSE) or Mean Absolute Error (MAE) \cite{zheng2017long}. These metrics treat underestimating and overestimating RUL symmetrically.
+    \item \textbf{Asymmetric Cost Realities}: In real-world aviation logistics, overestimating RUL by 10 cycles can allow an engine to operate beyond its physical failure boundary, causing catastrophic damage. In contrast, underestimating RUL by 10 cycles merely results in premature maintenance and a minor loss of usable component life \cite{saxena2008damage, robinson2026riskaware}.
+    \item \textbf{Uncalibrated Uncertainty}: When probabilistic or interval outputs are produced via heuristic dispersion or Bayesian approximations, they typically rely on Gaussianity or asymptotic normality assumptions that fail under non-stationary degradation dynamics and regime shifts \cite{javanmardi2023conformal}. Uncalibrated prediction intervals provide no statistical guarantees on coverage.
+\end{enumerate}
+
+\section{The IntelliTwin Approach}
+To resolve this gap, the \textbf{IntelliTwin} framework integrates data-driven base degradation predictors with hierarchical, decision-aware conformal prediction theory. By leveraging split-conformal inference, IntelliTwin provides finite-sample, distribution-free marginal coverage guarantees on turbofan RUL intervals without making parametric distributional assumptions regarding degradation noise.
+
+Furthermore, the framework introduces two critical adaptations:
+\begin{itemize}
+    \item \textbf{Regime-Stratified Calibration}: Conformal calibration is conditioned on operational flight regime clusters, preventing severe conditional undercoverage in rare or stressed operating conditions.
+    \item \textbf{Decision-Aware Asymmetry}: Nonconformity scores are scaled via an asymmetric parameter ($\beta = -\ln 2$), tilting prediction intervals to guard against hazardous RUL overestimation.
+\end{itemize}
+
+\section{Research Objectives and Scope}
+This dissertation formalizes four pre-registered research questions:
+\begin{itemize}
+    \item \textbf{RQ1 (Sequential Utility)}: Can decision-aware conformal calibration improve sequential maintenance cost efficiency while preserving nominal coverage guarantees?
+    \item \textbf{RQ2 (Subgroup Reliability)}: Does regime-stratified calibration eliminate worst-case coverage deficits across operational clusters without excessive interval inflation?
+    \item \textbf{RQ3 (Attribution vs. Matched Controls)}: Are observed cost benefits attributable to calibrated uncertainty rather than simple, ad-hoc conservatism?
+    \item \textbf{RQ4 (Robustness \& Generalization)}: Does the calibration advantage generalize across diverse base predictors (GBR, LSTM), operating regimes, and degradation modes?
+\end{itemize}
+
+\section{Thesis Organization}
+The remainder of this dissertation is organized as follows:
+\begin{itemize}
+    \item Chapter~\ref{chap:literature_review} provides a comprehensive review of turbofan prognostics, conformal prediction, and maintenance decision theory.
+    \item Chapter~\ref{chap:problem_hypotheses} details the mathematical problem formulation and authoritative hypothesis framework.
+    \item Chapter~\ref{chap:methodology} presents the complete methodological pipeline from causal windowing to asymmetric calibration.
+    \item Chapter~\ref{chap:implementation} outlines the software architecture, engine-level partitioning, and provenance tracking.
+    \item Chapter~\ref{chap:experimental_design} formalizes the confirmatory experimental setup, baselines, and bootstrap inference.
+    \item Chapter~\ref{chap:results_discussion} presents the status of experimental verification and discussion of expected outcomes.
+    \item Chapter~\ref{chap:limitations_conclusion} discusses threats to validity, research boundaries, and conclusions.
+    \item Appendix~\ref{chap:reproducibility} provides the complete reproducibility protocol and execution commands.
+\end{itemize}

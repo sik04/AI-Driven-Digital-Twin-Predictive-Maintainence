@@ -1,0 +1,41 @@
+\chapter{Limitations, Threats to Validity, and Conclusion}
+\label{chap:limitations_conclusion}
+
+\section{Threats to Validity and Research Boundaries}
+To maintain rigorous scientific standards, the methodological conclusions and empirical findings of this research must be interpreted within explicitly defined boundaries. We identify eight primary threats to validity:
+
+\subsection{Benchmark Simulation Fidelity}
+The experimental investigation is conducted exclusively on the synthetic NASA C-MAPSS turbofan engine degradation simulation suite \cite{saxena2008damage}. While C-MAPSS is the preeminent benchmark in PHM research, its degradation curves exhibit strictly monotonic wear profiles. Operational aircraft turbofan engines encounter complex operational realities—such as component washing, partial maintenance servicing, sensor drift, and intermittent fault reversibility—that are not modeled within C-MAPSS.
+
+\subsection{Synthetic Cost and Economic Assumptions}
+The discrete-event maintenance simulation operates on study-defined cost preferences ($C_{\text{preventive}} = 10$, $C_{\text{unplanned}} = 100$, $C_{\text{waste}} = 0.20$ SCU per engine). Although these parameters realistically reflect the order-of-magnitude cost disparity between scheduled overhauls and catastrophic engine failures, they represent benchmark simulation preferences rather than empirical airline accounting constants.
+
+\subsection{Finite Fleet Engine Counts}
+Across the complete C-MAPSS benchmark suite, 609 engines are evaluated, with 122 engines allocated to the held-out test splits. While this sample size is substantial for academic prognostics benchmarks, statistical power in paired cluster-bootstrap inference across rare flight regimes remains limited.
+
+\subsection{Temporal Autocorrelation and Exchangeability}
+Split-conformal prediction theory is mathematically founded on the assumption that calibration and test data points are independent and identically distributed (i.i.d.) or at least exchangeable. In sequential degradation monitoring, successive temporal windows within an engine trajectory are heavily autocorrelated. While our engine-level disjoint partitioning and cluster-bootstrap inference preserve trajectory-level exchangeability, cycle-level temporal correlations challenge local exchangeability.
+
+\subsection{Theoretical Conformal Coverage Guarantees}
+Conformal calibration guarantees marginal coverage over the joint distribution of calibration and test engines. It does not provide theoretical guarantees of exact pointwise conditional coverage or sequential stopping-time coverage along an individual engine's degradation path.
+
+\subsection{Capped Training Targets vs. Uncapped Evaluation}
+Base models are trained using piecewise-capped RUL targets ($R_{\text{max}} = 125$ cycles) to stabilize neural network training during early, healthy operational phases. In contrast, calibration, validation, and held-out test splits evaluate uncapped physical RUL. This distributional discrepancy must be accounted for during early-lifecycle inference.
+
+\subsection{Rare-Group Support and Fallback Protocols}
+In complex multi-regime environments (FD002 and FD004), rare flight conditions may contain fewer than $100$ calibration observations. While the framework implements deterministic fallback to the pooled global quantile $q^*_{\text{global}}$, empirical coverage in rare clusters depends on the efficacy of this fallback mechanism.
+
+\subsection{Absence of Physical Hardware Integration}
+IntelliTwin evaluates an offline, trace-driven simulation replay framework. The digital twin does not possess real-time bidirectional physical-digital synchronization or closed-loop engine control authority.
+
+\section{Summary of Thesis Contributions}
+This dissertation has established a comprehensive, scientifically audited research framework for industrial turbofan prognostic maintenance:
+\begin{enumerate}
+    \item \textbf{Methodological Synthesis}: Integration of modern base degradation predictors (GBR, LSTM) with hierarchical, condition-adaptive, and asymmetric conformal calibration.
+    \item \textbf{Rigorous Governance}: Complete engine-level disjoint data partitioning, eliminating temporal data leakage across 609 engine units.
+    \item \textbf{Principled Baseline Controls}: Formal evaluation against four named control strategies across three distinct families, isolating the true operational value of calibrated uncertainty.
+    \item \textbf{Pre-Registered Statistical Protocols}: Family-wise error rate control via Bonferroni-corrected $98.75\%$ confidence intervals generated through $10{,}000$ paired engine-cluster bootstrap resamples.
+\end{enumerate}
+
+\section{Path Forward to Final Experimental Completion}
+The theoretical formulation, software implementation, calibration registries, and evaluation protocols are fully specified, frozen, and audited. The remaining milestones comprise the execution of verification repair gates (\texttt{UPD-01}), held-out test split inference (\texttt{UPD-02}), discrete-event fleet simulation (\texttt{UPD-03}), confirmatory hypothesis resolution (\texttt{UPD-04}), demonstrator integration (\texttt{UPD-06}), and independent reproducibility verification (\texttt{UPD-07}). Upon completion of these gates, empirical findings will be incorporated directly into this dissertation.
