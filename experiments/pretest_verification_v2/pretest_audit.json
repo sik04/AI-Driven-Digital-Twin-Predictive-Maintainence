@@ -1,0 +1,63 @@
+{
+  "audit_timestamp_utc": "2026-10-14T11:20:56.456269+00:00",
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T11:20:54.377966+00:00"
+  },
+  "git_commit": "84b7e19e75be4ddd63a4c15b76ae1f19a64c0b07",
+  "git_dirty": false,
+  "held_out_execution_status": "NOT_STARTED",
+  "matrix_counts": {
+    "bootstrap_replicates": 10000,
+    "cell_summary_rows": 186,
+    "control_configurations": 120,
+    "outcome_rows": 19590,
+    "primary_configurations": 810,
+    "total_configurations": 930
+  },
+  "overall_status": "PASS",
+  "pretest_readiness_status": "PRETEST_READY",
+  "protocol_freeze_sha256": "82dffb2c4224d7dfbbd27012aeb7d7bdc22dc833a5e592ab7705b1ab550c2d7c",
+  "protocol_version": "step09-v1",
+  "rq_outcomes_status": "PENDING",
+  "schema_version": "step09-audit-v2",
+  "verified_bindings": {
+    "base_model_registry_sha256": true,
+    "baseline_manifest_sha256": true,
+    "calibrator_registry_sha256": true,
+    "control_reconstruction_sha256": true,
+    "control_selection_FD002_GBR_sha256": true,
+    "control_selection_FD002_LSTM_sha256": true,
+    "data/splits/fd001_engine_split_seed_2026.json": true,
+    "data/splits/fd002_engine_split_seed_2026.json": true,
+    "data/splits/fd002_lifetime_quartile_provenance.json": true,
+    "data/splits/fd004_engine_split_seed_2026.json": true,
+    "src/intellitwin/decision/controls.py": true,
+    "src/intellitwin/evaluation/artifacts.py": true,
+    "src/intellitwin/evaluation/bootstrap.py": true,
+    "src/intellitwin/evaluation/decisions.py": true,
+    "src/intellitwin/evaluation/inference.py": true,
+    "src/intellitwin/evaluation/metrics.py": true,
+    "src/intellitwin/evaluation/runner.py": true,
+    "src/intellitwin/evaluation/schema.py": true,
+    "src/intellitwin/evaluation/validation.py": true,
+    "src/intellitwin/evaluation/verification.py": true,
+    "src/intellitwin/provenance.py": true,
+    "src/intellitwin/uncertainty/verification.py": true,
+    "step08_full_audit_sha256": true,
+    "step08_selection_freeze_sha256": true,
+    "validation_smoke_execution_manifest_sha256": true
+  }
+}

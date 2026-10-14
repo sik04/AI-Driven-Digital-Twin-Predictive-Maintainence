@@ -747,3 +747,54 @@ This log documents formal architectural, methodological, and research governance
   - Pre-test confirmatory preparation is complete and frozen.
 - **Follow-up Review Date / Trigger**:
   - Official held-out test evaluation execution (Phase 7 execution stage).
+
+---
+
+### ADR-024: Pre-Test Readiness Reverification, Raw Checkpoint Reproduction, and Statistical Machinery Repair
+- **Date**: 2026-10-14
+- **Status**: Accepted (Amends ADR-022 and ADR-023)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-directed corrective verification and pre-test readiness completion mandate addressing identified audit gaps, provenance defects, and incomplete smoke evaluation.
+- **Context and Motivation**:
+  - A rigorous code and evidence review revealed several critical defects in prior Step 8 verification and Step 9 pre-test readiness records:
+    1. Incomplete Step 8 Audit: The Step 8 repair report recorded `checkpoint_prediction_reproduction = NOT RUN` while claiming `overall_status = PASS`. Step 9 completion documentation nevertheless claimed raw prediction reproduction had succeeded.
+    2. Incomplete Smoke Runner: The Step 9 validation smoke script evaluated only 810 primary configurations and completely omitted the 120 control configurations. It generated bootstrap draw arrays but never applied them to calculate replicate statistics, contrasts, or confidence intervals, and omitted point predictions, interval predictions, and decision traces.
+    3. Dirty Startup Provenance: Historical smoke and control runs were executed with `--allow-dirty` (recording `git_dirty = true`), and audit scripts excluded selected files from dirty-state checks.
+    4. Baseline SHA Typo: Historical reports cited typo SHA `f1edce7858c9748b6ee92e7c4f4a3b7849e7b235` instead of the actual baseline commit `f1edce7fdf48b45513ff90a680da49701451d9cb`.
+    5. Inventory Conflation: The preservation inventory listed 724 artifacts, but 72 model-selection search checkpoints were exploratory local-only files never tracked in Git and absent from a fresh checkout.
+    6. Non-Standard Control Tie-Breaking: Control selection used rounded tolerance buckets rather than the locked rule of retaining candidates within $10^{-8}$ of the actual minimum.
+    7. FD004 Engine Count Typo: Script documentation stated FD004 had 27 validation engines instead of the true split count of 25.
+- **Decisions**:
+  1. **Full Step 8 Reverification with Raw Checkpoint CPU Reproduction**:
+     - Provided official full-audit mode requiring CPU inference across all 60 model/partition checks (30 validation and 30 calibration).
+     - Joined reproduced predictions on `(unit, endpoint_cycle)`, asserted duplicate-key rejection, and verified true terminal cycles, labels, and preprocessor regimes.
+     - Confirmed maximum absolute prediction error is $0.0 \le 1.0 \times 10^{-4}$ cycles across all 60 checks.
+     - Full Step 8 audit passed and recorded in `experiments/pretest_verification_v2/step08_full_audit.json`.
+  2. **Git Baseline Preservation and Artifact Categorization**:
+     - Rebuilt `experiments/pretest_verification_v2/baseline_manifest.json` from the actual Git tree at `f1edce7fdf48b45513ff90a680da49701451d9cb` using `git cat-file --batch`.
+     - Separated Category A (652 repository-tracked protected artifacts, 100% matched bit-for-bit) and Category B (72 local-only search checkpoints, clearly categorized as `NOT_AVAILABLE_LOCAL_ONLY` on fresh checkouts and not claimed as public repository verified).
+     - Verified registry portability migration: all non-path fields agree 100%.
+  3. **Control Selection Tie-Breaking and Candidate Grid Validation**:
+     - Replaced rounded tolerance buckets in `src/intellitwin/decision/controls.py` with explicit minimum-relative filtering (`width <= min + 1e-8`, `cost <= min + 1e-8`, smaller parameter, `global_hcp` before `regime_hcp`).
+     - Validated complete candidate grids: 810 matched-width, 612 widened, 251 safety-margin, 502 earlier-intervention = 2,175 per family; 4,350 total.
+     - Recomputed FD002 validation controls with clean provenance (`git_dirty = false`, `device = cpu`):
+       - GBR: matched-width ($\lambda=0.92$, global, diff $0.2547 \le 1.0$ cycle), widened ($\lambda=1.00$, regime), safety ($m=5$, regime), earlier ($h=1$, regime).
+       - LSTM: matched-width ($\lambda=0.90$, regime, diff $0.0582 \le 1.0$ cycle), widened ($\lambda=1.00$, global), safety ($m=4$, regime), earlier ($h=1$, global).
+     - Recorded in `experiments/pretest_verification_v2/controls/` and `control_reconstruction.json`.
+  4. **Complete Validation Smoke Execution and Applied Bootstrap Calculations**:
+     - Implemented production evaluation runner `src/intellitwin/evaluation/runner.py`, inference simulator `inference.py`, and verification auditor `verification.py`.
+     - Executed complete validation matrix across all 930 configurations (810 primary + 120 controls), generating exactly 19,590 outcome rows, 186 cell-summary rows, point predictions, interval predictions, and decision traces.
+     - Applied 10,000 stratified engine-cluster bootstrap draws per dataset to compute replicate statistics, contrasts, 95% descriptive CIs, and 98.75% decision CIs.
+     - All smoke outputs strictly labeled `DEVELOPMENT_SMOKE_ONLY`.
+  5. **Strict Provenance and Supersession**:
+     - Provenance captured once at process entry; clean working trees enforced; writes performed outside working tree during execution; `overwrite=True` removed from official paths.
+     - Documented historical record supersession in `experiments/pretest_verification_v2/supersession.json`.
+     - Assembled immutable protocol freeze in `experiments/pretest_verification_v2/protocol_freeze.json` and verified in `pretest_audit.json` (`STATUS: PRETEST_READY`).
+  6. **Strict Scientific Boundary**:
+     - Zero held-out test windows prepared, processed, or evaluated.
+     - Held-out execution: `NOT_STARTED`.
+     - Confirmatory hypothesis conclusions RQ1–RQ4: `PENDING`.
+- **Expected Implications**:
+  - Full Step 8 verification and Step 9 pre-test readiness are genuinely achieved and cryptographically bound.
+- **Follow-up Review Date / Trigger**:
+  - Authorized held-out confirmatory evaluation execution.

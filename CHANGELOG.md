@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Completed Step 8 Full Raw Checkpoint Reproduction and Step 9 Pre-Test Readiness Verification under ADR-024:
+  - Executed full CPU raw prediction reproduction across all 60 model/partition checks (3 datasets $\times$ 2 model families $\times$ 5 seeds $\times$ 2 partitions [train, val]) in batches of 256; verified 60/60 checks within maximum absolute error $0.0 \le 10^{-4}$ cycles (`experiments/pretest_verification_v2/step08_full_audit.json`).
+  - Rebuilt and verified baseline manifest from actual git tree at commit `f1edce7fdf48b45513ff90a680da49701451d9cb`, distinguishing 652 tracked protected artifacts (100% match) from 72 local-only hyperparameter tuning checkpoints preserved under `.gitignore` (`experiments/pretest_verification_v2/baseline_manifest.json`).
+  - Reconstructed and audited 4 benchmark matched controls on FD002 validation engines across 5 seeds jointly with strict minimum-relative tie-breaking ($|x - \text{min}| \le 10^{-8}$) and deterministic ordering across 4,350 candidate evaluations (2,175 per family) in `experiments/pretest_verification_v2/controls/`.
+  - Executed complete pre-test validation smoke matrix across all 930 configurations (810 primary + 120 controls) on validation engines, producing exactly 19,590 engine-seed outcome rows, 186 cell-summary rows, and applied 10,000-draw stratified engine-cluster bootstrap contrast intervals in `experiments/pretest_verification_v2/validation_smoke/`.
+  - Implemented immutable `supersession.json` tracking historical supersessions between `experiments/audits/`, `experiments/confirmatory_development/`, and authoritative `experiments/pretest_verification_v2/`.
+  - Frozen pre-test confirmatory protocol in `experiments/pretest_verification_v2/protocol_freeze.json` (SHA-256: `82dffb2c4224d7dfbbd27012aeb7d7bdc22dc833a5e592ab7705b1ab550c2d7c`) and verified in `experiments/pretest_verification_v2/pretest_audit.json` with overall status PASS and pre-test readiness PRETEST_READY. Confirmatory held-out test execution remains NOT_STARTED and RQ1–RQ4 outcomes remain PENDING.
 - Completed Step 8 Corrective Verification, Provenance Repair, and Step 9 Pre-Test Confirmatory Freeze under ADR-022 and ADR-023:
   - Migrated calibration registry to canonical POSIX `/` separators, verified 100% bit-for-bit non-path equality, and implemented secure repository-relative path resolver `resolve_repo_relative_path` in `src/intellitwin/uncertainty/artifacts.py`.
   - Strengthened `load_frozen_calibrator` with schema, bundle count, finite threshold, legal regime, and dependency SHA-256 validation. Added CI tests ensuring all 90 calibrators load cleanly on Windows and Linux.
