@@ -40,7 +40,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="experiments/pretest_verification_v2/validation_smoke",
+        default="experiments/pretest_verification_v3/validation_smoke",
         help="Directory to write smoke run outputs",
     )
     parser.add_argument(

@@ -1,0 +1,44 @@
+{
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-supersession-v2",
+  "timestamp_utc": "2026-10-14T15:23:51.630776+00:00",
+  "source_execution_commit": "1b8d15e397679cd25fffe725663c35717591c96a",
+  "git_dirty": false,
+  "environment": {
+    "timestamp_utc": "2026-10-14T15:23:51.630776+00:00",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "platform": "Windows-10-10.0.19045-SP0",
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu",
+      "pyyaml": "6.0.3"
+    },
+    "command_args": [
+      "-c"
+    ]
+  },
+  "superseded_count": 3,
+  "superseded_records": [
+    {
+      "historical_path": "experiments/pretest_verification_v2/validation_smoke/execution_manifest.json",
+      "historical_sha256": "98a6a29b907aa5aad727cdd81d48bc0a2e34f5f7681d767718e37a9ca148fcef",
+      "reason_superseded": "Omitted component_evidence.csv (Defect E), omitted seeds 2027-2030 in point_predictions.csv (Defect F), omitted explicit bound replicate arrays (Defect D), and relied on a permissive verifier that skipped uncompared rows (Defect A) without exact Cartesian outcome key verification (Defect C) or independent PRNG draw reconstruction (Defect B).",
+      "replacement_evidence_path": "experiments/pretest_verification_v3/validation_smoke/execution_manifest.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v2/protocol_freeze.json",
+      "historical_sha256": "82dffb2c4224d7dfbbd27012aeb7d7bdc22dc833a5e592ab7705b1ab550c2d7c",
+      "reason_superseded": "Bound incomplete v2 smoke artifacts, omitted transitive dependency hash bindings (30 base model checkpoints, 3 preprocessors, 90 calibrators), and did not independently verify 60 Step-8 raw checkpoint reproduction audit records.",
+      "replacement_evidence_path": "experiments/pretest_verification_v3/protocol_freeze.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v2/pretest_audit.json",
+      "historical_sha256": "2ef91827023b53d9d45ef1165b857bbf377967d408bb213846adb5bb0b092d09",
+      "reason_superseded": "Accepted incomplete v2 validation smoke artifacts due to permissive verification skips and unasserted evidence completeness checks.",
+      "replacement_evidence_path": "experiments/pretest_verification_v3/pretest_audit.json"
+    }
+  ]
+}

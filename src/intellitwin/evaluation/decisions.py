@@ -590,18 +590,35 @@ def validate_component_manifest_completeness(
     total = sum(counts.values())
 
     if evaluated_component_ids is not None:
-        eval_set = set(evaluated_component_ids)
-        if len(evaluated_component_ids) != len(eval_set):
-            raise ValueError("Duplicate component IDs detected in evaluation results.")
+        eval_list = list(evaluated_component_ids)
+        eval_set = set(eval_list)
+        if len(eval_list) != len(eval_set):
+            seen = set()
+            dups = set()
+            for c_id in eval_list:
+                if c_id in seen:
+                    dups.add(c_id)
+                seen.add(c_id)
+            raise ValueError(
+                f"Duplicate component IDs detected in evaluation results: {sorted(dups)}"
+            )
 
         target_rqs = [rq_id] if rq_id is not None else ["RQ1", "RQ2", "RQ3", "RQ4"]
+        all_expected_ids = set()
         for rq in target_rqs:
             required_ids = {c.component_id for c in manifest[rq]}
+            all_expected_ids |= required_ids
             missing = required_ids - eval_set
             if missing:
                 raise ValueError(
                     f"Missing required hypothesis components for {rq}: {sorted(missing)}"
                 )
+
+        unexpected = eval_set - all_expected_ids
+        if unexpected:
+            raise ValueError(
+                f"Unexpected component IDs detected in evaluation results: {sorted(unexpected)}"
+            )
 
     return {
         "all_valid": True,

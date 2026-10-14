@@ -1,0 +1,114 @@
+{
+  "environment": {
+    "command_args": [
+      "scripts/run_step09_control_selection.py",
+      "--output-dir",
+      "C:\\Users\\Mayank\\.gemini\\antigravity-ide\\brain\\2caa3339-fbca-463b-873a-723d9fdacec0\\scratch\\pretest_v2_staging\\controls"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-14T10:38:04.938173+00:00"
+  },
+  "git_commit": "854dbdf42577540c49eb141bc50c86c1c7e529b2",
+  "git_dirty": false,
+  "models": {
+    "GBR": {
+      "artifact_hashes": {
+        "candidate_metrics_csv": "7da37abfd746c2f1407308ad24c665b26aa7a83494ac6d4b995c921e9133b281",
+        "engine_seed_outcomes_csv": "66202a34d1f11a8844824d7390c1c361d713140688e70da7b2a679476ef56ed6",
+        "selection_json": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d"
+      },
+      "comparisons": {
+        "earlier_intervention": {
+          "agrees": true,
+          "historical_parameter_value": 1,
+          "historical_source": "regime_hcp",
+          "new_parameter_value": 1,
+          "new_source": "regime_hcp",
+          "parameter_name": "h"
+        },
+        "matched_width_interval": {
+          "agrees": true,
+          "historical_parameter_value": 0.92,
+          "historical_source": "global_hcp",
+          "new_parameter_value": 0.92,
+          "new_source": "global_hcp",
+          "parameter_name": "lambda"
+        },
+        "point_safety_margin": {
+          "agrees": true,
+          "historical_parameter_value": 5,
+          "historical_source": "regime_hcp",
+          "new_parameter_value": 5,
+          "new_source": "regime_hcp",
+          "parameter_name": "m"
+        },
+        "widened_interval": {
+          "agrees": true,
+          "historical_parameter_value": 1.0,
+          "historical_source": "regime_hcp",
+          "new_parameter_value": 1.0,
+          "new_source": "regime_hcp",
+          "parameter_name": "lambda"
+        }
+      },
+      "matched_width_diff": 0.2547109118591351,
+      "matched_width_readiness_pass": true,
+      "target_mpiw": 111.47487562643208
+    },
+    "LSTM": {
+      "artifact_hashes": {
+        "candidate_metrics_csv": "6338bedb6db1cd64fc104b92fc20a4a6ae1bf4519fc6f89c501ac5dbfd4d740d",
+        "engine_seed_outcomes_csv": "0b74ddda91af892b1bd5e590042eb186d3969aa4aa7ee0b3361614036d983531",
+        "selection_json": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7"
+      },
+      "comparisons": {
+        "earlier_intervention": {
+          "agrees": true,
+          "historical_parameter_value": 1,
+          "historical_source": "global_hcp",
+          "new_parameter_value": 1,
+          "new_source": "global_hcp",
+          "parameter_name": "h"
+        },
+        "matched_width_interval": {
+          "agrees": true,
+          "historical_parameter_value": 0.9,
+          "historical_source": "regime_hcp",
+          "new_parameter_value": 0.9,
+          "new_source": "regime_hcp",
+          "parameter_name": "lambda"
+        },
+        "point_safety_margin": {
+          "agrees": true,
+          "historical_parameter_value": 4,
+          "historical_source": "regime_hcp",
+          "new_parameter_value": 4,
+          "new_source": "regime_hcp",
+          "parameter_name": "m"
+        },
+        "widened_interval": {
+          "agrees": true,
+          "historical_parameter_value": 1.0,
+          "historical_source": "global_hcp",
+          "new_parameter_value": 1.0,
+          "new_source": "global_hcp",
+          "parameter_name": "lambda"
+        }
+      },
+      "matched_width_diff": 0.05819265752545277,
+      "matched_width_readiness_pass": true,
+      "target_mpiw": 110.06243104300574
+    }
+  },
+  "overall_status": "PASS",
+  "scenario_id": "primary_reference"
+}
