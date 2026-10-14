@@ -66,10 +66,10 @@ def load_partition_quartile_strata(
     assigned = []
     for eng_list in strata.values():
         assigned.extend(eng_list)
-    if set(assigned) != part_set:
+    if len(assigned) != len(part_set) or set(assigned) != part_set:
         raise ValueError(
             f"Quartile stratum mismatch for {dataset}: "
-            f"assigned {len(assigned)} != partition {len(part_set)}"
+            f"assigned {len(assigned)} (unique {len(set(assigned))}) != partition {len(part_set)}"
         )
 
     return strata
@@ -126,9 +126,15 @@ def compute_bootstrap_ci(
     arr = np.asarray(replicate_values, dtype=float)
     if len(arr) == 0:
         raise ValueError("Cannot compute quantiles on empty replicate array.")
+    if not np.all(np.isfinite(arr)):
+        raise ValueError("Non-finite values encountered in compute_bootstrap_ci.")
     q_low, q_high = quantiles
+    if q_low < 0.0 or q_high > 1.0 or q_low >= q_high:
+        raise ValueError(f"Invalid quantile pair: {quantiles}")
     low = float(np.quantile(arr, q=q_low, method="linear"))
     high = float(np.quantile(arr, q=q_high, method="linear"))
+    if low > high:
+        raise ValueError(f"Inverted confidence interval: {low} > {high}")
     return (low, high)
 
 
@@ -142,8 +148,18 @@ def compute_conservative_bounded_ci(
     upp_arr = np.asarray(upper_bounds, dtype=float)
     if len(low_arr) != len(upp_arr):
         raise ValueError("lower_bounds and upper_bounds must have identical length.")
+    if len(low_arr) == 0:
+        raise ValueError("Cannot compute bounded quantiles on empty array.")
+    if not np.all(np.isfinite(low_arr)) or not np.all(np.isfinite(upp_arr)):
+        raise ValueError("Non-finite values encountered in compute_conservative_bounded_ci.")
+    if np.any(low_arr > upp_arr):
+        raise ValueError("Inverted bounds detected: lower_bounds > upper_bounds.")
 
     q_low, q_high = quantiles
+    if q_low < 0.0 or q_high > 1.0 or q_low >= q_high:
+        raise ValueError(f"Invalid quantile pair: {quantiles}")
     overall_low = float(np.quantile(low_arr, q=q_low, method="linear"))
     overall_high = float(np.quantile(upp_arr, q=q_high, method="linear"))
+    if overall_low > overall_high:
+        raise ValueError(f"Inverted confidence interval: {overall_low} > {overall_high}")
     return (overall_low, overall_high)

@@ -387,6 +387,116 @@ def _make_earlier_condition(
     return cond
 
 
+def select_control_parameters(
+    candidates: pd.DataFrame | list[dict[str, Any]],
+    control_family: str,
+    target_mpiw: float | None = None,
+) -> dict[str, Any]:
+    """Select optimal parameter for a control family under the locked pre-test tie-breaking rule.
+
+    Uses exact minimum-relative filtering without rounding tolerance buckets:
+    - matched_width_interval:
+      1. Calculate actual minimum width error.
+      2. Retain candidates with width error <= minimum + 1e-8.
+      3. Within that set, calculate minimum mean cost.
+      4. Retain candidates with cost <= minimum + 1e-8.
+      5. Choose smaller lambda, then global_hcp before regime_hcp.
+    - other controls (widened_interval, point_safety_margin, earlier_intervention):
+      1. Calculate actual minimum mean cost.
+      2. Retain candidates with cost <= minimum + 1e-8.
+      3. Choose smaller parameter.
+      4. Where applicable, choose global_hcp before regime_hcp.
+    """
+    if isinstance(candidates, pd.DataFrame):
+        records = [dict(r) for r in candidates.to_dict(orient="records")]
+    else:
+        records = [dict(r) for r in candidates]
+
+    if not records:
+        raise ValueError(f"No candidates provided for control family {control_family}")
+
+    if control_family == CONTROL_MATCHED_WIDTH:
+
+        def get_w(r: dict[str, Any]) -> float:
+            if "width_diff" in r and not np.isnan(r["width_diff"]):
+                return float(r["width_diff"])
+            if target_mpiw is not None and "achieved_mpiw" in r:
+                return float(abs(r["achieved_mpiw"] - target_mpiw))
+            raise ValueError("Cannot determine width_diff for matched_width candidate")
+
+        def get_cost(r: dict[str, Any]) -> float:
+            val = r.get("cost")
+            if val is not None:
+                return float(val)
+            val = r.get("mean_cost")
+            if val is not None:
+                return float(val)
+            return 0.0
+
+        def get_param(r: dict[str, Any]) -> float:
+            val = r.get("param")
+            if val is not None:
+                return float(val)
+            val = r.get("parameter_value")
+            if val is not None:
+                return float(val)
+            return 0.0
+
+        min_w = min(get_w(r) for r in records)
+        w_pool = [r for r in records if get_w(r) <= min_w + TIE_TOLERANCE]
+
+        min_c = min(get_cost(r) for r in w_pool)
+        c_pool = [r for r in w_pool if get_cost(r) <= min_c + TIE_TOLERANCE]
+        c_pool.sort(
+            key=lambda r: (
+                get_param(r),
+                0 if r.get("source", r.get("interval_source")) == "global_hcp" else 1,
+            )
+        )
+        chosen = c_pool[0]
+    else:
+
+        def get_cost(r: dict[str, Any]) -> float:
+            val = r.get("cost")
+            if val is not None:
+                return float(val)
+            val = r.get("mean_cost")
+            if val is not None:
+                return float(val)
+            return 0.0
+
+        def get_param(r: dict[str, Any]) -> float:
+            val = r.get("param")
+            if val is not None:
+                return float(val)
+            val = r.get("parameter_value")
+            if val is not None:
+                return float(val)
+            return 0.0
+
+        min_c = min(get_cost(r) for r in records)
+        c_pool = [r for r in records if get_cost(r) <= min_c + TIE_TOLERANCE]
+        c_pool.sort(
+            key=lambda r: (
+                get_param(r),
+                0 if r.get("source", r.get("interval_source")) == "global_hcp" else 1,
+            )
+        )
+        chosen = c_pool[0]
+
+    # Ensure compatibility with both raw dicts and selection records
+    if "metrics" not in chosen:
+        chosen["metrics"] = {"mean_cost": chosen.get("cost", chosen.get("mean_cost", 0.0))}
+    elif "mean_cost" not in chosen["metrics"]:
+        chosen["metrics"]["mean_cost"] = chosen.get("cost", chosen.get("mean_cost", 0.0))
+    if "parameter_value" not in chosen and "param" in chosen:
+        chosen["parameter_value"] = chosen["param"]
+    if "interval_source" not in chosen and "source" in chosen:
+        chosen["interval_source"] = chosen["source"]
+
+    return chosen
+
+
 def run_fd002_control_selection(
     model_family: str,
     base_dir: Path | str = ".",
@@ -405,8 +515,8 @@ def run_fd002_control_selection(
     base = Path(base_dir).resolve()
     scenario = COST_SCENARIOS[scenario_id]
 
-    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty)
-    env_meta = capture_environment_metadata()
+    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
+    env_meta = capture_environment_metadata(device="cpu")
 
     # 1. Load FD002 split manifest and verify validation engines
     split_p = resolve_repo_relative_path(base, "data/splits/fd002_engine_split_seed_2026.json")
@@ -564,19 +674,10 @@ def run_fd002_control_selection(
             matched_candidates.append(rec)
             candidate_records.append(rec)
 
-    # Sort & Tie-break for matched_width_interval:
-    # 1. Minimize width_diff
-    # 2. Width diff within 1e-8 tied -> minimize mean_cost
-    # 3. Smaller lambda
-    # 4. global_hcp before regime_hcp
-    def matched_sort_key(r: dict[str, Any]) -> tuple[Any, ...]:
-        w_bucket = round(r["width_diff"] / TIE_TOLERANCE)
-        c_bucket = round(r["mean_cost"] / TIE_TOLERANCE)
-        src_rank = 0 if r["interval_source"] == "global_hcp" else 1
-        return (w_bucket, c_bucket, r["parameter_value"], src_rank)
-
-    matched_candidates.sort(key=matched_sort_key)
-    selected_matched = matched_candidates[0]
+    # Selection & Tie-break for matched_width_interval
+    selected_matched = select_control_parameters(
+        matched_candidates, CONTROL_MATCHED_WIDTH, target_mpiw=proposed_target_mpiw
+    )
     matched_boundary = selected_matched["parameter_value"] == min(
         GRID_MATCHED_WIDTH_LAMBDA
     ) or selected_matched["parameter_value"] == max(GRID_MATCHED_WIDTH_LAMBDA)
@@ -613,13 +714,8 @@ def run_fd002_control_selection(
             widened_candidates.append(rec)
             candidate_records.append(rec)
 
-    def widened_sort_key(r: dict[str, Any]) -> tuple[Any, ...]:
-        c_bucket = round(r["mean_cost"] / TIE_TOLERANCE)
-        src_rank = 0 if r["interval_source"] == "global_hcp" else 1
-        return (c_bucket, r["parameter_value"], src_rank)
-
-    widened_candidates.sort(key=widened_sort_key)
-    selected_widened = widened_candidates[0]
+    # Selection for widened_interval
+    selected_widened = select_control_parameters(widened_candidates, CONTROL_WIDENED)
     widened_boundary = selected_widened["parameter_value"] == min(
         GRID_WIDENED_LAMBDA
     ) or selected_widened["parameter_value"] == max(GRID_WIDENED_LAMBDA)
@@ -652,12 +748,8 @@ def run_fd002_control_selection(
         safety_margin_candidates.append(rec)
         candidate_records.append(rec)
 
-    def safety_sort_key(r: dict[str, Any]) -> tuple[Any, ...]:
-        c_bucket = round(r["mean_cost"] / TIE_TOLERANCE)
-        return (c_bucket, r["parameter_value"])
-
-    safety_margin_candidates.sort(key=safety_sort_key)
-    selected_safety = safety_margin_candidates[0]
+    # Selection for point_safety_margin
+    selected_safety = select_control_parameters(safety_margin_candidates, CONTROL_SAFETY_MARGIN)
     safety_boundary = selected_safety["parameter_value"] == min(
         GRID_SAFETY_MARGIN_M
     ) or selected_safety["parameter_value"] == max(GRID_SAFETY_MARGIN_M)
@@ -692,16 +784,27 @@ def run_fd002_control_selection(
             earlier_candidates.append(rec)
             candidate_records.append(rec)
 
-    def earlier_sort_key(r: dict[str, Any]) -> tuple[Any, ...]:
-        c_bucket = round(r["mean_cost"] / TIE_TOLERANCE)
-        src_rank = 0 if r["interval_source"] == "global_hcp" else 1
-        return (c_bucket, r["parameter_value"], src_rank)
-
-    earlier_candidates.sort(key=earlier_sort_key)
-    selected_earlier = earlier_candidates[0]
+    # Selection for earlier_intervention
+    selected_earlier = select_control_parameters(earlier_candidates, CONTROL_EARLIER_INTERVENTION)
     earlier_boundary = selected_earlier["parameter_value"] == min(
         GRID_EARLIER_INTERVENTION_H
     ) or selected_earlier["parameter_value"] == max(GRID_EARLIER_INTERVENTION_H)
+
+    # Assert exact candidate grid size per family
+    if len(matched_candidates) != 810:
+        raise ValueError(f"Expected 810 matched_width candidates, got {len(matched_candidates)}")
+    if len(widened_candidates) != 612:
+        raise ValueError(f"Expected 612 widened candidates, got {len(widened_candidates)}")
+    if len(safety_margin_candidates) != 251:
+        raise ValueError(
+            f"Expected 251 point_safety_margin candidates, got {len(safety_margin_candidates)}"
+        )
+    if len(earlier_candidates) != 502:
+        raise ValueError(
+            f"Expected 502 earlier_intervention candidates, got {len(earlier_candidates)}"
+        )
+    if len(candidate_records) != 2175:
+        raise ValueError(f"Expected 2175 total candidates, got {len(candidate_records)}")
 
     # -------------------------------------------------------------------------
     # Collect Engine-Seed Simulation Outcomes for the 4 Selected Controls

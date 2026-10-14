@@ -33,18 +33,28 @@ from intellitwin.uncertainty.verification import (
 def run_step08_audit(
     base_dir: Path | str = ".",
     raw_data_dir: Path | str = "data/raw/cmapss",
-    reproduce_predictions_from_raw: bool = False,
+    full_audit: bool = True,
+    reproduce_predictions_from_raw: bool | None = None,
     allow_dirty: bool = False,
 ) -> dict[str, Any]:
-    """Execute complete independent Step 8 verification audit."""
+    """Execute complete independent Step 8 verification audit.
+
+    Official full audit mode executes all mandatory verification checks,
+    including raw checkpoint prediction reproduction on validation and
+    calibration partitions (60 model/partition checks).
+    """
     base = Path(base_dir).resolve()
 
-    # Provenance tracking at entry
+    # Provenance tracking at entry - strict clean tree enforced
     git_sha, git_dirty = get_git_info(
         allow_dirty=allow_dirty,
-        ignored_paths=["experiments/audits/step08_repair_verification.json"],
+        repo_root=base,
     )
-    env_meta = capture_environment_metadata()
+    env_meta = capture_environment_metadata(device="cpu")
+
+    should_reproduce = (
+        full_audit if reproduce_predictions_from_raw is None else reproduce_predictions_from_raw
+    )
 
     results: dict[str, Any] = {
         "registry_completeness": "PENDING",
@@ -87,8 +97,8 @@ def run_step08_audit(
     results["scoped_isolation"] = iso_res["status"]
     details["isolation"] = iso_res
 
-    # G. Raw Prediction Reproduction (when requested)
-    if reproduce_predictions_from_raw:
+    # G. Raw Prediction Reproduction
+    if should_reproduce:
         raw_p = base / raw_data_dir
         if not raw_p.exists():
             results["checkpoint_prediction_reproduction"] = "NOT RUN (RAW DATA MISSING)"
@@ -104,20 +114,28 @@ def run_step08_audit(
             results["checkpoint_prediction_reproduction"] = raw_res["status"]
             details["checkpoint_prediction_reproduction"] = raw_res
 
-    overall_status = "PASS"
-    for k, v in results.items():
-        if k == "checkpoint_prediction_reproduction":
-            if reproduce_predictions_from_raw and v != "PASS":
-                overall_status = "FAIL"
-        elif v != "PASS":
-            overall_status = "FAIL"
+    # Status determination:
+    # PASS: every mandatory check executed and passed.
+    # INCOMPLETE: mandatory evidence or execution is missing.
+    # FAIL: a check executed and failed.
+    failures = [k for k, v in results.items() if v == "FAIL"]
+    not_runs = [k for k, v in results.items() if str(v).startswith("NOT RUN") or v == "PENDING"]
+
+    if failures:
+        overall_status = "FAIL"
+    elif not_runs:
+        overall_status = "INCOMPLETE"
+    elif all(v == "PASS" for v in results.values()):
+        overall_status = "PASS"
+    else:
+        overall_status = "FAIL"
 
     return {
-        "schema_version": "step08-repair-verification-v1",
+        "schema_version": "step08-full-audit-v1" if full_audit else "step08-repair-verification-v1",
         "protocol_version": PROTOCOL_VERSION,
         "overall_status": overall_status,
         "historical_provenance_context": {
-            "historical_baseline_commit": "f1edce7858c9748b6ee92e7c4f4a3b7849e7b235",
+            "historical_baseline_commit": "f1edce7fdf48b45513ff90a680da49701451d9cb",
             "historical_audit_git_dirty": True,
             "historical_audit_path": "experiments/calibration/audit_report.json",
             "notice": (
@@ -131,8 +149,8 @@ def run_step08_audit(
             "environment": env_meta,
         },
         "checks_actually_run": [k for k, v in results.items() if not str(v).startswith("NOT RUN")],
-        "checks_not_run": [k for k, v in results.items() if str(v).startswith("NOT RUN")],
-        "failures": [k for k, v in results.items() if v == "FAIL"],
+        "checks_not_run": not_runs,
+        "failures": failures,
         "results": results,
         "details": details,
     }
@@ -149,32 +167,35 @@ def main() -> None:
         help="Directory containing raw C-MAPSS training text files",
     )
     parser.add_argument(
-        "--reproduce-checkpoint-predictions",
+        "--skip-raw-reproduction",
         action="store_true",
-        help="Reproduce frozen checkpoint predictions on validation and calibration partitions",
+        help="Explicitly skip raw checkpoint prediction reproduction (produces INCOMPLETE audit)",
     )
     parser.add_argument(
         "--output-audit-json",
         type=str,
-        default="experiments/audits/step08_repair_verification.json",
+        default="experiments/pretest_verification_v2/step08_full_audit.json",
         help="Output path for Step 8 audit report JSON",
     )
     parser.add_argument(
         "--allow-dirty",
         action="store_true",
-        help="Permit execution on a dirty git working tree (for exploratory/development runs only)",
+        help="Permit execution on a dirty git working tree (ineligible for official completion)",
     )
     args = parser.parse_args()
 
+    full_audit = not args.skip_raw_reproduction
+
     print("=" * 80)
-    print("Step 8: Independent Calibration Matrix & Content Verification Audit")
+    print("Step 8: Independent Calibration Matrix & Full Content Verification Audit")
+    print(f"Mode: {'FULL OFFICIAL AUDIT' if full_audit else 'ARTIFACT-ONLY (INCOMPLETE)'}")
     print("=" * 80)
 
     try:
         report = run_step08_audit(
             base_dir=".",
             raw_data_dir=args.raw_data_dir,
-            reproduce_predictions_from_raw=args.reproduce_checkpoint_predictions,
+            full_audit=full_audit,
             allow_dirty=args.allow_dirty,
         )
     except Exception as exc:
@@ -189,8 +210,12 @@ def main() -> None:
 
     out_p = Path(args.output_audit_json)
     out_p.parent.mkdir(parents=True, exist_ok=True)
-    write_immutable_json(out_p, report, overwrite=True)
+    write_immutable_json(out_p, report, overwrite=False)
     print(f"\nWrote Step 8 audit report to: {out_p}")
+
+    if report["overall_status"] != "PASS":
+        print(f"\nERROR: Audit overall status is {report['overall_status']} (required: PASS).")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
