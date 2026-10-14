@@ -50,9 +50,25 @@ from intellitwin.provenance import (
 # =============================================================================
 
 
+def _git_commit_exists(commit_sha: str) -> bool:
+    """Check if a commit exists in local git history (avoids failure in shallow clones)."""
+    try:
+        res = subprocess.run(
+            ["git", "cat-file", "-t", commit_sha],
+            capture_output=True,
+            text=True,
+        )
+        return res.returncode == 0
+    except Exception:
+        return False
+
+
 def test_raw_reproduction_not_run_cannot_satisfy_readiness(tmp_path: Path) -> None:
     """If raw reproduction was NOT RUN, audit must not report PASS."""
     from scripts.audit_step08_calibration import run_step08_audit
+
+    if not _git_commit_exists("d25d0fa5f50377ddf90e039be3a01da6067c1972"):
+        pytest.skip("Historical commit d25d0fa5... not available in shallow git clone")
 
     audit_res = run_step08_audit(base_dir=".", allow_dirty=True, full_audit=False)
     # Artifact-only audit explicitly marks checkpoint reproduction NOT RUN
@@ -67,6 +83,9 @@ def test_wrong_baseline_sha_fails_git_validation() -> None:
     """
     wrong_sha = "f1edce7858c9748b6ee92e7c4f4a3b7849e7b235"
     actual_sha = "f1edce7fdf48b45513ff90a680da49701451d9cb"
+
+    if not _git_commit_exists(actual_sha):
+        pytest.skip(f"Baseline commit {actual_sha} not available in shallow git clone")
 
     # Wrong SHA must fail
     res_wrong = subprocess.run(
@@ -90,6 +109,9 @@ def test_missing_tracked_protected_files_fail(tmp_path: Path) -> None:
     """A missing tracked protected file must cause baseline verification to fail."""
     from scripts.build_baseline_manifest import build_baseline_manifest
 
+    if not _git_commit_exists("f1edce7fdf48b45513ff90a680da49701451d9cb"):
+        pytest.skip("Baseline commit f1edce7f... not available in shallow git clone")
+
     # Point to empty directory where tracked files are missing
     out_json = tmp_path / "baseline_manifest.json"
     manifest = build_baseline_manifest(
@@ -105,6 +127,9 @@ def test_missing_tracked_protected_files_fail(tmp_path: Path) -> None:
 def test_missing_historical_local_only_checkpoints_reported_separately(tmp_path: Path) -> None:
     """72 local-only model selection search checkpoints are accounted for separately."""
     from scripts.build_baseline_manifest import build_baseline_manifest
+
+    if not _git_commit_exists("f1edce7fdf48b45513ff90a680da49701451d9cb"):
+        pytest.skip("Baseline commit f1edce7f... not available in shallow git clone")
 
     out_json = tmp_path / "baseline_manifest.json"
     manifest = build_baseline_manifest(
