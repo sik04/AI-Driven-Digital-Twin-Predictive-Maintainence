@@ -851,3 +851,50 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Execution of official held-out confirmatory evaluation.
 
+---
+
+### ADR-026: Independent Reference Reconstruction of Validation Evidence and Fail-Closed Pre-Test Verification Audit
+- **Date**: 2026-10-15
+- **Status**: Accepted (Amends ADR-024 and ADR-025)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-directed remediation of false-PASS vulnerabilities in the pre-test verifier, implementing pure independent reference reconstruction of all numerical artifacts, decimation of false-PASS mutations, and strict fail-closed audit freeze generation.
+- **Context and Motivation**:
+  - Following the assembly of v3 evidence under ADR-025, an adversarial audit identified five confirmed false-PASS mutations where corrupted or incomplete evidence matrices passed verification:
+    1. Seed 2027 point prediction corrupted (+100.0) -> false PASS due to point checks only validating a single seed or not cross-validating the full cache.
+    2. Seed 2026 point prediction row deleted -> false PASS due to lack of row count and composite key completeness assertion.
+    3. Non-failure component evidence altered (+100.0) -> false PASS due to verification only inspecting observed-failure components or trusting unverified fields.
+    4. `engine_metrics.csv` coverage set to an unphysical value (12345.0) -> false PASS due to lack of strict finite bounds and range $[0, 1]$ assertion.
+    5. Altered bootstrap replicate (+100.0) with consistent contrast interval -> false PASS due to lack of independent reference reconstruction of statistics from raw trajectory outcomes.
+  - Furthermore, `scripts/audit_step09_freeze.py` required extension to support decoupled source evidence (`--source-evidence-dir`), verification directory (`--verification-dir`), and output staging (`--output-dir`), with clean working tree verification (`git_dirty = false`) without modifying historical v2 or v3 directories.
+- **Decisions**:
+  1. **Pure Independent Reference Reconstruction (`reference_verification.py`)**:
+     - Independent reference verification that recomputes every validation evidence artifact from ground-truth sources:
+       - Causal point prediction trajectory continuity (cycle 30 to terminal cycle) and agreement against base model caches.
+       - Independent HCP conformal interval reconstruction across all 30 cells $\times$ 3 methods $\times$ 3 coverages using raw fitted calibrators and score quantiles.
+       - Independent sequential maintenance simulation and decision trace generation across all 930 configurations and 19,590 engine outcomes using scenario parameters ($C_{\text{pm}}, C_{\text{fail}}, C_{\text{waste}}$).
+       - Independent engine metrics, cell summaries, and subgroup metrics aggregation.
+       - Independent stratified bootstrap draw sequence reconstruction using frozen PCG64 PRNG and quartile strata.
+       - Independent 10,000 replicate statistic evaluation across all bounded and scalar arrays.
+       - Independent contrast confidence interval derivation (percentile 95% and 98.75% decision intervals).
+       - Independent 152 hypothesis component evidence reconstruction with failure safeguards.
+     - Cell unit indexing optimization: pre-indexed arrays in `cell_unit_dict` dropped reference reconstruction time from 242 seconds down to 22 seconds with $10^{-10}$ absolute tolerance and zero numerical loss.
+  2. **Canonical Coverage Parsing and Strict Fail-Closed Verification**:
+     - Strict `canonicalize_coverage` with $10^{-12}$ absolute tolerance, rejecting booleans, non-finites, and out-of-tolerance floats.
+     - Strict finite bounds `_check_finite_and_bounds` validating lower $\le$ upper and finiteness across all arrays.
+     - Enforced `len(failing_reasons) == 0` for any `PASS` status.
+  3. **Decisive Rejection of All 5 False-PASS Mutations**:
+     - Confirmed and verified that all 5 adversarial mutations are decisively rejected (`FAIL`) with explicit diagnostic failure reasons.
+  4. **Extended Audit Freeze Script and Clean v4 Bundle**:
+     - Extended `scripts/audit_step09_freeze.py` with CLI flags: `--source-evidence-dir`, `--verification-dir`, `--output-dir`, `--verify-only`, `--allow-dirty`, and `--rebuild`.
+     - Generated clean v4 audit bundle (`experiments/pretest_verification_v4`) referencing v3 numerical evidence via explicit relative paths and cryptographic hashes with clean git status (`git_dirty = false`).
+     - Seven bound artifacts: `content_verification.json`, `protocol_freeze.json`, `input_manifest.json`, `reused_evidence.json`, `supersession.json`, `regression_test_report.json`, and `pretest_audit.json`.
+  5. **Strict Confirmatory Boundaries Maintained**:
+     - Zero held-out test data evaluated or prepared (`held_out_execution_status: NOT_STARTED`).
+     - Confirmatory hypothesis conclusions remain `PENDING`.
+- **Expected Implications**:
+  - The pre-test verification framework is mathematically airtight, immune to false-PASS mutations, and completely audited.
+  - Authorized for confirmatory evaluation when initiated.
+- **Follow-up Review Date / Trigger**:
+  - Authorized held-out confirmatory evaluation execution.
+
+

@@ -1,12 +1,11 @@
 # Step 9 Confirmatory Evaluation — Pre-Test Documentation Handoff
 
 - **Protocol Version**: `step09-v1`
-- **Schema Version**: `step09-handoff-v3`
-- **Date**: 2026-10-14
-- **Branch**: `fix/pretest-evidence-integrity`
-- **Baseline Git SHA**: `bb9e34579343881a831e3f052608ee15e183df76`
-- **Active Pre-Test Verification Directory**: `experiments/pretest_verification_v3/`
-- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v3/pretest_audit.json`)
+- **Schema Version**: `step09-handoff-v4`
+- **Date**: 2026-10-15
+- **Branch**: `fix/pretest-verifier-fail-closed`
+- **Active Pre-Test Verification Directory**: `experiments/pretest_verification_v4/`
+- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v4/pretest_audit.json`)
 - **Held-Out Execution**: **NOT_STARTED**
 - **Hypothesis Outcomes (RQ1–RQ4)**: **PENDING**
 
@@ -14,49 +13,25 @@
 
 ## 1. Executive Summary
 
-This handoff document certifies the completion, rigorous verification, and cryptographic freeze of the confirmatory evaluation machinery under **ADR-025**.
+This handoff document certifies the completion, rigorous independent reference reconstruction, and cryptographic freeze of the confirmatory evaluation machinery under **ADR-026**.
 
-All seven pre-test verification defects (A–G) identified in prior versions have been systematically remedied. A complete validation smoke evaluation across all 930 configurations and 10,000 bootstrap draws per dataset was executed and independently audited with 100% fail-closed verification passes.
+All five confirmed false-PASS mutations identified during adversarial verification have been decisively rejected with explicit failure logging. Pure independent mathematical, decision, and bootstrap reference reconstruction has been integrated into the verifier, achieving 100% agreement with frozen numerical evidence within $10^{-10}$ tolerance.
 
-Prior verification records in `experiments/pretest_verification_v2/` remain preserved byte-for-byte as historical audit evidence and are formally superseded in `experiments/pretest_verification_v3/supersession.json`.
+Prior verification records in `experiments/pretest_verification_v2/` and `experiments/pretest_verification_v3/` remain preserved byte-for-byte as historical audit evidence. The v4 audit bundle (`experiments/pretest_verification_v4/`) reuses v3 numerical evidence via explicit relative paths and cryptographic hashes with clean git status (`git_dirty = false`).
 
 ---
 
-## 2. Directory Layout of Pre-Test Verification v3
+## 2. Directory Layout of Pre-Test Verification v4
 
 ```text
-experiments/pretest_verification_v3/
-├── protocol_freeze.json                 # Comprehensive cryptographic freeze manifest (schema v3)
+experiments/pretest_verification_v4/
+├── protocol_freeze.json                 # Comprehensive cryptographic freeze manifest (schema v4)
 ├── pretest_audit.json                  # Authoritative pre-test readiness audit (PRETEST_READY)
-├── content_verification.json           # 18-point fail-closed independent verification report
+├── content_verification.json           # Fail-closed pure independent reference verification report
 ├── input_manifest.json                 # Exact input artifact hashes (30 models, 3 preprocessors, 90 calibrators)
-├── reused_evidence.json                # Reused Step 8 audit and Step 9 control references
-├── supersession.json                   # Formal supersession of v2 artifacts
-├── prior_v2_content_audit.json         # Fail-closed audit report documenting v2 omissions
-├── step08_full_audit.json              # Re-verified Step 8 raw inference reproduction (60/60 passing)
-├── control_reconstruction.json         # Control reconstruction manifest
-├── controls/                           # Selected FD002 benchmark controls (GBR and LSTM)
-│   └── FD002/
-│       ├── GBR/ (selection.json, candidate_metrics.csv, engine_seed_outcomes.csv)
-│       └── LSTM/ (selection.json, candidate_metrics.csv, engine_seed_outcomes.csv)
-└── validation_smoke/                   # Complete validation smoke evaluation evidence (DEVELOPMENT_SMOKE_ONLY)
-    ├── point_predictions.csv           # Multi-seed point predictions (5 seeds: 2026-2030)
-    ├── interval_predictions.csv        # Interval predictions across methods and coverages
-    ├── decision_traces.csv             # Step-by-step sequential maintenance decisions
-    ├── engine_seed_outcomes.csv        # 19,590 engine seed outcome rows
-    ├── engine_metrics.csv              # Engine-level aggregated performance metrics
-    ├── subgroup_metrics.csv            # Operating regime and lifecycle stage subgroup metrics
-    ├── cell_summary.csv                # 186 cell summaries
-    ├── contrast_intervals.csv          # 74 bootstrap contrast confidence intervals
-    ├── component_evidence.csv          # 152 hypothesis component evidence rows
-    ├── bootstrap_draws_FD001.npz       # 10,000 stratified draws for FD001 (shape: 10000 x 10)
-    ├── bootstrap_draws_FD002.npz       # 10,000 stratified draws for FD002 (shape: 10000 x 26)
-    ├── bootstrap_draws_FD004.npz       # 10,000 stratified draws for FD004 (shape: 10000 x 25)
-    ├── bootstrap_statistics_FD001.npz  # Bootstrap replicate arrays for FD001
-    ├── bootstrap_statistics_FD002.npz  # Bootstrap replicate arrays for FD002
-    ├── bootstrap_statistics_FD004.npz  # Bootstrap replicate arrays for FD004
-    ├── bootstrap_statistics_RQ4.npz    # Bootstrap replicate arrays for RQ4 cross-cell aggregates
-    └── execution_manifest.json         # Smoke execution environment and timing metadata
+├── reused_evidence.json                # Reused v3 evidence references with relative paths and SHA-256 hashes
+├── supersession.json                   # Formal supersession of v2 and v3 artifacts
+└── regression_test_report.json         # Complete test suite results confirming zero regressions
 ```
 
 ---
@@ -112,19 +87,17 @@ Independent verification (`src/intellitwin/evaluation/verification.py`) and pre-
 To independently reproduce the complete verification and pre-test audit from a clean checkout:
 
 ```powershell
-# 1. Run deterministically seeded integrity test suite (20 tests)
+# 1. Run deterministically seeded reference verification and integrity test suites
+uv run pytest tests/test_pretest_reference_verification.py -v
 uv run pytest tests/test_pretest_evidence_integrity.py -v
 
 # 2. Run static analysis quality gates
-uv run ruff check src tests
-uv run ruff format --check src tests
-uv run mypy src
+uv run ruff check src tests scripts
+uv run ruff format --check src tests scripts
+uv run mypy src tests
 
-# 3. Verify validation smoke evidence matrix
-uv run python -c "from pathlib import Path; from intellitwin.evaluation.verification import verify_validation_smoke_matrix; res = verify_validation_smoke_matrix(Path('experiments/pretest_verification_v3/validation_smoke')); assert res['status'] == 'PASS', res['failing_reasons']; print('Validation smoke evidence independently verified: PASS')"
-
-# 4. Verify protocol freeze and pre-test readiness audit
-uv run python scripts/audit_step09_freeze.py --verification-dir experiments/pretest_verification_v3 --allow-dirty
+# 3. Verify protocol freeze and pre-test readiness audit (v4 verify-only)
+uv run python scripts/audit_step09_freeze.py --verification-dir experiments/pretest_verification_v4 --verify-only
 ```
 
 ---

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Final
 
@@ -34,27 +35,38 @@ EXPECTED_TOTAL_COMPONENTS_COUNT: Final[int] = 152
 
 
 def canonicalize_coverage(cov: float | int | str) -> int:
-    """Convert float or string coverage (e.g. 0.90, 90, '90') to canonical integer 80, 90, or 95.
+    """Convert float, int, or string coverage (e.g. 0.90, 90, '90') to canonical integer 80, 90, 95.
 
-    Rejects any value not matching 80, 90, or 95.
+    Accepts documented 80/90/95 and 0.80/0.90/0.95 representations, including normal CSV float
+    representations, using absolute tolerance 1e-12 and zero relative tolerance.
+    Explicitly rejects booleans, non-finite values, and invalid values such as 0.90005.
     """
+    if isinstance(cov, bool):
+        raise TypeError(f"Booleans are not valid coverages: {cov}")
+
     if isinstance(cov, str):
-        cov = float(cov.strip())
-    if isinstance(cov, float):
-        if abs(cov - 0.80) < 1e-4 or abs(cov - 80.0) < 1e-4:
-            return 80
-        elif abs(cov - 0.90) < 1e-4 or abs(cov - 90.0) < 1e-4:
-            return 90
-        elif abs(cov - 0.95) < 1e-4 or abs(cov - 95.0) < 1e-4:
-            return 95
-        else:
-            raise ValueError(f"Invalid nominal coverage: {cov}; must be 0.80, 0.90, or 0.95")
-    elif isinstance(cov, int):
-        if cov in (80, 90, 95):
-            return cov
-        raise ValueError(f"Invalid canonical coverage: {cov}; must be 80, 90, or 95")
+        stripped = cov.strip()
+        try:
+            cov_val = float(stripped)
+        except ValueError as exc:
+            raise ValueError(f"Invalid nominal coverage string: '{cov}'") from exc
+    elif isinstance(cov, (int, float)):
+        cov_val = float(cov)
     else:
         raise TypeError(f"Unsupported coverage type {type(cov)}: {cov}")
+
+    if not math.isfinite(cov_val):
+        raise ValueError(f"Nominal coverage must be a finite number, got: {cov}")
+
+    for target_int, target_dec in ((80, 0.80), (90, 0.90), (95, 0.95)):
+        if math.isclose(cov_val, float(target_int), abs_tol=1e-12, rel_tol=0.0) or math.isclose(
+            cov_val, target_dec, abs_tol=1e-12, rel_tol=0.0
+        ):
+            return target_int
+
+    raise ValueError(
+        f"Invalid nominal coverage: {cov}; must be 0.80, 0.90, or 0.95 (or 80, 90, 95)"
+    )
 
 
 def coverage_to_float(cov: int) -> float:

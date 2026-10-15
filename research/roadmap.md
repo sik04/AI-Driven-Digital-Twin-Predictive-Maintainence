@@ -164,15 +164,16 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 7: Uncertainty and Maintenance Decision Experiments (Step 9 Preparation & Confirmatory Evaluation)
-- **Status**: In Progress (Step 9 / Phase 7 pre-test confirmatory preparation, control selection, complete validation smoke across 930 configurations and 152 hypothesis components, independent PRNG draw verification, and protocol freeze verified under ADR-024 and ADR-025; official held-out test execution NOT STARTED; confirmatory RQ1–RQ4 outcomes PENDING)
+- **Status**: In Progress (Step 9 / Phase 7 pre-test confirmatory preparation, control selection, complete validation smoke across 930 configurations and 152 hypothesis components, pure independent reference reconstruction, and fail-closed protocol freeze verified under ADR-024, ADR-025, and ADR-026; official held-out test execution NOT STARTED; confirmatory RQ1–RQ4 outcomes PENDING)
 - **Objective**: Implement confirmatory evaluation machinery, freeze matched-conservatism benchmark controls on validation data, lock the complete pre-test evaluation protocol, and subsequently evaluate conformal prediction intervals and maintenance decision policies inside the frozen simulator across Experiments A through D (RQ1–RQ4).
 - **Expected Deliverables**:
   - Pre-test confirmatory evaluation protocol and configuration (`research/research_design/step09_confirmatory_protocol.md`, `step09_confirmatory_config.json`).
   - Production evaluation, simulation runner, and statistical inference modules (`src/intellitwin/evaluation/`).
+  - Pure independent mathematical, decision, and bootstrap reference verification (`src/intellitwin/evaluation/reference_verification.py`).
   - Validation-selected benchmark control models for RQ3 with minimum-relative tie-breaking (`src/intellitwin/decision/controls.py`, `experiments/pretest_verification_v3/controls/`).
   - Complete validation smoke matrix (930 configurations, 19,590 outcome rows, 186 cell-summary rows, 152 component rows) and applied 10,000-replicate bootstrap statistics under `experiments/pretest_verification_v3/validation_smoke/`.
-  - Fail-closed independent content verification report (`experiments/pretest_verification_v3/content_verification.json` with 18/18 checks passing).
-  - Pre-test freeze manifest and audit (`experiments/pretest_verification_v3/protocol_freeze.json`, `pretest_audit.json` with status `PRETEST_READY`).
+  - Fail-closed pure independent reference verification report (`experiments/pretest_verification_v4/content_verification.json`).
+  - Pre-test freeze manifest and audit (`experiments/pretest_verification_v4/protocol_freeze.json`, `pretest_audit.json` with status `PRETEST_READY`).
   - Validation-only smoke evaluation records labeled `DEVELOPMENT_SMOKE_ONLY`.
   - Future held-out test predictions, simulation traces, stratified bootstrap draws, and IUT decision outcomes.
 - **Acceptance Criteria**:
@@ -181,7 +182,7 @@ This document outlines the master research and development roadmap for the Intel
   - All confirmatory hypothesis decisions (Supported, Unsupported, Inconclusive) strictly follow the frozen Bonferroni / IUT decision rules.
   - Confirmatory test outcomes remain strictly PENDING until held-out test execution.
 - **Dependencies**: Phase 6 / Step 8.
-- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke across all 930 configurations, 19,590 rows, and 152 hypothesis components completed with 100% exact independent PRNG draw and CI reconstruction; confirmatory test execution remains strictly not started.
+- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke across all 930 configurations, 19,590 rows, and 152 hypothesis components completed with 100% exact independent reference reconstruction and CI verification; decisive rejection of all 5 confirmed false-PASS mutations verified; confirmatory test execution remains strictly not started.
 
 
 ---

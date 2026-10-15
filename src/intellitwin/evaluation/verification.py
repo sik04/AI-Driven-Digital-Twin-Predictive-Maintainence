@@ -18,6 +18,7 @@ from intellitwin.evaluation.decisions import (
     validate_component_manifest_completeness,
 )
 from intellitwin.evaluation.evidence_schema import (
+    COMPONENT_EVIDENCE_COLUMNS,
     EXPECTED_TOTAL_CELL_SUMMARIES_COUNT,
     EXPECTED_TOTAL_COMPONENTS_COUNT,
     EXPECTED_TOTAL_CONFIGS_COUNT,
@@ -30,6 +31,9 @@ from intellitwin.evaluation.evidence_schema import (
     generate_expected_configurations,
     generate_expected_engine_outcome_keys,
     get_expected_contrast_statistic_specs,
+)
+from intellitwin.evaluation.reference_verification import (
+    independently_verify_all_validation_evidence,
 )
 from intellitwin.evaluation.schema import (
     CONFIRMATORY_DATASETS,
@@ -57,6 +61,124 @@ REQUIRED_SMOKE_FILES: tuple[str, ...] = (
     "bootstrap_statistics_RQ4.npz",
     "execution_manifest.json",
 )
+
+REQUIRED_CSV_SCHEMAS: dict[str, tuple[str, ...]] = {
+    "point_predictions.csv": (
+        "dataset",
+        "model_family",
+        "seed",
+        "unit",
+        "endpoint_cycle",
+        "rul_true",
+        "prediction",
+        "regime",
+        "lifecycle_stage",
+    ),
+    "interval_predictions.csv": (
+        "dataset",
+        "model_family",
+        "seed",
+        "method_or_control_id",
+        "nominal_coverage",
+        "unit",
+        "endpoint_cycle",
+        "lower",
+        "upper",
+        "covered",
+        "width",
+        "interval_score",
+    ),
+    "decision_traces.csv": (
+        "dataset",
+        "model_family",
+        "seed",
+        "method_or_control_id",
+        "nominal_coverage",
+        "scenario_id",
+        "unit",
+        "cycle",
+        "action",
+    ),
+    "engine_seed_outcomes.csv": (
+        "dataset",
+        "model_family",
+        "seed",
+        "method_or_control_id",
+        "nominal_coverage",
+        "scenario_id",
+        "unit",
+        "terminal_event",
+        "intervention_cycle",
+        "failed",
+        "pm",
+        "wasted_rul",
+        "total_cost",
+        "is_cost_inefficient_early_pm",
+    ),
+    "engine_metrics.csv": (
+        "dataset",
+        "model_family",
+        "seed",
+        "method_or_control_id",
+        "nominal_coverage",
+        "scenario_id",
+        "unit",
+        "coverage",
+        "mpiw",
+        "mean_interval_score",
+        "rmse",
+        "total_cost",
+        "failed",
+        "pm",
+        "wasted_rul",
+    ),
+    "subgroup_metrics.csv": (
+        "dataset",
+        "model_family",
+        "method_id",
+        "nominal_coverage",
+        "subgroup_family",
+        "subgroup_id",
+        "engine_count",
+        "coverage",
+        "coverage_abs_error",
+        "is_eligible",
+    ),
+    "cell_summary.csv": (
+        "dataset",
+        "model_family",
+        "method_or_control_id",
+        "nominal_coverage",
+        "scenario_id",
+        "mean_cost",
+        "failure_rate",
+        "pm_rate",
+        "mean_wasted_rul",
+        "fleet_early_pm_rate",
+        "pm_only_early_pm_rate",
+        "marginal_coverage",
+        "marginal_coverage_abs_error",
+        "mpiw",
+        "interval_score",
+        "status",
+    ),
+    "contrast_intervals.csv": (
+        "contrast_id",
+        "dataset",
+        "model_family",
+        "comparator",
+        "metric",
+        "mean",
+        "median",
+        "ci_95_low",
+        "ci_95_high",
+        "ci_decision_low",
+        "ci_decision_high",
+        "margin",
+        "status",
+    ),
+    "component_evidence.csv": COMPONENT_EVIDENCE_COLUMNS,
+}
 
 
 def independently_generate_bootstrap_draws(
@@ -124,6 +246,67 @@ def verify_validation_smoke_matrix(
             "failing_reasons": failing_reasons,
             "checks": checks,
         }
+
+    # 1b. Required CSV Schemas and Finite Numeric Validity
+    schema_mismatches: list[str] = []
+    finite_bounds_errors: list[str] = []
+
+    for fname, req_cols in REQUIRED_CSV_SCHEMAS.items():
+        fpath = s_dir / fname
+        try:
+            df_check = pd.read_csv(fpath, nrows=5)
+            missing_cols = [c for c in req_cols if c not in df_check.columns]
+            if missing_cols:
+                schema_mismatches.append(f"{fname} missing columns: {missing_cols}")
+        except Exception as exc:
+            schema_mismatches.append(f"Failed to read {fname}: {exc}")
+
+    checks["csv_schemas_match"] = {
+        "status": "PASS" if len(schema_mismatches) == 0 else "FAIL",
+        "mismatches": schema_mismatches,
+    }
+    if schema_mismatches:
+        failing_reasons.extend(schema_mismatches)
+
+    # Validate finite values and interval bounds
+    df_chk_int = pd.read_csv(s_dir / "interval_predictions.csv", float_precision="round_trip")
+    if not (np.all(np.isfinite(df_chk_int["lower"])) and np.all(np.isfinite(df_chk_int["upper"]))):
+        finite_bounds_errors.append("Non-finite values detected in interval_predictions.csv")
+    if np.any(df_chk_int["lower"] > df_chk_int["upper"] + 1e-12):
+        finite_bounds_errors.append(
+            "Inverted interval bounds detected in interval_predictions.csv (lower > upper)"
+        )
+
+    df_chk_out = pd.read_csv(s_dir / "engine_seed_outcomes.csv", float_precision="round_trip")
+    if not np.all(np.isfinite(df_chk_out["total_cost"])):
+        finite_bounds_errors.append("Non-finite total_cost detected in engine_seed_outcomes.csv")
+    if not np.all(np.isfinite(df_chk_out["wasted_rul"])):
+        finite_bounds_errors.append("Non-finite wasted_rul detected in engine_seed_outcomes.csv")
+
+    df_chk_em = pd.read_csv(s_dir / "engine_metrics.csv", float_precision="round_trip")
+    if not (
+        np.all(np.isfinite(df_chk_em["total_cost"])) and np.all(np.isfinite(df_chk_em["rmse"]))
+    ):
+        finite_bounds_errors.append("Non-finite total_cost or rmse detected in engine_metrics.csv")
+    # Check coverage in engine_metrics is either NaN (safety margin) or strictly within [0, 1]
+    non_sm_mask = df_chk_em["method_or_control_id"] != "point_safety_margin"
+    cov_vals = df_chk_em.loc[non_sm_mask, "coverage"].to_numpy(dtype=float)
+    if not np.all(np.isfinite(cov_vals)):
+        finite_bounds_errors.append(
+            "Non-finite coverage detected in engine_metrics.csv for non-safety-margin methods"
+        )
+    elif np.any(cov_vals < 0.0) or np.any(cov_vals > 1.0):
+        finite_bounds_errors.append(
+            f"Coverage values outside [0, 1] in engine_metrics.csv: "
+            f"min={np.min(cov_vals)}, max={np.max(cov_vals)}"
+        )
+
+    checks["finite_values_and_bounds"] = {
+        "status": "PASS" if len(finite_bounds_errors) == 0 else "FAIL",
+        "errors": finite_bounds_errors,
+    }
+    if finite_bounds_errors:
+        failing_reasons.extend(finite_bounds_errors)
 
     # 2. Frozen Partition Engines
     expected_units: dict[str, list[int]] = {}
@@ -348,11 +531,12 @@ def verify_validation_smoke_matrix(
     if not checks["point_predictions_unique_keys"]:
         failing_reasons.append("point_predictions.csv contains duplicate trajectory keys.")
 
-    # Compare sample of point predictions against frozen validation caches
+    # Compare point predictions against frozen validation caches across all 5 seeds
     max_cache_diff = 0.0
+    cache_match = True
     for ds in CONFIRMATORY_DATASETS:
         for fam in CONFIRMATORY_MODELS:
-            for s in (2026, 2030):  # verify anchor seeds
+            for s in CONFIRMATORY_SEEDS:
                 cache_p = resolve_repo_relative_path(
                     base,
                     f"experiments/calibration/point_predictions/validation/{ds}/{fam}/seed_{s}.csv",
@@ -366,9 +550,11 @@ def verify_validation_smoke_matrix(
                 df_c_sorted = df_c.sort_values(["unit", "endpoint_cycle"])
                 if len(sub_pts) != len(df_c_sorted):
                     failing_reasons.append(
-                        f"Point predictions count mismatch for {ds}/{fam}/seed_{s}"
+                        f"Point predictions count mismatch for {ds}/{fam}/seed_{s}: "
+                        f"actual {len(sub_pts)} != cache {len(df_c_sorted)}"
                     )
-                    break
+                    cache_match = False
+                    continue
                 diff = np.max(
                     np.abs(sub_pts["prediction"].to_numpy() - df_c_sorted["prediction"].to_numpy())
                 )
@@ -377,11 +563,12 @@ def verify_validation_smoke_matrix(
 
     checks["point_predictions_cache_match"] = {
         "max_diff": max_cache_diff,
-        "match": max_cache_diff < 1e-10,
+        "match": cache_match and (max_cache_diff < 1e-10),
     }
     if not checks["point_predictions_cache_match"]["match"]:
         failing_reasons.append(
-            f"Point prediction discrepancy vs frozen cache: {max_cache_diff} > 1e-10"
+            f"Point prediction discrepancy vs frozen cache: {max_cache_diff} > 1e-10 "
+            f"(cache_match={cache_match})"
         )
 
     # 6. Verify Bootstrap Draws (Independent Reconstruction)
@@ -620,8 +807,17 @@ def verify_validation_smoke_matrix(
             "Non-development or premature confirmatory status detected in artifacts."
         )
 
+    # 9. Independent Reference Verification (Full Numerical & Semantic Reconstruction)
+    ref_res = independently_verify_all_validation_evidence(smoke_dir=s_dir, base_dir=base)
+    checks["reference_verification"] = ref_res
+    if not ref_res["overall_match"] or ref_res["failing_reasons"]:
+        failing_reasons.extend(ref_res["failing_reasons"])
+
     all_passed = (
-        checks["required_files_present"]
+        len(failing_reasons) == 0
+        and checks["required_files_present"]
+        and checks["csv_schemas_match"]["status"] == "PASS"
+        and checks["finite_values_and_bounds"]["status"] == "PASS"
         and all(checks["validation_engine_counts"].values())
         and checks["canonical_coverage_valid"]
         and checks["configurations_exact_match"]["match"]
@@ -642,6 +838,7 @@ def verify_validation_smoke_matrix(
         and checks["component_manifest_validation"].get("all_valid", False)
         and checks["failure_safeguards_exact_match"]["match"]
         and checks["development_smoke_status_only"]
+        and checks["reference_verification"]["overall_match"]
     )
 
     return {

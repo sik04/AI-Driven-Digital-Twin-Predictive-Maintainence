@@ -8,12 +8,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from intellitwin.evaluation.decisions import (
-    get_rq_component_manifest,
-)
-from intellitwin.evaluation.evidence_schema import (
-    map_component_to_evidence_spec,
-)
 from intellitwin.evaluation.metrics import (
     compute_equal_engine_metric,
 )
@@ -208,108 +202,14 @@ def test_action_trace_preservation_across_cost_repricing() -> None:
 
 
 def _create_minimal_valid_smoke_fixture(tmp_path: Path) -> Path:
-    """Create a synthetically complete, internally consistent smoke fixture."""
-    # We copy the structure from the existing v2 validation_smoke as starting point
-    src_dir = Path("experiments/pretest_verification_v2/validation_smoke")
+    """Create a complete, internally consistent smoke fixture by copying v3 validation_smoke."""
+    src_dir = Path("experiments/pretest_verification_v3/validation_smoke")
     fixture_dir = tmp_path / "valid_smoke"
     fixture_dir.mkdir(parents=True, exist_ok=True)
 
     for p in src_dir.glob("*"):
         if p.is_file():
             (fixture_dir / p.name).write_bytes(p.read_bytes())
-
-    # Add 5-seed point_predictions.csv
-    df_pts = pd.read_csv(src_dir / "point_predictions.csv")
-    pts_all_seeds = []
-    for s in (2026, 2027, 2028, 2029, 2030):
-        df_s = df_pts.copy()
-        df_s["seed"] = s
-        pts_all_seeds.append(df_s)
-    df_pts_full = pd.concat(pts_all_seeds, ignore_index=True)
-    df_pts_full.to_csv(fixture_dir / "point_predictions.csv", index=False)
-
-    # Add component_evidence.csv
-    manifest = get_rq_component_manifest()
-    all_comps = [c for rq in ("RQ1", "RQ2", "RQ3", "RQ4") for c in manifest[rq]]
-    df_contrasts = pd.read_csv(src_dir / "contrast_intervals.csv")
-    c_lookup = {r["contrast_id"]: r for _, r in df_contrasts.iterrows()}
-
-    comp_rows = []
-    for comp in all_comps:
-        ev_kind, stat_id = map_component_to_evidence_spec(
-            comp.component_id,
-            comp.rq_id,
-            comp.model_family,
-            comp.dataset,
-            comp.comparator,
-            comp.metric,
-            comp.rule_type,
-        )
-        if ev_kind == "observed_failure":
-            row = {
-                "component_id": comp.component_id,
-                "rq_id": comp.rq_id,
-                "dataset": comp.dataset or "ALL_6_CELLS",
-                "model_family": comp.model_family or "BOTH",
-                "comparator": comp.comparator,
-                "metric": comp.metric,
-                "rule_type": comp.rule_type,
-                "margin": comp.margin,
-                "evidence_kind": ev_kind,
-                "statistic_id": stat_id,
-                "observed_lower": np.nan,
-                "observed_upper": np.nan,
-                "ci_95_low": np.nan,
-                "ci_95_high": np.nan,
-                "ci_decision_low": np.nan,
-                "ci_decision_high": np.nan,
-                "proposed_failure_count": 0,
-                "comparator_failure_count": 0,
-                "status": "DEVELOPMENT_SMOKE_ONLY",
-            }
-        else:
-            c_info = c_lookup.get(stat_id, {})
-            row = {
-                "component_id": comp.component_id,
-                "rq_id": comp.rq_id,
-                "dataset": comp.dataset or "ALL_6_CELLS",
-                "model_family": comp.model_family or "BOTH",
-                "comparator": comp.comparator,
-                "metric": comp.metric,
-                "rule_type": comp.rule_type,
-                "margin": comp.margin,
-                "evidence_kind": ev_kind,
-                "statistic_id": stat_id,
-                "observed_lower": 0.0,
-                "observed_upper": 0.0,
-                "ci_95_low": float(c_info.get("ci_95_low", 0.0)),
-                "ci_95_high": float(c_info.get("ci_95_high", 0.0)),
-                "ci_decision_low": float(c_info.get("ci_decision_low", 0.0)),
-                "ci_decision_high": float(c_info.get("ci_decision_high", 0.0)),
-                "proposed_failure_count": np.nan,
-                "comparator_failure_count": np.nan,
-                "status": "DEVELOPMENT_SMOKE_ONLY",
-            }
-        comp_rows.append(row)
-    pd.DataFrame(comp_rows).to_csv(fixture_dir / "component_evidence.csv", index=False)
-
-    # Add lower/upper arrays to NPZ files
-    for ds in ("FD001", "FD002", "FD004"):
-        npz_p = fixture_dir / f"bootstrap_statistics_{ds}.npz"
-        data = dict(np.load(npz_p))
-        for k in list(data.keys()):
-            if "regime_error" in k or "stage_error" in k:
-                data[f"{k}_lower"] = data[k]
-                data[f"{k}_upper"] = data[k]
-        np.savez(npz_p, **data)
-
-    rq4_p = fixture_dir / "bootstrap_statistics_RQ4.npz"
-    rq4_data = dict(np.load(rq4_p))
-    for k in list(rq4_data.keys()):
-        if "regime_error" in k or "stage_error" in k:
-            rq4_data[f"{k}_lower"] = rq4_data[k]
-            rq4_data[f"{k}_upper"] = rq4_data[k]
-    np.savez(rq4_p, **rq4_data)
 
     return fixture_dir
 
