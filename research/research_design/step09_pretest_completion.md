@@ -1,12 +1,11 @@
 # Step 9 Confirmatory Evaluation Preparation — Pre-Test Completion and Verification Report
 
 - **Protocol Version**: `step09-v1`
-- **Schema Version**: `step09-pretest-completion-v3`
-- **Date**: 2026-10-14
-- **Branch**: `fix/pretest-evidence-integrity`
-- **Baseline Git SHA**: `bb9e34579343881a831e3f052608ee15e183df76`
-- **Active Pre-Test Verification Directory**: `experiments/pretest_verification_v3/`
-- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v3/pretest_audit.json`)
+- **Schema Version**: `step09-pretest-completion-v4`
+- **Date**: 2026-10-15
+- **Branch**: `fix/pretest-verifier-fail-closed`
+- **Active Pre-Test Verification Directory**: `experiments/pretest_verification_v4/`
+- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v4/pretest_audit.json`)
 - **Held-Out Confirmatory Execution**: **NOT_STARTED**
 - **Hypothesis Outcomes (RQ1–RQ4)**: **PENDING**
 
@@ -176,5 +175,28 @@ Under **ADR-025**, a comprehensive overhaul of the verification machinery was en
 7. **Defect G (Strengthened Protocol Freeze & Pre-Test Audit Gate)**: Protocol freeze generation binds 30 base checkpoints, 3 preprocessors, and 90 calibrator bundles with transitive hash checks, independently re-verifying all 60 Step-8 raw checkpoint reproduction records.
 
 All outputs in `experiments/pretest_verification_v3/validation_smoke/` passed 18 out of 18 independent verification checks, resulting in `overall_status: PASS` and `pretest_readiness_status: PRETEST_READY` in `experiments/pretest_verification_v3/pretest_audit.json`.
+
+---
+
+## 10. Pure Independent Reference Verification and Fail-Closed v4 Audit (ADR-026)
+
+Under **ADR-026**, a comprehensive independent reference verification framework was constructed in `src/intellitwin/evaluation/reference_verification.py`. The verifier reconstructs all numerical evidence from raw mathematical specifications and model artifacts, eliminating all trust in intermediate artifacts:
+
+1. **Independent Causal Point Trajectory & Continuous Cycle Continuity**:
+   - Reconstructs causal endpoint sequences for each engine from cycle 30 to terminal cycle.
+   - Verifies all 5 confirmatory seeds (2026–2030) with exact row counts, non-negative finite bounds, and bit-level agreement with frozen validation prediction caches.
+2. **Pure Independent Conformal Interval Reconstruction**:
+   - Re-evaluates HCP intervals across all 30 cells $\times$ 3 methods $\times$ 3 nominal coverages directly from candidate parameters in `calibrator.json`.
+   - Computes width, empirical coverage, and Winkler interval scores with zero divergence from ground-truth formula.
+3. **Pure Independent Sequential Maintenance Simulation**:
+   - Re-runs sequential maintenance simulations across all 930 configurations and 19,590 engine outcomes using scenario parameters ($C_{\text{pm}}, C_{\text{fail}}, C_{\text{waste}}$).
+   - Generates independent terminal events, intervention cycles, failure indicators, wasted RUL, total costs, and early-PM diagnostics.
+4. **Independent Metrics & Aggregate Summaries**:
+   - Recomputes equal-engine-weighted metrics, subgroup worst-group bounds, and 6-cell balanced averages with maximum absolute discrepancy $\le 10^{-10}$.
+5. **Decisive Decimation of Confirmed False-PASS Mutations**:
+   - Adversarial verification verified that all 5 confirmed false-PASS mutations (corrupted seed 2027 point prediction, deleted seed 2026 row, corrupted non-failure component, unphysical engine metrics coverage, and perturbed bootstrap replicates with consistent contrast intervals) are decisively rejected with `FAIL` status and explicit diagnostic failure logs.
+6. **Immutable v4 Audit Bundle (`experiments/pretest_verification_v4`)**:
+   - Reuses v3 numerical evidence via explicit relative paths and cryptographic hashes with clean git working tree status (`git_dirty = false`).
+   - Contains all 7 authoritative audit documents: `content_verification.json`, `protocol_freeze.json`, `input_manifest.json`, `reused_evidence.json`, `supersession.json`, `regression_test_report.json`, and `pretest_audit.json`.
 
 *(Note: Automated verification confirms numerical reproducibility and contract adherence; it does not constitute an independent human review).*

@@ -1,0 +1,100 @@
+{
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py",
+      "--source-evidence-dir",
+      "experiments/pretest_verification_v3",
+      "--verification-dir",
+      "experiments/pretest_verification_v4",
+      "--output-dir",
+      "C:\\Users\\Mayank\\AppData\\Local\\Temp\\pretest_v4_staging"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.4",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-10-10.0.19045-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-15T17:48:02.725887+00:00"
+  },
+  "git_commit": "550a7994d5746d3bcbfa28c26e7ed4f1a26a6153",
+  "git_dirty": false,
+  "mutations_evaluated": 5,
+  "mutations_rejected": 5,
+  "protocol_version": "step09-v1",
+  "records": [
+    {
+      "baseline_defect": "Permissive cache check only evaluated seed 2026, ignoring seeds 2027-2030",
+      "baseline_status": "PASS",
+      "description": "Increase one seed-2027 point prediction by 100",
+      "failing_reasons": [
+        "Point prediction discrepancy vs frozen cache: 100.0 > 1e-10 (cache_match=True)",
+        "Point prediction discrepancy 100.0 > 1e-10"
+      ],
+      "mutation_id": "mutation_1",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv"
+    },
+    {
+      "baseline_defect": "Cache check did not fail closed on row count mismatch across confirmatory seeds",
+      "baseline_status": "PASS",
+      "description": "Delete one seed-2026 prediction row",
+      "failing_reasons": [
+        "Point predictions count mismatch for FD001/GBR/seed_2026: actual 1759 != cache 1760",
+        "Point prediction discrepancy vs frozen cache: 2.842170943040401e-14 > 1e-10 (cache_match=False)",
+        "Point prediction key/attribute mismatches: [\"('FD001', 'GBR', 2026, 3, 30)\"]"
+      ],
+      "mutation_id": "mutation_2",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv"
+    },
+    {
+      "baseline_defect": "Verifier only checked schema, nullability, and failure count safeguards without reference numerical reconstruction",
+      "baseline_status": "PASS",
+      "description": "Increase one non-failure component's ci_decision_low by 100",
+      "failing_reasons": [
+        "Component evidence discrepancies: ['RQ1_GBR_global_hcp_cost_improvement: discrepancy 100.0 > 1e-10']"
+      ],
+      "mutation_id": "mutation_3",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "component_evidence.csv"
+    },
+    {
+      "baseline_defect": "Verifier lacked finite bounds, range, and CSV schema validation on engine_metrics.csv coverage",
+      "baseline_status": "PASS",
+      "description": "Set one engine_metrics.csv coverage value to 12345",
+      "failing_reasons": [
+        "Coverage values outside [0, 1] in engine_metrics.csv: min=0.3819875776397515, max=12345.0",
+        "Engine metrics discrepancies: [\"('FD001', 'GBR', 2026, 'global_hcp', 80, 'primary_reference', 3): max discrepancy 12344.0 > 1e-10\"]"
+      ],
+      "mutation_id": "mutation_4",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "engine_metrics.csv"
+    },
+    {
+      "baseline_defect": "Verifier only checked internal consistency between saved NPZ and contrast_intervals.csv, accepting arbitrary forged arrays without independent draw/stat reconstruction",
+      "baseline_status": "PASS",
+      "description": "Add 100 to every replicate in FD001_GBR_global_hcp_cost_improvement and update contrast intervals accordingly",
+      "failing_reasons": [
+        "Bootstrap statistics NPZ discrepancies: ['FD001/FD001_GBR_global_hcp_cost_improvement discrepancy 100.0 > 1e-10']",
+        "Contrast intervals discrepancies: ['Numerical discrepancy in contrast FD001_GBR_global_hcp_cost_improvement: 100.0 > 1e-10']",
+        "Component evidence discrepancies: ['RQ4_cell_FD001_GBR_global_hcp_non_harm_cost: discrepancy 100.0 > 1e-10']"
+      ],
+      "mutation_id": "mutation_5",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "bootstrap_statistics_FD001.npz and contrast_intervals.csv"
+    }
+  ],
+  "schema_version": "step09-regression-report-v1",
+  "status": "PASS",
+  "timestamp_utc": "2026-10-15T17:48:36.552507+00:00"
+}
