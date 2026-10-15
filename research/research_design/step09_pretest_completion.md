@@ -1,11 +1,12 @@
 # Step 9 Confirmatory Evaluation Preparation — Pre-Test Completion and Verification Report
 
 - **Protocol Version**: `step09-v1`
-- **Schema Version**: `step09-pretest-completion-v2`
+- **Schema Version**: `step09-pretest-completion-v3`
 - **Date**: 2026-10-14
-- **Branch**: `fix/complete-pretest-verification`
-- **Baseline Git SHA**: `f1edce7fdf48b45513ff90a680da49701451d9cb`
-- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v2/pretest_audit.json`)
+- **Branch**: `fix/pretest-evidence-integrity`
+- **Baseline Git SHA**: `bb9e34579343881a831e3f052608ee15e183df76`
+- **Active Pre-Test Verification Directory**: `experiments/pretest_verification_v3/`
+- **Pre-Test Audit Status**: **PRETEST_READY** (`experiments/pretest_verification_v3/pretest_audit.json`)
 - **Held-Out Confirmatory Execution**: **NOT_STARTED**
 - **Hypothesis Outcomes (RQ1–RQ4)**: **PENDING**
 
@@ -153,11 +154,27 @@ The final pre-test freeze and audit were executed (`scripts/audit_step09_freeze.
 
 | Stage / Component | Status | Required Gate Condition | Evidence Path |
 | :--- | :---: | :--- | :--- |
-| **Step 8 Conformal Uncertainty Calibration** | **FULLY REVERIFIED (PASS)** | All 60 model/partition raw reproduction checks passed with max error $\le 10^{-4}$ | `experiments/pretest_verification_v2/step08_full_audit.json` |
-| **Benchmark Matched-Control Selection** | **VERIFIED (PASS)** | Minimum-relative tie-breaking applied; matched-width diff $\le 1.0$ cycle | `experiments/pretest_verification_v2/controls/` |
-| **Validation Smoke Evaluation** | **VERIFIED (PASS)** | Full 930 configurations and 19,590 rows evaluated; 10,000 bootstrap draws applied | `experiments/pretest_verification_v2/validation_smoke/` |
-| **Pre-Test Protocol Freeze & Readiness Audit** | **PRETEST_READY** | Immutable freeze and pre-test audit verified from clean startup | `experiments/pretest_verification_v2/pretest_audit.json` |
+| **Step 8 Conformal Uncertainty Calibration** | **FULLY REVERIFIED (PASS)** | All 60 model/partition raw reproduction checks passed with max error $\le 10^{-4}$ | `experiments/pretest_verification_v3/step08_full_audit.json` |
+| **Benchmark Matched-Control Selection** | **VERIFIED (PASS)** | Minimum-relative tie-breaking applied; matched-width diff $\le 1.0$ cycle | `experiments/pretest_verification_v3/controls/` |
+| **Validation Smoke Evaluation** | **VERIFIED (PASS)** | Full 930 configurations, 19,590 outcome rows, 186 cell summaries, 152 component rows; 10,000 bootstrap draws applied | `experiments/pretest_verification_v3/validation_smoke/` |
+| **Pre-Test Protocol Freeze & Readiness Audit** | **PRETEST_READY** | Immutable freeze and pre-test audit verified from clean startup | `experiments/pretest_verification_v3/pretest_audit.json` |
 | **Held-Out Test Data Execution** | **NOT_STARTED** | Zero test windows prepared or evaluated | Confirmatory protocol barrier |
 | **Confirmatory Hypotheses (RQ1–RQ4)** | **PENDING** | Decision rules locked; awaiting held-out execution | `research/hypotheses/hypothesis_framework.yaml` |
+
+---
+
+## 9. Pre-Test Evidence Integrity and Verification Defect Remediation (ADR-025)
+
+Under **ADR-025**, a comprehensive overhaul of the verification machinery was enacted, correcting seven specific defects (A–G) present in prior versions:
+
+1. **Defect A (Fail-Closed Verification)**: All permissive skips (`continue` statements) were eliminated from `src/intellitwin/evaluation/verification.py` and `scripts/audit_step09_freeze.py`. The verifier fails closed if any expected file, row, configuration, metric, or bootstrap statistic is absent.
+2. **Defect B (Independent Draw Reconstruction)**: Bootstrap draws are reconstructed independently from the PRNG generator `np.random.PCG64(np.random.SeedSequence([2026, 6, dataset_number]))` across sorted quartile strata, verifying 100% exact bit-for-bit array equality against saved draws.
+3. **Defect C (Exact Cartesian Configurations & Keys)**: Exact bi-directional set equality is asserted for 930 configurations (810 primary + 120 controls), 19,590 outcome keys, 186 cell summary keys, and canonical coverage levels {80, 90, 95}.
+4. **Defect D (Conservative Error Bounds & Explicit Bounded Replicate Arrays)**: Subgroup error contrasts propagate conservative interval arithmetic ($\Delta_{\text{lower}} = \text{base}_L - \text{prop}_U$ and $\Delta_{\text{upper}} = \text{base}_U - \text{prop}_L$). Bounded statistics store explicit `_lower` and `_upper` replicate distributions; absent subgroups preserve $[0.0, 0.90]$.
+5. **Defect E (Complete 152 Hypothesis Component Evidence)**: Implemented `component_evidence.csv` covering all 152 hypothesis components and 19 canonical columns, verified via `validate_component_manifest_completeness` and failure safeguard reconciliation.
+6. **Defect F (Multi-Seed Point Predictions Export)**: Point predictions across all 5 confirmatory seeds (`[2026, 2027, 2028, 2029, 2030]`) are exported with unique composite keys and verified against frozen validation prediction caches.
+7. **Defect G (Strengthened Protocol Freeze & Pre-Test Audit Gate)**: Protocol freeze generation binds 30 base checkpoints, 3 preprocessors, and 90 calibrator bundles with transitive hash checks, independently re-verifying all 60 Step-8 raw checkpoint reproduction records.
+
+All outputs in `experiments/pretest_verification_v3/validation_smoke/` passed 18 out of 18 independent verification checks, resulting in `overall_status: PASS` and `pretest_readiness_status: PRETEST_READY` in `experiments/pretest_verification_v3/pretest_audit.json`.
 
 *(Note: Automated verification confirms numerical reproducibility and contract adherence; it does not constitute an independent human review).*

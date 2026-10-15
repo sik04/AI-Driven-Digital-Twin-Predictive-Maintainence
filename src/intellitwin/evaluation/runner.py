@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,13 @@ from intellitwin.data.splits import load_split_manifest
 from intellitwin.evaluation.bootstrap import (
     compute_bootstrap_ci,
     generate_stratified_bootstrap_draws,
+)
+from intellitwin.evaluation.decisions import (
+    get_rq_component_manifest,
+    validate_component_manifest_completeness,
+)
+from intellitwin.evaluation.evidence_schema import (
+    map_component_to_evidence_spec,
 )
 from intellitwin.evaluation.inference import (
     SimulationTraceOutcome,
@@ -61,6 +69,58 @@ from intellitwin.uncertainty.artifacts import (
     load_frozen_calibrator,
     resolve_repo_relative_path,
 )
+
+
+def compute_subgroup_bounds(
+    multiplicity_matrix: np.ndarray[Any, Any],  # shape (B, N)
+    eng_to_idx: dict[int, int],
+    cov_map_by_group: dict[str, dict[int, float]],
+    eligible_groups: Sequence[str],
+    nominal_coverage: float = PRIMARY_NOMINAL_COVERAGE,
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+    """Compute replicate lower and upper worst-group error bounds under the missing-group protocol.
+
+    Rules:
+    - If represented (weight > 0): error interval is [abs(cov - nominal), abs(cov - nominal)].
+    - If absent (weight == 0): error interval is [0.0, nominal_coverage].
+    - Worst group family bounds: lower = max(group lower bounds), upper = max(group upper bounds).
+    - If no eligible groups exist: returns ([0.0, ...], [nominal_coverage, ...]).
+    """
+    n_bootstrap = multiplicity_matrix.shape[0]
+    if len(eligible_groups) == 0:
+        return np.zeros(n_bootstrap, dtype=float), np.full(
+            n_bootstrap, nominal_coverage, dtype=float
+        )
+
+    all_low: list[np.ndarray[Any, Any]] = []
+    all_up: list[np.ndarray[Any, Any]] = []
+
+    for grp in eligible_groups:
+        cov_map = cov_map_by_group.get(grp, {})
+        grp_units = sorted(cov_map.keys())
+        if len(grp_units) == 0:
+            all_low.append(np.zeros(n_bootstrap, dtype=float))
+            all_up.append(np.full(n_bootstrap, nominal_coverage, dtype=float))
+            continue
+
+        grp_indices = [eng_to_idx[u] for u in grp_units]
+        c_vec = np.array([cov_map[u] for u in grp_units], dtype=float)
+        w_grp = multiplicity_matrix[:, grp_indices]
+        sum_w = np.sum(w_grp, axis=1)
+        pres_mask = sum_w > 0
+
+        cov_g = np.zeros(n_bootstrap, dtype=float)
+        cov_g[pres_mask] = (w_grp[pres_mask] @ c_vec) / sum_w[pres_mask]
+        err_g = np.abs(cov_g - nominal_coverage)
+
+        low_g = np.where(pres_mask, err_g, 0.0)
+        up_g = np.where(pres_mask, err_g, nominal_coverage)
+        all_low.append(low_g)
+        all_up.append(up_g)
+
+    worst_lower = np.max(all_low, axis=0)
+    worst_upper = np.max(all_up, axis=0)
+    return worst_lower, worst_upper
 
 
 def run_full_validation_smoke(
@@ -119,6 +179,7 @@ def run_full_validation_smoke(
     # Engine-level aggregated arrays for bootstrap evaluation:
     # Key: (ds, fam, method_or_ctrl, cov, scen) -> dict[unit -> float]
     fleet_engine_costs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_covs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
     fleet_engine_cov_errs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
     fleet_engine_mpiws: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
     fleet_engine_iscores: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
@@ -201,14 +262,13 @@ def run_full_validation_smoke(
                     rul_trues=grp_sort["rul_true"].to_numpy(),
                 )
 
-            # Record point predictions (seed 2026 once for logging)
-            df_seed_first = df_cell[df_cell["seed"] == 2026]
-            for row in df_seed_first.itertuples():
+            # Record point predictions (all five seeds)
+            for row in df_cell.itertuples():
                 point_pred_rows.append(
                     {
                         "dataset": ds,
                         "model_family": fam,
-                        "seed": 2026,
+                        "seed": int(row.seed),
                         "unit": int(row.unit),
                         "endpoint_cycle": int(row.endpoint_cycle),
                         "prediction": float(row.prediction),
@@ -524,6 +584,7 @@ def run_full_validation_smoke(
                     for u_idx in valid_engines:
                         for scen_id in COST_SCENARIOS:
                             cfg_k = (ds, fam, method, cov, scen_id)
+                            fleet_engine_covs[cfg_k][u_idx] = float(engine_covs[u_idx])
                             fleet_engine_cov_errs[cfg_k][u_idx] = abs(
                                 float(engine_covs[u_idx]) - cov
                             )
@@ -864,41 +925,49 @@ def run_full_validation_smoke(
             rep_cost_prop = (M @ prop_cost_vec) / n_engs
             dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_cost"] = rep_cost_prop
 
-            # Subgroup errors for proposed method
-            # Regime coverage per replicate
-            reg_err_rep_prop = np.zeros(n_bootstrap, dtype=float)
-            for reg in eligible_regimes_dict[ds]:
-                reg_cov_map = fleet_engine_regime_covs[prop_key][reg]
-                reg_units = sorted(reg_cov_map.keys())
-                reg_indices = [eng_to_idx[u] for u in reg_units]
-                c_vec = np.array([reg_cov_map[u] for u in reg_units], dtype=float)
-                # Weights for this subgroup in each replicate
-                w_reg = M[:, reg_indices]  # (B, |S_g|)
-                sum_w = np.sum(w_reg, axis=1)  # (B,)
-                pres_mask = sum_w > 0
-                reg_cov = np.zeros(n_bootstrap, dtype=float)
-                reg_cov[pres_mask] = (w_reg[pres_mask] @ c_vec) / sum_w[pres_mask]
-                err_g = np.abs(reg_cov - PRIMARY_NOMINAL_COVERAGE)
-                err_g[~pres_mask] = 0.90  # absent bound
-                reg_err_rep_prop = np.maximum(reg_err_rep_prop, err_g)
-            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error"] = reg_err_rep_prop
+            # Marginal coverage error for proposed method
+            prop_cov_vec = np.array([fleet_engine_covs[prop_key][u] for u in engines], dtype=float)
+            rep_marg_cov = (M @ prop_cov_vec) / n_engs
+            rep_marg_cov_err = np.abs(rep_marg_cov - PRIMARY_NOMINAL_COVERAGE)
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_marginal_coverage_error"] = (
+                rep_marg_cov_err
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_marginal_coverage_error"] = (
+                rep_marg_cov_err
+            )
 
-            # Stage coverage per replicate
-            stage_err_rep_prop = np.zeros(n_bootstrap, dtype=float)
-            for stg in eligible_stages_dict[ds]:
-                stg_cov_map = fleet_engine_stage_covs[prop_key][stg]
-                stg_units = sorted(stg_cov_map.keys())
-                stg_indices = [eng_to_idx[u] for u in stg_units]
-                c_vec = np.array([stg_cov_map[u] for u in stg_units], dtype=float)
-                w_stg = M[:, stg_indices]
-                sum_w = np.sum(w_stg, axis=1)
-                pres_mask = sum_w > 0
-                stg_cov = np.zeros(n_bootstrap, dtype=float)
-                stg_cov[pres_mask] = (w_stg[pres_mask] @ c_vec) / sum_w[pres_mask]
-                err_g = np.abs(stg_cov - PRIMARY_NOMINAL_COVERAGE)
-                err_g[~pres_mask] = 0.90
-                stage_err_rep_prop = np.maximum(stage_err_rep_prop, err_g)
-            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error"] = stage_err_rep_prop
+            # Subgroup errors for proposed method
+            prop_reg_low, prop_reg_up = compute_subgroup_bounds(
+                multiplicity_matrix=M,
+                eng_to_idx=eng_to_idx,
+                cov_map_by_group=fleet_engine_regime_covs[prop_key],
+                eligible_groups=eligible_regimes_dict[ds],
+                nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+            )
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_lower"] = prop_reg_low
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_upper"] = prop_reg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_lower"] = (
+                prop_reg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_upper"] = (
+                prop_reg_up
+            )
+
+            prop_stg_low, prop_stg_up = compute_subgroup_bounds(
+                multiplicity_matrix=M,
+                eng_to_idx=eng_to_idx,
+                cov_map_by_group=fleet_engine_stage_covs[prop_key],
+                eligible_groups=eligible_stages_dict[ds],
+                nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+            )
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_lower"] = prop_stg_low
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_upper"] = prop_stg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_lower"] = (
+                prop_stg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_upper"] = (
+                prop_stg_up
+            )
 
             # Contrasts against baselines
             for base_id in ("global_hcp", "regime_hcp"):
@@ -935,27 +1004,30 @@ def run_full_validation_smoke(
                 )
 
                 # Subgroup errors for baseline
-                reg_err_rep_base = np.zeros(n_bootstrap, dtype=float)
-                for reg in eligible_regimes_dict[ds]:
-                    reg_cov_map = fleet_engine_regime_covs[base_key][reg]
-                    reg_units = sorted(reg_cov_map.keys())
-                    reg_indices = [eng_to_idx[u] for u in reg_units]
-                    c_vec = np.array([reg_cov_map[u] for u in reg_units], dtype=float)
-                    w_reg = M[:, reg_indices]
-                    sum_w = np.sum(w_reg, axis=1)
-                    pres_mask = sum_w > 0
-                    reg_cov = np.zeros(n_bootstrap, dtype=float)
-                    reg_cov[pres_mask] = (w_reg[pres_mask] @ c_vec) / sum_w[pres_mask]
-                    err_g = np.abs(reg_cov - PRIMARY_NOMINAL_COVERAGE)
-                    err_g[~pres_mask] = 0.90
-                    reg_err_rep_base = np.maximum(reg_err_rep_base, err_g)
-                dataset_stats_arrays[ds][f"{fam}_{base_id}_regime_error"] = reg_err_rep_base
+                base_reg_low, base_reg_up = compute_subgroup_bounds(
+                    multiplicity_matrix=M,
+                    eng_to_idx=eng_to_idx,
+                    cov_map_by_group=fleet_engine_regime_covs[base_key],
+                    eligible_groups=eligible_regimes_dict[ds],
+                    nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                )
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_regime_error_lower"] = base_reg_low
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_regime_error_upper"] = base_reg_up
 
-                delta_reg_err = reg_err_rep_base - reg_err_rep_prop
+                delta_reg_low = base_reg_low - prop_reg_up
+                delta_reg_up = base_reg_up - prop_reg_low
                 c_reg_name = f"{ds}_{fam}_{base_id}_regime_error_improvement"
-                dataset_stats_arrays[ds][c_reg_name] = delta_reg_err
-                ci_95_r = compute_bootstrap_ci(delta_reg_err, quantiles=DESCRIPTIVE_QUANTILES)
-                ci_dec_r = compute_bootstrap_ci(delta_reg_err, quantiles=DECISION_QUANTILES)
+                dataset_stats_arrays[ds][f"{c_reg_name}_lower"] = delta_reg_low
+                dataset_stats_arrays[ds][f"{c_reg_name}_upper"] = delta_reg_up
+
+                ci_95_r = (
+                    float(np.quantile(delta_reg_low, 0.025, method="linear")),
+                    float(np.quantile(delta_reg_up, 0.975, method="linear")),
+                )
+                ci_dec_r = (
+                    float(np.quantile(delta_reg_low, 0.00625, method="linear")),
+                    float(np.quantile(delta_reg_up, 0.99375, method="linear")),
+                )
                 contrast_records.append(
                     {
                         "contrast_id": c_reg_name,
@@ -963,8 +1035,8 @@ def run_full_validation_smoke(
                         "model_family": fam,
                         "comparator": base_id,
                         "metric": "delta_regime_error",
-                        "mean": float(np.mean(delta_reg_err)),
-                        "median": float(np.median(delta_reg_err)),
+                        "mean": float(np.mean(0.5 * (delta_reg_low + delta_reg_up))),
+                        "median": float(np.median(0.5 * (delta_reg_low + delta_reg_up))),
                         "ci_95_low": ci_95_r[0],
                         "ci_95_high": ci_95_r[1],
                         "ci_decision_low": ci_dec_r[0],
@@ -974,27 +1046,30 @@ def run_full_validation_smoke(
                     }
                 )
 
-                stage_err_rep_base = np.zeros(n_bootstrap, dtype=float)
-                for stg in eligible_stages_dict[ds]:
-                    stg_cov_map = fleet_engine_stage_covs[base_key][stg]
-                    stg_units = sorted(stg_cov_map.keys())
-                    stg_indices = [eng_to_idx[u] for u in stg_units]
-                    c_vec = np.array([stg_cov_map[u] for u in stg_units], dtype=float)
-                    w_stg = M[:, stg_indices]
-                    sum_w = np.sum(w_stg, axis=1)
-                    pres_mask = sum_w > 0
-                    stg_cov = np.zeros(n_bootstrap, dtype=float)
-                    stg_cov[pres_mask] = (w_stg[pres_mask] @ c_vec) / sum_w[pres_mask]
-                    err_g = np.abs(stg_cov - PRIMARY_NOMINAL_COVERAGE)
-                    err_g[~pres_mask] = 0.90
-                    stage_err_rep_base = np.maximum(stage_err_rep_base, err_g)
-                dataset_stats_arrays[ds][f"{fam}_{base_id}_stage_error"] = stage_err_rep_base
+                base_stg_low, base_stg_up = compute_subgroup_bounds(
+                    multiplicity_matrix=M,
+                    eng_to_idx=eng_to_idx,
+                    cov_map_by_group=fleet_engine_stage_covs[base_key],
+                    eligible_groups=eligible_stages_dict[ds],
+                    nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                )
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_stage_error_lower"] = base_stg_low
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_stage_error_upper"] = base_stg_up
 
-                delta_stg_err = stage_err_rep_base - stage_err_rep_prop
+                delta_stg_low = base_stg_low - prop_stg_up
+                delta_stg_up = base_stg_up - prop_stg_low
                 c_stg_name = f"{ds}_{fam}_{base_id}_stage_error_improvement"
-                dataset_stats_arrays[ds][c_stg_name] = delta_stg_err
-                ci_95_s = compute_bootstrap_ci(delta_stg_err, quantiles=DESCRIPTIVE_QUANTILES)
-                ci_dec_s = compute_bootstrap_ci(delta_stg_err, quantiles=DECISION_QUANTILES)
+                dataset_stats_arrays[ds][f"{c_stg_name}_lower"] = delta_stg_low
+                dataset_stats_arrays[ds][f"{c_stg_name}_upper"] = delta_stg_up
+
+                ci_95_s = (
+                    float(np.quantile(delta_stg_low, 0.025, method="linear")),
+                    float(np.quantile(delta_stg_up, 0.975, method="linear")),
+                )
+                ci_dec_s = (
+                    float(np.quantile(delta_stg_low, 0.00625, method="linear")),
+                    float(np.quantile(delta_stg_up, 0.99375, method="linear")),
+                )
                 contrast_records.append(
                     {
                         "contrast_id": c_stg_name,
@@ -1002,8 +1077,8 @@ def run_full_validation_smoke(
                         "model_family": fam,
                         "comparator": base_id,
                         "metric": "delta_stage_error",
-                        "mean": float(np.mean(delta_stg_err)),
-                        "median": float(np.median(delta_stg_err)),
+                        "mean": float(np.mean(0.5 * (delta_stg_low + delta_stg_up))),
+                        "median": float(np.median(0.5 * (delta_stg_low + delta_stg_up))),
                         "ci_95_low": ci_95_s[0],
                         "ci_95_high": ci_95_s[1],
                         "ci_decision_low": ci_dec_s[0],
@@ -1133,6 +1208,7 @@ def run_full_validation_smoke(
             dataset_stats_arrays[d][f"{d}_{f}_{base_id}_cost_improvement"] for d, f in cells
         ]
         agg_delta_cost = np.mean(cell_cost_contrasts, axis=0)  # shape (B,)
+        rq4_stats_dict[f"agg_{base_id}_cost_improvement"] = agg_delta_cost
         rq4_stats_dict[f"aggregate_{base_id}_cost_improvement"] = agg_delta_cost
 
         ci_95 = compute_bootstrap_ci(agg_delta_cost, quantiles=DESCRIPTIVE_QUANTILES)
@@ -1156,14 +1232,28 @@ def run_full_validation_smoke(
             }
         )
 
-        # Aggregate Regime Error Contrast
-        cell_reg_contrasts = [
-            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_regime_error_improvement"] for d, f in cells
+        # Aggregate Regime Error Contrast (bounded)
+        cell_reg_contrasts_low = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_regime_error_improvement_lower"]
+            for d, f in cells
         ]
-        agg_delta_reg = np.mean(cell_reg_contrasts, axis=0)
-        rq4_stats_dict[f"aggregate_{base_id}_regime_error_improvement"] = agg_delta_reg
-        ci_95_r = compute_bootstrap_ci(agg_delta_reg, quantiles=DESCRIPTIVE_QUANTILES)
-        ci_dec_r = compute_bootstrap_ci(agg_delta_reg, quantiles=DECISION_QUANTILES)
+        cell_reg_contrasts_up = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_regime_error_improvement_upper"]
+            for d, f in cells
+        ]
+        agg_delta_reg_low = np.mean(cell_reg_contrasts_low, axis=0)
+        agg_delta_reg_up = np.mean(cell_reg_contrasts_up, axis=0)
+        rq4_stats_dict[f"agg_{base_id}_regime_error_improvement_lower"] = agg_delta_reg_low
+        rq4_stats_dict[f"agg_{base_id}_regime_error_improvement_upper"] = agg_delta_reg_up
+
+        ci_95_r = (
+            float(np.quantile(agg_delta_reg_low, 0.025, method="linear")),
+            float(np.quantile(agg_delta_reg_up, 0.975, method="linear")),
+        )
+        ci_dec_r = (
+            float(np.quantile(agg_delta_reg_low, 0.00625, method="linear")),
+            float(np.quantile(agg_delta_reg_up, 0.99375, method="linear")),
+        )
         contrast_records.append(
             {
                 "contrast_id": f"RQ4_aggregate_{base_id}_regime_error_improvement",
@@ -1171,8 +1261,8 @@ def run_full_validation_smoke(
                 "model_family": "BOTH",
                 "comparator": base_id,
                 "metric": "aggregate_delta_regime_error",
-                "mean": float(np.mean(agg_delta_reg)),
-                "median": float(np.median(agg_delta_reg)),
+                "mean": float(np.mean(0.5 * (agg_delta_reg_low + agg_delta_reg_up))),
+                "median": float(np.median(0.5 * (agg_delta_reg_low + agg_delta_reg_up))),
                 "ci_95_low": ci_95_r[0],
                 "ci_95_high": ci_95_r[1],
                 "ci_decision_low": ci_dec_r[0],
@@ -1182,14 +1272,28 @@ def run_full_validation_smoke(
             }
         )
 
-        # Aggregate Stage Error Contrast
-        cell_stg_contrasts = [
-            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_stage_error_improvement"] for d, f in cells
+        # Aggregate Stage Error Contrast (bounded)
+        cell_stg_contrasts_low = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_stage_error_improvement_lower"]
+            for d, f in cells
         ]
-        agg_delta_stg = np.mean(cell_stg_contrasts, axis=0)
-        rq4_stats_dict[f"aggregate_{base_id}_stage_error_improvement"] = agg_delta_stg
-        ci_95_s = compute_bootstrap_ci(agg_delta_stg, quantiles=DESCRIPTIVE_QUANTILES)
-        ci_dec_s = compute_bootstrap_ci(agg_delta_stg, quantiles=DECISION_QUANTILES)
+        cell_stg_contrasts_up = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_stage_error_improvement_upper"]
+            for d, f in cells
+        ]
+        agg_delta_stg_low = np.mean(cell_stg_contrasts_low, axis=0)
+        agg_delta_stg_up = np.mean(cell_stg_contrasts_up, axis=0)
+        rq4_stats_dict[f"agg_{base_id}_stage_error_improvement_lower"] = agg_delta_stg_low
+        rq4_stats_dict[f"agg_{base_id}_stage_error_improvement_upper"] = agg_delta_stg_up
+
+        ci_95_s = (
+            float(np.quantile(agg_delta_stg_low, 0.025, method="linear")),
+            float(np.quantile(agg_delta_stg_up, 0.975, method="linear")),
+        )
+        ci_dec_s = (
+            float(np.quantile(agg_delta_stg_low, 0.00625, method="linear")),
+            float(np.quantile(agg_delta_stg_up, 0.99375, method="linear")),
+        )
         contrast_records.append(
             {
                 "contrast_id": f"RQ4_aggregate_{base_id}_stage_error_improvement",
@@ -1197,8 +1301,8 @@ def run_full_validation_smoke(
                 "model_family": "BOTH",
                 "comparator": base_id,
                 "metric": "aggregate_delta_stage_error",
-                "mean": float(np.mean(agg_delta_stg)),
-                "median": float(np.median(agg_delta_stg)),
+                "mean": float(np.mean(0.5 * (agg_delta_stg_low + agg_delta_stg_up))),
+                "median": float(np.median(0.5 * (agg_delta_stg_low + agg_delta_stg_up))),
                 "ci_95_low": ci_95_s[0],
                 "ci_95_high": ci_95_s[1],
                 "ci_decision_low": ci_dec_s[0],
@@ -1209,7 +1313,7 @@ def run_full_validation_smoke(
         )
 
     # -------------------------------------------------------------------------
-    # Save Artifacts
+    # Save Primary Artifacts
     # -------------------------------------------------------------------------
     df_point_preds = pd.DataFrame(point_pred_rows)
     df_interval_preds = pd.DataFrame(interval_pred_rows)
@@ -1229,6 +1333,333 @@ def run_full_validation_smoke(
     write_immutable_csv(out_dir / "subgroup_metrics.csv", df_subgroup_metrics)
     write_immutable_csv(out_dir / "cell_summary.csv", df_cell_summary)
     write_immutable_csv(out_dir / "contrast_intervals.csv", df_contrasts)
+
+    # -------------------------------------------------------------------------
+    # Generate Component Evidence (152 hypothesis components)
+    # -------------------------------------------------------------------------
+    manifest_rq = get_rq_component_manifest()
+    contrast_lookup = {r["contrast_id"]: r for r in contrast_records}
+    component_evidence_rows: list[dict[str, Any]] = []
+
+    def get_failure_count(d: str, m_fam: str, comp: str) -> int:
+        sub = df_outcomes[
+            (df_outcomes["dataset"] == d)
+            & (df_outcomes["model_family"] == m_fam)
+            & (df_outcomes["method_or_control_id"] == comp)
+            & (df_outcomes["nominal_coverage"] == PRIMARY_NOMINAL_COVERAGE)
+            & (df_outcomes["scenario_id"] == PRIMARY_COST_SCENARIO)
+        ]
+        return int(sub["failed"].sum())
+
+    def get_obs_subgroup_error(d: str, m_fam: str, meth: str, fam_type: str) -> float:
+        cfg = (d, m_fam, meth, PRIMARY_NOMINAL_COVERAGE, PRIMARY_COST_SCENARIO)
+        if fam_type == "regime":
+            cov_map_all = fleet_engine_regime_covs[cfg]
+            el_grps = eligible_regimes_dict[d]
+        else:
+            cov_map_all = fleet_engine_stage_covs[cfg]
+            el_grps = eligible_stages_dict[d]
+        if len(el_grps) == 0:
+            return 0.90
+        max_err = 0.0
+        for grp in el_grps:
+            cov_map = cov_map_all.get(grp, {})
+            if len(cov_map) > 0:
+                c_val = float(np.mean(list(cov_map.values())))
+                err_g = abs(c_val - PRIMARY_NOMINAL_COVERAGE)
+                if err_g > max_err:
+                    max_err = err_g
+        return max_err
+
+    for rq in ("RQ1", "RQ2", "RQ3", "RQ4"):
+        for comp in manifest_rq[rq]:
+            ev_kind, stat_id = map_component_to_evidence_spec(
+                component_id=comp.component_id,
+                rq_id=comp.rq_id,
+                model_family=comp.model_family,
+                dataset=comp.dataset,
+                comparator=comp.comparator,
+                metric=comp.metric,
+                rule_type=comp.rule_type,
+            )
+
+            obs_low: float = float("nan")
+            obs_up: float = float("nan")
+            ci_95_l: float = float("nan")
+            ci_95_h: float = float("nan")
+            ci_dec_l: float = float("nan")
+            ci_dec_h: float = float("nan")
+            prop_fails: int | float = float("nan")
+            comp_fails: int | float = float("nan")
+
+            if ev_kind == "observed_failure":
+                assert comp.dataset is not None and comp.model_family is not None
+                prop_fails = get_failure_count(
+                    comp.dataset, comp.model_family, "decision_aware_hcp"
+                )
+                comp_fails = get_failure_count(comp.dataset, comp.model_family, comp.comparator)
+            elif comp.comparator == "nominal_90":
+                assert comp.dataset is not None and comp.model_family is not None
+                if comp.metric == "marginal_coverage_abs_error":
+                    obs_prop_cov = float(
+                        np.mean(
+                            [
+                                fleet_engine_covs[
+                                    (
+                                        comp.dataset,
+                                        comp.model_family,
+                                        "decision_aware_hcp",
+                                        PRIMARY_NOMINAL_COVERAGE,
+                                        PRIMARY_COST_SCENARIO,
+                                    )
+                                ][u]
+                                for u in partition_engines_dict[comp.dataset]
+                            ]
+                        )
+                    )
+                    obs_low = abs(obs_prop_cov - PRIMARY_NOMINAL_COVERAGE)
+                    obs_up = obs_low
+                    rep_arr = dataset_stats_arrays[comp.dataset][stat_id]
+                    q95 = compute_bootstrap_ci(rep_arr, quantiles=DESCRIPTIVE_QUANTILES)
+                    qdec = compute_bootstrap_ci(rep_arr, quantiles=DECISION_QUANTILES)
+                    ci_95_l, ci_95_h = q95[0], q95[1]
+                    ci_dec_l, ci_dec_h = qdec[0], qdec[1]
+                elif comp.metric == "worst_regime_coverage_error":
+                    obs_err = get_obs_subgroup_error(
+                        comp.dataset, comp.model_family, "decision_aware_hcp", "regime"
+                    )
+                    obs_low = obs_err
+                    obs_up = obs_err
+                    low_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_lower"]
+                    up_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_upper"]
+                    ci_95_l = float(np.quantile(low_arr, 0.025, method="linear"))
+                    ci_95_h = float(np.quantile(up_arr, 0.975, method="linear"))
+                    ci_dec_l = float(np.quantile(low_arr, 0.00625, method="linear"))
+                    ci_dec_h = float(np.quantile(up_arr, 0.99375, method="linear"))
+                elif comp.metric == "worst_stage_coverage_error":
+                    obs_err = get_obs_subgroup_error(
+                        comp.dataset, comp.model_family, "decision_aware_hcp", "stage"
+                    )
+                    obs_low = obs_err
+                    obs_up = obs_err
+                    low_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_lower"]
+                    up_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_upper"]
+                    ci_95_l = float(np.quantile(low_arr, 0.025, method="linear"))
+                    ci_95_h = float(np.quantile(up_arr, 0.975, method="linear"))
+                    ci_dec_l = float(np.quantile(low_arr, 0.00625, method="linear"))
+                    ci_dec_h = float(np.quantile(up_arr, 0.99375, method="linear"))
+            else:
+                # Contrast components
+                c_row = contrast_lookup[stat_id]
+                ci_95_l = float(c_row["ci_95_low"])
+                ci_95_h = float(c_row["ci_95_high"])
+                ci_dec_l = float(c_row["ci_decision_low"])
+                ci_dec_h = float(c_row["ci_decision_high"])
+
+                if comp.rq_id == "RQ4" and comp.dataset is None:
+                    # Aggregate contrasts across 6 cells
+                    if comp.metric == "aggregate_delta_cost":
+                        obs_vals = [
+                            float(
+                                np.mean(
+                                    [
+                                        fleet_engine_costs[
+                                            (
+                                                d,
+                                                f,
+                                                comp.comparator,
+                                                PRIMARY_NOMINAL_COVERAGE,
+                                                PRIMARY_COST_SCENARIO,
+                                            )
+                                        ][u]
+                                        for u in partition_engines_dict[d]
+                                    ]
+                                )
+                            )
+                            - float(
+                                np.mean(
+                                    [
+                                        fleet_engine_costs[
+                                            (
+                                                d,
+                                                f,
+                                                "decision_aware_hcp",
+                                                PRIMARY_NOMINAL_COVERAGE,
+                                                PRIMARY_COST_SCENARIO,
+                                            )
+                                        ][u]
+                                        for u in partition_engines_dict[d]
+                                    ]
+                                )
+                            )
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals))
+                        obs_up = obs_low
+                    elif comp.metric == "aggregate_delta_regime_error":
+                        obs_vals_r = [
+                            get_obs_subgroup_error(d, f, comp.comparator, "regime")
+                            - get_obs_subgroup_error(d, f, "decision_aware_hcp", "regime")
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals_r))
+                        obs_up = obs_low
+                    elif comp.metric == "aggregate_delta_stage_error":
+                        obs_vals_s = [
+                            get_obs_subgroup_error(d, f, comp.comparator, "stage")
+                            - get_obs_subgroup_error(d, f, "decision_aware_hcp", "stage")
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals_s))
+                        obs_up = obs_low
+                else:
+                    assert comp.dataset is not None and comp.model_family is not None
+                    d = comp.dataset
+                    fam = comp.model_family
+                    if comp.metric in ("delta_cost", "cell_delta_cost"):
+                        obs_base = float(
+                            np.mean(
+                                [
+                                    fleet_engine_costs[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_prop = float(
+                            np.mean(
+                                [
+                                    fleet_engine_costs[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_base - obs_prop
+                        obs_up = obs_low
+                    elif comp.metric in ("delta_regime_error", "cell_delta_regime_error"):
+                        obs_base_r = get_obs_subgroup_error(d, fam, comp.comparator, "regime")
+                        obs_prop_r = get_obs_subgroup_error(d, fam, "decision_aware_hcp", "regime")
+                        obs_low = obs_base_r - obs_prop_r
+                        obs_up = obs_low
+                    elif comp.metric in ("delta_stage_error", "cell_delta_stage_error"):
+                        obs_base_s = get_obs_subgroup_error(d, fam, comp.comparator, "stage")
+                        obs_prop_s = get_obs_subgroup_error(d, fam, "decision_aware_hcp", "stage")
+                        obs_low = obs_base_s - obs_prop_s
+                        obs_up = obs_low
+                    elif comp.metric == "mpiw_deterioration":
+                        obs_prop_w = float(
+                            np.mean(
+                                [
+                                    fleet_engine_mpiws[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_base_w = float(
+                            np.mean(
+                                [
+                                    fleet_engine_mpiws[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_prop_w - obs_base_w
+                        obs_up = obs_low
+                    elif comp.metric == "interval_score_deterioration":
+                        obs_prop_is = float(
+                            np.mean(
+                                [
+                                    fleet_engine_iscores[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_base_is = float(
+                            np.mean(
+                                [
+                                    fleet_engine_iscores[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_prop_is - obs_base_is
+                        obs_up = obs_low
+
+            component_evidence_rows.append(
+                {
+                    "component_id": comp.component_id,
+                    "rq_id": comp.rq_id,
+                    "dataset": comp.dataset if comp.dataset is not None else "ALL_6_CELLS",
+                    "model_family": comp.model_family if comp.model_family is not None else "BOTH",
+                    "comparator": comp.comparator,
+                    "metric": comp.metric,
+                    "rule_type": comp.rule_type,
+                    "margin": comp.margin,
+                    "evidence_kind": ev_kind,
+                    "statistic_id": stat_id,
+                    "observed_lower": obs_low,
+                    "observed_upper": obs_up,
+                    "ci_95_low": ci_95_l,
+                    "ci_95_high": ci_95_h,
+                    "ci_decision_low": ci_dec_l,
+                    "ci_decision_high": ci_dec_h,
+                    "proposed_failure_count": prop_fails,
+                    "comparator_failure_count": comp_fails,
+                    "status": "DEVELOPMENT_SMOKE_ONLY",
+                }
+            )
+
+    # Validate component evidence completeness
+    validate_component_manifest_completeness([r["component_id"] for r in component_evidence_rows])
+    df_comp_evidence = pd.DataFrame(component_evidence_rows)
+    write_immutable_csv(out_dir / "component_evidence.csv", df_comp_evidence)
 
     # Write Bootstrap Statistics NPZs
     npz_hashes: dict[str, str] = {}
@@ -1275,6 +1706,7 @@ def run_full_validation_smoke(
             "primary_summary_rows": 162,
             "control_summary_rows": 24,
             "total_summary_rows": 186,
+            "component_evidence_rows": len(component_evidence_rows),
             "bootstrap_replicates": n_bootstrap,
         },
         "artifact_hashes": {
@@ -1286,6 +1718,7 @@ def run_full_validation_smoke(
             "subgroup_metrics_csv": compute_sha256(out_dir / "subgroup_metrics.csv"),
             "cell_summary_csv": compute_sha256(out_dir / "cell_summary.csv"),
             "contrast_intervals_csv": compute_sha256(out_dir / "contrast_intervals.csv"),
+            "component_evidence_csv": compute_sha256(out_dir / "component_evidence.csv"),
             "bootstrap_draws_FD001": compute_sha256(out_dir / "bootstrap_draws_FD001.npz"),
             "bootstrap_draws_FD002": compute_sha256(out_dir / "bootstrap_draws_FD002.npz"),
             "bootstrap_draws_FD004": compute_sha256(out_dir / "bootstrap_draws_FD004.npz"),

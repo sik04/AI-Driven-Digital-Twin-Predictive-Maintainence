@@ -798,3 +798,56 @@ This log documents formal architectural, methodological, and research governance
   - Full Step 8 verification and Step 9 pre-test readiness are genuinely achieved and cryptographically bound.
 - **Follow-up Review Date / Trigger**:
   - Authorized held-out confirmatory evaluation execution.
+
+---
+
+### ADR-025: Confirmatory Pre-Test Evidence Integrity, Complete Replicate Statistics, and Strengthened Freeze Audit
+- **Date**: 2026-10-14
+- **Status**: Accepted (Amends ADR-023 and ADR-024)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Researcher-directed remediation of pre-test verification defects A–G, establishing fail-closed independent content verification, complete 152 hypothesis component evidence, independent PRNG draw reconstruction, and transitive cryptographic freeze bindings.
+- **Context and Motivation**:
+  - Following the assembly of pre-test artifacts under ADR-024, a thorough forensic audit of the pre-test verification machinery revealed seven specific defects (A–G) that prevented genuine mathematical verification:
+    1. **Defect A (Permissive Verifier Skips)**: Verification logic contained permissive conditional blocks (`continue` statements when keys or statistics were absent), allowing incomplete evidence matrices to be reported as verified without asserting strict completeness.
+    2. **Defect B (Draw Reconstruction Divergence)**: Bootstrap draw validation checked only dimensions or properties rather than independently recomputing the deterministic PCG64 draw sequences from the frozen seed sequence `[2026, 6, dataset_number]` and stratified quartile bounds.
+    3. **Defect C (Omitted Cartesian Configuration and Outcome Checks)**: Verifiers did not assert exact bi-directional set equality across the complete 930 configurations (810 primary + 120 controls), 19,590 engine seed outcome keys, and 186 cell summary keys with canonical coverages (80, 90, 95).
+    4. **Defect D (Unbounded Replicate Arrays and Non-Conservative Bounds)**: Bounded statistics lacked explicit `_lower` and `_upper` replicate distributions for bootstrap intervals, and missing-group error bounds were not computed using conservative interval arithmetic ($\Delta_{\text{lower}} = \text{base}_L - \text{prop}_U$ and $\Delta_{\text{upper}} = \text{base}_U - \text{prop}_L$) while preserving $[0.0, 0.90]$ bounds for absent groups.
+    5. **Defect E (Omitted Component Evidence Artifact)**: The required `component_evidence.csv` artifact tracking all 152 hypothesis components and 19 canonical schema columns was omitted from the smoke generation pipeline and unvalidated against the preregistered hypothesis manifest.
+    6. **Defect F (Single-Seed Point Predictions Export)**: The smoke runner exported only seed 2026 to `point_predictions.csv` rather than all 5 confirmatory seeds (2026–2030), and omitted unique composite key assertions.
+    7. **Defect G (Superficial Freeze and Audit Gate)**: Protocol freeze generation bound incomplete v2 artifacts, omitted transitive dependency hashes (30 base model checkpoints, 3 preprocessors, 90 calibrator bundles), and accepted mock/skipped checks without independently verifying all 60 Step-8 raw checkpoint reproduction records.
+- **Decisions**:
+  1. **Fail-Closed Content Verification (`verification.py`)**:
+     - Removed all permissive `continue` bypasses. The verifier asserts fail-closed validation: if any expected file, configuration, outcome key, metric, or bootstrap statistic is missing, mismatched, or unverified, the entire audit fails with explicit diagnostic reasons.
+  2. **Independent Deterministic Draw Reconstruction (Defect B)**:
+     - Implemented `independently_generate_bootstrap_draws` using `np.random.Generator(np.random.PCG64(np.random.SeedSequence([2026, 6, dataset_number])))` on stratified quartile engine partitions. Verified 100% exact bit-for-bit array equality against generated `bootstrap_draws_{dataset}.npz`.
+  3. **Exact Cartesian Configuration and Key Set Equality (Defect C)**:
+     - Implemented canonical coverage validation (`canonicalize_coverage`, `coverage_to_float`) mapping $\{0.80, 0.90, 0.95\}$ to integer canonical coverages $\{80, 90, 95\}$.
+     - Asserted exact bi-directional set equality for all 930 configurations, 19,590 outcome keys, and 186 cell summary keys.
+  4. **Conservative Error Contrasts and Explicit Bounded Replicate Arrays (Defect D)**:
+     - Implemented pure `compute_subgroup_bounds` preserving exact $[0.0, 0.90]$ bounds for absent subgroups.
+     - Propagated conservative interval arithmetic for error contrasts: $\Delta_{\text{lower}} = \text{base}_L - \text{prop}_U$ and $\Delta_{\text{upper}} = \text{base}_U - \text{prop}_L$.
+     - Stored explicit `_lower` and `_upper` arrays for bounded statistics across all dataset and RQ4 NPZs.
+     - Reconstructed all 74 contrast confidence intervals with maximum absolute discrepancy $0.0 < 10^{-10}$ cycles.
+  5. **Complete 152 Hypothesis Component Evidence (Defect E)**:
+     - Implemented `component_evidence.csv` with exactly 152 rows covering all preregistered hypothesis components across RQ1 (24), RQ2 (10), RQ3 (22), and RQ4 (96) and the 19 required schema columns.
+     - Enforced `validate_component_manifest_completeness` to reject missing, duplicate, or unexpected component IDs.
+     - Reconciled empirical failure safeguard counts with exact agreement against `engine_seed_outcomes.csv`.
+  6. **Multi-Seed Point Predictions Export (Defect F)**:
+     - Exported all 5 confirmatory seeds (`[2026, 2027, 2028, 2029, 2030]`) to `point_predictions.csv` with unique composite keys `(dataset, model_family, seed, unit, cycle)`.
+     - Verified exact value equality against frozen base model validation prediction caches.
+  7. **Strengthened Protocol Freeze and Pre-Test Audit Gate (Defect G)**:
+     - Rebuilt protocol freeze and pre-test audit in `scripts/audit_step09_freeze.py` under schema `step09-freeze-v3` and `step09-audit-v3`.
+     - Verified all 60 Step-8 raw checkpoint inference reproduction records with maximum absolute error $0.0 \le 10^{-4}$.
+     - Bound transitive dependency cryptographic digests: 30 base model checkpoints, 3 preprocessor artifacts, and 90 fitted calibrator bundles.
+     - Executed and passed all 18 independent verification checks on `experiments/pretest_verification_v3/validation_smoke/`.
+     - Preserved `experiments/pretest_verification_v2/` byte-for-byte as historical audit evidence with formal supersession documentation in `experiments/pretest_verification_v3/supersession.json`.
+  8. **Strict Confirmatory Boundaries Maintained**:
+     - Strictly zero held-out test windows evaluated or prepared (`held_out_execution_status: NOT_STARTED`).
+     - Validation smoke outputs strictly labeled `DEVELOPMENT_SMOKE_ONLY`.
+     - Confirmatory scientific conclusions RQ1–RQ4 remain strictly `PENDING`.
+- **Expected Implications**:
+  - The confirmatory evaluation machinery and pre-test evidence are 100% verified, mathematically exact, and cryptographically frozen.
+  - The project is fully prepared and authorized for official held-out test evaluation.
+- **Follow-up Review Date / Trigger**:
+  - Execution of official held-out confirmatory evaluation.
+
