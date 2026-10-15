@@ -298,3 +298,24 @@ def test_audit_step09_freeze_cli_verify_only_nonexistent_dir() -> None:
         text=True,
     )
     assert res.returncode == 1
+
+
+def test_audit_step09_freeze_cli_verify_only_v4() -> None:
+    """audit_step09_freeze.py --verify-only succeeds with code 0 on v4 bundle."""
+    import subprocess
+    import sys
+
+    res = subprocess.run(
+        [
+            sys.executable,
+            "scripts/audit_step09_freeze.py",
+            "--verification-dir",
+            "experiments/pretest_verification_v4",
+            "--verify-only",
+            "--allow-dirty",
+        ],
+        capture_output=True,
+        text=True,
+    )
+    assert res.returncode == 0
+    assert "STATUS: PRETEST_READY" in res.stdout
