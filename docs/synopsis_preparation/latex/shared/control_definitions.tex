@@ -1,0 +1,41 @@
+% Matched-Conservatism Control Specifications
+% Authoritative Sources: src/intellitwin/decision/controls.py, experiments/pretest_verification_v2/controls/FD002/{GBR,LSTM}/selection.json
+% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+
+\subsection*{Four Named Controls across Three Baseline Families}
+To rigorously evaluate whether the operational benefits of the proposed method stem from calibrated decision uncertainty rather than simple over-conservatism (RQ3), IntelliTwin evaluates four pre-registered controls across three families:
+\begin{enumerate}
+    \item \textbf{Matched-Width Interval Family} (\texttt{matched\_width\_interval}): Evaluates a parameterized scaling of unclipped half-width from a baseline conformal interval:
+    \begin{align}
+    q_{\text{source}}(t) &= \UpperBound_{\text{source}}(t) - \RULpred(t), \\
+    \LowerBound_\lambda(t) &= \max(0, \RULpred(t) - \lambda q_{\text{source}}(t)), \\
+    \UpperBound_\lambda(t) &= \RULpred(t) + \lambda q_{\text{source}}(t),
+    \end{align}
+    where $\text{source} \in \{\texttt{global\_hcp}, \texttt{regime\_hcp}\}$. Note that scaling applies to unclipped half-width $q_{\text{source}}(t)$ rather than an already-clipped lower bound. The scaling parameter is searched across grid $\lambda \in \{k/100 : k = 1, \dots, 400\} \cup \{5, 6, 8, 12, 16\}$. Parameter selection minimizes the absolute difference from the proposed method's validation MPIW across 5 seeds jointly (requiring width difference $\le 1.0$ cycle). Ties within $10^{-8}$ of the minimum width error are broken by minimizing validation cost, then smaller $\lambda$, then \texttt{global\_hcp} before \texttt{regime\_hcp}.
+
+    \item \textbf{Widened Interval Family} (\texttt{widened\_interval}): Employs the identical interval scaling formula with $\lambda \in \{k/100 : k = 100, \dots, 400\} \cup \{5, 6, 8, 12, 16\}$ ($\lambda \ge 1.0$). Parameter selection directly minimizes validation cost, then smaller $\lambda$, then source order.
+
+    \item \textbf{Point Safety Margin Family} (\texttt{point\_safety\_margin}): A point-prediction threshold policy triggering maintenance when $\RULpred(t) \le 1 + m$, with integer margin $m \in \{0, \dots, 250\}$. Selection minimizes validation cost, then smaller $m$. As a point policy, it emits no prediction interval bounds.
+
+    \item \textbf{Earlier Fixed Intervention Family} (\texttt{earlier\_intervention}): An elevated intervention threshold on baseline lower bounds triggering maintenance when $\LowerBound_{\text{source}}(t) \le h$, with integer threshold $h \in \{1, \dots, 251\}$ and $\text{source} \in \{\texttt{global\_hcp}, \texttt{regime\_hcp}\}$. Selection minimizes validation cost, then smaller $h$, then source order.
+\end{enumerate}
+
+\subsection*{Validation Selection Outcomes (FD002)}
+Control parameter selection was executed strictly on the 26 validation engines of C-MAPSS FD002 evaluated across five seeds jointly at 90\% nominal coverage under \texttt{primary\_reference} cost:
+\begin{itemize}
+    \item \textbf{GBR}:
+    \begin{itemize}
+        \item \texttt{matched\_width\_interval}: \texttt{global\_hcp}, $\lambda = 0.92$ (achieved MPIW: 111.22 vs target 111.47, $\Delta W = 0.25$ cycles).
+        \item \texttt{widened\_interval}: \texttt{regime\_hcp}, $\lambda = 1.00$.
+        \item \texttt{point\_safety\_margin}: $m = 5$ cycles.
+        \item \texttt{earlier\_intervention}: \texttt{regime\_hcp}, $h = 1$ cycle.
+    \end{itemize}
+    \item \textbf{LSTM}:
+    \begin{itemize}
+        \item \texttt{matched\_width\_interval}: \texttt{regime\_hcp}, $\lambda = 0.90$ (achieved MPIW: 110.12 vs target 110.06, $\Delta W = 0.06$ cycles).
+        \item \texttt{widened\_interval}: \texttt{global\_hcp}, $\lambda = 1.00$.
+        \item \texttt{point\_safety\_margin}: $m = 4$ cycles.
+        \item \texttt{earlier\_intervention}: \texttt{global\_hcp}, $h = 1$ cycle.
+    \end{itemize}
+\end{itemize}
+No calibration or held-out test data were accessed during control selection.

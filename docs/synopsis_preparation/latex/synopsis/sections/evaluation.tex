@@ -3,7 +3,7 @@
 \subsection{Statistical Uncertainty and Engine-Level Resampling}
 To account for trajectory autocorrelation, all comparative inferences use paired engine-cluster bootstrap resampling with replacement ($B = 10{,}000$ resamples) stratified by lifetime quartiles ($Q_1$--$Q_4$). The pseudo-random number generator is \texttt{PCG64} seeded via \texttt{SeedSequence([2026, 6, dataset\_number])}.
 
-Multiplicity control across the four research questions is enforced at $\alpha_{\text{fam}} = 0.05 / 4 = 0.0125$ via Bonferroni correction, yielding **98.75\% decision intervals** ($\alpha = [0.00625, 0.99375]$). In accordance with intersection-union testing (IUT), full support for an RQ requires every single component condition to clear its boundary at the 98.75\% decision level.
+Multiplicity control across the four research questions is enforced at $\alpha_{\text{fam}} = 0.05 / 4 = 0.0125$ via Bonferroni correction, yielding \textbf{98.75\% decision intervals} (empirical quantiles $0.00625$ and $0.99375$). In accordance with intersection-union testing (IUT), full support for an RQ requires every single component condition to clear its boundary at the 98.75\% decision level.
 
 \subsection{Frozen Decision Rules and Practical Margins}
 \begin{itemize}

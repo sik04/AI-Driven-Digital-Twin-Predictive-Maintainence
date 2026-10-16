@@ -1,10 +1,11 @@
 # IntelliTwin Research Writing & Documentation Package
 
-**Document Version**: `1.0`  
-**Branch**: `docs/synopsis-evidence-preparation`  
-**Source Commit Reviewed**: `224c741f5f3da19821a708e0a6da417d4810e9da`  
+**Document Version**: `1.1 (Scientifically Corrected)`  
+**Branch**: `fix/research-documentation-consistency`  
+**Source Commit Reviewed**: `bb9e34579343881a831e3f052608ee15e183df76`  
 **Authoring Team**: Mayank Singh, Shiksha Pandey, Ruchi Gupta  
 **Package Scope**: Complete, evidence-linked working drafts for Research Synopsis, IEEE Conference/Journal Manuscript, Academic Thesis, and Standalone Hypothesis Appendix.
+
 
 ---
 

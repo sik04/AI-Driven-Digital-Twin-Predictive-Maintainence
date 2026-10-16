@@ -56,34 +56,35 @@
   - Total Fleet: 609 engines (304 train, 122 calibration, 61 validation, 122 held-out test).
 * **Strict Anti-Leakage Protocol**:
   - *Engine-Level Splits*: Entire run-to-failure trajectories allocated to a single partition; zero cross-engine leakage.
-  - *Training-Only Preprocessing*: Scaling medians, interquartile ranges, and K-Means centroids fit exclusively on training data.
-  - *Causal Temporal Windowing*: Window length $W=30$ cycles, stride 1; **zero padding prohibited** (first inference at $t=30$).
-  - *Dual-Horizon Target Construction*: Base models trained on capped RUL ($y \le 125$); calibration and evaluation performed strictly against uncapped $y_{\text{true}} = T - t$.
+  - *Training-Only Preprocessing*: Training-only z-score normalization ($x_{\text{normalized}} = (x - \mu_{\text{train}}) / s_{\text{train}}$, where $s_{\text{train}} = \sigma_{\text{train}}$ if $\sigma_{\text{train}} > 0$ else $1.0$, `ddof=0`), frozen 17-feature selection order, and K-Means operational regime clustering ($k=6, \text{random\_state}=2026, \text{n\_init}=10$) fit exclusively on training data.
+  - *Causal Temporal Windowing*: Window length $W=30$ cycles, stride 1; **zero padding prohibited** (first inference at $t=30$); no crossing engine boundaries.
+  - *Dual-Horizon Target Construction*: Base models trained on capped RUL ($y \le 125$, modeling convention); evaluated predictions $p = \max(0, \text{raw\_pred})$ without upper clipping at 125; calibration and evaluation performed strictly against uncapped $y_{\text{true}} = T - t$.
 
 ---
 
 ## Slide 6: Frozen Base Predictor Matrix
 * **Two Complementary Model Families (ADR-019, ADR-020)**:
-  - *Histogram Gradient Boosting Regressor (GBR)*: Flattened 510-dimensional causal vectors ($30 \text{ cycles} \times 17 \text{ features}$). Fast, high-capacity non-neural baseline. Deterministic execution ($\sigma_{\text{RMSE}} = 0.0000$).
-  - *Unidirectional LSTM Network*: Sequential input tensors of shape $(30, 17)$, hidden dimension $H=64$, dropout $0.20$, early stopping on validation RMSE.
+  - *Histogram Gradient Boosting Regressor (GBR)*: `sklearn.ensemble.HistGradientBoostingRegressor` on C-order flattened 510-dimensional causal vectors ($30 \text{ cycles} \times 17 \text{ features}$). Not LightGBM or XGBoost. Frozen winning configs: `gbr_lr010_leaf15_l2_0` (FD001), `gbr_lr010_leaf31_l2_0` (FD002/FD004).
+  - *Unidirectional LSTM Network*: Sequential input tensors of shape $(30, 17)$, 1 recurrent layer, hidden dimension $H=64$, internal LSTM dropout $0.0$, final sequence step, separate `nn.Dropout(p=0.20)`, `nn.Linear(64,1)`. Selected config: `lstm_h64_lr0010`. Early stopping on validation uncapped RMSE.
 * **Validation-Only Configuration Freeze**:
-  - Winning configurations selected on validation data across seeds 2026–2027.
-  - Full 30-model matrix trained across five official seeds (`2026, 2027, 2028, 2029, 2030`). Checkpoints cryptographically verified and frozen in `experiments/base_models/model_registry.json`.
+  - Hyperparameters tuned across selection seeds 2026 and 2027 on validation engines.
+  - Full 30-model production matrix trained across five official seeds (`2026, 2027, 2028, 2029, 2030`). Checkpoints cryptographically verified and frozen in `experiments/base_models/model_registry.json`.
 
 ---
 
 ## Slide 7: Proposed Decision-Aware Conformal Calibration
 * **Exact Engine-Weighted Quantiles (Lee et al., 2023)**:
-  - Eliminates survivor bias: individual endpoint weight $w_{it} = \frac{1}{m \cdot n_i}$.
-  - Finite-score probability mass bounded by $\frac{m}{m+1}$; remaining mass $\frac{1}{m+1}$ placed at $+\infty$.
+  - For final calibration with $m$ contributing engines: $F_{\text{final}}(q) = \frac{1}{m+1} \sum_{i=1}^m \frac{1}{n_i} \sum_{t=1}^{n_i} \mathbb{I}(\text{score}_{it} \le q)$.
+  - Probability mass of finite endpoint is $\frac{1}{(m+1)n_i}$; total finite mass is $\frac{m}{m+1}$; remaining mass $\frac{1}{m+1}$ is at $+\infty$.
+  - Regime fallback support threshold: $m_g \ge \max(10, \lceil 1/\alpha \rceil - 1)$ (10 for 80%/90%, 19 for 95%); routes to global threshold if unsatisfied.
 * **Proposed Asymmetric Score Inversion**:
   $$\sigma(p) = \left(1 + \frac{p}{125}\right)^\gamma, \quad z(p) = \exp\left(-\frac{p}{20}\right)$$
   $$a(p) = \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))$$
   $$\text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)$$
   $$L = \max(0, \; p - q_g \cdot a(p)), \quad U = p + q_g \cdot b(p)$$
 * **Mechanics of Negative Beta ($\beta = -\ln 2$)**:
-  - As $p \to 0$, $a(p)$ decreases by half and $b(p)$ doubles.
-  - At fixed $p, q, \gamma$, negative beta raises the unclipped lower bound (narrowing lower-side margin).
+  - At fixed $p$, $q$, and $\gamma$, negative $\beta$ decreases $a$ relative to $\beta=0$ and increases $b$.
+  - Lower bound is nondecreasing and upper bound is nondecreasing. Does not guarantee earlier intervention or reduced costs; utility must be evaluated empirically.
   - Validation selection froze `gamma2_betam1` across all 6 cells under ADR-021.
 
 ---
@@ -91,43 +92,47 @@
 ## Slide 8: Sequential Maintenance Simulator and Economic Costing
 * **Discrete-Event Simulation Replay Engine (ADR-014, ADR-015)**:
   - Replays engine operational cycles sequentially from $t=30$ to $T-1$.
-  - Evaluates operational policy: `MAINTAIN_NOW` iff $L(t) \le 1.0$.
-  - Immediate episode termination upon maintenance trigger; in-service failure recorded at cycle $T$ if unmaintained.
+  - Evaluates operational policy: `MAINTAIN_NOW` iff $L(t) \le 1.0$ cycle.
+  - Immediate preventive maintenance occurs upon trigger with zero intervention lead time, terminating the episode.
+  - In-service failure recorded at cycle $T$ if unmaintained before $T$.
+  - Offline interval evaluation includes all qualified endpoints $30$ through $T$.
 * **Normalized Simulated Cost Units (SCU) under ADR-018**:
-  - Planned replacement base cost: $C_{\text{PM}} = 1.0$ SCU.
-  - Unplanned in-service failure penalty: $C_{\text{FAIL}} = 5.0$ SCU.
-  - Wasted life cost per discarded usable cycle: $C_{\text{WASTE}} = 0.20$ SCU.
-  - Economic Equivalence Horizon: $r_{\text{equal}} = \frac{5.0 - 1.0}{0.20} = 20$ cycles.
-  - Evaluates secondary sensitivity scenarios: `failure_sensitive` ($C_{\text{FAIL}}=10.0$) and `waste_sensitive` ($C_{\text{WASTE}}=0.40$).
+  - Planned replacement base cost: $C_{\text{PM}} = 1.0$ SCU per event.
+  - Unplanned in-service failure penalty: $C_{\text{FAIL}} = 5.0$ SCU per event.
+  - Wasted life cost per discarded usable cycle: $C_{\text{WASTE}} = 0.20$ SCU per unused cycle.
+  - Cost Equality Horizon: $r_{\text{equal}} = \frac{5.0 - 1.0}{0.20} = 20$ cycles (economic breakeven point; not a policy threshold).
+  - Evaluates descriptive sensitivity scenarios: `failure_sensitive` ($C_{\text{FAIL}}=10.0$) and `waste_sensitive` ($C_{\text{WASTE}}=0.40$).
 
 ---
 
 ## Slide 9: Statistical Inference Protocol and Matched Controls
 * **10,000-Draw Stratified Cluster Bootstrap (ADR-018, ADR-023)**:
-  - Resamples engines intact with replacement, stratified by lifetime quartiles ($Q_1$–$Q_4$).
+  - Resamples engines intact with replacement, stratified by lifetime quartiles ($Q_1$–$Q_4$) using PCG64 PRNG (`SeedSequence([2026, 6, dataset_number])`).
   - Multiplicity control: Bonferroni family-wise error control ($\alpha = 0.05/4 = 0.0125$) yielding **98.75% decision intervals**.
-  - Conservative missing-group bound propagation ($[0.0, 0.90]$ per absent group).
+  - Dynamic worst-group recomputation; conservative missing-group bound propagation ($[0.0, 0.90]$ per absent group).
   - Intersection-Union Testing (IUT): All component conditions must pass.
-* **Four Matched-Conservatism Controls (RQ3)**:
-  - `matched_width_interval`: Width matched to proposed validation MPIW within $\le 1.0$ cycle.
-  - `widened_interval`: Parameterized interval expansion ($\lambda \ge 1.0$).
-  - `point_safety_margin`: Point prediction offset ($p \le 1 + m$).
-  - `earlier_intervention`: Elevated threshold policy ($L \le h$).
-  - Selected strictly on validation engines; test data untouched.
+* **Four Matched-Conservatism Controls across Three Families (RQ3)**:
+  - `matched_width_interval`: Target width matched within $\le 1.0$ cycle ($\lambda=0.92$ global for GBR, $\lambda=0.90$ regime for LSTM).
+  - `widened_interval`: Parameterized interval expansion $\lambda \ge 1.0$ ($\lambda=1.00$ regime for GBR, $\lambda=1.00$ global for LSTM).
+  - `point_safety_margin`: Point prediction offset policy $p \le 1 + m$ ($m=5$ for GBR, $m=4$ for LSTM).
+  - `earlier_intervention`: Elevated threshold policy $L \le h$ ($h=1$ regime for GBR, $h=1$ global for LSTM).
+  - Selected strictly on FD002 validation engines; test data untouched.
 
 ---
 
-## Slide 10: Experimental Results — Held-Out Evaluation Strictly Pending
-* **Current Implementation & Audit Status**:
+## Slide 10: Experimental Results — Committed Audit Status and Pending Evaluation
+* **Committed Audit Status at Reviewed Commit `bb9e345` (PR #25)**:
   - Base Model Registry: 30/30 checkpoints verified (`experiments/base_models/model_registry.json`).
-  - Calibration Registry: 90/90 bundles verified (`experiments/calibration/calibration_registry.json`).
-  - Pre-Test Audit: Zero held-out test data processed (`experiments/confirmatory_development/pretest_audit.json`).
-* **Pending Held-Out Verification Gates (UPD-01 to UPD-04)**:
-  - *Milestone UPD-01*: Corrected pretest verification audit (`experiments/pretest_verification_v2/`).
+  - Step 8 Full Audit: All 6 mandatory checks run; 60 model/partition reproductions on `validation` and `calibration` with max diff $0.0$ (`experiments/pretest_verification_v2/step08_full_audit.json`).
+  - Pre-Test Audit: Confirms `PASS` and `PRETEST_READY` (`experiments/pretest_verification_v2/pretest_audit.json`).
+  - Artifact Baseline: 652 tracked protected artifacts verified from Git; 72 historical local search checkpoints accounted for (`baseline_manifest.json`).
+  - Execution Status: `held_out_execution_status` is `NOT_STARTED`; `rq_outcomes_status` is `PENDING`.
+* **Pending Held-Out Verification Gates (UPD-02 to UPD-05)**:
   - *Milestone UPD-02*: Held-out predictive accuracy and interval coverage metrics (Tables T3, T4, T5).
   - *Milestone UPD-03*: Sequential maintenance simulation event logs and cost accounting (Table T6).
   - *Milestone UPD-04*: 10,000-draw bootstrap decision intervals and three-way RQ classifications (Table T8).
-* **Demarcation Statement**: No preliminary or validation numbers are presented as confirmatory test findings.
+  - *Milestone UPD-05*: Descriptive sensitivity analyses for 80%/95% coverage and secondary cost scenarios.
+* **Demarcation Statement**: No preliminary, development, or validation smoke test numbers are presented as confirmatory held-out test findings.
 
 ---
 

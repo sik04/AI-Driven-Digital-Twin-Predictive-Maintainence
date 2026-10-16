@@ -1,12 +1,13 @@
-\section{Current Project Status and Preliminary Results}
+\section{Current Project Status and Verification Milestones}
 
 \subsection{Completed Preparatory Engineering \& Governance}
-The research preparation phases are complete and immutably frozen:
+The research preparation and audit phases are complete and immutably frozen:
 \begin{itemize}
-  \item \textbf{Phase 0--3 (Governance \& Splits)}: Packaging verified under ADR-001; C-MAPSS dataset splits frozen across 609 engines in \texttt{data/splits/}; 17-feature schema locked under ADR-013.
-  \item \textbf{Phase 5 (Base Predictors)}: Complete 30-model matrix trained across five official seeds (\texttt{2026}--\texttt{2030}) under ADR-019 and ADR-020; all 30 checkpoints verified on CPU in \texttt{experiments/base\_models/model\_registry.json}.
-  \item \textbf{Phase 6 (Conformal Calibration)}: 90 calibrator bundles fitted and verified under ADR-021; configuration \texttt{gamma2\_betam1} frozen across all six cells in \texttt{experiments/calibration/selection/selection\_freeze.json}.
-  \item \textbf{Phase 7 Pre-Test Preparation}: Pre-test evaluation machinery, 10,000-draw cluster bootstrap engine, and four matched controls frozen under ADR-023 in \texttt{experiments/confirmatory\_development/protocol\_freeze.json}.
+  \item \textbf{Data Splits \& Schema}: Packaging verified under ADR-001; C-MAPSS dataset splits frozen across 609 engines in \texttt{data/splits/}; 17-feature schema locked under ADR-013.
+  \item \textbf{Base Predictors}: Complete 30-model matrix trained across five official seeds (\texttt{2026}--\texttt{2030}) under ADR-019 and ADR-020; all 30 checkpoints verified on CPU in \texttt{experiments/base\_models/model\_registry.json}.
+  \item \textbf{Conformal Calibration}: 90 calibrator bundles fitted and verified under ADR-021; configuration \texttt{gamma2\_betam1} frozen across all six cells in \texttt{experiments/calibration/selection/selection\_freeze.json}.
+  \item \textbf{Full Pre-Test Verification Audit (PR \#25)}: Under committed audit artifact \texttt{experiments/pretest\_verification\_v2/step08\_full\_audit.json}, all six mandatory checks ran cleanly, completing CPU prediction reproduction across 60 model/partition checks on \texttt{validation} and \texttt{calibration} partitions with an overall maximum absolute difference of 0.0. The baseline manifest distinguishes 652 git-tracked protected artifacts from 72 local-only development search checkpoints.
+  \item \textbf{Confirmatory Protocol Freeze}: Protocol and control reconstruction are locked under \texttt{experiments/pretest\_verification\_v2/protocol\_freeze.json}. Pre-test readiness is audited as \texttt{PASS} and \texttt{PRETEST\_READY} in \texttt{pretest\_audit.json}.
 \end{itemize}
 
 \subsection{Honest Demarcation: Results Strictly Pending}
@@ -14,7 +15,7 @@ In accordance with preregistration ethics:
 \begin{enumerate}
   \item \textbf{Held-Out Confirmatory Evaluation}: Strictly \textbf{NOT STARTED}. Zero held-out test windows have been evaluated (\texttt{pretest\_audit.json}).
   \item \textbf{RQ1--RQ4 Outcomes}: Strictly \textbf{PENDING}. No performance numbers or hypothesis outcomes are reported from held-out data in this draft.
-  \item \textbf{Pending Corrective Audit}: Official Step 8 checkpoint prediction reproduction was recorded as \texttt{NOT RUN} in \texttt{step08\_repair\_verification.json}; formal reverification is pending under \texttt{experiments/pretest\_verification\_v2/} (\texttt{UPD-01}).
+  \item \textbf{Incorporation Roadmap}: Verified empirical findings will be incorporated following the pre-registered 10-step protocol once held-out evaluation is executed.
 \end{enumerate}
 
 \begin{table}[t]

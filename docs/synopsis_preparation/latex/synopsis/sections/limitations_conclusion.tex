@@ -4,8 +4,8 @@
 \begin{enumerate}
   \item \textbf{Benchmark Simulation}: Evaluations are conducted on synthetic NASA C-MAPSS data where degradation is monotonic. Operational aircraft engines experience maintenance reversibility and non-engine sensor faults not captured in the benchmark.
   \item \textbf{Synthetic Economic Scenarios}: The Simulated Cost Units ($\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$) represent study-defined benchmark preferences, not empirical airline accounting constants.
-  \item \textbf{Conformal Theory Boundaries}: Conformal calibration guarantees marginal exchangeable coverage. It does not provide theoretical guarantees of exact pointwise conditional coverage or sequential stopping-time coverage.
-  \item \textbf{No Physical Integration}: The framework evaluates an offline, trace-driven simulation replay engine; no physical engine hardware coupling exists.
+  \item \textbf{Conformal Theory Boundaries}: Hierarchical conformal theory provides marginal predictive coverage under its stated sampling and exchangeability assumptions. IntelliTwin uses an engine-weighted construction motivated by that theory. Applicability of those assumptions to ordered, lifetime-stratified degradation trajectories is not established merely by weighting engines equally; reliability is therefore evaluated empirically under the frozen protocol. Furthermore, downstream sequential stopping times are not theoretically guaranteed by split conformal guarantees.
+  \item \textbf{Research Prototype Boundaries}: The software is a research prototype evaluating an offline, trace-driven simulation replay engine; it makes no claim of production readiness, aircraft certification, physical hardware integration, or independently established end-to-end operational reproducibility.
 \end{enumerate}
 
 \subsection{Conclusion and Next Milestones}

@@ -23,41 +23,50 @@ The experimental matrix comprises a $3 \times 2$ grid (6 experimental cells):
 \begin{equation}
 \{\text{FD001}, \text{FD002}, \text{FD004}\} \times \{\text{GBR}, \text{LSTM}\}.
 \end{equation}
-To account for stochasticity in neural network weight initialization and gradient boosting data subsampling, each cell is trained across five pre-registered random seeds:
+Two point-prediction architectures operate on identical 30-cycle causal horizons:
+\begin{enumerate}
+    \item \textbf{Gradient Boosted Regressor (GBR)}: \texttt{sklearn.ensemble.HistGradientBoostingRegressor} operating on C-order flattened $30 \times 17 = 510$-dimensional vectors. Selected configs: \texttt{gbr\_lr010\_leaf15\_l2\_0} (FD001) and \texttt{gbr\_lr010\_leaf31\_l2\_0} (FD002, FD004).
+    \item \textbf{Long Short-Term Memory (LSTM)}: Single-layer unidirectional PyTorch LSTM ($H=64$, recurrent dropout $0.0$, followed by \texttt{nn.Dropout(p=0.20)} and \texttt{nn.Linear(64, 1)}, learning rate $\eta=0.0010$, \texttt{lstm\_h64\_lr0010}) with early stopping on validation uncapped RMSE.
+\end{enumerate}
+Each cell is trained across five pre-registered random seeds:
 \begin{equation}
 \mathcal{S} = \{2026, 2027, 2028, 2029, 2030\}.
 \end{equation}
-This produces 30 base model checkpoints and 90 conformal calibrator bundles.
+This produces 30 base model checkpoints and 90 conformal calibrator bundles. Two selection seeds (2026 and 2027) used during model development are distinguished from the five final model seeds. We do not characterize the five GBR seeds as independent experiments, nor assert universal deterministic behavior beyond the recorded runs.
 
 \section{Matched-Conservatism Control Baselines}
 To isolate the operational decision value of calibrated uncertainty from trivial policy over-conservatism (RQ3), we formulate four named controls across three distinct baseline families:
 \begin{enumerate}
-    \item \textbf{Heuristic Interval Family}:
-    \begin{itemize}
-        \item \emph{Matched-Width Interval} (\texttt{matched\_width\_interval}): A symmetric heuristic interval $\hat{y}_t \pm \bar{w}$ where $\bar{w}$ matches the validation Mean Prediction Interval Width (MPIW) of the calibrated conformal interval within $\le 1.0$ cycle.
-        \item \emph{Widened Interval} (\texttt{widened\_interval}): An expanded heuristic interval with width $1.25 \times \bar{w}$.
-    \end{itemize}
-    \item \textbf{Point Safety Margin Family}:
-    \begin{itemize}
-        \item \emph{Point Safety Margin} (\texttt{point\_safety\_margin}): A point prediction trigger shifted downward by a fixed safety margin $m$: replace when $\hat{y}_t \le \tau_{\text{lead}} + m$.
-    \end{itemize}
-    \item \textbf{Earlier Fixed Policy Family}:
-    \begin{itemize}
-        \item \emph{Earlier Intervention} (\texttt{earlier\_intervention}): A threshold inflation policy triggering replacement when $\hat{y}_t \le \tau_{\text{early}} = \tau_{\text{lead}} + 15$ cycles.
-    \end{itemize}
+    \item \textbf{Matched-Width Interval Family (\texttt{matched\_width\_interval})}:
+    Sources from \texttt{global\_hcp} or \texttt{regime\_hcp}, scaling unclipped half-width by $\lambda \in [0.01, 4.0]$ (plus $\{5, 6, 8, 12, 16\}$):
+    \begin{align}
+    q_{\text{source}}(t) &= U_{\text{source}}(t) - p(t) \\
+    L_\lambda(t) &= \max(0, \; p(t) - \lambda q_{\text{source}}(t)), \quad U_\lambda(t) = p(t) + \lambda q_{\text{source}}(t)
+    \end{align}
+    Selected on FD002 validation data to minimize absolute difference from proposed validation MPIW (required $\le 1.0$ cycle): GBR selects \texttt{global\_hcp} with $\lambda=0.92$; LSTM selects \texttt{regime\_hcp} with $\lambda=0.90$.
+
+    \item \textbf{Widened Interval Family (\texttt{widened\_interval})}:
+    Same scaling formula with $\lambda \ge 1.00$, minimizing validation cost: GBR selects \texttt{regime\_hcp} with $\lambda=1.00$; LSTM selects \texttt{global\_hcp} with $\lambda=1.00$.
+
+    \item \textbf{Point Safety Margin Family (\texttt{point\_safety\_margin})}:
+    Maintains iff $p \le 1 + m$ for $m \in \{0, \dots, 250\}$, minimizing validation cost: GBR selects $m=5$; LSTM selects $m=4$. As a point policy, width and conformal coverage metrics are designated \texttt{NOT\_APPLICABLE}.
+
+    \item \textbf{Earlier Fixed Policy Family (\texttt{earlier\_intervention})}:
+    Maintains iff $L_{\text{source}} \le h$ for $h \in \{1, \dots, 251\}$, minimizing validation cost: GBR selects \texttt{regime\_hcp} with $h=1$; LSTM selects \texttt{global\_hcp} with $h=1$.
 \end{enumerate}
+All control selection executed on FD002 validation engines across seeds 2026--2030 under \texttt{primary\_reference} at 90\% coverage, completely isolated from calibration or held-out test data.
 
 \section{Statistical Inference Protocol and Decision Rules}
 Confirmatory hypothesis testing is executed strictly via paired engine-level cluster bootstrap resampling:
 \begin{itemize}
-    \item \textbf{Cluster Unit}: The independent statistical unit is the physical engine unit ($i \in \{1, \dots, N\}$). Individual cycles within an engine trajectory are never resampled independently.
-    \item \textbf{Bootstrap Replicates}: $B = 10{,}000$ paired bootstrap samples are drawn with replacement, stratified by engine lifetime quartiles ($Q_1$--$Q_4$).
+    \item \textbf{Cluster Unit}: The independent statistical unit is the physical engine unit ($i \in \{1, \dots, N\}$). Individual cycles within an engine trajectory are never resampled independently. Seeds are averaged within engine clusters as descriptive training variability.
+    \item \textbf{Bootstrap Replicates}: $B = 10{,}000$ paired bootstrap samples are drawn with replacement, stratified by engine lifetime quartiles ($Q_1$--$Q_4$), using \texttt{PCG64} PRNG with seed sequence \texttt{SeedSequence([2026, 6, dataset\_number])}.
     \item \textbf{Equal Engine Weighting}: All fleet metrics (coverage, width, cost, failure rate) are computed with equal weighting per engine unit.
-    \item \textbf{Missing-Group Bound Propagation}: If a bootstrap resample lacks representation for a specific flight regime cluster ($\ge 10$ engines required for eligibility), worst-case bounds ($[0.0, 1.0]$ for coverage, $[0.0, \infty)$ for width) are propagated conservatively.
-    \item \textbf{Multiplicity Correction}: Family-wise error rate across the four primary research questions is controlled via Bonferroni correction:
+    \item \textbf{Missing-Group Bound Propagation}: If an eligible subgroup ($\ge 10$ engines) is absent in a bootstrap resample, its absolute coverage error is bounded by $[0.0, 0.90]$ at 90\% nominal coverage and propagated conservatively.
+    \item \textbf{Multiplicity Correction}: Family-wise error rate across RQ1--RQ4 is controlled via Bonferroni correction:
     \begin{equation}
     \alpha_{\text{conf}} = \frac{0.05}{4} = 0.0125.
     \end{equation}
     Confirmatory decision rules utilize $98.75\%$ two-sided percentile confidence intervals (empirical percentiles $0.625\%$ and $99.375\%$).
-    \item \textbf{Intersection-Union Test (IUT)}: A hypothesis is decided as \textbf{Supported} if and only if all pre-registered criteria (practical margin, coverage ceiling, failure safeguard) pass at the $98.75\%$ level. If any condition fails, the hypothesis is decided as \textbf{Unsupported}; if the confidence interval spans the threshold boundary, the outcome is cataloged as \textbf{Inconclusive}.
+    \item \textbf{Intersection-Union Test (IUT)}: Benefit conditions pass if lower $\text{CI} > \text{margin}$; ceiling/noninferiority conditions pass if upper $\text{CI} < \text{ceiling}$. Equality with a boundary or degenerate inference is inconclusive. Failure safeguard uses observed fleet failure rates ($\Deltafail \le 0.0$). A hypothesis is decided as \textbf{Supported} iff all required criteria pass at the $98.75\%$ level, \textbf{Unsupported} if any required condition fails, and otherwise \textbf{Inconclusive}.
 \end{itemize}

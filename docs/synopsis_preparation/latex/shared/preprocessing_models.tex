@@ -1,0 +1,38 @@
+% Preprocessing and Base Model Specifications
+% Authoritative Sources: src/intellitwin/data/preprocessing.py, src/intellitwin/data/schema.py,
+%                        src/intellitwin/models/gbr.py, src/intellitwin/models/lstm.py
+% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+
+\subsection*{Preprocessing Protocol}
+Preprocessing uses training-only z-score normalization. Means ($\mu_{\text{train}}$) and population standard deviations ($\sigma_{\text{train}}$) are estimated with degrees of freedom $\text{ddof}=0$. An exactly zero standard deviation is replaced by an effective scale of $1.0$, while the mean is still subtracted:
+\begin{equation}
+x_{\text{normalized}} = \frac{x - \mu_{\text{train}}}{s_{\text{train}}}, \quad \text{where } s_{\text{train}} = \begin{cases} \sigma_{\text{train}} & \text{if } \sigma_{\text{train}} > 0, \\ 1.0 & \text{otherwise.} \end{cases}
+\end{equation}
+
+Dataset-specific processing is structured as follows:
+\begin{itemize}
+    \item \textbf{FD001} (Single operating condition): Standardized using global training-fitted normalization across all 17 features.
+    \item \textbf{FD002 and FD004} (Six operating conditions): Operational settings (\texttt{setting1}, \texttt{setting2}, \texttt{setting3}) are standardized using training data. Six operating regimes are learned exclusively from standardized training settings via $K$-means clustering ($k=6$, $\text{random\_state}=2026$, $\text{n\_init}=10$). Canonical regime labels (\texttt{C1} through \texttt{C6}) are assigned based on lexicographic centroid ordering, with nearest-centroid assignment and lower-index tie-breaking. Sensor normalization parameters are fitted separately within training regimes.
+\end{itemize}
+Preprocessing executes strictly prior to sliding temporal window construction. 
+
+\subsection*{Predictive Feature Space and Causal Windowing}
+The canonical feature vector consists of exactly 17 features in locked sequential order:
+\begin{center}
+\texttt{setting1, setting2, setting3, s2, s3, s4, s7, s8, s9, s11, s12, s13, s14, s15, s17, s20, s21}.
+\end{center}
+This 17-feature selection is supported by the recorded training-only qualification procedure. The seven excluded sensors are not asserted to be universally uninformative across all operational domains, but were frozen under qualification protocol ADR-013.
+
+Temporal feature windows are formed via backward causal rolling windows of length $w = 30$ operational cycles with unit stride ($s = 1$). Windows never cross engine boundaries, and zero-padding is strictly precluded (cycles $t < 30$ receive no predictions). During base model training, an upper piecewise cap $R_{\text{max}} = 125$ cycles is applied to RUL targets ($\min(y, 125)$) as a modeling convention. Point predictions are evaluated as $p = \max(0, \text{raw\_prediction})$ without upper clipping.
+
+\subsection*{Base Predictor Architectures and Frozen Configurations}
+Two distinct model families operate on identical 30-cycle causal horizons:
+\begin{enumerate}
+    \item \textbf{Gradient Boosted Regressor (GBR)}: Implemented using \texttt{sklearn.ensemble.HistGradientBoostingRegressor} operating on C-order flattened $30 \times 17 = 510$-dimensional feature vectors. Hyperparameters: $\text{loss}=\text{"squared\_error"}$, $\text{early\_stopping}=\text{False}$, $\text{min\_samples\_leaf}=20$, $\text{max\_bins}=255$, $\text{max\_iter}=300$. Frozen selected configurations:
+    \begin{itemize}
+        \item FD001: \texttt{gbr\_lr010\_leaf15\_l2\_0} ($\text{learning\_rate}=0.10$, $\text{max\_leaf\_nodes}=15$, $\text{l2\_regularization}=0.0$).
+        \item FD002 and FD004: \texttt{gbr\_lr010\_leaf31\_l2\_0} ($\text{learning\_rate}=0.10$, $\text{max\_leaf\_nodes}=31$, $\text{l2\_regularization}=0.0$).
+    \end{itemize}
+    \item \textbf{Long Short-Term Memory (LSTM)}: Recurrent neural network consisting of a single unidirectional LSTM layer ($\text{input\_size}=17$, $\text{hidden\_size}=64$, $\text{num\_layers}=1$, $\text{batch\_first}=\text{True}$, $\text{bidirectional}=\text{False}$, internal $\text{dropout}=0.0$). The final sequence output ($\text{lstm\_out}[:, -1, :]$) is passed through an explicit $\text{nn.Dropout}(p=0.20)$ and projected via $\text{nn.Linear}(64, 1)$. Frozen selected configuration across all cells: \texttt{lstm\_h64\_lr0010} ($\text{learning\_rate}=0.001$, AdamW optimizer, $\text{weight\_decay}=10^{-4}$). Early stopping monitors uncapped-RUL RMSE on validation engines.
+\end{enumerate}
+Model selection evaluated configurations across two development seeds ($2026, 2027$). The final frozen base model matrix comprises 30 checkpoints spanning all 6 experimental cells across five pre-registered model seeds ($2026, 2027, 2028, 2029, 2030$). Repeated seeds capture training variability rather than five independent experiments.
