@@ -1,9 +1,10 @@
 % Matched-Conservatism Control Specifications
-% Authoritative Sources: src/intellitwin/decision/controls.py, experiments/pretest_verification_v2/controls/FD002/{GBR,LSTM}/selection.json
-% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Authoritative Sources: src/intellitwin/decision/controls.py, experiments/pretest_verification_v4/
+% Pinned Repository Baseline: c163bb279e7427b8f1b6e75955af4969ff9370fd
+% Audit Execution Commit: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153
 
 \subsection*{Four Named Controls across Three Baseline Families}
-To rigorously evaluate whether the operational benefits of the proposed method stem from calibrated decision uncertainty rather than simple over-conservatism (RQ3), IntelliTwin evaluates four pre-registered controls across three families:
+To rigorously evaluate whether the operational benefits of the proposed method stem from calibrated decision uncertainty rather than simple over-conservatism (RQ3), IntelliTwin evaluates four prespecified controls across three families:
 \begin{enumerate}
     \item \textbf{Matched-Width Interval Family} (\texttt{matched\_width\_interval}): Evaluates a parameterized scaling of unclipped half-width from a baseline conformal interval:
     \begin{align}
@@ -38,4 +39,4 @@ Control parameter selection was executed strictly on the 26 validation engines o
         \item \texttt{earlier\_intervention}: \texttt{global\_hcp}, $h = 1$ cycle.
     \end{itemize}
 \end{itemize}
-No calibration or held-out test data were accessed during control selection.
+Note that selection of $\lambda = 1.00$ corresponds to unscaled baseline width rather than actual interval widening, and selection of $h = 1$ matches the standard baseline decision threshold rather than an empirically earlier intervention. No calibration or held-out test data were accessed during control selection.

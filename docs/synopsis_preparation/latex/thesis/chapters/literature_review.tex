@@ -23,7 +23,7 @@ However, across the turbofan prognostics literature, model evaluation has remain
 \section{Pillar 2: Uncertainty Quantification and Conformal Prediction}
 To address the limitations of point estimates, various uncertainty quantification (UQ) methodologies have been explored in PHM:
 \begin{itemize}
-    \item \textbf{Bayesian Neural Networks (BNNs)}: Employ Monte Carlo dropout or variational inference to estimate weight posterior distributions. While theoretically principled, BNNs impose heavy computational overheads and rely heavily on prior distribution specifications.
+    \item \textbf{Bayesian and Probabilistic Frameworks}: Predictive uncertainty methods differ in their assumptions and calibration behavior. Their maintenance value must be evaluated through interval reliability and downstream decision outcomes under a common protocol.
     \item \textbf{Quantile Regression}: Estimates conditional quantiles directly via the pinball loss. However, quantile regression provides no finite-sample coverage guarantees and is vulnerable to quantile crossing under non-stationary degradation.
     \item \textbf{Conformal Prediction}: Conformal prediction theory provides a distribution-free uncertainty framework \cite{javanmardi2023conformal}. By evaluating nonconformity scores on a reserved calibration dataset, inductive split-conformal inference constructs prediction intervals targeting valid finite-sample marginal coverage:
     \begin{equation}
@@ -36,7 +36,9 @@ Recently, Javanmardi et al.~\cite{javanmardi2023conformal} and Yang et al.~\cite
 \section{Pillar 3: Operating Regime Heterogeneity and Subgroup Reliability}
 In real-world aviation operations, engines traverse diverse flight regimes (climb, cruise, descent, sea-level take-off). In C-MAPSS sub-datasets FD002 and FD004, six discrete operating regimes induce severe sensor non-stationarity.
 
-When conformal calibration is applied globally across a pooled calibration split, the resulting marginal guarantee $1-\alpha$ guarantees only aggregate coverage across the entire dataset. Lee et al.~\cite{lee2023hierarchical} and Benabdennour et al.~\cite{benabdennour2026grouped} demonstrated that global calibration frequently yields severe conditional undercoverage in rare or high-stress operational clusters. While hierarchical conformal prediction (HCP) allows conditioning on group indicators, naive partitioning across small subgroup samples can induce catastrophic quantile variance. Establishing structured fallback protocols for sparse clusters is essential for industrial viability.
+When conformal calibration is applied globally across a pooled calibration split, the resulting marginal guarantee $1-\alpha$ guarantees only aggregate coverage across the entire dataset. Lee, Barber, and Willett~\cite{lee2023hierarchical} established hierarchical conformal inference for clustered data, placing $\frac{1}{m+1}$ probability mass at $+\infty$ to target valid coverage for unseen clusters under exchangeable group sampling.
+
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
 
 \section{Pillar 4: Maintenance Decisions and Conservatism Controls}
 The ultimate objective of prognostic modeling is to inform maintenance scheduling. In operational fleet logistics, an asymmetric cost structure prevails:
@@ -54,6 +56,6 @@ Despite the individual advancements cataloged above, no prior study has simultan
     \item Condition-stratified conformal calibration with deterministic fallback for rare flight regimes;
     \item Asymmetric nonconformity scaling aligned with maintenance cost structures;
     \item End-to-end discrete-event maintenance simulation evaluating sequential fleet utility;
-    \item Attribution testing against matched-conservatism controls under pre-registered cluster-bootstrap statistical protocols.
+    \item Attribution testing against matched-conservatism controls under prespecified cluster-bootstrap statistical protocols.
 \end{enumerate}
-IntelliTwin directly resolves this research gap through an open, reproducible, and pre-registered experimental framework.
+IntelliTwin directly resolves this research gap through an open, reproducible, and prespecified experimental framework version-controlled prior to held-out evaluation.

@@ -24,40 +24,44 @@ All three researchers participate in conceptualization, project governance, and 
 
 To ensure rigorous execution and balanced progress across software engineering and academic documentation, the research initiative operates under a collaborative work plan among all three authors:
 
-- **Mayank Singh, Shiksha Pandey, Ruchi Gupta**:
+- **Mayank Singh (Lead Developer & Experimental Verification)**:
   - Base predictor training pipelines and data windowing (`src/intellitwin/data/`, `src/intellitwin/models/`).
   - Conformal calibration engine and exact quantile solver implementation (`src/intellitwin/uncertainty/`).
   - Maintenance simulation replay and economic cost accounting (`src/intellitwin/simulator/`).
-  - Control-selection specifications and execution audits (`scripts/`, `experiments/`).
+  - Control-selection specifications, execution verification audits, and experimental test runs (`scripts/`, `experiments/`).
+- **Research Partners (Shiksha Pandey, Ruchi Gupta)**:
   - Formulation of decision-aware, condition-adaptive conformal inference and score functions.
   - Literature synthesis and bibliometric verification across RUL, uncertainty quantification, and predictive maintenance.
   - Preparation of formal hypothesis registry, mathematical notation, and statistical inference explanations.
-  - Drafting and review of academic deliverables (Department Synopsis, IEEE Manuscript, and Thesis).
+  - Drafting and review of academic deliverables (Department Synopsis, IEEE Manuscript, and Project Report/Thesis Draft).
   - Maintaining documentation control registers (`source_manifest.csv`, `claims_evidence_matrix.csv`, `discrepancy_register.md`, `update_register.csv`).
+  - Specific individual partner attribution and final authorship approval remain pending mutual confirmation.
 
 > **Governance Notice on Author Roles**:
 > - Ruchi Gupta is not assigned as supervisor without formal documentation.
 > - Shiksha Pandey is not assigned as methodology lead without mutual agreement.
-> - Role allocations are active collaborative work items, not completed unilateral contributions.
+> - Blanket assignment of every role to all three authors is avoided; individual partner attributions remain pending confirmation.
 > - Neutral pending affiliation and contact information is maintained across all drafts.
+> - Unsupported "Master's/Doctoral thesis" descriptions are replaced with "project report/thesis draft". Degree, department, supervisor details, and institution-specific format remain pending formal administrative specification.
+> - The paper and synopsis use IEEEtran presentation; the thesis draft uses LaTeX report class with IEEE-style references. An IEEE conference template does not establish university thesis compliance.
 > - Final contribution percentages, role definitions, and author ordering require mutual consensus among all three authors prior to formal submission.
 
 ---
 
 ## 3. CRediT (Contributor Roles Taxonomy) Mapping
 
-In accordance with scholarly integrity, role contributions are recorded neutrally:
+In accordance with scholarly integrity, role contributions are recorded accurately distinguishing assigned development from collaborative and pending roles:
 
 | CRediT Role | Role Definition | Contributing Authors | Status |
 | :--- | :--- | :--- | :--- |
+| **Software** | Programming, code implementation, test suites, and simulation pipelines. | Mayank Singh | Lead Developer (Pre-test machinery frozen; held-out pending) |
+| **Validation & Experiments**| Execution of experiments, verification audits, and empirical replication. | Mayank Singh (Development execution); Partners (Audit review) | Pre-test complete; held-out execution pending |
 | **Conceptualization** | Formulation or evolution of overarching research goals, questions, and hypotheses. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (RQ1–RQ4 locked under ADR-018) |
-| **Methodology** | Development of calibration mechanisms, evaluation contracts, and statistical protocols. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Frozen under ADR-018, ADR-021, ADR-023) |
-| **Software** | Programming, code implementation, test suites, and simulation pipelines. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Pre-test machinery frozen; held-out pending) |
-| **Validation & Experiments**| Execution of experiments, verification audits, and empirical replication. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Pre-test complete; held-out pending) |
-| **Formal Analysis** | Application of statistical, mathematical, or computational techniques to analyze data. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Protocol frozen: 10,000-draw cluster bootstrap IUT) |
-| **Data Curation** | Acquisition, preprocessing, split isolation, and manifest verification. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Completed for C-MAPSS FD001, FD002, FD004) |
-| **Writing – Original Draft**| Preparation, creation, and presentation of the initial published work. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Working drafts in `docs/synopsis_preparation/`) |
-| **Writing – Review & Editing**| Critical review, commentary, and revision by all authors prior to submission. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Joint (Iterative review of generated drafts) |
+| **Methodology** | Development of calibration mechanisms, evaluation contracts, and statistical protocols. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Collaborative (Partner attribution pending confirmation) |
+| **Formal Analysis** | Application of statistical, mathematical, or computational techniques to analyze data. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Protocol frozen: 10,000-draw cluster bootstrap IUT |
+| **Data Curation** | Acquisition, preprocessing, split isolation, and manifest verification. | Mayank Singh | Completed for C-MAPSS FD001, FD002, FD004 |
+| **Writing – Original Draft**| Preparation, creation, and presentation of the initial published work. | Shiksha Pandey, Ruchi Gupta, Mayank Singh | Working drafts in `docs/synopsis_preparation/` |
+| **Writing – Review & Editing**| Critical review, commentary, and revision by all authors prior to submission. | Mayank Singh, Shiksha Pandey, Ruchi Gupta | Iterative review of generated drafts |
 
 ---
 

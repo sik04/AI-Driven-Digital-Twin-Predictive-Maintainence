@@ -3,7 +3,7 @@
 
 \begin{quote}
 \itshape
-\textbf{Status Notice:} The empirical evaluations and analytical tables reported in this chapter represent the pre-registered reporting templates for the confirmatory evaluation. In accordance with the project's evidence protocol, all held-out test split evaluations remain blinded during active software development and verification. Empirical entries are designated \texttt{PENDING} awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
+\textbf{Status Notice:} Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST\_READY. Held-out execution has not started, and RQ1--RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness. All held-out evaluations remain blinded awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
 \end{quote}
 
 \section{Point Degradation Predictor Evaluation}
@@ -34,6 +34,7 @@ Conformal prediction intervals are evaluated at nominal confidence level $1-\alp
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Primary Interval Calibration Performance at Nominal $90\%$ Confidence Level on Held-Out Test Splits ($3 \times 2 \times 3 = 18$ cells)}
 \label{tab:thesis_calibration_performance}
 \begin{tabular}{lllccc}
@@ -75,6 +76,7 @@ Downstream maintenance outcomes under the primary economic scenario (\texttt{pri
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Sequential Maintenance Policy Outcomes on Held-Out Test Engines (\texttt{primary\_reference}: $\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$ SCU; 26 rows)}
 \label{tab:thesis_maintenance_outcomes}
 \begin{tabular}{lllccc}
@@ -124,19 +126,20 @@ Confirmatory statistical inference is conducted via 10,000 paired engine-level c
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Pre-Registered Confirmatory Hypothesis Decision Rules and Outcome Contrasts (ADR-018)}
 \label{tab:thesis_hypothesis_matrix}
-\begin{tabular}{lp{4.2cm}p{5.0cm}ccc}
+\begin{tabular}{lp{3.2cm}p{4.2cm}ccc}
 \toprule
-\textbf{Research Question} & \textbf{Contrast Metric \& Scope} & \textbf{Pre-Registered Thresholds (98.75\% CI)} & \textbf{Point Est.} & \textbf{98.75\% CI} & \textbf{Status} \\
+\textbf{RQ} & \textbf{Contrast Metric} & \textbf{Thresholds (98.75\% CI)} & \textbf{Est.} & \textbf{98.75\% CI} & \textbf{Status} \\
 \midrule
-\textbf{RQ1 (Utility \& Coverage)} & Cost improvement vs.\ \texttt{global\_hcp} and \texttt{regime\_hcp} on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$; coverage errors $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\textbf{RQ1} & Cost vs.\ \texttt{global\_hcp} and \texttt{regime\_hcp} on FD002 & $\Deltacost > 0.20~\SCU$; coverage errors $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-\textbf{RQ2 (Subgroup Reliability)} & Worst-group coverage error contrast for regimes ($C_1$--$C_6$) and stages on FD002 & $\Deltaerror > 0.01$; worst error $< 0.05$; $\Dwidth < 1.0$; $\Dscore < 1.0$ cycle & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\textbf{RQ2} & Worst-group coverage error on regimes ($C_1$--$C_6$) and stages & $\Deltaerror > 0.01$; worst error $< 0.05$; $\Dwidth, \Dscore < 1.0$ cycle & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-\textbf{RQ3 (Control Attribution)} & Cost improvement vs.\ each of the 4 matched controls on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$ over every control; coverage $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\textbf{RQ3} & Cost vs.\ each of the 4 matched controls on FD002 & $\Deltacost > 0.20~\SCU$ over every control; absolute coverage error $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-\textbf{RQ4 (Generalization)} & Balanced 6-cell evaluation matrix ($w_k=1/6$ each) across FD001, FD002, FD004 & Aggregate: $\Deltacost > 0.20, \Deltaerror > 0.01$; Cell non-harm: $\Deltacost > -0.20, \Deltaerror > -0.01$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\textbf{RQ4} & 6-cell evaluation matrix ($w_k=1/6$ each) across FD001/002/004 & Aggregate: $\Deltacost > 0.20, \Deltaerror > 0.01$; Cell non-harm: $\Deltacost > -0.20, \Deltaerror > -0.01$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \bottomrule
 \end{tabular}
 \begin{flushleft}

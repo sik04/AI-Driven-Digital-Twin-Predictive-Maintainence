@@ -57,7 +57,8 @@ In strict adherence to research integrity standards, **no institutional details,
 - **Authorship Representation**: Mayank Singh, Shiksha Pandey, Ruchi Gupta (provisional alphabetical/equal layout pending author agreement).
 - **Results Notice**: Abstract and Results sections must explicitly declare that held-out confirmatory evaluation is pending.
 
-### 3.3 Academic Master's / Doctoral Thesis
+### 3.3 Academic Project Report / Thesis Draft
+- **Scope Note**: Formatted as a comprehensive project report / thesis draft baseline using LaTeX `report` class with IEEE-style bracketed numerical references. An IEEE conference template does not establish university thesis compliance; degree, institution-specific format, supervisor details, and final author order remain pending confirmation.
 - **Document Class**: Standard LaTeX `report` class, 12pt, A4 paper, one-sided (`\documentclass[12pt,a4paper,oneside]{report}`).
 - **Citation Format**: IEEE-style bracketed numerical citations (`[1]`, `[2]`).
 - **Required University Frontmatter (To Be Supplied)**:

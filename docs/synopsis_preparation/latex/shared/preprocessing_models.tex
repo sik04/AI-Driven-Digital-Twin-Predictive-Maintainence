@@ -1,7 +1,8 @@
 % Preprocessing and Base Model Specifications
 % Authoritative Sources: src/intellitwin/data/preprocessing.py, src/intellitwin/data/schema.py,
 %                        src/intellitwin/models/gbr.py, src/intellitwin/models/lstm.py
-% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Pinned Repository Baseline: c163bb279e7427b8f1b6e75955af4969ff9370fd
+% Audit Execution Commit: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153
 
 \subsection*{Preprocessing Protocol}
 Preprocessing uses training-only z-score normalization. Means ($\mu_{\text{train}}$) and population standard deviations ($\sigma_{\text{train}}$) are estimated with degrees of freedom $\text{ddof}=0$. An exactly zero standard deviation is replaced by an effective scale of $1.0$, while the mean is still subtracted:
@@ -33,6 +34,6 @@ Two distinct model families operate on identical 30-cycle causal horizons:
         \item FD001: \texttt{gbr\_lr010\_leaf15\_l2\_0} ($\text{learning\_rate}=0.10$, $\text{max\_leaf\_nodes}=15$, $\text{l2\_regularization}=0.0$).
         \item FD002 and FD004: \texttt{gbr\_lr010\_leaf31\_l2\_0} ($\text{learning\_rate}=0.10$, $\text{max\_leaf\_nodes}=31$, $\text{l2\_regularization}=0.0$).
     \end{itemize}
-    \item \textbf{Long Short-Term Memory (LSTM)}: Recurrent neural network consisting of a single unidirectional LSTM layer ($\text{input\_size}=17$, $\text{hidden\_size}=64$, $\text{num\_layers}=1$, $\text{batch\_first}=\text{True}$, $\text{bidirectional}=\text{False}$, internal $\text{dropout}=0.0$). The final sequence output ($\text{lstm\_out}[:, -1, :]$) is passed through an explicit $\text{nn.Dropout}(p=0.20)$ and projected via $\text{nn.Linear}(64, 1)$. Frozen selected configuration across all cells: \texttt{lstm\_h64\_lr0010} ($\text{learning\_rate}=0.001$, AdamW optimizer, $\text{weight\_decay}=10^{-4}$). Early stopping monitors uncapped-RUL RMSE on validation engines.
+    \item \textbf{Long Short-Term Memory (LSTM)}: Recurrent neural network consisting of a single unidirectional LSTM layer ($\text{input\_size}=17$, $\text{hidden\_size}=64$, $\text{num\_layers}=1$, $\text{batch\_first}=\text{True}$, $\text{bidirectional}=\text{False}$, internal $\text{dropout}=0.0$). The final sequence output ($\text{lstm\_out}[:, -1, :]$) is passed through an explicit $\text{nn.Dropout}(p=0.20)$ and projected via $\text{nn.Linear}(64, 1)$. Frozen selected configuration across all cells: \texttt{lstm\_h64\_lr0010} (AdamW optimizer, $\text{learning\_rate}=0.001$, $\text{weight\_decay}=10^{-4}$, $\text{batch\_size}=256$, betas $(0.9, 0.999)$, $\epsilon=10^{-8}$). Early stopping monitors uncapped-RUL RMSE on validation engines.
 \end{enumerate}
-Model selection evaluated configurations across two development seeds ($2026, 2027$). The final frozen base model matrix comprises 30 checkpoints spanning all 6 experimental cells across five pre-registered model seeds ($2026, 2027, 2028, 2029, 2030$). Repeated seeds capture training variability rather than five independent experiments.
+Model selection evaluated configurations across two development seeds ($2026, 2027$). The final frozen base model matrix comprises 30 checkpoints spanning all 6 experimental cells across five prespecified model seeds ($2026, 2027, 2028, 2029, 2030$). Repeated seeds capture training variability rather than five independent experiments.
