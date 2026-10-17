@@ -1,6 +1,6 @@
 # Discrepancy Register and Documentation Risk Assessment
 
-**Pinned Source Commit**: `bb9e34579343881a831e3f052608ee15e183df76` (Historical initial draft: `224c741f5f3da19821a708e0a6da417d4810e9da`)  
+**Pinned Repository Baseline**: `c163bb279e7427b8f1b6e75955af4969ff9370fd` (Audit Execution: `550a7994d5746d3bcbfa28c26e7ed4f1a26a6153`, Historical initial draft: `224c741f5f3da19821a708e0a6da417d4810e9da`)  
 **Governing Principle**: Identify contradictions between legacy documents, protocol specifications, implementation code, and audit records. Do not alter underlying historical files outside `docs/synopsis_preparation/`. Instead, record discrepancies and enforce strictly conservative wording in all new documentation deliverables.
 
 ---
@@ -11,12 +11,12 @@
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **DISC-01** | Outdated Phase-0 Scope | `docs/project_scope.md`, `docs/architecture_overview.md` | `README.md`, `research/decision_log.md` (ADR-001, ADR-002) | Moderate | Documented; scoped in new drafts |
 | **DISC-02** | Legacy Paper Outline Baselines | `paper/outline.md` (Section 7) | `research/research_design/step07_base_predictor_specification.md` (ADR-019, ADR-020) | High | Resolved in new drafts; frozen baselines restricted to GBR & LSTM |
-| **DISC-03** | Epistemic/Aleatoric Decomposition | `paper/outline.md`, early notes | `src/intellitwin/uncertainty/conformal.py`, ADR-021 | High | Prohibited claim; drafts evaluate total predictive nonconformity |
+| **DISC-03** | Epistemic/Aleatoric Decomposition | `paper/outline.md`, early notes | `src/intellitwin/uncertainty/calibration.py`, ADR-021 | High | Prohibited claim; drafts evaluate total predictive nonconformity |
 | **DISC-04** | Physical Asset / Bidirectional Twin | `docs/project_scope.md`, early drafts | Codebase inspection (`src/intellitwin/`) | Critical | Prohibited claim; drafts describe simulation replay on C-MAPSS |
 | **DISC-05** | Inherited Literature Status Labels | `research/literature/source_verification.csv` | Independent source checking of unindexed DOIs/theses | Moderate | Documented; unverified sources flagged in `reference_audit.csv` |
 | **DISC-06** | Blanket "Verified Bibliography" Claim | `paper/references.bib` header | Several entries lack formal peer review or assigned DOIs | Moderate | Replaced with verified subset in `references_verified.bib` |
 | **DISC-07** | Unqualified Conditional Coverage | Early methodology notes | `statistical_inference_protocol.md` (Section 8) | High | Drafts explicitly state conformal guarantees are marginal exchangeable |
-| **DISC-08** | Step 8 Prediction Audit Status | Historical step08 report (`step08_repair_verification.json`) | `experiments/pretest_verification_v2/step08_full_audit.json` (PR #25) | Critical | Resolved by committed PR #25 artifacts (60 reproductions, max diff 0.0) |
+| **DISC-08** | Step 8 Prediction Audit Status | Historical step08 report (`step08_repair_verification.json`) | `experiments/pretest_verification_v4/pretest_audit.json` | Critical | Resolved by committed v4 pretest audit (PASS, PRETEST_READY; 652 tracked protected artifacts verified) |
 | **DISC-09** | Pooled-Cycle vs. Engine-Weighted Metrics | Early protocol drafts | `research/research_design/data_evaluation_protocol.md` (ADR-012, ADR-018) | Critical | Drafts enforce engine-weighted aggregation exclusively |
 | **DISC-10** | Four Named Controls vs. Three Families | `research_questions.md` vs. `selection.json` | `experiments/confirmatory_development/controls/` | Moderate | Clarified in drafts: 4 named controls spanning 3 distinct families |
 | **DISC-11** | Unresolved Authorship & Roles | Fabricated supervisor/lead roles | `research/author_contributions.md` | High | Resolved in new drafts: 3 neutral authors, roles pending agreement |
@@ -101,7 +101,7 @@
 
 ---
 
-### DISC-08: Historical Step 8 Verification Report vs Committed PR #25 Full Audit
+### DISC-08: Historical Step 8 Verification Report vs Committed Pretest Verification Evidence
 - **Exact Source**: Historical `experiments/audits/step08_repair_verification.json` recorded:
   ```json
   "checks_not_run": ["checkpoint_prediction_reproduction"],
@@ -109,13 +109,14 @@
     "checkpoint_prediction_reproduction": "NOT RUN"
   }
   ```
-- **Conflicting Evidence & Resolution**: PR #25 merged into `main` at commit `bb9e34579343881a831e3f052608ee15e183df76`. The committed audit artifacts in `experiments/pretest_verification_v2/` establish:
-  - `step08_full_audit.json`: All 6 mandatory verification checks ran; 60 base-model/partition prediction reproductions were verified across `validation` and `calibration` partitions (not training), reporting a maximum numerical prediction difference of `0.0`.
+- **Conflicting Evidence & Resolution**: Committed pretest audit artifacts in `experiments/pretest_verification_v4/` (Audit execution: `550a7994d5746d3bcbfa28c26e7ed4f1a26a6153`, baseline commit: `c163bb279e7427b8f1b6e75955af4969ff9370fd`) establish:
   - `pretest_audit.json`: Reports overall status `PASS` and `PRETEST_READY`.
-  - `baseline_manifest.json`: 652 tracked protected artifacts verified from Git; 72 local-only search checkpoints accounted for.
-  - `held_out_execution_status` remains `NOT_STARTED` and `rq_outcomes_status` remains `PENDING`.
-- **Why It Matters**: Earlier documentation described prediction reproduction as pending/NOT RUN. The documentation is now updated to report the committed PR #25 audit findings directly without claiming personal re-execution.
-- **Resolution Status**: Resolved by committed audit artifacts in PR #25 at commit `bb9e345`.
+  - `input_manifest.json`: 652 tracked protected artifacts verified from Git; 72 historical/unavailable entries accounted for.
+  - `reused_evidence.json`: 60 validation and calibration prediction reproduction records with maximum difference 0.0 preserved with original provenance.
+  - Validation-smoke evidence: 930 configurations (810 primary + 120 controls), 19,590 engine-seed outcomes, 186 cell-summary rows, 152 hypothesis-component rows, 10,000 bootstrap draws.
+  - `held_out_execution_status` remains strictly `NOT_STARTED` and `rq_outcomes_status` remains `PENDING`.
+- **Why It Matters**: Earlier documentation described prediction reproduction as pending/NOT RUN. The documentation is now updated to report the committed v4 audit findings directly without claiming personal re-execution.
+- **Resolution Status**: Resolved by committed audit artifacts in `experiments/pretest_verification_v4/`.
 
 ---
 
@@ -187,9 +188,9 @@
 
 ### DISC-16: Invented RQ3 Controls vs. Pre-Registered Controls
 - **Exact Source**: Legacy drafts describing constant half-width intervals, fixed 1.25 widening, universal safety margin 10, point threshold inflation 15, or unregistered Gaussian intervals.
-- **Conflicting Evidence**: `experiments/pretest_verification_v2/controls/FD002/{GBR,LSTM}/selection.json`, `research/research_design/step09_control_selection.md`, and ADR-023.
+- **Conflicting Evidence**: `experiments/pretest_verification_v4/control_selection.json`, `research/research_design/step09_control_selection.md`, and ADR-023.
 - **Why It Matters**: Fabricating control definitions compromises the validity of RQ3 decision-value attribution.
-- **Resolution in Corrected Package**: Four controls across three families are enforced: `matched_width_interval`, `widened_interval`, `point_safety_margin`, and `earlier_intervention`. Exact frozen parameters selected on FD002 validation engines across 5 seeds are recorded from the committed JSON files (GBR: matched $\lambda=0.92$, widened $\lambda=1.00$, $m=5$, $h=1$; LSTM: matched $\lambda=0.90$, widened $\lambda=1.00$, $m=4$, $h=1$).
+- **Resolution in Corrected Package**: Four controls across three families are enforced: `matched_width_interval`, `widened_interval`, `point_safety_margin`, and `earlier_intervention`. Exact frozen parameters selected on FD002 validation engines across 5 seeds are recorded from the committed JSON files (GBR: matched $\lambda=0.92$, widened $\lambda=1.00$, $m=5$, $h=1$; LSTM: matched $\lambda=0.90$, widened $\lambda=1.00$, $m=4$, $h=1$). Note that $\lambda=1.00$ corresponds to unscaled baseline width (not actual expansion beyond baseline), and $h=1$ matches the baseline threshold (not earlier intervention).
 
 ---
 
@@ -198,3 +199,38 @@
 - **Conflicting Evidence**: `research/hypotheses/hypothesis_framework.yaml`, `research/research_design/statistical_inference_protocol.md`, and ADR-018.
 - **Why It Matters**: Collapsing composite intersection-union rules into isolated arbitrary thresholds misrepresents the pre-registered scientific design.
 - **Resolution in Corrected Package**: Full ADR-018 hypothesis definitions and practical-effect margins are restored for RQ1–RQ4 ($\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$, coverage error ceilings $< 0.05$, noninferiority $D_{\text{width}}, D_{\text{score}} < 1.0$, non-harm $\Delta_{\text{cost}} > -0.20, \Delta_{\text{error}} > -0.01$, observed failure rate safeguard $\Delta_{\text{fail}} \le 0.0$). The 10,000-draw cluster bootstrap percentile intervals (98.75% decision, 95% descriptive) with conservative missing-group bound propagation ($[0, 0.90]$) are enforced throughout.
+
+---
+
+## 3. Developer-Owned Audit Limitations and Handoff Items
+
+The following observations are recorded directly from the pre-test audit inspection and review environment without modifying frozen production files. These entries have explicit developer owners and pending statuses:
+
+### DEV-01: Regression Audit Execution Evidence vs. Stored Metadata
+- **Location**: `scripts/audit_step09_freeze.py::build_regression_test_report`.
+- **Observation**: `build_regression_test_report` constructs a fixed mutation-summary record. Generating that JSON is not itself execution of the mutation tests.
+- **Documentation Requirement**: Documentation must distinguish stored regression metadata from actual pytest execution evidence.
+- **Owner**: Lead Developer (Mayank Singh).
+- **Status**: `PENDING_DEVELOPER`.
+
+### DEV-02: Mutation Test Decision Quantiles in Reference Verification
+- **Location**: `tests/test_pretest_reference_verification.py::test_mutation_bootstrap_stat_with_consistent_contrast_fails_closed`.
+- **Observation**: The test fixture uses 5th/95th percentiles for fields named decision intervals. The frozen decision quantiles are 0.00625 and 0.99375.
+- **Developer Correction**: Construct genuinely consistent altered descriptive/decision summaries using the frozen quantiles (0.00625 and 0.99375), update any affected summary fields, demonstrate internal consistency, and verify fail-closed rejection by independent bootstrap reconstruction. The existing fixture is not described as proof of complete internal consistency.
+- **Owner**: Lead Developer (Mayank Singh).
+- **Status**: `PENDING_DEVELOPER`.
+
+### DEV-03: Staging Path Reference in Supersession Artifact
+- **Location**: `experiments/pretest_verification_v4/supersession.json`.
+- **Observation**: Contains an execution-machine staging path (`C:\Users\Mayank\AppData\Local\Temp\pretest_v4_staging`).
+- **Documentation Requirement**: Documentation links must use the committed repository paths. The historical artifact is preserved unchanged.
+- **Owner**: Lead Developer (Mayank Singh).
+- **Status**: `PENDING_DEVELOPER`.
+
+### DEV-04: Scikit-Learn Dependency Compatibility & Checkpoint Reproduction
+- **Location**: `pyproject.toml` and `experiments/base_models/`.
+- **Observation**: The review environment loaded sklearn 1.9.1 checkpoints with sklearn 1.8.0 and emitted compatibility warnings. Passing local tests does not establish clean-environment checkpoint reproduction.
+- **Developer Correction**: Record dependency-compatible reproduction and environment lock verification as a developer-owned release task.
+- **Owner**: Lead Developer (Mayank Singh).
+- **Status**: `PENDING_DEVELOPER`.
+

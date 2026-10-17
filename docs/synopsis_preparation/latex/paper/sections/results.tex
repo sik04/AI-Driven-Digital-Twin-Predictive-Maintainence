@@ -3,7 +3,7 @@
 
 \begin{quote}
 \itshape
-\textbf{Status Notice:} The empirical evaluations reported in this section represent the pre-registered reporting templates for the confirmatory evaluation. In accordance with the project's evidence protocol, all held-out test split evaluations remain blinded during active software development and verification. Empirical entries are designated \texttt{PENDING} awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
+\textbf{Status Notice:} Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST\_READY. Held-out execution has not started, and RQ1--RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness. All held-out evaluations remain blinded awaiting completion of experimental gates \emph{UPD-02}, \emph{UPD-03}, and \emph{UPD-04}. No synthetic or unverified empirical numbers are reported.
 \end{quote}
 
 \subsection{Base Degradation Prediction Performance}
@@ -138,7 +138,7 @@ Confirmatory statistical inference is governed by 10,000 paired engine-cluster b
 \midrule
 \textbf{RQ2 (Subgroup Reliability)} & Worst-group coverage error contrast for regimes ($C_1$--$C_6$) and stages on FD002 & $\Deltaerror > 0.01$; worst error $< 0.05$; $\Dwidth < 1.0$; $\Dscore < 1.0$ cycle & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
-\textbf{RQ3 (Control Attribution)} & Cost improvement vs.\ each of the 4 matched controls on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$ over every control; coverage $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
+\textbf{RQ3 (Control Attribution)} & Cost improvement vs.\ each of the 4 matched controls on FD002 (GBR and LSTM) & $\Deltacost > 0.20~\SCU$ over every control; absolute coverage error $< 0.05$; $\Deltafail \le 0.0$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \midrule
 \textbf{RQ4 (Generalization)} & Balanced 6-cell evaluation matrix ($w_k=1/6$ each) across FD001, FD002, FD004 & Aggregate: $\Deltacost > 0.20, \Deltaerror > 0.01$; Cell non-harm: $\Deltacost > -0.20, \Deltaerror > -0.01$ & \textit{PENDING} & \textit{PENDING} & \textit{PENDING} \\
 \bottomrule

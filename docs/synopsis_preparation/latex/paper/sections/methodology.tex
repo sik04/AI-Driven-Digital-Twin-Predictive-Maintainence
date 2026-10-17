@@ -15,24 +15,40 @@ Dataset-specific processing is structured as follows:
   \item \textbf{FD001}: Single nominal operating condition; global training-fitted z-score normalization across all qualified features.
   \item \textbf{FD002 and FD004}: Operational flight settings are standardized using training data; six operating regimes ($C_1$--$C_6$) are learned from standardized training settings using $K$-Means clustering ($k=6$, $\text{random\_state}=2026$, $\text{n\_init}=10$). Canonical regime labels are assigned based on lexicographic centroid ordering. Sensor normalization parameters are fitted separately within each training regime.
 \end{itemize}
-Preprocessing executes strictly prior to window construction. The pipeline enforces a frozen 17-feature selection supported by the recorded qualification procedure:
+Pre\begin{figure}[htbp]
+\centering
+\resizebox{\columnwidth}{!}{\input{../shared/figures/architecture.tex}}
+\caption{IntelliTwin pipeline architecture, split counts, and strict offline evaluation boundary.}
+\label{fig:architecture}
+\end{figure}
+
+Pre-processing executes strictly prior to window construction. The pipeline enforces a frozen 17-feature selection supported by the recorded qualification procedure:
 \begin{center}
 \texttt{setting1, setting2, setting3, s2, s3, s4, s7, s8, s9, s11, s12, s13, s14, s15, s17, s20, s21}
 \end{center}
 Seven sensors ($s_1, s_5, s_6, s_{10}, s_{16}, s_{18}, s_{19}$) are excluded under this recorded qualification procedure; we do not claim they are mathematically constant or universally uninformative across all datasets and regimes.
 
-Causal temporal windowing extracts chronological sequences of length $W=30$ cycles with stride 1, strictly no padding, and no crossing of engine boundaries. In training splits, target RUL is capped at $\min(\text{rul\_true}, 125)$ cycles as a modeling convention. Point predictions are evaluated as $p = \max(0, \text{raw\_prediction})$ without upper clipping at 125.
+\begin{figure}[htbp]
+\centering
+\resizebox{\columnwidth}{!}{\input{../shared/figures/causal_window.tex}}
+\caption{Causal observation window ($w=30$), feature representations (LSTM $30 \times 17$ vs.\ GBR 510), and target definitions.}
+\label{fig:causal_window}
+\end{figure}
+
+Causal temporal windowing extracts chronological sequences of length $W=30$ cycles with stride 1, strictly no padding, and no crossing of engine boundaries. Predictions start at cycle 30. In training splits, target RUL is capped at $\min(\text{rul\_true}, 125)$ cycles as a linear piecewise modeling convention. Point predictions are evaluated as $p = \max(0, \text{raw\_prediction})$ clipped below at zero without upper clipping at 125.
 
 \subsection{Frozen Base Predictor Matrix}
 Two base predictor families receive identical 30-cycle causal information horizons:
 \begin{itemize}
-  \item \textbf{Histogram Gradient Boosting Regressor (GBR)}: \texttt{sklearn.ensemble.HistGradientBoostingRegressor} operating on C-order flattened $30 \times 17$ windows (510 features). Winning configurations selected on validation data across seeds 2026--2027: \texttt{gbr\_lr010\_leaf15\_l2\_0} for FD001, and \texttt{gbr\_lr010\_leaf31\_l2\_0} for FD002 and FD004.
-  \item \textbf{Unidirectional LSTM}: PyTorch neural network comprising one unidirectional recurrent layer (\texttt{input\_size=17}, \texttt{hidden\_size=64}, \texttt{num\_layers=1}, \texttt{batch\_first=True}, \texttt{bidirectional=False}, internal LSTM \texttt{dropout=0.0}), extracting the final sequence output, followed by a separate \texttt{nn.Dropout(p=0.20)} and \texttt{nn.Linear(64, 1)}. Winning configuration: \texttt{lstm\_h64\_lr0010} (learning rate $\eta = 0.0010$), using early stopping on validation uncapped-RUL RMSE.
+  \item \textbf{Histogram Gradient Boosting Regressor (GBR)}: \texttt{sklearn.ensemble.HistGradientBoostingRegressor} operating on C-order row-major flattened $30 \times 17$ windows (510 features). Winning configurations selected on validation data across seeds 2026--2027: \texttt{gbr\_lr010\_leaf15\_l2\_0} for FD001, and \texttt{gbr\_lr010\_leaf31\_l2\_0} for FD002 and FD004.
+  \item \textbf{Unidirectional LSTM}: PyTorch neural network comprising one unidirectional recurrent layer (\texttt{input\_size=17}, \texttt{hidden\_size=64}, \texttt{num\_layers=1}, \texttt{batch\_first=True}, \texttt{bidirectional=False}, internal recurrent \texttt{dropout=0.0}), extracting final sequence output followed by \texttt{nn.Dropout(p=0.20)} and \texttt{nn.Linear(64, 1)}. Optimization uses AdamW with learning rate $\eta = 0.001$, weight decay $10^{-4}$, batch size 256, betas $(0.9, 0.999)$, and epsilon $10^{-8}$. Early stopping is governed by validation uncapped-RUL RMSE. Winning configuration: \texttt{lstm\_h64\_lr0010}.
 \end{itemize}
 Each selected configuration is trained across five final research seeds (\texttt{2026, 2027, 2028, 2029, 2030}), yielding 30 frozen checkpoints cataloged in \texttt{experiments/base\_models/model\_registry.json}. We do not characterize the five GBR seeds as independent experiments, nor assert universal deterministic behavior beyond the recorded runs.
 
 \subsection{Hierarchical Engine-Weighted Conformal Calibration}
 Standard pooled conformal prediction introduces survivor bias in industrial run-to-failure telemetry because long-lived engines contribute more sliding windows than short-lived units. IntelliTwin implements hierarchical engine-weighted quantiles motivated by Lee, Barber, and Willett~\cite{lee2023hierarchical}.
+
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90\% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
 
 For FINAL calibration with $m$ contributing engines, where engine $i$ contains $n_i$ valid endpoints, the empirical distribution function is:
 \begin{equation}
@@ -44,7 +60,7 @@ The mass of each finite endpoint is $\frac{1}{(m+1)n_i}$. The total finite mass 
 Let $p \ge 0$ denote non-negative predicted RUL in cycles, $y = \trueRUL \ge 0$ denote uncapped ground-truth RUL, and $g \in \{C_1, \dots, C_6\}$ denote the observed operational regime.
 
 \subsubsection{Global Hierarchical Conformal Prediction (\texttt{global\_hcp})}
-Uses symmetric absolute residuals $\text{score}(p, y) = |y - p|$, fitting a single global threshold $q_{\text{global}}$, yielding $L = \max(0, p - q_{\text{global}})$ and $U = p + q_{\text{global}}$.
+Uses symmetric absolute residuals $\text{score}(p, y) = |y - p|$, fitting a single global threshold $q_{\text{global}}$, yielding $L = \max(0, p - q_{\text{global}})$ and $U = p + q_{\text{global}}$. The baseline interval is symmetric before lower clipping, with displayed width $p + q - \max(0, p - q)$, which equals $2q$ only when $p \ge q$.
 
 \subsubsection{Condition-Aware Hierarchical Conformal Prediction (\texttt{regime\_hcp})}
 Uses symmetric absolute residuals, fitting separate regime-specific thresholds $q_g$. Regime support requires $m_g \ge \max(10, \lceil 1/\alpha \rceil - 1)$ distinct contributing engines (10 engines for 80\% and 90\% coverage; 19 engines for 95\% coverage). If $m_g$ is insufficient, the method falls back deterministically to $q_{\text{global}}$ fitted for the same method and coverage level, recording fallback.
@@ -55,7 +71,7 @@ Modulates interval width and asymmetry via scaling functions:
 \sigma(p) &= \left(1 + \frac{p}{125}\right)^\gamma, \quad z(p) = \exp\left(-\frac{p}{20}\right) \\
 a(p) &= \sigma(p)\exp(\beta z(p)), \quad b(p) = \sigma(p)\exp(-\beta z(p))
 \end{align}
-where $\gamma \in \{0, 1, 2\}$ and $\beta \in \{-\ln 2, 0, +\ln 2\}$. Nonconformity scores and inverted intervals are:
+where $\gamma \in \{0, 1, 2\}$ and numerical $\beta \in \{-\ln 2, 0, +\ln 2\}$. Nonconformity scores and inverted intervals are:
 \begin{equation}
 \text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)
 \end{equation}
@@ -64,6 +80,6 @@ L = \max(0, \; p - q_g \cdot a(p)), \quad U = p + q_g \cdot b(p)
 \end{equation}
 
 \subsection{Mathematical Mechanics of Negative Beta ($\beta < 0$)}
-At fixed $p$, $q$, and $\gamma$, negative $\beta$ decreases $a(p)$ relative to $\beta=0$ and increases $b(p)$. The lower bound $L$ is nondecreasing and the upper bound $U$ is nondecreasing. We do not claim $a < 1$ or $b > 1$ for every $p$, as the $\sigma(p)$ factor also influences their magnitude. Furthermore, this mathematical fact does not establish improved maintenance utility or earlier intervention; nonconformity thresholds $q^*$ are fitted separately and utility must be evaluated empirically in sequential simulation.
+At fixed $p$, $q$ and $\gamma$, negative $\beta$ decreases $a(p)$ and increases $b(p)$. The lower and upper endpoints are therefore nondecreasing relative to $\beta=0$. This does not establish earlier intervention or better maintenance utility because calibration thresholds are refitted and policy outcomes depend on the resulting trajectories.
 
-Candidate \texttt{gamma2\_betam1} ($\gamma=2, \beta=-\ln 2$) was selected as the optimal feasible configuration across all six mandatory cells and frozen under ADR-021.
+Candidate \texttt{gamma2\_betam1} ($\gamma=2, \beta_{\text{code}}=-1, \beta=-\ln 2$) was selected as the optimal feasible configuration across all six mandatory cells and frozen under ADR-021.

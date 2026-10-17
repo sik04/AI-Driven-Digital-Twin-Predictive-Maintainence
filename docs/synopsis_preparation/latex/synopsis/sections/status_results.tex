@@ -6,16 +6,20 @@ The research preparation and audit phases are complete and immutably frozen:
   \item \textbf{Data Splits \& Schema}: Packaging verified under ADR-001; C-MAPSS dataset splits frozen across 609 engines in \texttt{data/splits/}; 17-feature schema locked under ADR-013.
   \item \textbf{Base Predictors}: Complete 30-model matrix trained across five official seeds (\texttt{2026}--\texttt{2030}) under ADR-019 and ADR-020; all 30 checkpoints verified on CPU in \texttt{experiments/base\_models/model\_registry.json}.
   \item \textbf{Conformal Calibration}: 90 calibrator bundles fitted and verified under ADR-021; configuration \texttt{gamma2\_betam1} frozen across all six cells in \texttt{experiments/calibration/selection/selection\_freeze.json}.
-  \item \textbf{Full Pre-Test Verification Audit (PR \#25)}: Under committed audit artifact \texttt{experiments/pretest\_verification\_v2/step08\_full\_audit.json}, all six mandatory checks ran cleanly, completing CPU prediction reproduction across 60 model/partition checks on \texttt{validation} and \texttt{calibration} partitions with an overall maximum absolute difference of 0.0. The baseline manifest distinguishes 652 git-tracked protected artifacts from 72 local-only development search checkpoints.
-  \item \textbf{Confirmatory Protocol Freeze}: Protocol and control reconstruction are locked under \texttt{experiments/pretest\_verification\_v2/protocol\_freeze.json}. Pre-test readiness is audited as \texttt{PASS} and \texttt{PRETEST\_READY} in \texttt{pretest\_audit.json}.
+  \item \textbf{Pre-Test Verification Audit (v4)}: Under committed audit artifact \texttt{experiments/pretest\_verification\_v4/pretest\_audit.json}, all verification gates ran cleanly with \texttt{git\_dirty = false}. The pre-test readiness status reports \texttt{PASS} and \texttt{PRETEST\_READY}. Reused historical evidence confirms 60 model/partition reproductions on \texttt{validation} and \texttt{calibration} partitions with an overall maximum absolute difference of 0.0.
+  \item \textbf{Confirmatory Protocol Freeze}: Evaluation scripts, metrics, and matched controls are locked under \texttt{experiments/pretest\_verification\_v4/protocol\_freeze.json}.
 \end{itemize}
 
-\subsection{Honest Demarcation: Results Strictly Pending}
-In accordance with preregistration ethics:
+\subsection{Demarcation and Verified Status Statement}
+\begin{quote}
+\itshape
+Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST\_READY. Held-out execution has not started, and RQ1--RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness.
+\end{quote}
+In accordance with prespecified research governance:
 \begin{enumerate}
   \item \textbf{Held-Out Confirmatory Evaluation}: Strictly \textbf{NOT STARTED}. Zero held-out test windows have been evaluated (\texttt{pretest\_audit.json}).
   \item \textbf{RQ1--RQ4 Outcomes}: Strictly \textbf{PENDING}. No performance numbers or hypothesis outcomes are reported from held-out data in this draft.
-  \item \textbf{Incorporation Roadmap}: Verified empirical findings will be incorporated following the pre-registered 10-step protocol once held-out evaluation is executed.
+  \item \textbf{Incorporation Roadmap}: Verified empirical findings will be incorporated following the prespecified 10-step protocol once held-out evaluation is executed.
 \end{enumerate}
 
 \begin{table}[t]

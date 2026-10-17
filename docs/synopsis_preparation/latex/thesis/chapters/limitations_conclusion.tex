@@ -13,11 +13,8 @@ The discrete-event maintenance simulation operates on study-defined cost prefere
 \subsection{Finite Fleet Engine Counts}
 Across the complete C-MAPSS benchmark suite, 609 engines are evaluated, with 122 engines allocated to the held-out test splits. While this sample size is substantial for academic prognostics benchmarks, statistical power in paired cluster-bootstrap inference across rare flight regimes remains limited.
 
-\subsection{Temporal Autocorrelation and Conformal Exchangeability}
-Hierarchical conformal theory provides marginal predictive coverage under its stated sampling and exchangeability assumptions. IntelliTwin uses an engine-weighted construction motivated by that theory. Applicability of those assumptions to ordered, lifetime-stratified degradation trajectories is not established merely by weighting engines equally; reliability is therefore evaluated empirically under the frozen protocol. Furthermore, downstream sequential stopping times are not theoretically guaranteed by split conformal guarantees.
-
-\subsection{Theoretical Conformal Coverage Guarantees}
-Conformal calibration guarantees marginal coverage over the joint distribution of calibration and test engines. It does not provide theoretical guarantees of exact pointwise conditional coverage or sequential stopping-time coverage along an individual engine's degradation path.
+\subsection{Temporal Autocorrelation, Conformal Exchangeability, and Coverage Bounds}
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
 
 \subsection{Capped Training Targets vs. Uncapped Evaluation}
 Base models are trained using piecewise-capped RUL targets ($R_{\text{max}} = 125$ cycles) as a modeling convention. In contrast, calibration, validation, and held-out test splits evaluate uncapped physical RUL. This distributional discrepancy must be accounted for during early-lifecycle inference.
@@ -26,16 +23,18 @@ Base models are trained using piecewise-capped RUL targets ($R_{\text{max}} = 12
 In complex multi-regime environments (FD002 and FD004), rare flight conditions may contain fewer than the required support threshold $m_g = \max(10, \lceil 1/\alpha \rceil - 1)$ distinct contributing calibration engines (10 engines for 80\% and 90\% coverage; 19 engines for 95\% coverage). When a regime lacks sufficient support, the framework executes a deterministic fallback to the pooled global quantile $q^*_{\text{global}}$ for the same method and coverage level, recording fallback.
 
 \subsection{Research Prototype Boundaries}
-The software is an academic research prototype evaluating an offline, trace-driven simulation replay framework; it makes no claim of production readiness, aircraft certification, physical hardware integration, or independently established end-to-end operational reproducibility.
+The system is an offline, trace-driven prognostic decision-support research prototype; physical engine integration and operational airline validation have not been demonstrated.
 
 \section{Summary of Thesis Contributions}
-This dissertation has established a comprehensive, scientifically audited research framework for industrial turbofan prognostic maintenance:
+This project report / thesis draft has established a comprehensive, scientifically audited research framework for industrial turbofan prognostic maintenance:
 \begin{enumerate}
     \item \textbf{Methodological Synthesis}: Integration of modern base degradation predictors (GBR, LSTM) with hierarchical, condition-adaptive, and asymmetric conformal calibration.
     \item \textbf{Rigorous Governance}: Complete engine-level disjoint data partitioning, eliminating temporal data leakage across 609 engine units.
     \item \textbf{Principled Baseline Controls}: Formal evaluation against four named control strategies across three distinct families, isolating the true operational value of calibrated uncertainty.
-    \item \textbf{Pre-Registered Statistical Protocols}: Family-wise error rate control via Bonferroni-corrected $98.75\%$ confidence intervals generated through $10{,}000$ paired engine-cluster bootstrap resamples.
+    \item \textbf{Prespecified Statistical Protocols}: Nominal family-wise error rate control via Bonferroni-corrected $98.75\%$ confidence intervals generated through $10{,}000$ paired engine-cluster bootstrap resamples.
 \end{enumerate}
 
-\section{Path Forward to Final Experimental Completion}
-The theoretical formulation, software implementation, calibration registries, and evaluation protocols are fully specified, frozen, and audited. The remaining milestones comprise the execution of verification repair gates (\texttt{UPD-01}), held-out test split inference (\texttt{UPD-02}), discrete-event fleet simulation (\texttt{UPD-03}), confirmatory hypothesis resolution (\texttt{UPD-04}), demonstrator integration (\texttt{UPD-06}), and independent reproducibility verification (\texttt{UPD-07}). Upon completion of these gates, empirical findings will be incorporated directly into this dissertation.
+\section{Current Status and Path Forward}
+Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST\_READY. Held-out execution has not started, and RQ1–RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness.
+
+The reviewed repository baseline is commit \texttt{c163bb279e7427b8f1b6e75955af4969ff9370fd}, with current committed readiness evidence in \texttt{experiments/pretest\_verification\_v4/}. All methodology, base models, calibrator bundles, and evaluation contracts are completely frozen and audited. Remaining milestones comprise held-out test split inference (\texttt{UPD-02}), discrete-event fleet simulation (\texttt{UPD-03}), confirmatory hypothesis resolution (\texttt{UPD-04}), demonstrator integration (\texttt{UPD-06}), and independent reproducibility verification (\texttt{UPD-07}). Upon completion of these gates, empirical findings will be incorporated directly into this report/thesis draft.

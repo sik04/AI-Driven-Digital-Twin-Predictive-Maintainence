@@ -5,11 +5,15 @@ Existing literature separately evaluates conformal uncertainty calibration, oper
 
 Our study investigates whether decision-aware, condition-adaptive conformal calibration can improve sequential maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.
 
-\subsection{Formal Research Questions}
-In accordance with the frozen research protocol (ADR-018), four pre-registered questions are evaluated:
+\subsection{Formal Research Questions and Hypotheses}
+In accordance with the frozen research protocol (ADR-018), four prespecified research questions are evaluated under version control prior to held-out evaluation:
 \begin{itemize}
-  \item \textbf{RQ1 (Sequential Maintenance Utility \& Coverage)}: Can the proposed calibration method improve sequential maintenance utility by at least $0.20~\SCU$ per engine over both global and standard condition-aware calibration while maintaining absolute coverage errors below $0.05$ on C-MAPSS FD002?
-  \item \textbf{RQ2 (Conditional Subgroup Reliability)}: Can the proposed method improve worst-group coverage error by at least $0.01$ across operating regimes and degradation stages without worsening mean prediction interval width or Winkler score by $1.0$~cycle or more?
-  \item \textbf{RQ3 (Decision-Value Attribution)}: Are observed maintenance utility gains attributable to decision-aware calibration rather than trivial over-conservatism, demonstrated by outperforming four prespecified matched-conservatism control configurations across three families?
-  \item \textbf{RQ4 (Robustness \& Generalization)}: Does the proposed method retain its maintenance and calibration benefits across an evaluation matrix of six mandatory cells (FD001, FD002, FD004 $\times$ GBR, LSTM) without material harm in any individual cell?
+  \item \textbf{RQ1 (Sequential Maintenance Utility \& Coverage)}: \textit{Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?}
+  Evaluated on FD002 at 90\% nominal coverage under \texttt{primary\_reference} cost: requires cost improvement $\Deltacost > 0.20~\SCU$ per engine over both global and condition-aware calibration, marginal, worst-regime, and worst-stage absolute coverage error ceilings $< 0.05$, and observed fleet failure rate increase $\Deltafail \le 0.0$.
+  \item \textbf{RQ2 (Conditional Subgroup Reliability)}: \textit{Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?}
+  Evaluated across operating regimes ($C_1$--$C_6$) and degradation stages (Early/Mid/Late): requires worst-group conditional coverage error improvement $\Deltaerror > 0.01$ over both baselines, absolute worst-group error $< 0.05$, and width and Winkler score deteriorations $\Dwidth, \Dscore < 1.0$~cycle.
+  \item \textbf{RQ3 (Decision-Value Attribution)}: \textit{Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?}
+  Evaluated against four prespecified matched-conservatism controls across three families (matched width, widened interval, point safety margin, earlier intervention): requires cost improvement $\Deltacost > 0.20~\SCU$ over every control, proposed-method coverage error ceilings $< 0.05$, and observed failure rate increase $\Deltafail \le 0.0$.
+  \item \textbf{RQ4 (Robustness \& Generalization)}: \textit{Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?}
+  Evaluated across the balanced 6-cell matrix (FD001, FD002, FD004 $\times$ GBR, LSTM) weighted equally ($1/6$ each): requires weighted aggregate $\Deltacost > 0.20~\SCU$ and $\Deltaerror > 0.01$, cell-level non-harm ($\Deltacost > -0.20~\SCU$, $\Deltaerror > -0.01$), and all cell-level coverage, width, score, and observed-failure safeguards.
 \end{itemize}

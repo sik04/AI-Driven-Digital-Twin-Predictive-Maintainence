@@ -9,6 +9,13 @@ The IntelliTwin methodological framework links machine learning degradation mode
     \item \textbf{Asymmetric Cost Alignment}: Nonconformity metrics modulate intervals to reflect the severe cost penalties of component failure relative to preventive replacement.
 \end{enumerate}
 
+\begin{figure}[htbp]
+\centering
+\input{../shared/figures/architecture.tex}
+\caption{IntelliTwin Methodological System Architecture and Partitioning Boundary.}
+\label{fig:thesis_architecture}
+\end{figure}
+
 \section{Data Preprocessing and Causal Windowing}
 \subsection{Training-Only Z-Score Normalization}
 Preprocessing uses training-only z-score normalization. Means and population standard deviations are estimated with \texttt{ddof=0}. An exactly zero standard deviation is replaced by an effective scale of 1.0, while the mean is still subtracted:
@@ -37,17 +44,26 @@ Temporal feature matrices are formed via rolling causal windows of duration $w =
 \end{equation}
 Windows are formed exclusively within continuous engine trajectories; windows never span across engine boundaries, and cycles $t < 30$ are unpredicted. In training splits, target RUL is capped at $\min(\text{rul\_true}, 125)$ cycles as a modeling convention. Point predictions are evaluated as $p = \max(0, \text{raw\_prediction})$ without upper clipping at 125.
 
+\begin{figure}[htbp]
+\centering
+\input{../shared/figures/causal_window.tex}
+\caption{Causal 30-Cycle Information Horizon and Dual-Target Representation.}
+\label{fig:thesis_causal_window}
+\end{figure}
+
 \section{Base Degradation Predictors}
 We examine two distinct algorithmic paradigms receiving identical 30-cycle causal information horizons:
 \begin{enumerate}
     \item \textbf{Gradient Boosted Regressor (GBR)}: \texttt{sklearn.ensemble.HistGradientBoostingRegressor} operating on C-order flattened $30 \times 17$ feature vectors (510 features). Winning configurations selected on validation data across seeds 2026--2027: \texttt{gbr\_lr010\_leaf15\_l2\_0} for FD001, and \texttt{gbr\_lr010\_leaf31\_l2\_0} for FD002 and FD004.
-    \item \textbf{Long Short-Term Memory (LSTM)}: Single-layer unidirectional PyTorch LSTM (\texttt{input\_size=17}, \texttt{hidden\_size=64}, \texttt{num\_layers=1}, \texttt{batch\_first=True}, \texttt{bidirectional=False}, internal LSTM \texttt{dropout=0.0}), extracting the final sequence output, followed by \texttt{nn.Dropout(p=0.20)} and \texttt{nn.Linear(64, 1)}. Winning configuration: \texttt{lstm\_h64\_lr0010} (learning rate $\eta = 0.0010$), using early stopping on validation uncapped-RUL RMSE.
+    \item \textbf{Long Short-Term Memory (LSTM)}: Single-layer unidirectional PyTorch LSTM (\texttt{input\_size=17}, \texttt{hidden\_size=64}, \texttt{num\_layers=1}, \texttt{batch\_first=True}, \texttt{bidirectional=False}, internal LSTM \texttt{dropout=0.0}), extracting the final sequence output, followed by \texttt{nn.Dropout(p=0.20)} and \texttt{nn.Linear(64, 1)}. Winning configuration: \texttt{lstm\_h64\_lr0010} (AdamW optimizer, learning rate $\eta = 0.001$, weight decay $10^{-4}$, batch size 256, betas $(0.9, 0.999)$, $\epsilon = 10^{-8}$), using early stopping on validation uncapped-RUL RMSE.
 \end{enumerate}
-Each selected configuration is trained across five final research seeds (\texttt{2026, 2027, 2028, 2029, 2030}), yielding 30 frozen checkpoints in \texttt{experiments/base\_models/model\_registry.json}. We do not call the five GBR seeds independent experiments, nor assert universal deterministic behavior beyond the recorded runs.
+Each selected configuration is trained across five prespecified research seeds (\texttt{2026, 2027, 2028, 2029, 2030}), yielding 30 frozen checkpoints in \texttt{experiments/base\_models/model\_registry.json}. We do not call the five GBR seeds independent experiments, nor assert universal deterministic behavior beyond the recorded runs.
 
 \section{Conformal Calibration Formulation}
 \subsection{Engine-Weighted Quantile Computation}
-Standard pooled conformal prediction introduces survivor bias in industrial run-to-failure telemetry because long-lived engines contribute more sliding windows than short-lived units. IntelliTwin implements hierarchical engine-weighted quantiles motivated by Lee, Barber, and Willett~\cite{lee2023hierarchical}.
+Standard pooled conformal prediction introduces survivor bias in industrial run-to-failure telemetry because long-lived engines contribute more sliding windows than short-lived units.
+
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
 
 For FINAL calibration with $m$ contributing engines, where engine $i$ contains $n_i = T_i - 29$ valid endpoints, the empirical distribution function is:
 \begin{equation}
@@ -58,10 +74,11 @@ The mass of each finite endpoint is $\frac{1}{(m+1)n_i}$. The total finite mass 
 \subsection{Conformal Calibration Variants}
 Let $p \ge 0$ denote non-negative predicted RUL in cycles, $y = \trueRUL \ge 0$ denote uncapped ground-truth RUL, and $g \in \{C_1, \dots, C_6\}$ denote the observed operational regime.
 \begin{enumerate}
-    \item \textbf{Global HCP (\texttt{global\_hcp})}: Evaluates absolute residual nonconformity $\text{score}(p, y) = |y - p|$. The resulting prediction interval is:
+    \item \textbf{Global HCP (\texttt{global\_hcp})}: Evaluates absolute residual nonconformity $\text{score}(p, y) = |y - p|$. The resulting prediction interval is symmetric prior to lower clipping:
     \begin{equation}
     L = \max(0, \; p - q_{\text{global}}), \quad U = p + q_{\text{global}}
     \end{equation}
+    Its displayed width is $p + q_{\text{global}} - \max(0, p - q_{\text{global}})$, which equals $2q_{\text{global}}$ only when $p \ge q_{\text{global}}$.
 
     \item \textbf{Regime-Stratified HCP (\texttt{regime\_hcp})}: Evaluates absolute residuals, fitting separate regime-specific thresholds $q_g$. Regime support requires $m_g \ge \max(10, \lceil 1/\alpha \rceil - 1)$ distinct contributing calibration engines in that regime (10 engines for 80\% and 90\% coverage; 19 engines for 95\% coverage). When $m_g$ is insufficient, the method falls back deterministically to $q_{\text{global}}$ fitted for the same method and coverage level, recording fallback.
 
@@ -80,7 +97,7 @@ Let $p \ge 0$ denote non-negative predicted RUL in cycles, $y = \trueRUL \ge 0$ 
 \end{enumerate}
 
 \subsection{Mathematical Mechanics of Negative Beta ($\beta < 0$)}
-At fixed $p$, $q$, and $\gamma$, negative $\beta$ decreases $a(p)$ relative to $\beta=0$ and increases $b(p)$. The lower bound $L$ is nondecreasing and the upper bound $U$ is nondecreasing. We do not claim $a < 1$ or $b > 1$ for every $p$, as the $\sigma(p)$ factor also influences their magnitude. Furthermore, this mathematical fact does not establish improved maintenance utility or earlier intervention; nonconformity thresholds $q^*$ are fitted separately and utility must be evaluated empirically in sequential simulation.
+At fixed $p$, $q$ and $\gamma$, negative $\beta$ decreases $a(p)$ and increases $b(p)$. The lower and upper endpoints are therefore nondecreasing relative to $\beta=0$. This does not establish earlier intervention or better maintenance utility because calibration thresholds are refitted and policy outcomes depend on the resulting trajectories.
 
 Candidate \texttt{gamma2\_betam1} ($\gamma=2, \beta=-\ln 2$) was selected as the optimal feasible configuration across all six mandatory cells and frozen under ADR-021.
 
@@ -99,4 +116,4 @@ The study evaluates three synthetic cost scenarios:
     \item \textbf{\texttt{failure\_sensitive}}: $\CPM = 1.0~\SCU, \CFAIL = 10.0~\SCU, \CWASTE = 0.20~\SCU/\text{cycle}$.
     \item \textbf{\texttt{waste\_sensitive}}: $\CPM = 1.0~\SCU, \CFAIL = 5.0~\SCU, \CWASTE = 0.40~\SCU/\text{cycle}$.
 \end{itemize}
-Offline interval evaluation includes all qualified endpoints $30$ through $T_i$, independently of policy stopping. The equality values (20, 45, and 10 cycles) compare preventive-plus-waste cost with failure cost, and do not represent policy decision thresholds.
+SCU values represent synthetic benchmark preferences rather than validated airline economics. Offline interval evaluation includes all qualified endpoints $30$ through $T_i$, independently of policy stopping. The equality values (20, 45, and 10 cycles) compare preventive-plus-waste cost with failure cost, and do not represent policy decision thresholds.
