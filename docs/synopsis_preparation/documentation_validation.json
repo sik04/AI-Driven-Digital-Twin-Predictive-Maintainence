@@ -1,160 +1,89 @@
 {
-  "reviewed_repository_commit": "bb9e34579343881a831e3f052608ee15e183df76",
-  "review_date_utc": "2026-10-14T20:45:00Z",
-  "branch": "fix/research-documentation-consistency",
-  "changed_document_paths": [
-    "docs/synopsis_preparation/README.md",
-    "docs/synopsis_preparation/author_contribution_record.md",
-    "docs/synopsis_preparation/claims_evidence_matrix.csv",
-    "docs/synopsis_preparation/completion_checklist.md",
-    "docs/synopsis_preparation/discrepancy_register.md",
-    "docs/synopsis_preparation/documentation_correction_report.md",
-    "docs/synopsis_preparation/documentation_validation.json",
-    "docs/synopsis_preparation/figure_plan.md",
-    "docs/synopsis_preparation/latex/hypotheses/main.tex",
-    "docs/synopsis_preparation/latex/paper/main.tex",
-    "docs/synopsis_preparation/latex/paper/sections/conclusion.tex",
-    "docs/synopsis_preparation/latex/paper/sections/discussion.tex",
-    "docs/synopsis_preparation/latex/paper/sections/experimental_setup.tex",
-    "docs/synopsis_preparation/latex/paper/sections/introduction.tex",
-    "docs/synopsis_preparation/latex/paper/sections/methodology.tex",
-    "docs/synopsis_preparation/latex/paper/sections/results.tex",
-    "docs/synopsis_preparation/latex/shared/calibration_equations.tex",
-    "docs/synopsis_preparation/latex/shared/control_definitions.tex",
-    "docs/synopsis_preparation/latex/shared/decision_rules.tex",
-    "docs/synopsis_preparation/latex/shared/hypotheses.tex",
-    "docs/synopsis_preparation/latex/shared/notation.tex",
-    "docs/synopsis_preparation/latex/shared/preprocessing_models.tex",
-    "docs/synopsis_preparation/latex/shared/simulator_costs.tex",
-    "docs/synopsis_preparation/latex/synopsis/main.tex",
-    "docs/synopsis_preparation/latex/synopsis/sections/evaluation.tex",
-    "docs/synopsis_preparation/latex/synopsis/sections/introduction.tex",
-    "docs/synopsis_preparation/latex/synopsis/sections/limitations_conclusion.tex",
-    "docs/synopsis_preparation/latex/synopsis/sections/methodology.tex",
-    "docs/synopsis_preparation/latex/synopsis/sections/status_results.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/experimental_design.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/implementation.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/introduction.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/limitations_conclusion.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/literature_review.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/methodology.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/problem_hypotheses.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/reproducibility_appendix.tex",
-    "docs/synopsis_preparation/latex/thesis/chapters/results_discussion.tex",
-    "docs/synopsis_preparation/latex/thesis/main.tex",
-    "docs/synopsis_preparation/limitations_draft.md",
-    "docs/synopsis_preparation/methodology_draft.md",
-    "docs/synopsis_preparation/presentation_outline.md",
-    "docs/synopsis_preparation/previews/hypotheses_appendix.pdf",
-    "docs/synopsis_preparation/previews/ieee_paper_draft.pdf",
-    "docs/synopsis_preparation/previews/synopsis_draft.pdf",
-    "docs/synopsis_preparation/previews/thesis_draft.pdf",
-    "docs/synopsis_preparation/reproducibility_draft.md",
-    "docs/synopsis_preparation/results_table_templates.md",
-    "docs/synopsis_preparation/source_manifest.csv",
-    "docs/synopsis_preparation/system_description.md",
-    "docs/synopsis_preparation/update_register.csv",
-    "docs/synopsis_preparation/validate_documentation.py"
-  ],
-  "citation_resolution_results": {
-    "total_bibtex_keys": 19,
+  "bibtex": {
+    "status": "PASS",
+    "total_keys": 19,
+    "unique_keys": 19,
     "duplicate_keys": [],
-    "unresolved_citations": [],
-    "removed_unsupported_keys": [
-      "zheng2017long",
-      "vovk2005algorithmic",
-      "angelopoulos2021gentle"
+    "keys": [
+      "saxena2008damage",
+      "javanmardi2023conformal",
+      "lee2023hierarchical",
+      "cortesgomez2025utility",
+      "chen2022data",
+      "zhu2025predictive",
+      "diao2026turbofan",
+      "walia2026uncertainty",
+      "xu2026novel",
+      "yang2026empirical",
+      "yan2026audit",
+      "robinson2026riskaware",
+      "benabdennour2026grouped",
+      "lakens2017equivalence",
+      "gneiting2007strictly",
+      "wu2026research",
+      "huang2021survey",
+      "hasan2025new",
+      "shehadeh2024evaluating"
+    ]
+  },
+  "latex": {
+    "status": "PASS",
+    "checked_files": 37,
+    "missing_inputs": [],
+    "undefined_citations": []
+  },
+  "source_manifest": {
+    "status": "PASS",
+    "total_sources": 98,
+    "missing_paths": []
+  },
+  "table_templates": {
+    "status": "PASS",
+    "tables_checked": [
+      "T1",
+      "T2",
+      "T3",
+      "T4",
+      "T5",
+      "T6",
+      "T7",
+      "T8",
+      "T9",
+      "T10"
     ],
-    "status": "PASS"
+    "issues": []
   },
-  "source_path_validation_results": {
-    "total_source_entries": 91,
-    "missing_paths": [],
-    "verified_pr25_audit_artifacts": [
-      "experiments/pretest_verification_v2/step08_full_audit.json",
-      "experiments/pretest_verification_v2/pretest_audit.json",
-      "experiments/pretest_verification_v2/baseline_manifest.json",
-      "experiments/pretest_verification_v2/control_reconstruction.json",
-      "experiments/pretest_verification_v2/controls/FD002/GBR/selection.json",
-      "experiments/pretest_verification_v2/controls/FD002/LSTM/selection.json",
-      "experiments/pretest_verification_v2/protocol_freeze.json",
-      "experiments/pretest_verification_v2/supersession.json",
-      "experiments/pretest_verification_v2/validation_smoke/execution_manifest.json"
-    ],
-    "status": "PASS"
+  "component_manifest": {
+    "status": "PASS",
+    "total_components": 152,
+    "rq_counts": {
+      "RQ1": 14,
+      "RQ2": 20,
+      "RQ3": 22,
+      "RQ4": 96
+    },
+    "issues": []
   },
-  "scientific_consistency_checklist": {
-    "preprocessing_zscore_ddof0_frozen17": "PASS",
-    "base_models_histgbr_510_lstm_unidirectional_64": "PASS",
-    "calibration_equations_exact_finite_mass_regime_support": "PASS",
-    "maintenance_simulation_costs_scu_immediate_pm": "PASS",
-    "rq3_matched_controls_frozen_validation_selection": "PASS",
-    "hypotheses_and_statistics_adr018_iut_cluster_bootstrap": "PASS",
-    "coverage_claims_qualified_prototype_demarcation": "PASS",
-    "table_coverage_18_interval_26_maintenance_rows": "PASS",
-    "author_roles_neutral_credit_framework": "PASS",
-    "audit_artifacts_updated_pr25_baseline": "PASS",
-    "reproducibility_dependencies_pyproject_constraints": "PASS"
+  "evaluation_matrix": {
+    "status": "PASS",
+    "total_keys": 186,
+    "issues": []
   },
-  "build_commands_and_exit_status": {
-    "hypotheses_appendix": {
-      "engine": "tectonic",
-      "command": "tectonic docs/synopsis_preparation/latex/hypotheses/main.tex -o docs/synopsis_preparation/previews",
-      "exit_code": 0,
-      "status": "PASS"
-    },
-    "synopsis_draft": {
-      "engine": "tectonic",
-      "command": "tectonic docs/synopsis_preparation/latex/synopsis/main.tex -o docs/synopsis_preparation/previews",
-      "exit_code": 0,
-      "status": "PASS"
-    },
-    "ieee_paper_draft": {
-      "engine": "tectonic",
-      "command": "tectonic docs/synopsis_preparation/latex/paper/main.tex -o docs/synopsis_preparation/previews",
-      "exit_code": 0,
-      "status": "PASS"
-    },
-    "thesis_draft": {
-      "engine": "tectonic",
-      "command": "tectonic docs/synopsis_preparation/latex/thesis/main.tex -o docs/synopsis_preparation/previews",
-      "exit_code": 0,
-      "status": "PASS"
-    }
+  "calibration_math": {
+    "status": "PASS",
+    "issues": []
   },
-  "pdf_page_counts": {
-    "previews/hypotheses_appendix.pdf": 5,
-    "previews/synopsis_draft.pdf": 4,
-    "previews/ieee_paper_draft.pdf": 9,
-    "previews/thesis_draft.pdf": 50
+  "no_fabricated_results": {
+    "status": "PASS",
+    "issues": []
   },
-  "visual_inspection_status": {
-    "hypotheses_appendix": {
-      "pages_inspected": 5,
-      "undefined_references": 0,
-      "undefined_citations": 0,
-      "layout_inspection": "PASS"
-    },
-    "synopsis_draft": {
-      "pages_inspected": 4,
-      "undefined_references": 0,
-      "undefined_citations": 0,
-      "layout_inspection": "PASS"
-    },
-    "ieee_paper_draft": {
-      "pages_inspected": 9,
-      "undefined_references": 0,
-      "undefined_citations": 0,
-      "layout_inspection": "PASS"
-    },
-    "thesis_draft": {
-      "pages_inspected": 50,
-      "undefined_references": 0,
-      "undefined_citations": 0,
-      "layout_inspection": "PASS"
-    },
-    "status": "PASS"
+  "provenance_and_claims": {
+    "status": "PASS",
+    "issues": []
   },
-  "blockers": [],
-  "overall_documentation_correction_status": "PASS"
+  "forbidden_phrases": {
+    "status": "PASS",
+    "findings": []
+  },
+  "overall_status": "PASS"
 }
