@@ -13,29 +13,32 @@ Despite significant advances in deep learning for degradation modeling, an acute
 \begin{enumerate}
     \item \textbf{Cycle-Level Error Optimization}: Point regression architectures—such as Long Short-Term Memory (LSTM) networks, Temporal Convolutional Networks (TCNs), and Gradient Boosted Regressors (GBRs)—are conventionally trained to minimize symmetric cycle-level loss functions such as Mean Squared Error (MSE) or Mean Absolute Error (MAE) \cite{saxena2008damage, diao2026turbofan}. These metrics treat underestimating and overestimating RUL symmetrically.
     \item \textbf{Asymmetric Cost Realities}: In real-world aviation logistics, overestimating RUL by 10 cycles can allow an engine to operate beyond its physical failure boundary, causing catastrophic damage. In contrast, underestimating RUL by 10 cycles merely results in premature maintenance and a minor loss of usable component life \cite{saxena2008damage, robinson2026riskaware}.
-    \item \textbf{Uncalibrated Uncertainty}: When probabilistic or interval outputs are produced via heuristic dispersion or Bayesian approximations, they typically rely on Gaussianity or asymptotic normality assumptions that fail under non-stationary degradation dynamics and regime shifts \cite{javanmardi2023conformal}. Uncalibrated prediction intervals provide no statistical guarantees on coverage.
+    \item \textbf{Uncalibrated Uncertainty}: Predictive uncertainty methods differ in their assumptions and calibration behavior. Their maintenance value must be evaluated through interval reliability and downstream decision outcomes under a common protocol.
 \end{enumerate}
 
 \section{The IntelliTwin Approach}
-To resolve this gap, the \textbf{IntelliTwin} research prototype integrates data-driven base degradation predictors with hierarchical, decision-aware conformal prediction theory. Hierarchical conformal theory provides marginal predictive coverage under its stated sampling and exchangeability assumptions. IntelliTwin uses an engine-weighted construction motivated by that theory. Applicability of those assumptions to ordered, lifetime-stratified degradation trajectories is not established merely by weighting engines equally; reliability is therefore evaluated empirically under the frozen protocol.
+To resolve this gap, the \textbf{IntelliTwin} research prototype integrates data-driven base degradation predictors with hierarchical, decision-aware conformal prediction theory.
+
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
 
 Furthermore, the framework introduces two critical adaptations:
 \begin{itemize}
-    \item \textbf{Regime-Stratified Calibration}: Conformal calibration is conditioned on operational flight regime clusters, preventing severe conditional undercoverage in rare or stressed operating conditions.
+    \item \textbf{Regime-Stratified Calibration}: Conformal calibration is conditioned on operational flight regime clusters, evaluating whether localized calibration improves conditional coverage under stressed operating conditions.
     \item \textbf{Decision-Aware Asymmetry}: Nonconformity scores are scaled via an asymmetric parameter ($\beta = -\ln 2$), tilting prediction intervals to guard against hazardous RUL overestimation.
 \end{itemize}
+The system is evaluated as an offline, trace-driven prognostic decision-support research prototype; physical engine integration and operational airline validation have not been demonstrated, and maintenance costs are evaluated in Simulated Cost Units (SCU) reflecting synthetic benchmark preferences rather than validated airline economics.
 
 \section{Research Objectives and Scope}
-This dissertation formalizes four pre-registered research questions:
+This project report / thesis draft formalizes four prespecified research questions version-controlled prior to held-out evaluation:
 \begin{itemize}
-    \item \textbf{RQ1 (Sequential Utility)}: Can decision-aware conformal calibration improve sequential maintenance cost efficiency while preserving nominal coverage guarantees?
-    \item \textbf{RQ2 (Subgroup Reliability)}: Does regime-stratified calibration eliminate worst-case coverage deficits across operational clusters without excessive interval inflation?
-    \item \textbf{RQ3 (Attribution vs. Matched Controls)}: Are observed cost benefits attributable to calibrated uncertainty rather than simple, ad-hoc conservatism?
-    \item \textbf{RQ4 (Robustness \& Generalization)}: Does the calibration advantage generalize across diverse base predictors (GBR, LSTM), operating regimes, and degradation modes?
+    \item \textbf{RQ1 (Sequential Utility)}: \textit{Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?}
+    \item \textbf{RQ2 (Subgroup Reliability)}: \textit{Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?}
+    \item \textbf{RQ3 (Attribution vs. Matched Controls)}: \textit{Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?}
+    \item \textbf{RQ4 (Robustness \& Generalization)}: \textit{Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?}
 \end{itemize}
 
 \section{Thesis Organization}
-The remainder of this dissertation is organized as follows:
+The remainder of this report/thesis draft is organized as follows:
 \begin{itemize}
     \item Chapter~\ref{chap:literature_review} provides a comprehensive review of turbofan prognostics, conformal prediction, and maintenance decision theory.
     \item Chapter~\ref{chap:problem_hypotheses} details the mathematical problem formulation and authoritative hypothesis framework.

@@ -1,16 +1,17 @@
 % Maintenance Simulator and Cost Specifications
 % Authoritative Sources: src/intellitwin/simulator/costs.py, src/intellitwin/simulator/engine.py,
 %                        src/intellitwin/decision/policies.py, research/research_design/maintenance_cost_scenarios.yaml
-% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Pinned Repository Baseline: c163bb279e7427b8f1b6e75955af4969ff9370fd
+% Audit Execution Commit: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153
 
 \subsection*{Synthetic Economic Cost Scenarios}
-Maintenance decision utility is evaluated across three pre-registered synthetic economic cost scenarios:
+Maintenance decision utility is evaluated across three prespecified synthetic economic cost scenarios:
 \begin{enumerate}
     \item \textbf{Primary Reference} (\texttt{primary\_reference}): $\CPM = 1.0$, $\CFAIL = 5.0$, $\CWASTE = 0.20$ Simulated Cost Units (SCU) per engine.
     \item \textbf{Failure-Sensitive} (\texttt{failure\_sensitive}): $\CPM = 1.0$, $\CFAIL = 10.0$, $\CWASTE = 0.20$ SCU.
     \item \textbf{Waste-Sensitive} (\texttt{waste\_sensitive}): $\CPM = 1.0$, $\CFAIL = 5.0$, $\CWASTE = 0.40$ SCU.
 \end{enumerate}
-Here $\CPM$ and $\CFAIL$ represent synthetic cost units incurred per overhaul or failure event, and $\CWASTE$ represents synthetic cost incurred per unused operational cycle.
+Here $\CPM$ and $\CFAIL$ represent synthetic cost units incurred per overhaul or failure event, and $\CWASTE$ represents synthetic cost incurred per unused operational cycle. SCU values are synthetic benchmark preferences, not validated airline economics.
 
 The economic indifference values $R_{\text{equal}} = (\CFAIL - \CPM)/\CWASTE$ are 20 cycles for \texttt{primary\_reference}, 45 cycles for \texttt{failure\_sensitive}, and 10 cycles for \texttt{waste\_sensitive}. At these cycle margins, the cost of preventive intervention plus accumulated discarded life exactly equals catastrophic failure penalty. These are economic benchmark parameters, not policy threshold triggers.
 

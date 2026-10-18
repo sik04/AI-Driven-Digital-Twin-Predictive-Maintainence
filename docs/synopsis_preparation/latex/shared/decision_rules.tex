@@ -1,7 +1,7 @@
 % Statistical Decision Rules and Cluster Bootstrap Protocols
 % Authoritative Sources: src/intellitwin/evaluation/bootstrap.py, src/intellitwin/evaluation/decisions.py,
 %                        research/research_design/statistical_inference_protocol.md
-% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Pinned Repository Commit: c163bb279e7427b8f1b6e75955af4969ff9370fd (Audit Execution: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153)
 
 \subsection*{Statistical Contrasts and Decision Metrics}
 Confirmatory comparisons evaluate four paired statistical contrast definitions:
@@ -17,10 +17,10 @@ Statistical uncertainty is estimated via paired engine-cluster bootstrap inferen
 \begin{itemize}
     \item \textbf{Resampling Unit}: Physical engine units ($i \in \{1, \dots, N\}$). Individual operational cycles are never resampled independently.
     \item \textbf{Stratification}: Resampling draws stratum-by-stratum from frozen lifetime quartiles ($Q_1, Q_2, Q_3, Q_4$).
-    \item \textbf{Multiplicity & Seed Sequence}: $B = 10{,}000$ paired bootstrap draws generated via \texttt{numpy.random.Generator} backed by \texttt{PCG64} initialized with \texttt{SeedSequence([2026, 6, dataset\_number])}.
+    \item \textbf{Multiplicity \& Seed Sequence}: $B = 10{,}000$ paired bootstrap draws generated via \texttt{numpy.random.Generator} backed by \texttt{PCG64} initialized with \texttt{SeedSequence([2026, 6, dataset\_number])}.
     \item \textbf{Seed Aggregation}: Model seeds ($2026$--$2030$) are averaged within each engine trajectory before computing fleet contrasts; seeds are descriptive training replications, not independent sampling units.
-    \item \textbf{Percentile Intervals}: Computed via linear interpolation. Descriptive reporting uses 95\% intervals (empirical percentiles $0.025$ and $0.975$). Confirmatory decision rules use Bonferroni-corrected 98.75\% intervals (empirical percentiles $0.00625$ and $0.99375$).
-    \item \textbf{Subgroup Eligibility & Bound Propagation}: Subgroup eligibility ($\ge 10$ engines) is frozen from the observed split before resampling and never dynamically re-evaluated using duplicated bootstrap draws. If an eligible subgroup is absent in a bootstrap resample, its absolute coverage error is conservatively bounded by $[0.0, 0.90]$ at 90\% nominal coverage, and bounds propagate into contrast statistics.
+    \item \textbf{Percentile Intervals}: Computed via linear interpolation. Descriptive reporting uses 95\% intervals (empirical percentiles $0.025$ and $0.975$). Confirmatory decision rules use Bonferroni-corrected 98.75\% intervals (empirical percentiles $0.00625$ and $0.99375$). The Bonferroni adjustment is a prespecified nominal family-wise error rate control. Percentile bootstrap inference is approximate; it does not claim exact finite-sample error control.
+    \item \textbf{Subgroup Eligibility \& Bound Propagation}: Subgroup eligibility ($\ge 10$ engines) is frozen from the observed split before resampling and never dynamically re-evaluated using duplicated bootstrap draws. The worst eligible group is recomputed within each bootstrap replicate. If an eligible subgroup is absent in a bootstrap resample, its absolute coverage error is conservatively bounded by $[0.0, 0.90]$ at 90\% nominal coverage, and bounds propagate into contrast statistics.
 \end{itemize}
 
 \subsection*{Intersection-Union Test (IUT) Decision Logic}
@@ -28,7 +28,7 @@ Component-level decisions follow strict boundary rules:
 \begin{itemize}
     \item \textbf{Benefit Conditions} ($\Delta > \text{margin}$): \texttt{PASS} if lower CI bound $> \text{margin}$; \texttt{FAIL} if upper CI bound $< \text{margin}$; otherwise \texttt{INDETERMINATE}.
     \item \textbf{Ceiling / Noninferiority Conditions} ($D < \text{ceiling}$): \texttt{PASS} if upper CI bound $< \text{ceiling}$; \texttt{FAIL} if lower CI bound $> \text{ceiling}$; otherwise \texttt{INDETERMINATE}.
-    \item \textbf{Boundary Equality & Degeneracy}: Equality with a decision boundary or degenerate zero-width intervals yield \texttt{INDETERMINATE}.
-    \item \textbf{Fleet Failure Safeguard}: Observed engine-averaged failure rate increase must satisfy $\Deltafail \le 0.0$ against comparator.
+    \item \textbf{Boundary Equality \& Degeneracy}: Equality with a decision boundary or degenerate zero-width intervals yield \texttt{INDETERMINATE}.
+    \item \textbf{Fleet Failure Safeguard}: Observed engine-averaged failure rate increase must satisfy $\Deltafail \le 0.0$ against comparator. The observed failure safeguard is an empirical gate, not a confidence-interval proof of population safety.
     \item \textbf{Research Question Aggregation}: An RQ is decided as \textbf{Supported} if and only if every required component passes at the 98.75\% level. If any required component fails, the RQ is decided as \textbf{Unsupported}. If no component fails but at least one component is indeterminate, the RQ is decided as \textbf{Inconclusive}.
 \end{itemize}

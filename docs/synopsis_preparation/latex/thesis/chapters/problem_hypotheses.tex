@@ -20,7 +20,7 @@ The physical Remaining Useful Life (RUL) of engine $i$ at cycle $t$ is defined a
 \begin{equation}
 y_{i,t} = T_i - t, \quad t \in [w, T_i].
 \end{equation}
-During base model training, an upper piecewise cap $R_{\text{max}} = 125$ cycles is applied to reflect negligible initial degradation:
+During base model training, an upper piecewise cap $R_{\text{max}} = 125$ cycles is applied as a modeling convention to avoid predicting excessively long unobservable lifespans during early life:
 \begin{equation}
 y_{i,t}^{\text{train}} = \min(y_{i,t}, R_{\text{max}}).
 \end{equation}
@@ -45,7 +45,7 @@ The total simulated maintenance cost for engine $i$ is given by:
 \CFAIL & \text{if failure occurs at } t = T_i.
 \end{cases}
 \end{equation}
-The study specifies three synthetic economic scenarios:
+The study specifies three synthetic economic scenarios evaluated in Simulated Cost Units (SCU) reflecting study-defined benchmark preferences rather than empirical airline accounting constants:
 \begin{itemize}
   \item \textbf{\texttt{primary\_reference}}: $\CPM = 1.0~\SCU, \CFAIL = 5.0~\SCU, \CWASTE = 0.20~\SCU/\text{cycle}$.
   \item \textbf{\texttt{failure\_sensitive}}: $\CPM = 1.0~\SCU, \CFAIL = 10.0~\SCU, \CWASTE = 0.20~\SCU/\text{cycle}$.
@@ -54,6 +54,6 @@ The study specifies three synthetic economic scenarios:
 Offline interval evaluation includes all qualified endpoints $30$ through $T_i$, independently of policy stopping. The equality values (20, 45, and 10 cycles) compare preventive-plus-waste cost with failure cost, and do not represent policy decision thresholds.
 
 \section{Authoritative Research Hypotheses}
-The research questions, null and alternative hypotheses, primary outcome metrics, practical-effect thresholds, and statistical decision rules are permanently locked under Architecture Decision Record ADR-018. The authoritative specification is reproduced in its entirety below.
+The research questions, null and alternative hypotheses, primary outcome metrics, practical-effect thresholds, and statistical decision rules are permanently locked under Architecture Decision Record ADR-018 and prespecified and version-controlled before held-out evaluation. The authoritative specification is reproduced in its entirety below.
 
 \input{../shared/hypotheses.tex}

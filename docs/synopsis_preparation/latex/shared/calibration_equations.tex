@@ -1,7 +1,8 @@
 % Conformal Calibration Mathematical Formulations and Fallback Rules
 % Authoritative Sources: src/intellitwin/uncertainty/scores.py, src/intellitwin/uncertainty/quantiles.py,
 %                        src/intellitwin/uncertainty/calibration.py, research/research_design/step08_calibration_specification.md
-% Pinned Repository Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Pinned Repository Baseline: c163bb279e7427b8f1b6e75955af4969ff9370fd
+% Audit Execution Commit: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153
 
 \subsection*{Point Predictions and Decision-Aware Asymmetric Nonconformity}
 Let $\RULpred = \max(0, \hat{y})$ denote the non-negative evaluated point prediction in operational cycles, and let $\RULtrue$ denote the true uncapped Remaining Useful Life. The asymmetric decision-aware nonconformity score scales deviations according to state-dependent factors:
@@ -19,7 +20,7 @@ Inverting this score with respect to a fitted threshold $q$ produces prediction 
 \begin{equation}
 \LowerBound = \max(0, \RULpred - q \cdot \ap), \quad \UpperBound = \RULpred + q \cdot \bp.
 \end{equation}
-Standard global and condition-aware baselines evaluate absolute residuals $|y - p|$ (corresponding to $\gamma=0, \beta=0, a(p)=1, b(p)=1$), yielding symmetric bounds $[ \max(0, p - q), p + q ]$.
+Standard global and condition-aware baselines evaluate absolute residuals $|y - p|$ (corresponding to $\gamma=0, \beta=0, a(p)=1, b(p)=1$), yielding baseline bounds $[ \max(0, p - q), p + q ]$ that are symmetric prior to lower clipping. The displayed width of this baseline interval is $p + q - \max(0, p - q)$, which equals $2q$ only when $p \ge q$.
 
 The hyperparameter grid spans 9 candidate pairs ($\gamma \in \{0, 1, 2\}$, $\beta \in \{-\ln 2, 0, +\ln 2\}$). Across all six experimental cells, hyperparameter selection on validation engines uniquely selected the configuration \texttt{gamma2\_betam1} ($\gamma = 2$, $\beta = -\ln 2$).
 
@@ -41,7 +42,7 @@ Evaluating this criterion across nominal coverage levels dictates:
     \item 90\% coverage ($\alpha = 0.10$): Requires $m_g \ge \max(10, 10 - 1) = 10$ distinct engines.
     \item 95\% coverage ($\alpha = 0.05$): Requires $m_g \ge \max(10, 20 - 1) = 19$ distinct engines.
 \end{itemize}
-If regime $g$ fails this threshold, the framework deterministically falls back to the pooled global threshold $q^*_{\text{global}}$ fitted for the exact same calibration method and coverage level, formally logging the fallback event.
+If regime $g$ fails this threshold, the framework deterministically falls back to the pooled global threshold $q^*_{\text{global}}$ fitted for the exact same calibration method and coverage level, formally logging the fallback event. These calibration support thresholds are distinct from the separate evaluation-subgroup eligibility threshold of 10 engines used in downstream reporting.
 
 \subsection*{Mathematical Impact of Negative $\beta$}
-At fixed point prediction $\RULpred$, threshold $q$, and exponent $\gamma$, negative $\beta$ decreases $\ap$ relative to $\beta=0$ and increases $\bp$. Consequently, the lower bound $\LowerBound = \max(0, \RULpred - q \ap)$ is nondecreasing, and the upper bound $\UpperBound = \RULpred + q \bp$ is nondecreasing. This algebraic property does not establish improved maintenance utility or earlier intervention; calibration thresholds $q$ are refitted on asymmetrically scaled scores, altering the empirical score distribution. Maintenance decision efficacy must therefore be established through sequential simulation.
+At fixed $p$, $q$ and $\gamma$, negative $\beta$ decreases $a(p)$ and increases $b(p)$. The lower and upper endpoints are therefore nondecreasing relative to $\beta=0$. This does not establish earlier intervention or better maintenance utility because calibration thresholds are refitted and policy outcomes depend on the resulting trajectories. Maintenance decision efficacy must therefore be established through sequential simulation.

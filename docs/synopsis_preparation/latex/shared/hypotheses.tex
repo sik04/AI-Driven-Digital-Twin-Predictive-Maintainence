@@ -1,6 +1,6 @@
 % Derived LaTeX Rendering of IntelliTwin Authoritative Hypothesis Framework
 % Primary Authority: research/hypotheses/hypothesis_framework.yaml & research/research_design/statistical_inference_protocol.md
-% Pinned Source Commit: bb9e34579343881a831e3f052608ee15e183df76
+% Pinned Source Commit: c163bb279e7427b8f1b6e75955af4969ff9370fd (Audit Execution: 550a7994d5746d3bcbfa28c26e7ed4f1a26a6153)
 % Governing Architecture Decision Record: ADR-018
 
 \subsection*{Governance Rules on Hypothesis Integrity (ADR-018)}
@@ -8,7 +8,7 @@
 \begin{quote}
 \textbf{Authoritative Precedence:} This document is a derived LaTeX rendering. The YAML specification (\texttt{hypothesis\_framework.yaml}) and statistical protocol (\texttt{statistical\_inference\_protocol.md}) remain the primary immutable authorities.
 
-\textbf{Decision Outcome Rules:} Each research question possesses a pre-specified primary outcome, comparator set, frozen numerical practical-effect threshold, and cluster-bootstrap decision rule classifying results into a three-way outcome: \textbf{Supported}, \textbf{Unsupported}, or \textbf{Inconclusive}.
+\textbf{Decision Outcome Rules:} Each research question possesses a prespecified primary outcome, comparator set, frozen numerical practical-effect threshold, and cluster-bootstrap decision rule classifying results into a three-way outcome: \textbf{Supported}, \textbf{Unsupported}, or \textbf{Inconclusive}.
 
 \textbf{Outcome Hierarchy:} The primary outcome determines the confirmatory claim for each research question. Secondary outcomes verify operational constraints, reliability trade-offs, and failure safeguards. A favorable secondary outcome cannot replace failure on the primary outcome.
 
@@ -23,12 +23,13 @@
   \item \textbf{Primary Maintenance Cost Scenario}: \texttt{primary\_reference} ($\CPM = 1.0, \CFAIL = 5.0, \CWASTE = 0.20$ SCU per engine).
   \item \textbf{Secondary Sensitivity Scenarios}: \texttt{failure\_sensitive} ($\CFAIL = 10.0$) and \texttt{waste\_sensitive} ($\CWASTE = 0.40$).
   \item \textbf{Nominal Coverage}: Primary confirmatory coverage 90\% ($\alpha = 0.10$); descriptive sensitivities at 80\% and 95\%.
-  \item \textbf{Cost Improvement Margin}: $\Deltacost > 0.20$ SCU per engine.
-  \item \textbf{Coverage Error Improvement Margin}: $\Deltaerror > 0.01$ (one percentage point error reduction).
+  \item \textbf{Cost Improvement Margin}: $\Deltacost > 0.20$ SCU per engine (strict inequality).
+  \item \textbf{Coverage Error Improvement Margin}: $\Deltaerror > 0.01$ (one percentage point error reduction; strict inequality).
   \item \textbf{Maximum Absolute Coverage Error Ceiling}: $E < 0.05$ (prespecified 85\%--95\% empirical acceptance band).
   \item \textbf{Interval Noninferiority Margins}: $\Dwidth < 1.0$ cycle for MPIW and $\Dscore < 1.0$ cycle for Winkler interval score.
   \item \textbf{Robustness Non-Harm Margins}: $\Deltacost > -0.20$ SCU per engine and $\Deltaerror > -0.01$ in every cell.
-  \item \textbf{Failure Safeguard}: Observed fleet failure rate increase $\Deltafail \le 0.0$ against comparator.
+  \item \textbf{Failure Safeguard}: Observed fleet failure rate increase $\Deltafail \le 0.0$ against comparator (empirical gate).
+  \item \textbf{Asymmetry Calibration}: $\gamma = 2, \beta_{\text{code}} = -1, \beta = -\ln(2) \approx -0.693147$.
   \item \textbf{Fixed Model Seeds}: Five prespecified training seeds: \texttt{[2026, 2027, 2028, 2029, 2030]}.
 \end{itemize}
 
@@ -37,8 +38,9 @@
 \begin{enumerate}
   \item \textbf{Resampling Engine}: 10,000 paired engine-cluster bootstrap resamples with replacement, stratified by dataset lifetime quartiles ($Q_1$--$Q_4$) fixed from split manifests.
   \item \textbf{PRNG Specification}: \texttt{numpy.random.Generator} backed by \texttt{PCG64} with seed sequence \texttt{SeedSequence([2026, 6, dataset\_number])}.
-  \item \textbf{Decision Confidence Level}: Confirmatory decision rules use \textbf{98.75\% cluster-bootstrap percentile intervals} (quantiles 0.00625 and 0.99375), providing Bonferroni family-wise error rate control ($\alpha = 0.05 / 4 = 0.0125$) across the four primary research questions. Descriptive 95\% intervals (quantiles 0.025 and 0.975) are reported for context.
-  \item \textbf{Subgroup Eligibility \& Bound Propagation}: Subgroup eligibility ($\ge 10$ engines) is frozen before resampling. If an eligible subgroup is absent in replicate $b$, its absolute error is bounded by $[0.0, 0.90]$ at 90\% nominal coverage, propagating conservatively.
+  \item \textbf{Decision Confidence Level}: Confirmatory decision rules use \textbf{98.75\% cluster-bootstrap percentile intervals} (quantiles 0.00625 and 0.99375), providing a prespecified nominal Bonferroni family-wise error rate control ($\alpha = 0.05 / 4 = 0.0125$) across the four primary research questions. Percentile bootstrap inference is approximate and does not guarantee exact finite-sample error control. Descriptive 95\% intervals (quantiles 0.025 and 0.975) are reported for context.
+  \item \textbf{Subgroup Families \& Bound Propagation}: Operating regime and lifecycle stage subgroup families are evaluated separately but may contain overlapping observations. Subgroup eligibility ($\ge 10$ engines) is frozen before resampling. If an eligible subgroup is absent in replicate $b$, its absolute error is bounded by $[0.0, 0.90]$ at 90\% nominal coverage, propagating conservatively.
+  \item \textbf{Failure Gate}: The observed failure safeguard ($\Deltafail \le 0.0$) is an empirical gate, not a confidence-interval proof of population safety.
   \item \textbf{Intersection-Union Testing (IUT)}: An RQ is Supported if and only if \textbf{every required component condition passes} at the 98.75\% decision interval level.
 \end{enumerate}
 
@@ -47,8 +49,8 @@
 \subsubsection*{Research Question 1 (RQ1): Sequential Maintenance Utility and Coverage Reliability}
 \begin{itemize}
   \item \textbf{Question}: \textit{Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?}
-  \item \textbf{Null Hypothesis ($H_{0,1}$)}: The proposed method does not improve sequential maintenance utility by at least 0.20 SCU per engine over both global and standard condition-aware calibration, or fails to maintain required coverage reliability.
-  \item \textbf{Alternative Hypothesis ($H_{1,1}$)}: The proposed method improves maintenance utility by at least 0.20 SCU per engine over both global and standard condition-aware calibration while maintaining required coverage reliability.
+  \item \textbf{Null Hypothesis ($H_{0,1}$)}: The proposed method does not improve sequential maintenance utility by more than 0.20 SCU per engine over both global and standard condition-aware calibration, or fails to maintain required coverage reliability.
+  \item \textbf{Alternative Hypothesis ($H_{1,1}$)}: The proposed method improves maintenance utility by more than 0.20 SCU per engine over both global and standard condition-aware calibration while maintaining required coverage reliability.
   \item \textbf{Primary Outcome}: Total simulated maintenance cost per engine contrast ($\Deltacost = \overline{\text{Cost}}_B - \overline{\text{Cost}}_P$).
   \item \textbf{Primary Comparators}: Global conformal calibration (\texttt{global\_hcp}) and standard condition-aware calibration (\texttt{regime\_hcp}) on C-MAPSS FD002 held-out test split under \texttt{primary\_reference} at 90\% nominal coverage (both GBR and LSTM required).
   \item \textbf{Supported Logic}: For both GBR and LSTM, lower 98.75\% CI of $\Deltacost > 0.20$ SCU against both baselines, upper 98.75\% CI of marginal, worst-regime, and worst-stage coverage error $< 0.05$, and observed fleet failure rate increase $\le 0.0$ against both baselines.
@@ -59,8 +61,8 @@
 \subsubsection*{Research Question 2 (RQ2): Conditional Subgroup Reliability and Interval Sharpness}
 \begin{itemize}
   \item \textbf{Question}: \textit{Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?}
-  \item \textbf{Null Hypothesis ($H_{0,2}$)}: The proposed method does not improve worst-group conditional coverage error by at least 0.01 over both baselines, or causes interval width or interval score to deteriorate by 1.0 cycle or more.
-  \item \textbf{Alternative Hypothesis ($H_{1,2}$)}: The proposed method improves worst-group conditional coverage error by at least 0.01 over both baselines while restricting interval width and score deterioration to under 1.0 cycle.
+  \item \textbf{Null Hypothesis ($H_{0,2}$)}: The proposed method does not improve worst-group conditional coverage error by more than 0.01 coverage-error reduction over both baselines, or causes interval width or interval score to deteriorate by 1.0 cycle or more.
+  \item \textbf{Alternative Hypothesis ($H_{1,2}$)}: The proposed method improves worst-group conditional coverage error by more than 0.01 coverage-error reduction over both baselines while restricting interval width and score deterioration to under 1.0 cycle.
   \item \textbf{Primary Outcome}: Worst-group conditional coverage error contrast ($\Deltaerror = \WorstErr_B - \WorstErr_P$).
   \item \textbf{Required Subgroup Families}: Operating regimes ($C_1$--$C_6$) and degradation lifecycle stages (Early, Mid, Late thirds).
   \item \textbf{Supported Logic}: For both models and both subgroup families, lower 98.75\% CI of $\Deltaerror > 0.01$ against both baselines, upper 98.75\% CI of worst-group error $< 0.05$, upper 98.75\% CI of $\Dwidth < 1.0$ cycle, and upper 98.75\% CI of $\Dscore < 1.0$ cycle.
@@ -71,15 +73,15 @@
 \subsubsection*{Research Question 3 (RQ3): Decision-Value Attribution vs. Matched Controls}
 \begin{itemize}
   \item \textbf{Question}: \textit{Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?}
-  \item \textbf{Null Hypothesis ($H_{0,3}$)}: The proposed method does not improve maintenance utility by at least 0.20 SCU per engine over every prespecified matched-conservatism control family, or violates coverage constraints.
-  \item \textbf{Alternative Hypothesis ($H_{1,3}$)}: The proposed method provides maintenance improvements beyond those achievable through matched-conservatism baselines, demonstrating useful decision information rather than simple over-conservatism.
+  \item \textbf{Null Hypothesis ($H_{0,3}$)}: The proposed method does not improve maintenance utility by more than 0.20 SCU per engine over every prespecified matched-conservatism control family, or violates coverage constraints.
+  \item \textbf{Alternative Hypothesis ($H_{1,3}$)}: The proposed method provides maintenance improvements of more than 0.20 SCU per engine beyond those achievable through matched-conservatism baselines, demonstrating useful decision information rather than simple over-conservatism.
   \item \textbf{Primary Outcome}: Maintenance cost improvement over matched-conservatism controls ($\Deltacost = \overline{\text{Cost}}_{\text{control}} - \overline{\text{Cost}}_P$).
   \item \textbf{Four Evaluated Control Configurations across Three Families}:
     \begin{enumerate}
       \item \texttt{matched\_width\_interval}: $\lambda$-scaled baseline interval matching proposed validation MPIW within $\le 1.0$ cycle (GBR: \texttt{global\_hcp}, $\lambda=0.92$; LSTM: \texttt{regime\_hcp}, $\lambda=0.90$).
-      \item \texttt{widened\_interval}: Parameterized interval expansion $\lambda \ge 1.0$ (GBR: \texttt{regime\_hcp}, $\lambda=1.00$; LSTM: \texttt{global\_hcp}, $\lambda=1.00$).
+      \item \texttt{widened\_interval}: Parameterized interval expansion $\lambda \ge 1.0$ (GBR: \texttt{regime\_hcp}, $\lambda=1.00$; LSTM: \texttt{global\_hcp}, $\lambda=1.00$). Note: $\lambda=1.00$ does not represent actual widening.
       \item \texttt{point\_safety\_margin}: Thresholding $p \le 1 + m$ (GBR: $m=5$; LSTM: $m=4$).
-      \item \texttt{earlier\_intervention}: Elevated thresholding $L \le h$ (GBR: \texttt{regime\_hcp}, $h=1$; LSTM: \texttt{global\_hcp}, $h=1$).
+      \item \texttt{earlier\_intervention}: Elevated thresholding $L \le h$ (GBR: \texttt{regime\_hcp}, $h=1$; LSTM: \texttt{global\_hcp}, $h=1$). Note: $h=1$ represents baseline thresholding, not an empirically earlier intervention.
     \end{enumerate}
   \item \textbf{Supported Logic}: For both GBR and LSTM, lower 98.75\% CI of $\Deltacost > 0.20$ SCU against \textbf{every single prespecified control configuration}, upper 98.75\% CI of marginal, regime, and stage coverage error $< 0.05$, and observed fleet failure rate increase $\le 0.0$ against all controls.
   \item \textbf{Unsupported Logic}: For either model, upper 98.75\% CI of $\Deltacost < 0.20$ SCU against any control configuration, lower 98.75\% CI of any coverage error $> 0.05$, or fleet failure rate increases over any control.

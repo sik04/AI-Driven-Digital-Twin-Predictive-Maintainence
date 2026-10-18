@@ -1,20 +1,29 @@
 # Proposed Methodology and Technical Architecture
 
-**Document Version**: `1.0`  
+**Document Version**: `2.0 (v4 Audit Alignment)`  
+**Reviewed Repository Baseline**: `c163bb279e7427b8f1b6e75955af4969ff9370fd`  
+**Committed Readiness Evidence**: `experiments/pretest_verification_v4/` (Audit Execution Commit: `550a7994d5746d3bcbfa28c26e7ed4f1a26a6153`, `git_dirty: false`, readiness: `PRETEST_READY`, held-out execution: `NOT_STARTED`, RQ outcomes: `PENDING`)  
 **Governing ADRs**: `ADR-011`, `ADR-012`, `ADR-013`, `ADR-018`, `ADR-019`, `ADR-020`, `ADR-021`, `ADR-022`, `ADR-023`  
 **Target Codebase**: `src/intellitwin/{data, models, uncertainty, decision, simulator, evaluation}`  
 **Status**: Authoritative Technical Specification and Research Draft
+
+> **Status Statement**: Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST_READY. Held-out execution has not started, and RQ1–RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness.
 
 ---
 
 ## 1. Overview of the Predictive Maintenance Pipeline
 
+### Theoretical Basis and Empirical Scope
+IntelliTwin uses an engine-weighted conformal construction motivated by hierarchical conformal prediction. Formal coverage results require the hierarchical sampling and exchangeability assumptions stated in the underlying theory. Equal engine weighting does not establish these assumptions for ordered, lifetime-stratified degradation trajectories. This study therefore evaluates marginal and subgroup coverage empirically. It does not claim guaranteed coverage for each engine, lifecycle stage, operating regime, complete trajectory, or adaptively selected maintenance time. Nominal 90% coverage is a target, not a guaranteed realized coverage proportion. Maintenance outcomes are evaluated separately under the frozen simulator.
+
+Predictive uncertainty methods differ in their assumptions and calibration behavior. Their maintenance value must be evaluated through interval reliability and downstream decision outcomes under a common protocol.
+
 The IntelliTwin methodology integrates five interconnected layers:
-1. **Data Curation & Causal Windowing**: Strict engine-level partition isolation, training-only fitted scaling, zero-leakage causal temporal windowing, and dual-horizon target construction across C-MAPSS FD001, FD002, and FD004.
-2. **Frozen Point Predictor Matrix**: High-capacity non-neural (Histogram Gradient Boosting Regressor) and deep recurrent (unidirectional LSTM) architectures trained across 5 official seeds on training engines under validation-only checkpoint selection.
+1. **Data Curation & Causal Windowing**: Strict engine-level partition isolation, training-only fitted scaling, zero-leakage causal temporal windowing, and causal information horizon and RUL target definitions across C-MAPSS FD001, FD002, and FD004.
+2. **Frozen Point Predictor Matrix**: High-capacity non-neural (Histogram Gradient Boosting Regressor) and deep recurrent (unidirectional LSTM) architectures trained across 5 prespecified seeds on training engines under validation-only checkpoint selection.
 3. **Engine-Weighted Conformal Calibration**: Multi-regime hierarchical conformal calibration implementing exact engine-weighted quantiles, finite-score mass bounding ($m/(m+1)$), and candidate configuration selection.
 4. **Decision-Aware Asymmetric Score Inversion**: Dynamic modulation of interval width and asymmetry near the critical end-of-life decision boundary.
-5. **Sequential Maintenance Simulation**: Discrete-event trace-driven simulation of operational replacement policies under transparent, pre-registered economic cost scenarios.
+5. **Sequential Maintenance Simulation**: Discrete-event trace-driven simulation of operational replacement policies under transparent, prespecified synthetic cost scenarios.
 
 ```
 Raw C-MAPSS Run-to-Failure Telemetry (FD001, FD002, FD004)
@@ -32,7 +41,7 @@ Raw C-MAPSS Run-to-Failure Telemetry (FD001, FD002, FD004)
                      │
                      ▼
   [Frozen Base Point Predictors: Capped RUL (max 125 cycles), 5 Seeds (2026-2030)]
-       └── Predictions p_it >= 0.0
+       └── Predictions p = max(0, raw_prediction)
                      │
                      ▼
   [Conformal Calibration Layer (Reserved Calibration Partition)]
@@ -41,7 +50,7 @@ Raw C-MAPSS Run-to-Failure Telemetry (FD001, FD002, FD004)
        └── Decision-Aware Asymmetric Calibration (decision_aware_hcp: gamma2_betam1)
                      │
                      ▼
-  [Prediction Intervals: [L_it, U_it] calibrated against True Uncapped RUL]
+  [Prediction Intervals: [L, U] calibrated against True Uncapped RUL]
                      │
                      ▼
   [Sequential Maintenance Simulator: lower_bound_one_cycle_policy]
@@ -75,34 +84,32 @@ To prevent cross-trajectory data leakage, all dataset splits are constructed str
 | **Total Fleet** | **609** | **304** | **122** | **61** | **122** | Reconstructed provenance in `data/splits/` |
 
 ### 2.3 Training-Only Preprocessing & Sensor Schema
-Preprocessing uses training-only z-score normalization. Means and population standard deviations are estimated with `ddof=0`. An exactly zero standard deviation is replaced by an effective scale of 1.0, while the mean is still subtracted:
-$$x_{\text{normalized}} = \frac{x - \mu_{\text{train}}}{s_{\text{train}}}$$
-where:
-$$s_{\text{train}} = \begin{cases} \sigma_{\text{train}}, & \text{when } \sigma_{\text{train}} > 0 \\ 1.0, & \text{otherwise} \end{cases}$$
+Raw C-MAPSS records contain engine identifiers, cycle, three operating settings, and 21 sensor measurements. Normalization uses training-only z-score normalization with population standard deviation, `ddof=0`. An exactly zero standard deviation is replaced by an effective scale of 1.0, while the mean is still subtracted:
+$$x_{\text{normalized}} = \frac{x - \mu_{\text{train}}}{s_{\text{train}}}, \quad s_{\text{train}} = \begin{cases} \sigma_{\text{train}}, & \text{when } \sigma_{\text{train}} > 0 \\ 1.0, & \text{otherwise} \end{cases}$$
 
 Dataset-specific processing is structured as follows:
 - **FD001**: Operates under a single operating condition; fitted with global training-only normalization across all engines.
-- **FD002 and FD004**: Operating settings are standardized using training data. Six operating regimes ($C_1$ to $C_6$) are learned from standardized training settings via K-Means clustering ($k=6, \text{random\_state}=2026, \text{n\_init}=10$). Canonical regime labels are preserved based on lexicographic centroid ordering. Sensor normalization parameters are fitted separately within each training regime.
+- **FD002 and FD004**: Operating settings are standardized using training data. Six operating regimes ($C_1$ to $C_6$) are learned from standardized training settings via K-Means clustering ($k=6, \text{random\_state}=2026, \text{n\_init}=10$). Canonical regime labels are preserved based on lexicographic centroid ordering. Sensor normalization parameters are fitted separately within each training regime. Learned regime clusters represent algorithmic partitions on standardized settings, not named physical flight conditions.
 - Preprocessing transformations are computed and applied prior to window construction.
 
 The pipeline enforces the exact frozen 17-feature selection order:
 $$\text{setting1, setting2, setting3, s2, s3, s4, s7, s8, s9, s11, s12, s13, s14, s15, s17, s20, s21}$$
-This is a frozen 17-feature selection supported by the recorded qualification procedure. The seven excluded sensors (s1, s5, s6, s10, s16, s18, s19) are omitted under this frozen protocol; they are not claimed to be mathematically constant or universally uninformative across all possible datasets and regimes.
+The seven excluded sensors (s1, s5, s6, s10, s16, s18, s19) are omitted under this frozen protocol; they are not claimed to be mathematically constant or universally uninformative across all possible datasets and regimes.
 
 ### 2.4 Causal Temporal Windowing and Identical Information Horizons
-- **Window Size**: Fixed causal window length $W = 30$ operating cycles.
+- **Window Size**: Fixed causal window length $w = 30$ operating cycles.
 - **Stride & Padding**: Stride $= 1$ cycle. **Zero padding is strictly prohibited**; engines must execute for at least 30 cycles before the first prediction is emitted.
 - **Qualified Endpoints**: For an engine with run-to-failure lifetime $T_i$, qualified endpoints are $V_i = \{30, 31, \dots, T_i\}$, yielding exactly $n_i = T_i - 29$ valid predictions without crossing engine boundaries.
-- **Identical Information Horizon**:
+- **Information Horizon Representation**:
   - The LSTM consumes a sequential tensor of shape $(30, 17)$ representing the exact chronological sequence $t-29 \dots t$.
   - The GBR consumes a flattened vector of shape $(510,)$ constructed in C-order by unrolling the identical 30 cycles $\times$ 17 features.
-  - This guarantees that differences in predictive performance between GBR and LSTM reflect representational capacity rather than differing temporal information horizons.
+  - While both models access the same temporal information window, equal lookback horizons do not isolate every architectural difference between recurrent and gradient-boosted tabular representations.
 
-### 2.5 Dual-Horizon RUL Target Construction
+### 2.5 Causal Information Horizon and RUL Target Definitions
 Under ADR-012, a rigorous distinction is maintained between training and evaluation targets:
 - **Capped Training Targets**: To prevent deep models from overfitting to non-informative sensor plateaus during early life, training targets are capped at $RUL_{\text{max}} = 125$ cycles:
   $$y_{\text{train}}(t) = \min(125, \; T_i - t)$$
-  The 125-cycle target cap is a modeling convention; it is not a physical proof that early-life degradation is physically absent.
+  The 125-cycle target cap is a modeling convention; it does not constitute physical proof that early-life degradation is absent or that overfitting has been demonstrably prevented.
 - **Uncapped Evaluation & Calibration Targets**: Calibration nonconformity scores and evaluation metrics are computed strictly against true, uncapped RUL:
   $$y_{\text{true}}(t) = T_i - t$$
   This ensures that prediction intervals reflect physical component longevity and that maintenance replacement decisions are penalized based on actual discarded life.
@@ -114,25 +121,22 @@ Under ADR-012, a rigorous distinction is maintained between training and evaluat
 
 ## 3. Frozen Base Predictor Production Matrix
 
-Under ADR-019 and ADR-020, two distinct point-predictor model families were specified, tuned on validation data, and frozen across five official research seeds (`2026, 2027, 2028, 2029, 2030`), forming a complete 30-model production matrix:
+Under ADR-019 and ADR-020, two distinct point-predictor model families were specified, tuned on validation data, and frozen across five prespecified research seeds (`2026, 2027, 2028, 2029, 2030`), forming a complete 30-model production matrix:
 
 1. **Histogram Gradient Boosting Regressor (GBR)**:
    - Implemented via `sklearn.ensemble.HistGradientBoostingRegressor`.
    - Input: C-order flattened $30 \times 17$ causal window, forming 510 tabular features.
    - The project's model is not LightGBM or XGBoost; it relies strictly on scikit-learn's native histogram gradient boosting regressor.
-   - Evaluated over hyperparameter search grid of learning rates ($\{0.05, 0.10\}$), max leaf nodes ($\{15, 31, 63\}$), and L2 regularization ($\{0.0, 1.0\}$) across selection seeds 2026 and 2027.
-   - *Frozen winning configuration on FD001*: `gbr_lr010_leaf15_l2_0` (learning rate 0.10, max leaf nodes 15, L2 regularization 0.0).
-   - *Frozen winning configuration on FD002 and FD004*: `gbr_lr010_leaf31_l2_0` (learning rate 0.10, max leaf nodes 31, L2 regularization 0.0).
-   - Execution across the five seeds (2026–2030) reflects seed replication for protocol completeness; the repeated seeds are not five independent stochastic experiments, nor is random subsampling invented as a cause of variation. Universal deterministic behavior beyond the recorded runs is not asserted.
+   - Winning configuration on FD001: `gbr_lr010_leaf15_l2_0` (learning rate 0.10, max leaf nodes 15, L2 regularization 0.0).
+   - Winning configuration on FD002 and FD004: `gbr_lr010_leaf31_l2_0` (learning rate 0.10, max leaf nodes 31, L2 regularization 0.0).
 2. **Unidirectional Long Short-Term Memory (LSTM)**:
-   - PyTorch unidirectional recurrent network with one recurrent layer (`num_layers=1`, `bidirectional=False`, `batch_first=True`, `input_size=17`).
-   - Internal LSTM dropout is $0.0$.
+   - PyTorch unidirectional recurrent network with one recurrent layer (`num_layers=1`, `bidirectional=False`, `batch_first=True`, `input_size=17`, `hidden_size=64`).
+   - Internal recurrent-layer dropout is $0.0$.
    - The network extracts the final sequence output, applies an explicit separate `nn.Dropout(p=0.20)`, and passes it to an output projection `nn.Linear(64, 1)`.
-   - Selected configuration across all datasets: `lstm_h64_lr0010` (hidden dimension $H=64$, Adam optimizer with learning rate $\eta = 0.0010$, batch size 128).
-   - Early stopping uses validation uncapped-RUL RMSE.
-   - Two selection seeds (2026 and 2027) were used for hyperparameter validation selection; five final model seeds (2026–2030) form the frozen production matrix.
+   - Optimizer: **AdamW** (not standard Adam), learning rate $\eta = 0.001$, weight decay $0.0001$, batch size 256 (not 128), betas $(0.9, 0.999)$, epsilon $10^{-8}$.
+   - Winning configuration: `lstm_h64_lr0010`. Early stopping uses validation uncapped-RUL RMSE.
 
-All 30 checkpoints are cryptographically hashed and immutably indexed in `experiments/base_models/model_registry.json`. Numerical validation and test performance metrics are reported in designated results tables rather than explanatory method text.
+All 30 checkpoints are cryptographically hashed and immutably indexed in `experiments/base_models/model_registry.json`.
 
 ---
 
@@ -141,7 +145,7 @@ All 30 checkpoints are cryptographically hashed and immutably indexed in `experi
 ### 4.1 Exact Engine-Weighted Quantiles and Boundary Mass
 Standard split conformal prediction pools all calibration residuals into a single empirical distribution. In industrial degradation, this violates exchangeability because engines vary in run-to-failure length. 
 
-IntelliTwin implements **hierarchical engine-weighted conformal calibration** based on the theoretical framework of Lee, Barber, and Willett (2023):
+IntelliTwin implements **hierarchical engine-weighted conformal calibration** motivated by the framework of Lee, Barber, and Willett (2023):
 - Let $m$ denote the number of calibration engines contributing valid endpoints.
 - Engine $i$ contains $n_i$ valid temporal windows ($n_i = T_i - 29$).
 - For final calibration with $m$ contributing engines, the empirical cumulative distribution function is:
@@ -150,73 +154,47 @@ IntelliTwin implements **hierarchical engine-weighted conformal calibration** ba
   $$\text{mass}(i, t) = \frac{1}{(m + 1) n_i}$$
 - The total finite probability mass is $\frac{m}{m+1}$. The remaining probability mass of $\frac{1}{m+1}$ is placed at $+\infty$.
 - The nonconformity threshold $q$ is the smallest observed score whose cumulative probability reaches $1 - \alpha$. If no finite score reaches $1 - \alpha$, $q = +\infty$.
-- *(Note: During validation leave-one-engine-out candidate selection, a development empirical CDF with normalized $\frac{1}{m}$ engine weighting is evaluated separately over the validation engines).*
-- For regime-specific calibration, $m_g$ counts distinct engines contributing to that regime, and $n_{ig}$ counts their eligible endpoints in that regime.
 - All quantile boundaries are computed and verified using exact rational arithmetic (`fractions.Fraction`) to eliminate floating-point representation errors.
 
 ### 4.2 Mathematical Formulations of the Three Evaluated Methods
 Let $p \ge 0$ denote the base model point prediction (in cycles), $y = y_{\text{true}} \ge 0$ denote ground-truth uncapped RUL, and $g \in \{C_1, \dots, C_6\}$ denote the discrete operating regime observed at cycle $t$.
 
 #### Method 1: Global Hierarchical Conformal Prediction (`global_hcp`)
-- **Nonconformity Score**: Symmetric absolute residual:
-  $$s(p, y) = |y - p|$$
-- **Threshold**: A single global engine-weighted hierarchical threshold $q_{\text{global}}$ fitted across all calibration engines.
-- **Prediction Interval**:
+- Nonconformity Score: Symmetric absolute residual $s(p, y) = |y - p|$.
+- Threshold: A single global engine-weighted hierarchical threshold $q_{\text{global}}$ fitted across all calibration engines.
+- Prediction Interval:
   $$L = \max(0, \; p - q_{\text{global}}), \quad U = p + q_{\text{global}}$$
+  The displayed interval width is $p + q - \max(0, p-q)$, which equals $2q$ only when $p \ge q$.
 
 #### Method 2: Condition-Aware Hierarchical Conformal Prediction (`regime_hcp`)
-- **Nonconformity Score**: Symmetric absolute residual:
-  $$s(p, y) = |y - p|$$
-- **Threshold**: Separate regime-specific hierarchical thresholds $q_g$ fitted using calibration residuals observed in operating regime $g$. A global threshold $q_{\text{global}}$ is fit concurrently for fallback routing.
-- **Prediction Interval**:
+- Nonconformity Score: Symmetric absolute residual $s(p, y) = |y - p|$.
+- Threshold: Separate regime-specific hierarchical thresholds $q_g$ fitted using calibration residuals observed in operating regime $g$. A global threshold $q_{\text{global}}$ is fit concurrently for fallback routing.
+- Prediction Interval:
   $$L = \max(0, \; p - q_g), \quad U = p + q_g$$
-- *(Note: On single-regime FD001, `regime_hcp` and `global_hcp` are mathematically and numerically identical).*
 
 #### Method 3: Proposed Decision-Aware Conformal Prediction (`decision_aware_hcp`)
 The proposed method dynamically modulates nonconformity scaling and interval asymmetry as a function of the point prediction $p$:
+$$p = \max(0, \text{raw\_prediction})$$
 $$\sigma(p) = \left(1 + \frac{p}{125}\right)^\gamma$$
 $$z(p) = \exp\left(-\frac{p}{20}\right)$$
 $$a(p) = \sigma(p) \exp\left(\beta z(p)\right)$$
 $$b(p) = \sigma(p) \exp\left(-\beta z(p)\right)$$
-where $\gamma \in \{0, 1, 2\}$ is the polynomial scaling exponent, $\beta = \beta_{\text{code}} \ln(2)$ with $\beta_{\text{code}} \in \{-1, 0, 1\}$ governs asymmetry, $125$ is the reference training cap scale, and $20$ cycles represents the characteristic end-of-life decision transition scale.
+$$\text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)$$
+$$L = \max\left(0, \; p - q_g \cdot a(p)\right), \quad U = p + q_g \cdot b(p)$$
 
-- **Nonconformity Score Function**:
-  $$\text{score}(p, y) = \max\left(\frac{p - y}{a(p)}, \; \frac{y - p}{b(p)}, \; 0\right)$$
-- **Score Inversion & Prediction Interval**:
-  Inverting the score against the fitted regime-specific threshold $q_g$ yields:
-  $$L = \max\left(0, \; p - q_g \cdot a(p)\right), \quad U = p + q_g \cdot b(p)$$
+The selected candidate is `gamma2_betam1`: $\gamma = 2, \beta_{\text{code}} = -1, \beta = -\ln(2) \approx -0.693147$.
 
 ### 4.3 Mathematical Mechanics of Negative Beta ($\beta < 0$)
-At fixed $p$, $q$, and $\gamma$, negative $\beta$ decreases $a$ relative to $\beta=0$ and increases $b$. The lower bound is nondecreasing and the upper bound is nondecreasing. This does not establish improved maintenance utility or earlier intervention; thresholds are fitted separately and utility must be evaluated.
+At fixed $p$, $q$ and $\gamma$, negative $\beta$ decreases $a(p)$ and increases $b(p)$. The lower and upper endpoints are therefore nondecreasing relative to $\beta=0$. This does not establish earlier intervention or better maintenance utility because calibration thresholds are refitted and policy outcomes depend on the resulting trajectories.
 
-*(Note: It is not claimed that $a(p) < 1$ or $b(p) > 1$ for every $p$, because the scaling factor $\sigma(p)$ also modulates their absolute magnitude).*
-
-### 4.4 Nine-Candidate Parameter Space & Validation Selection
-The parameter space was prespecified as a strict $3 \times 3$ grid:
-
-| Candidate ID | $\gamma$ | $\beta_{\text{code}}$ | $\beta$ | Description |
-| :--- | :---: | :---: | :---: | :--- |
-| `gamma0_beta0` | 0 | 0 | $0.0000$ | Identity candidate (matches `regime_hcp`) |
-| `gamma0_betam1` | 0 | -1 | $-0.6931$ | Constant scale, asymmetric upper expansion |
-| `gamma0_betap1` | 0 | +1 | $+0.6931$ | Constant scale, asymmetric lower expansion |
-| `gamma1_beta0` | 1 | 0 | $0.0000$ | Linear scale, symmetric |
-| `gamma1_betam1` | 1 | -1 | $-0.6931$ | Linear scale, asymmetric upper expansion |
-| `gamma1_betap1` | 1 | +1 | $+0.6931$ | Linear scale, asymmetric lower expansion |
-| `gamma2_beta0` | 2 | 0 | $0.0000$ | Quadratic scale, symmetric |
-| `gamma2_betam1` | 2 | -1 | $-0.6931$ | Quadratic scale, asymmetric upper expansion |
-| `gamma2_betap1` | 2 | +1 | $+0.6931$ | Quadratic scale, asymmetric lower expansion |
-
-Under ADR-021, candidate selection was executed exclusively on validation engines across seeds 2026–2030 using leave-one-engine-out cross-validation. Candidate `gamma2_betam1` was selected as the optimal feasible configuration across **all six mandatory cells** (`FD001_GBR`, `FD001_LSTM`, `FD002_GBR`, `FD002_LSTM`, `FD004_GBR`, `FD004_LSTM`) and frozen in `experiments/calibration/selection/selection_freeze.json`.
-
-### 4.5 Fallback Routing Rules for Insufficient Subgroup Support
-For regime-specific calibration at nominal coverage $1 - \alpha$, regime $g$ requires a minimum sample support of:
+### 4.4 Fallback Routing Rules for Insufficient Subgroup Support
+For regime-specific calibration at nominal coverage $1 - \alpha$, regime $g$ requires a minimum calibration sample support of:
 $$m_g \ge \max\left(10, \; \left\lceil \frac{1}{\alpha} \right\rceil - 1\right)$$
-Therefore:
-- **80% coverage** ($\alpha = 0.20$): requires at least $\max(10, 4) = 10$ distinct engines.
-- **90% coverage** ($\alpha = 0.10$): requires at least $\max(10, 9) = 10$ distinct engines.
-- **95% coverage** ($\alpha = 0.05$): requires at least $\max(10, 19) = 19$ distinct engines.
+- **80% coverage**: requires at least $\max(10, 4) = 10$ distinct engines.
+- **90% coverage**: requires at least $\max(10, 9) = 10$ distinct engines.
+- **95% coverage**: requires at least $\max(10, 19) = 19$ distinct engines.
 
-If a regime contains fewer than $m_g$ distinct engines in the calibration split, the calibrator automatically routes to the global threshold $q_{\text{global}}$ for the same method and coverage level, records the fallback occurrence, and logs the rationale. Fallback does not depend on an observation count of 100.
+These calibration support thresholds are separate from the evaluation-subgroup eligibility threshold of 10 engines. If a regime contains fewer than $m_g$ distinct engines in the calibration split, the calibrator automatically routes to the global threshold $q_{\text{global}}$.
 
 ---
 
@@ -225,19 +203,15 @@ If a regime contains fewer than $m_g$ distinct engines in the calibration split,
 Under ADR-014 and ADR-015, the downstream operational impact of calibrated intervals is evaluated via a discrete-event sequential maintenance simulation engine (`src/intellitwin/simulator/engine.py`).
 
 ### 5.1 Shared Benchmark Replacement Policy
-All conformal methods and controls are evaluated using an identical, pre-registered maintenance policy:
+All conformal methods and controls are evaluated using an identical, prespecified maintenance policy:
 $$\text{Policy}: \quad \text{Action}(t) = \begin{cases} \text{MAINTAIN\_NOW}, & \text{if } L(t) \le 1.0 \text{ cycle} \\ \text{CONTINUE}, & \text{otherwise} \end{cases}$$
 - **Operational Window**: Actions occur at cycles $t \in [30, T_i - 1]$.
-- **Immediate Preventive Maintenance**: If `MAINTAIN_NOW` is triggered at cycle $t_{\text{stop}} < T_i$, a planned preventive maintenance (PM) event occurs immediately and terminates the episode. There is no intervention lead time; the one-cycle decision threshold ($L(t) \le 1.0$) must not be confused with an intervention lead time.
+- **Immediate Preventive Maintenance**: If `MAINTAIN_NOW` is triggered at cycle $t_{\text{stop}} < T_i$, a planned preventive maintenance (PM) event occurs immediately and terminates the episode. There is no intervention lead time.
 - **Unplanned Failure**: If an engine reaches terminal cycle $T_i$ without triggering PM, an unplanned in-service failure occurs at cycle $T_i$, incurring cost $C_{\text{FAIL}}$ and zero wasted life ($W=0$).
 - **Offline Interval Evaluation**: Offline prediction interval evaluation still includes all qualified endpoints $30$ through $T_i$, independently of policy stopping.
 
 ### 5.2 Economic Cost Structure
-Under ADR-018, maintenance costs are quantified in synthetic Simulated Cost Units (SCU):
-- $C_{\text{PM}}$ and $C_{\text{FAIL}}$ are synthetic cost units per event.
-- $C_{\text{WASTE}}$ is synthetic cost units per unused cycle of true RUL.
-
-The cost and wasted life $W$ are defined as:
+Under ADR-018, maintenance costs are quantified in synthetic Simulated Cost Units (SCU), which reflect synthetic benchmark preferences rather than validated airline economics:
 $$\text{Cost} = \begin{cases} C_{\text{PM}} + C_{\text{WASTE}} \cdot (T_i - t_{\text{stop}}), & \text{if PM occurred at } t_{\text{stop}} < T_i \\ C_{\text{FAIL}}, & \text{if in-service failure occurred at } T_i \end{cases}$$
 $$W = \begin{cases} T_i - t_{\text{stop}}, & \text{if PM occurred at } t_{\text{stop}} < T_i \\ 0, & \text{if in-service failure occurred at } T_i \end{cases}$$
 
@@ -252,4 +226,4 @@ $$W = \begin{cases} T_i - t_{\text{stop}}, & \text{if PM occurred at } t_{\text{
 3. **Waste-Sensitive Sensitivity Scenario (`waste_sensitive`)**:
    - $C_{\text{PM}} = 1.0, \; C_{\text{FAIL}} = 5.0, \; C_{\text{WASTE}} = 0.40$ ($r_{\text{equal}} = 10$ cycles).
 
-*(Note: The cost equality values of 20, 45, and 10 cycles compare preventive-plus-waste cost with failure cost; they are economic breakeven reference points and are not policy decision thresholds or optimal replacement times).*
+*(Note: The cost equality values of 20, 45, and 10 cycles are economic breakeven reference points and are not policy decision thresholds or optimal replacement times).*
