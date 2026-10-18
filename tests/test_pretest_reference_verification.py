@@ -238,27 +238,32 @@ def test_mutation_engine_metrics_coverage_out_of_bounds_fails_closed(tmp_path: P
 
 def test_mutation_bootstrap_stat_with_consistent_contrast_fails_closed(tmp_path: Path) -> None:
     """Mutation 5: Altered bootstrap replicate with matching contrast is decisively rejected."""
-    smoke_dir = _copy_v3_validation_smoke(tmp_path / "smoke_m5")
-    npz_p = smoke_dir / "bootstrap_statistics_FD001.npz"
-    data = dict(np.load(npz_p))
-    target_key = "FD001_GBR_global_hcp_cost_improvement"
-    data[target_key] = data[target_key] + 100.0
-    np.savez(npz_p, **data)
-
-    c_p = smoke_dir / "contrast_intervals.csv"
-    df_c = pd.read_csv(c_p)
-    mask = df_c["contrast_id"] == target_key
-    idx = df_c[mask].index[0]
-    df_c.at[idx, "ci_95_low"] = float(np.percentile(data[target_key], 2.5))
-    df_c.at[idx, "ci_95_high"] = float(np.percentile(data[target_key], 97.5))
-    df_c.at[idx, "ci_decision_low"] = float(np.percentile(data[target_key], 5.0))
-    df_c.at[idx, "ci_decision_high"] = float(np.percentile(data[target_key], 95.0))
-    df_c.to_csv(c_p, index=False)
-
+    from intellitwin.evaluation.regression_audit import apply_mutation_5_consistent_contrast
     from intellitwin.evaluation.verification import verify_validation_smoke_matrix
+
+    smoke_dir = _copy_v3_validation_smoke(tmp_path / "smoke_m5")
+    mut_info = apply_mutation_5_consistent_contrast(smoke_dir)
+
+    # Verify that the saved contrast summary is internally consistent with altered array
+    df_c = pd.read_csv(smoke_dir / "contrast_intervals.csv")
+    row = df_c[df_c["contrast_id"] == mut_info["contrast_id"]].iloc[0]
+    assert np.isclose(float(row["mean"]), mut_info["mean"], atol=1e-10)
+    assert np.isclose(float(row["median"]), mut_info["median"], atol=1e-10)
+    assert np.isclose(float(row["ci_95_low"]), mut_info["ci_95_low"], atol=1e-10)
+    assert np.isclose(float(row["ci_95_high"]), mut_info["ci_95_high"], atol=1e-10)
+    assert np.isclose(float(row["ci_decision_low"]), mut_info["ci_decision_low"], atol=1e-10)
+    assert np.isclose(float(row["ci_decision_high"]), mut_info["ci_decision_high"], atol=1e-10)
+    assert str(row["status"]) == "DEVELOPMENT_SMOKE_ONLY"
 
     res = verify_validation_smoke_matrix(smoke_dir, base_dir=".")
     assert res["status"] == "FAIL"
+    # ci_verification (internal consistency between NPZ and contrast_intervals.csv) passed
+    assert res["checks"]["ci_verification"]["match"] is True
+    # Independent reference reconstruction rejected the altered bootstrap values
+    boot_res = res["checks"]["reference_verification"]["checks"][
+        "bootstrap_statistics_npz_reconstruction"
+    ]
+    assert boot_res["status"] == "FAIL"
     assert any("Bootstrap statistics NPZ discrepancies" in r for r in res["failing_reasons"])
 
 
@@ -300,8 +305,8 @@ def test_audit_step09_freeze_cli_verify_only_nonexistent_dir() -> None:
     assert res.returncode == 1
 
 
-def test_audit_step09_freeze_cli_verify_only_v4() -> None:
-    """audit_step09_freeze.py --verify-only succeeds with code 0 on v4 bundle."""
+def test_audit_step09_freeze_cli_verify_only_v4_historical_source_mismatch() -> None:
+    """Historical v4 bundle fails closed (exit code 1) when current source hashes have changed."""
     import subprocess
     import sys
 
@@ -317,5 +322,5 @@ def test_audit_step09_freeze_cli_verify_only_v4() -> None:
         capture_output=True,
         text=True,
     )
-    assert res.returncode == 0
-    assert "STATUS: PRETEST_READY" in res.stdout
+    assert res.returncode == 1
+    assert "Pre-Test Readiness:        BLOCKED" in res.stdout

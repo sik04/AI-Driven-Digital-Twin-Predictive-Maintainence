@@ -175,6 +175,8 @@ This document outlines the master research and development roadmap for the Intel
   - Fail-closed pure independent reference verification report (`experiments/pretest_verification_v4/content_verification.json`).
   - Pre-test freeze manifest and audit (`experiments/pretest_verification_v4/protocol_freeze.json`, `pretest_audit.json` with status `PRETEST_READY`).
   - Validation-only smoke evaluation records labeled `DEVELOPMENT_SMOKE_ONLY`.
+  - Executed regression audit runner and mutation rejection verification (`src/intellitwin/evaluation/regression_audit.py`, `docs/development/verification_repairs.md`).
+  - Portable readiness bundle (`experiments/pretest_verification_v5/`) incorporating empirical regression evidence, corrected mutation fixtures, and partner checkpoint evidence (`experiments/checkpoint_verification_v1/`).
   - Future held-out test predictions, simulation traces, stratified bootstrap draws, and IUT decision outcomes.
 - **Acceptance Criteria**:
   - Completion requires valid execution, reproducibility, and honest reporting.
@@ -182,7 +184,7 @@ This document outlines the master research and development roadmap for the Intel
   - All confirmatory hypothesis decisions (Supported, Unsupported, Inconclusive) strictly follow the frozen Bonferroni / IUT decision rules.
   - Confirmatory test outcomes remain strictly PENDING until held-out test execution.
 - **Dependencies**: Phase 6 / Step 8.
-- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke across all 930 configurations, 19,590 rows, and 152 hypothesis components completed with 100% exact independent reference reconstruction and CI verification; decisive rejection of all 5 confirmed false-PASS mutations verified; confirmatory test execution remains strictly not started.
+- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke across all 930 configurations, 19,590 rows, and 152 hypothesis components completed with 100% exact independent reference reconstruction and CI verification; decisive rejection of all 5 confirmed false-PASS mutations verified. Verification repairs (Portion A) completed: executed regression evidence runner implemented in `regression_audit.py`, Mutation 5 corrected with linear quantiles [0.025, 0.975] and [0.00625, 0.99375] with mean/median updates, portable repository-relative POSIX artifact locators enforced, and partner checkpoint verification integration gate established; integration awaiting partner checkpoint verification merge (`experiments/checkpoint_verification_v1/`); confirmatory test execution remains strictly not started.
 
 
 ---
