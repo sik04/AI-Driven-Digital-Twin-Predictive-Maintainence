@@ -1,0 +1,40 @@
+{
+  "actual_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "python": "3.14.0",
+    "pyyaml": "6.0.3",
+    "scikit-learn": "1.9.1",
+    "torch": "2.14.1+cpu"
+  },
+  "clean_source_execution": true,
+  "cpu": "Intel64 Family 6 Model 60 Stepping 3, GenuineIntel",
+  "device": "cpu",
+  "environment_match": true,
+  "error_details": [],
+  "expected_versions": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "python": "3.14.0",
+    "pyyaml": "6.0.3",
+    "scikit-learn": "1.9.1",
+    "torch": "2.14.1+cpu"
+  },
+  "git_dirty": false,
+  "held_out_execution_status": "NOT_STARTED",
+  "max_absolute_difference": 0.0,
+  "metadata_records_verified": 30,
+  "overall_status": "PASS",
+  "pip_check_exit_code": 0,
+  "platform": "Windows-10-10.0.19045-SP0",
+  "protected_inputs_unchanged": true,
+  "reproduction_record_count": 60,
+  "reproduction_records_complete": true,
+  "schema_version": "checkpoint-environment-verification-v1",
+  "sklearn_inconsistent_version_warning_count": 0,
+  "source_execution_commit": "7bc372aa29947af29846b20ecf6c5c69d615f6f8",
+  "status": "PASS",
+  "utc_end_timestamp": "2026-10-19T11:58:43.400816+00:00",
+  "utc_start_timestamp": "2026-10-19T11:52:46.486627+00:00",
+  "warning_details": []
+}

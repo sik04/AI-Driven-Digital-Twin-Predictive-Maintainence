@@ -1,0 +1,18 @@
+================================================================================
+IntelliTwin Checkpoint Environment Verification & Prediction Reproduction
+Base Directory:     .
+Raw Data Directory: data/raw/cmapss
+Output Directory:   C:\Users\Mayank\.gemini\antigravity-ide\brain\2caa3339-fbca-463b-873a-723d9fdacec0\scratch\official_checkpoint_verification
+Allow Dirty:        False
+Skip Reproduction:  False
+================================================================================
+
+================================================================================
+CHECKPOINT VERIFICATION RESULT: PASS
+  Records Verified:        60/60
+  All Records Complete:    True
+  Max Absolute Difference: 0.000000e+00
+  Inconsistent Warnings:   0
+  Protected Inputs Preserved: True
+  Held-Out Execution:      NOT_STARTED
+================================================================================
