@@ -1,0 +1,28 @@
+{
+  "schema_version": "checkpoint-environment-specification-v1",
+  "environment_name": "metadata-matched-explicitly-locked-verification-environment",
+  "python_version": "3.14.0",
+  "platform": "windows",
+  "architecture": "x86_64",
+  "device": "cpu",
+  "runtime_pins": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "torch": "2.14.1+cpu",
+    "PyYAML": "6.0.3"
+  },
+  "package_sources": {
+    "torch": "https://download.pytorch.org/whl/cpu",
+    "pypi": "https://pypi.org/simple"
+  },
+  "lockfile": "requirements/checkpoint-verification/requirements-windows-py314.lock.txt",
+  "requirements_in": "requirements/checkpoint-verification/requirements.in",
+  "installation_commands": [
+    "uv venv --seed .venv_checkpoint_verification --python <path_to_python_3.14.0>",
+    ".venv_checkpoint_verification\\Scripts\\pip.exe install -r requirements/checkpoint-verification/requirements-windows-py314.lock.txt",
+    ".venv_checkpoint_verification\\Scripts\\pip.exe install -e . --no-deps",
+    ".venv_checkpoint_verification\\Scripts\\pip.exe check"
+  ],
+  "reproducibility_notes": "All 30 base model metadata files uniformly declare Python 3.14.0, numpy 2.5.3, pandas 3.0.6, scikit-learn 1.9.1, and torch 2.14.1+cpu. This environment matches those metadata declarations exactly. Transitive dependencies are pinned explicitly in requirements-windows-py314.lock.txt. No claim is made that unrecorded original transitive dependencies have been recovered."
+}
