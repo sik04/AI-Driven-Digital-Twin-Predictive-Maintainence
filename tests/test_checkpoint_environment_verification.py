@@ -119,9 +119,19 @@ def test_sklearn_version_warnings_fail_audit(tmp_path: Path) -> None:
         )
         return {"overall_status": "PASS", "details": {}}
 
-    with patch(
-        "scripts.verify_checkpoint_environment.run_step08_audit",
-        side_effect=mock_run_step08_audit,
+    with (
+        patch(
+            "scripts.verify_checkpoint_environment.verify_runtime_versions",
+            return_value={"status": "PASS", "match": True, "expected": {}, "actual": {}},
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.execute_pip_check",
+            return_value=(0, "No broken requirements found."),
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.run_step08_audit",
+            side_effect=mock_run_step08_audit,
+        ),
     ):
         with pytest.raises(RuntimeError, match="InconsistentVersionWarning detected"):
             run_checkpoint_verification(
@@ -135,9 +145,15 @@ def test_failed_pip_check_prevents_pass(tmp_path: Path) -> None:
     """Test that a failed pip check prevents PASS and halts verification."""
     out_dir = tmp_path / "output"
 
-    with patch(
-        "scripts.verify_checkpoint_environment.execute_pip_check",
-        return_value=(1, "broken dependencies: package A requires B<1.0, but you have B 2.0"),
+    with (
+        patch(
+            "scripts.verify_checkpoint_environment.verify_runtime_versions",
+            return_value={"status": "PASS", "match": True, "expected": {}, "actual": {}},
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.execute_pip_check",
+            return_value=(1, "broken dependencies: package A requires B<1.0, but you have B 2.0"),
+        ),
     ):
         with pytest.raises(RuntimeError, match="pip check failed with exit code 1"):
             run_checkpoint_verification(
@@ -240,9 +256,19 @@ def test_modified_protected_inputs_prevent_pass(tmp_path: Path) -> None:
     mod_post = {k: v.copy() for k, v in real_pre.items()}
     mod_post["model_registry"]["experiments/base_models/model_registry.json"] = "deadbeef" * 8
 
-    with patch(
-        "scripts.verify_checkpoint_environment.hash_protected_inputs",
-        side_effect=[real_pre, mod_post],
+    with (
+        patch(
+            "scripts.verify_checkpoint_environment.verify_runtime_versions",
+            return_value={"status": "PASS", "match": True, "expected": {}, "actual": {}},
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.execute_pip_check",
+            return_value=(0, "No broken requirements found."),
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.hash_protected_inputs",
+            side_effect=[real_pre, mod_post],
+        ),
     ):
         with pytest.raises(RuntimeError, match="Protected inputs were modified during execution"):
             run_checkpoint_verification(
