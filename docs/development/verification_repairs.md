@@ -87,10 +87,12 @@ The repair suite is thoroughly validated by unit and integration tests:
   - `execution.log`
   - `pip_freeze.txt`
   - `pip_check.txt`
-- **Current Integration Status**:
-  - Portion A implementation is complete and clean.
-  - Partner PR has not yet been submitted or merged on `origin/main`.
-  - In accordance with task protocol, a draft PR is opened to record progress. Official generation of `experiments/pretest_verification_v5/` and final freeze merge will proceed immediately once the partner PR is merged into `main`.
+- **Verification Completion Status**:
+  - Partner checkpoint reproduction evidence (`experiments/checkpoint_verification_v1/`) merged via PR #32 (`14f5f57`).
+  - Strict verification audit in `scripts/audit_step09_freeze.py` requires both environment status fields to be PASS, clean execution (`clean_source_execution=true`, `git_dirty=false`), exact version matches, exit code 0, 0 sklearn warnings, 60-record reproduction report PASS with max absolute diff $\le 10^{-4}$, source-execution SHA agreement, and exact category/path membership with SHA-256 hash validation across all 11 categories / 233 protected input files.
+  - Final official v5 verification bundle generated from clean source (`experiments/pretest_verification_v5/`) with `pretest_audit.json` status `PRETEST_READY` and `overall_status`: `PASS`.
+  - All empirical regression mutations decisively rejected.
+  - Held-out test execution remains strictly **NOT_STARTED**; confirmatory RQ outcomes remain strictly **PENDING**.
 
 ---
 

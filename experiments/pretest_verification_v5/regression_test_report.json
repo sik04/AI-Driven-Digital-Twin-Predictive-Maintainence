@@ -1,0 +1,372 @@
+{
+  "baseline_verification": {
+    "elapsed_seconds": 19.369,
+    "failing_reasons": [],
+    "overall_match": true,
+    "status": "PASS"
+  },
+  "elapsed_seconds": 127.864,
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py",
+      "--source-evidence-dir",
+      "experiments/pretest_verification_v3",
+      "--verification-dir",
+      "experiments/pretest_verification_v5",
+      "--logical-output-dir",
+      "experiments/pretest_verification_v5",
+      "--checkpoint-evidence-dir",
+      "experiments/checkpoint_verification_v1",
+      "--output-dir",
+      "C:\\Users\\shiks\\AppData\\Local\\Temp\\v5_official_staging"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.4.4",
+      "pandas": "3.0.2",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.8.0",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-22T15:33:03.168193+00:00"
+  },
+  "git_commit": "e0ea919e670d4c2d522049da5ece7230fc66df90",
+  "git_dirty": false,
+  "mutations": [
+    {
+      "description": "Increase one FD001/GBR/seed-2027 point prediction by 100",
+      "elapsed_seconds": 22.372,
+      "failing_reasons": [
+        "Point prediction discrepancy vs frozen cache: 100.0 > 1e-10 (cache_match=True)",
+        "Point prediction discrepancy 100.0 > 1e-10"
+      ],
+      "historical_defect": "Historical evidence: Permissive cache check only evaluated seed 2026, ignoring seeds 2027-2030.",
+      "intended_check_details": {
+        "cache_match_failed": true,
+        "has_point_discrepancy_reason": true,
+        "ref_recon_failed": false
+      },
+      "intended_check_id": "point_predictions_cache_match",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "dataset": "FD001",
+        "model_family": "GBR",
+        "mutated_prediction": 230.57448918571103,
+        "original_prediction": 130.57448918571103,
+        "row_index": 1760,
+        "seed": 2027
+      },
+      "mutation_id": "mutation_1",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Delete one FD001/GBR/seed-2026 point-prediction row",
+      "elapsed_seconds": 21.948,
+      "failing_reasons": [
+        "Point predictions count mismatch for FD001/GBR/seed_2026: actual 1759 != cache 1760",
+        "Point prediction discrepancy vs frozen cache: 2.842170943040401e-14 > 1e-10 (cache_match=False)",
+        "Point prediction key/attribute mismatches: [\"('FD001', 'GBR', 2026, 3, 30)\"]"
+      ],
+      "historical_defect": "Historical evidence: Cache check did not fail closed on row count mismatch across confirmatory seeds.",
+      "intended_check_details": {
+        "cache_match_failed": true,
+        "has_mismatch_reason": true,
+        "ref_recon_failed": false,
+        "unique_keys_failed": false
+      },
+      "intended_check_id": "point_predictions_count_and_keys",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "dataset": "FD001",
+        "dropped_index": 0,
+        "dropped_unit": 3,
+        "model_family": "GBR",
+        "seed": 2026
+      },
+      "mutation_id": "mutation_2",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Increase ci_decision_low by 100 for component: RQ1_GBR_global_hcp_cost_improvement",
+      "elapsed_seconds": 23.043,
+      "failing_reasons": [
+        "Component evidence discrepancies: ['RQ1_GBR_global_hcp_cost_improvement: discrepancy 100.0 > 1e-10']"
+      ],
+      "historical_defect": "Historical evidence: Verifier only checked schema, nullability, and failure count safeguards without reference numerical reconstruction.",
+      "intended_check_details": {
+        "comp_reconstruction_status": "FAIL",
+        "has_component_discrepancy_reason": true
+      },
+      "intended_check_id": "component_evidence_reconstruction",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "component_id": "RQ1_GBR_global_hcp_cost_improvement",
+        "mutated_ci_decision_low": 107.08841346153847,
+        "original_ci_decision_low": 7.088413461538461,
+        "row_index": 0
+      },
+      "mutation_id": "mutation_3",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "component_evidence.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Set one engine_metrics.csv coverage value to 12345",
+      "elapsed_seconds": 20.514,
+      "failing_reasons": [
+        "Coverage values outside [0, 1] in engine_metrics.csv: min=0.3819875776397515, max=12345.0",
+        "Engine metrics discrepancies: [\"('FD001', 'GBR', 2026, 'global_hcp', 80, 'primary_reference', 3): max discrepancy 12344.0 > 1e-10\"]"
+      ],
+      "historical_defect": "Historical evidence: Verifier lacked finite bounds, range, and CSV schema validation on engine_metrics.csv coverage.",
+      "intended_check_details": {
+        "eng_recon_failed": true,
+        "finite_check_failed": true,
+        "has_bounds_reason": true
+      },
+      "intended_check_id": "finite_values_and_bounds",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "mutated_coverage": 12345.0,
+        "original_coverage": 1.0,
+        "row_index": 0
+      },
+      "mutation_id": "mutation_4",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "engine_metrics.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Add 100 to every replicate in FD001_GBR_global_hcp_cost_improvement and update contrast intervals accordingly",
+      "elapsed_seconds": 20.532,
+      "failing_reasons": [
+        "Bootstrap statistics NPZ discrepancies: ['FD001/FD001_GBR_global_hcp_cost_improvement discrepancy 100.0 > 1e-10']",
+        "Contrast intervals discrepancies: ['Numerical discrepancy in contrast FD001_GBR_global_hcp_cost_improvement: 100.0 > 1e-10']",
+        "Component evidence discrepancies: ['RQ4_cell_FD001_GBR_global_hcp_non_harm_cost: discrepancy 100.0 > 1e-10']"
+      ],
+      "historical_defect": "Historical evidence: Verifier only checked internal consistency between saved NPZ and contrast_intervals.csv, accepting arbitrary forged arrays without independent draw/stat reconstruction.",
+      "intended_check_details": {
+        "boot_reconstruction_status": "FAIL",
+        "ci_internal_consistency_passed": true,
+        "has_boot_discrepancy_reason": true
+      },
+      "intended_check_id": "bootstrap_statistics_npz_reconstruction",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "ci_95_high": 109.82000000000001,
+        "ci_95_low": 107.38,
+        "ci_decision_high": 110.06,
+        "ci_decision_low": 107.22,
+        "contrast_id": "FD001_GBR_global_hcp_cost_improvement",
+        "mean": 108.593172,
+        "median": 108.6,
+        "quantiles_used": {
+          "decision": [
+            0.00625,
+            0.99375
+          ],
+          "descriptive": [
+            0.025,
+            0.975
+          ]
+        },
+        "shift": 100.0
+      },
+      "mutation_id": "mutation_5",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "bootstrap_statistics_FD001.npz and contrast_intervals.csv",
+      "verifier_status": "FAIL"
+    }
+  ],
+  "mutations_evaluated": 5,
+  "mutations_rejected": 5,
+  "overall_status": "PASS",
+  "protocol_version": "step09-v1",
+  "records": [
+    {
+      "description": "Increase one FD001/GBR/seed-2027 point prediction by 100",
+      "elapsed_seconds": 22.372,
+      "failing_reasons": [
+        "Point prediction discrepancy vs frozen cache: 100.0 > 1e-10 (cache_match=True)",
+        "Point prediction discrepancy 100.0 > 1e-10"
+      ],
+      "historical_defect": "Historical evidence: Permissive cache check only evaluated seed 2026, ignoring seeds 2027-2030.",
+      "intended_check_details": {
+        "cache_match_failed": true,
+        "has_point_discrepancy_reason": true,
+        "ref_recon_failed": false
+      },
+      "intended_check_id": "point_predictions_cache_match",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "dataset": "FD001",
+        "model_family": "GBR",
+        "mutated_prediction": 230.57448918571103,
+        "original_prediction": 130.57448918571103,
+        "row_index": 1760,
+        "seed": 2027
+      },
+      "mutation_id": "mutation_1",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Delete one FD001/GBR/seed-2026 point-prediction row",
+      "elapsed_seconds": 21.948,
+      "failing_reasons": [
+        "Point predictions count mismatch for FD001/GBR/seed_2026: actual 1759 != cache 1760",
+        "Point prediction discrepancy vs frozen cache: 2.842170943040401e-14 > 1e-10 (cache_match=False)",
+        "Point prediction key/attribute mismatches: [\"('FD001', 'GBR', 2026, 3, 30)\"]"
+      ],
+      "historical_defect": "Historical evidence: Cache check did not fail closed on row count mismatch across confirmatory seeds.",
+      "intended_check_details": {
+        "cache_match_failed": true,
+        "has_mismatch_reason": true,
+        "ref_recon_failed": false,
+        "unique_keys_failed": false
+      },
+      "intended_check_id": "point_predictions_count_and_keys",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "dataset": "FD001",
+        "dropped_index": 0,
+        "dropped_unit": 3,
+        "model_family": "GBR",
+        "seed": 2026
+      },
+      "mutation_id": "mutation_2",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "point_predictions.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Increase ci_decision_low by 100 for component: RQ1_GBR_global_hcp_cost_improvement",
+      "elapsed_seconds": 23.043,
+      "failing_reasons": [
+        "Component evidence discrepancies: ['RQ1_GBR_global_hcp_cost_improvement: discrepancy 100.0 > 1e-10']"
+      ],
+      "historical_defect": "Historical evidence: Verifier only checked schema, nullability, and failure count safeguards without reference numerical reconstruction.",
+      "intended_check_details": {
+        "comp_reconstruction_status": "FAIL",
+        "has_component_discrepancy_reason": true
+      },
+      "intended_check_id": "component_evidence_reconstruction",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "component_id": "RQ1_GBR_global_hcp_cost_improvement",
+        "mutated_ci_decision_low": 107.08841346153847,
+        "original_ci_decision_low": 7.088413461538461,
+        "row_index": 0
+      },
+      "mutation_id": "mutation_3",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "component_evidence.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Set one engine_metrics.csv coverage value to 12345",
+      "elapsed_seconds": 20.514,
+      "failing_reasons": [
+        "Coverage values outside [0, 1] in engine_metrics.csv: min=0.3819875776397515, max=12345.0",
+        "Engine metrics discrepancies: [\"('FD001', 'GBR', 2026, 'global_hcp', 80, 'primary_reference', 3): max discrepancy 12344.0 > 1e-10\"]"
+      ],
+      "historical_defect": "Historical evidence: Verifier lacked finite bounds, range, and CSV schema validation on engine_metrics.csv coverage.",
+      "intended_check_details": {
+        "eng_recon_failed": true,
+        "finite_check_failed": true,
+        "has_bounds_reason": true
+      },
+      "intended_check_id": "finite_values_and_bounds",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "mutated_coverage": 12345.0,
+        "original_coverage": 1.0,
+        "row_index": 0
+      },
+      "mutation_id": "mutation_4",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "engine_metrics.csv",
+      "verifier_status": "FAIL"
+    },
+    {
+      "description": "Add 100 to every replicate in FD001_GBR_global_hcp_cost_improvement and update contrast intervals accordingly",
+      "elapsed_seconds": 20.532,
+      "failing_reasons": [
+        "Bootstrap statistics NPZ discrepancies: ['FD001/FD001_GBR_global_hcp_cost_improvement discrepancy 100.0 > 1e-10']",
+        "Contrast intervals discrepancies: ['Numerical discrepancy in contrast FD001_GBR_global_hcp_cost_improvement: 100.0 > 1e-10']",
+        "Component evidence discrepancies: ['RQ4_cell_FD001_GBR_global_hcp_non_harm_cost: discrepancy 100.0 > 1e-10']"
+      ],
+      "historical_defect": "Historical evidence: Verifier only checked internal consistency between saved NPZ and contrast_intervals.csv, accepting arbitrary forged arrays without independent draw/stat reconstruction.",
+      "intended_check_details": {
+        "boot_reconstruction_status": "FAIL",
+        "ci_internal_consistency_passed": true,
+        "has_boot_discrepancy_reason": true
+      },
+      "intended_check_id": "bootstrap_statistics_npz_reconstruction",
+      "intended_check_rejected": true,
+      "mutation_applied_details": {
+        "ci_95_high": 109.82000000000001,
+        "ci_95_low": 107.38,
+        "ci_decision_high": 110.06,
+        "ci_decision_low": 107.22,
+        "contrast_id": "FD001_GBR_global_hcp_cost_improvement",
+        "mean": 108.593172,
+        "median": 108.6,
+        "quantiles_used": {
+          "decision": [
+            0.00625,
+            0.99375
+          ],
+          "descriptive": [
+            0.025,
+            0.975
+          ]
+        },
+        "shift": 100.0
+      },
+      "mutation_id": "mutation_5",
+      "rejection_confirmed": true,
+      "repaired_status": "FAIL",
+      "target_artifact": "bootstrap_statistics_FD001.npz and contrast_intervals.csv",
+      "verifier_status": "FAIL"
+    }
+  ],
+  "schema_version": "step09-regression-report-v2",
+  "source_evidence_hashes": {
+    "bootstrap_draws_FD001.npz": "8c8f6a4ca76b0fb660ace977126c91809e4c6a0025c2a4949897f8830949a297",
+    "bootstrap_draws_FD002.npz": "818d11252f676747afd8471c5bca5c5aa1006d548869e5995c39e9051dfb5a33",
+    "bootstrap_draws_FD004.npz": "e0cf7d075d366faca7b121867ae03158e890d56935a3b04bb5d111c22eeec169",
+    "bootstrap_statistics_FD001.npz": "33a5d92b6b0ba8158e0927f7dc72c85be529a55df1d127c848369202b6e36636",
+    "bootstrap_statistics_FD002.npz": "744a1a4531ef2bbe1285e20c48e4cf6dba7fb3f0989a9be0a67ce13cbc00bd63",
+    "bootstrap_statistics_FD004.npz": "2889f45188205995b9b41ac100cb41325ddf802c184f5cefef3af801a2c7a8bf",
+    "bootstrap_statistics_RQ4.npz": "9171da5e9f2cefa9cfb8d0e55eedd3e37c269716c94b73d08b4daa1da7ec12dc",
+    "cell_summary.csv": "3cc8a859d9e5d7c9be16a7e913e523c881dd36f92b86735544445113b80253d7",
+    "component_evidence.csv": "e60d655fbebfd86e4c8144ec0e0cca533d3bee3e5054e9269bc8c9d3748a2421",
+    "contrast_intervals.csv": "dce74da43ece8834565d7aaa1dcba994195d388aca0574a1ef17400cab8e6328",
+    "decision_traces.csv": "0db95d1e487a77d2f0a62632a68f9e0c870e6534988c77b98ae07f837adf051e",
+    "engine_metrics.csv": "b0461ff1b5282ec4acb6ae876b91dfaeb240434dbb8479518d2d75bef73da5fe",
+    "engine_seed_outcomes.csv": "2316f59a165ea2aa72d513d0509894e13198fb42ffa71b259db8aa829aebf53c",
+    "execution_manifest.json": "02333cece043fbb576e475192b737b734e925b3c5a37deaccda6df65613eea35",
+    "interval_predictions.csv": "b14aba2e3cb8cf0061115a819fc4a63c4c000909b21c966fd3c6ae74f543638f",
+    "point_predictions.csv": "8072d570cebe9cb550011b0879ca90bc63fa2635f3fdc1b4c5861e35e9a006e6",
+    "subgroup_metrics.csv": "10e9a8daca739ea22e342c6814c5b4b45248c7e50d34199281ee4b168827e9b7"
+  },
+  "status": "PASS",
+  "timestamp_end_utc": "2026-10-22T15:35:33.400166+00:00",
+  "timestamp_start_utc": "2026-10-22T15:33:25.536228+00:00"
+}

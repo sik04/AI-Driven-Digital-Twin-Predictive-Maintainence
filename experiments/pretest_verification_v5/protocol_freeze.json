@@ -1,0 +1,569 @@
+{
+  "bindings": {
+    "base_model_registry_sha256": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
+    "calibrator_registry_sha256": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
+    "content_verification_sha256": "1b5bb8b905fdc0534ffba9094a8545441c3697a4b64483ca75eb8c29a9e5e653",
+    "control_reconstruction_sha256": "3fe91090831174cb4c4ec356df0ba70d3b898aab735de8335d55361c84b2ef86",
+    "control_selection_FD002_GBR_sha256": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d",
+    "control_selection_FD002_LSTM_sha256": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7",
+    "partner_checkpoint_verification_hashes": {
+      "environment_verification.json": "cb6553f3573c1dd955957d434bd58c7b5a72072e39f5082412adfb6f2da27cfc",
+      "execution.log": "36b185ead3423fc5b0b08e4cb688c3bf067a6609a6fc97a9d5632d1be4276fc0",
+      "input_manifest.json": "26f2c3b1da45cda2e3fd236d8bc4a3b8d79711d643ac26fb58cae234006d8219",
+      "pip_check.txt": "9261363b733079a641c2e4cc9bc46ffa1d8336945a87f807b6cf68847dbc9b09",
+      "pip_freeze.txt": "89c512390dbd68e71fabff960f70cfbe810d0b91efdc1011eb3391f82565cdd8",
+      "step08_full_audit.json": "0bc519146b3251f05c7a37d68285753da5965be18004e87ef07c3b796431d4bd"
+    },
+    "regression_test_report_sha256": "354aef869967ee8b2b7fdd0c7c17e9cf0ac22fc9d05de559e52b8b53470c20ff",
+    "scientific_protocols": {
+      "research/hypotheses/hypothesis_framework.yaml": "25d65001f76f07d03c685384d7dc1572a7c59603363d033d5d80ff7820c5e432",
+      "research/research_design/data_evaluation_protocol.md": "fbc94e9a298973fc29d45672689a372e4c64f1ac17afb7f565448c9a08605715",
+      "research/research_design/maintenance_cost_scenarios.yaml": "c36743a2ebe40e56d972cf84fd7419ec938347181abc1aaae8a031e5140a9d79",
+      "research/research_design/statistical_inference_protocol.md": "6e70a67cb063b8aff03b0ec2e88292de7c62e696722060e99b7c560ab01d0a39",
+      "research/research_design/step09_confirmatory_config.json": "b56ff30c9214282a3cac55b94b0e2205001b0c5d6ea9ff6c5db5cb8a4774a76f",
+      "research/research_design/step09_confirmatory_protocol.md": "a1db333bcee5f15280540b23f1012093821572bbdd3149b302ce05b9341be88f",
+      "research/research_design/step09_control_selection.md": "385a011d654d880d9a795f09391fe362a762bee36f6bc035c97a4cfa5d5cd2fc"
+    },
+    "smoke_evidence_files": {
+      "bootstrap_draws_FD001.npz": "8c8f6a4ca76b0fb660ace977126c91809e4c6a0025c2a4949897f8830949a297",
+      "bootstrap_draws_FD002.npz": "818d11252f676747afd8471c5bca5c5aa1006d548869e5995c39e9051dfb5a33",
+      "bootstrap_draws_FD004.npz": "e0cf7d075d366faca7b121867ae03158e890d56935a3b04bb5d111c22eeec169",
+      "bootstrap_statistics_FD001.npz": "33a5d92b6b0ba8158e0927f7dc72c85be529a55df1d127c848369202b6e36636",
+      "bootstrap_statistics_FD002.npz": "744a1a4531ef2bbe1285e20c48e4cf6dba7fb3f0989a9be0a67ce13cbc00bd63",
+      "bootstrap_statistics_FD004.npz": "2889f45188205995b9b41ac100cb41325ddf802c184f5cefef3af801a2c7a8bf",
+      "bootstrap_statistics_RQ4.npz": "9171da5e9f2cefa9cfb8d0e55eedd3e37c269716c94b73d08b4daa1da7ec12dc",
+      "cell_summary.csv": "3cc8a859d9e5d7c9be16a7e913e523c881dd36f92b86735544445113b80253d7",
+      "component_evidence.csv": "e60d655fbebfd86e4c8144ec0e0cca533d3bee3e5054e9269bc8c9d3748a2421",
+      "contrast_intervals.csv": "dce74da43ece8834565d7aaa1dcba994195d388aca0574a1ef17400cab8e6328",
+      "decision_traces.csv": "0db95d1e487a77d2f0a62632a68f9e0c870e6534988c77b98ae07f837adf051e",
+      "engine_metrics.csv": "b0461ff1b5282ec4acb6ae876b91dfaeb240434dbb8479518d2d75bef73da5fe",
+      "engine_seed_outcomes.csv": "2316f59a165ea2aa72d513d0509894e13198fb42ffa71b259db8aa829aebf53c",
+      "execution_manifest.json": "02333cece043fbb576e475192b737b734e925b3c5a37deaccda6df65613eea35",
+      "interval_predictions.csv": "b14aba2e3cb8cf0061115a819fc4a63c4c000909b21c966fd3c6ae74f543638f",
+      "point_predictions.csv": "8072d570cebe9cb550011b0879ca90bc63fa2635f3fdc1b4c5861e35e9a006e6",
+      "subgroup_metrics.csv": "10e9a8daca739ea22e342c6814c5b4b45248c7e50d34199281ee4b168827e9b7"
+    },
+    "source_hashes": {
+      "scripts/audit_step09_freeze.py": "edeb2a3dbbcbba59357ef73a7b9775c3c3d7f4c8c929024e3acedd181dec4ded",
+      "scripts/run_step09_validation_smoke.py": "4ff266431e0ad108d23dbb139339d16e1aae104385d85d0ecf5c872ad2db836a",
+      "src/intellitwin/decision/controls.py": "f4a7babd2e8a2cc345276cae7948e8870f8af9db3e46fc631b1504834a6f2769",
+      "src/intellitwin/evaluation/artifacts.py": "091ba3e17df90dace87a68ec5e5b7e47f5fe886b8b6f615d9859113a0308ee23",
+      "src/intellitwin/evaluation/bootstrap.py": "3fcd9e460a521efe29de056e92c9cdf8dc1935e00a1edaba3c3a0f072deae29a",
+      "src/intellitwin/evaluation/decisions.py": "7a3be15ec9886b73f0b05fa3ce9a040597ace6db240c67201568d630d143308c",
+      "src/intellitwin/evaluation/evidence_schema.py": "582fd807f8fdb9b9ae66450cdc4c336df751d56c49f9977d041aa3d0bef76533",
+      "src/intellitwin/evaluation/inference.py": "38a4e136ab1d060db2900256617a9b1c13885a5871075631fe156fdcacac408b",
+      "src/intellitwin/evaluation/metrics.py": "ad7171e00a5d4d47788da426e84164deb387eff95068df1ef99b28d461bd8584",
+      "src/intellitwin/evaluation/reference_verification.py": "cc38d71a855e37031ccff44e0ca5b6c3aa00c4cce85c860d842bfdf43827a9bc",
+      "src/intellitwin/evaluation/regression_audit.py": "5091f67592be16001515aa75a3522dc4b66e683bd6a8f5c353622a4dfa96bee0",
+      "src/intellitwin/evaluation/runner.py": "f531dc85ce9f070202a30b9a5e6e00cea03033bab69fceb502ed635edf5d8f79",
+      "src/intellitwin/evaluation/schema.py": "a5f5618063501782f2982e357199bb8634b98d96d389e112b811e35c6838ce90",
+      "src/intellitwin/evaluation/validation.py": "09a05e2b79fc44d156b031f9d97ee54566a41658ea41f14c32402d7903fbd8e2",
+      "src/intellitwin/evaluation/verification.py": "427c744a98cb9c2b827a147ee908e2f6d8e43e0f16ff0587874e64677adde08d",
+      "src/intellitwin/provenance.py": "5d781f41df324236bd0e7ae4bfb7253c61fc758ce8ff73a2b20af8d4890c09c7",
+      "src/intellitwin/uncertainty/artifacts.py": "91e9344197b90830e48faa27aa7b5308bbef75d2765fb1434aa67004e6d21989",
+      "src/intellitwin/uncertainty/verification.py": "31933d24e8cc9f09de4b940a03fc4fbf7541118bf25f255e331c9cf0cf885b04",
+      "tests/test_pretest_reference_verification.py": "790e1d4c45454a1f77026161db58aa07bd8aba1caa78481a147e5c48ffecbea2"
+    },
+    "splits_and_quartiles": {
+      "data/splits/fd001_engine_split_seed_2026.json": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+      "data/splits/fd002_engine_split_seed_2026.json": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+      "data/splits/fd002_lifetime_quartile_provenance.json": "10e80c73ef6af621aff7194f24b71374a98d91aae84d1500c51d3195a331f33a",
+      "data/splits/fd004_engine_split_seed_2026.json": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2"
+    },
+    "step08_full_audit_sha256": "a7234fd2bbc911cd5c667af950013c70c12925beee9ccfb08ff01faeec9d508d",
+    "step08_selection_freeze_sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0",
+    "transitive_calibrators": {
+      "experiments/calibration/fitted/FD001/GBR/seed_2026/decision_aware_hcp/calibrator.json": "b4027c2f97e0b2baa68b489ec3957462c589ed74c8744bf259284733688318f3",
+      "experiments/calibration/fitted/FD001/GBR/seed_2026/global_hcp/calibrator.json": "1514713e36e6eea03ac441ecb93b462eb74788416ce0cf0f92a0929cb9a17c85",
+      "experiments/calibration/fitted/FD001/GBR/seed_2026/regime_hcp/calibrator.json": "b5e928d0fec93b2aaa3a3e5ef185abdb7646d84e9a46cf5b7ff535d771985793",
+      "experiments/calibration/fitted/FD001/GBR/seed_2027/decision_aware_hcp/calibrator.json": "c4429e6535bfdef510211817883827c7920d81a820298ff39c3a8ef07292bfdd",
+      "experiments/calibration/fitted/FD001/GBR/seed_2027/global_hcp/calibrator.json": "9c3add68f7e775954a44a647a8ea61bbf65b359bbfb602b6497a1e674071202b",
+      "experiments/calibration/fitted/FD001/GBR/seed_2027/regime_hcp/calibrator.json": "1b1c652f9366ac292e16c08c7b241c45ec9b18ae5bdbb9da15d54c34c76d684d",
+      "experiments/calibration/fitted/FD001/GBR/seed_2028/decision_aware_hcp/calibrator.json": "20a593a73da555890442e3dfbd513cd7fe62ba13266548b1e0a9c5d01e2e7f23",
+      "experiments/calibration/fitted/FD001/GBR/seed_2028/global_hcp/calibrator.json": "23c1d5d02bb04f425772b99b15a2b057f69a8567bbde2dab92c801e44b452ef8",
+      "experiments/calibration/fitted/FD001/GBR/seed_2028/regime_hcp/calibrator.json": "87b7901e6ebdff2b6467dd2c9b2373b9a41080d581a0c69367da2c8d20c300b5",
+      "experiments/calibration/fitted/FD001/GBR/seed_2029/decision_aware_hcp/calibrator.json": "e2039ce4950f2eecc7c80de9825bcece778d2762bfc894809ca2a0d4edc81d8d",
+      "experiments/calibration/fitted/FD001/GBR/seed_2029/global_hcp/calibrator.json": "4e9e24344682e668807e2fe2eca917044961a00c018f456c6253f744d80d382e",
+      "experiments/calibration/fitted/FD001/GBR/seed_2029/regime_hcp/calibrator.json": "a5797960c088749afd6bed14c7f4ad12225c5e4f8762340440ab34714d435116",
+      "experiments/calibration/fitted/FD001/GBR/seed_2030/decision_aware_hcp/calibrator.json": "3119412925997b25a6d46d81d78e674ed4f0d0d7603c834e932cef9e10b0b375",
+      "experiments/calibration/fitted/FD001/GBR/seed_2030/global_hcp/calibrator.json": "0f9135e70a0f18a6c2e13ebac2838eff7ade1b162afe3cd792545b77fe4dd539",
+      "experiments/calibration/fitted/FD001/GBR/seed_2030/regime_hcp/calibrator.json": "4450cc7b76e5a84e254f56c74ac9c4b1f3502f1c901f15fbb880f0d86fd923a7",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2026/decision_aware_hcp/calibrator.json": "41b9feeb8bca98eacc0c54ed7e07f7871a040a0e7e9b38ce77608620fce4982e",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2026/global_hcp/calibrator.json": "50dec984e5d39ac1d376954bb4eac930382051cbc40d3bf335dd59e9a79c41d1",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2026/regime_hcp/calibrator.json": "3830227c90f14f817dc4b53fb5f57d61b12f8e249cd9da7d6cfa383cf7ee4be8",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2027/decision_aware_hcp/calibrator.json": "64d71cdacabfd7b8d479e4757b8c50227b801159dfd90a548df692adf03a0873",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2027/global_hcp/calibrator.json": "5be52e2345a07a4c6042ba43f3bf104b0241ad0ad31e04237ec281ecf9d0472a",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2027/regime_hcp/calibrator.json": "295b45ae84fae3d153b4764656e33bdc68e1e2c8ee58c4d163de6d91cb92d3a7",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2028/decision_aware_hcp/calibrator.json": "83ee7050f9919684675d36e69f71c85e2c7a830ee2bf349fb90baf3ff5a39b48",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2028/global_hcp/calibrator.json": "fe05b3a1cd23bf7ce2ef87b85e98daf12efa1b90f981ca178abcbee0ea60d37f",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2028/regime_hcp/calibrator.json": "aecacaf4ea19c6445eab163e72b0b4054868e56cdc39479006df6d4125e76554",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2029/decision_aware_hcp/calibrator.json": "87e64c25bab1c9d916135725eb6c6e8d0f309e684e2386cc39f0e03752af62ed",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2029/global_hcp/calibrator.json": "c756123c338f5f4d1afc042260b07b704eada1bf1ea219ed490504bf6705b80c",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2029/regime_hcp/calibrator.json": "e2a73b6ec8f9f5c6eac25a51921c47595dfe41092d289ff3e69688381e135600",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2030/decision_aware_hcp/calibrator.json": "1fad30d1021d127582dfa65d55744f53c73190cd75ac61b42f6fe70e1fc4d9d7",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2030/global_hcp/calibrator.json": "ea360343dae954d9348975b52572543c65e1389238d771ac81f133dd0bf312c9",
+      "experiments/calibration/fitted/FD001/LSTM/seed_2030/regime_hcp/calibrator.json": "8093f96926754d419069b1b03419751ebd21bb75146b7bc41d6b2b464e5b3cb5",
+      "experiments/calibration/fitted/FD002/GBR/seed_2026/decision_aware_hcp/calibrator.json": "cf1af2b9f4f974e5200224ab4bdf3160cea47ae36ed24ff3af0f5b386b64050e",
+      "experiments/calibration/fitted/FD002/GBR/seed_2026/global_hcp/calibrator.json": "4a4738091b586f5dddc63b3319fdf792bcee15e86e3c7bad037eb9758bf7b023",
+      "experiments/calibration/fitted/FD002/GBR/seed_2026/regime_hcp/calibrator.json": "b45e3c20a5532d45242e4d14f4135e3fc3d87059121eea82ad5d1ed3786f6d32",
+      "experiments/calibration/fitted/FD002/GBR/seed_2027/decision_aware_hcp/calibrator.json": "40fb01e50d9ae5de093193d23c1462547581c8c9537856a9861dcb6b2c2ed1e0",
+      "experiments/calibration/fitted/FD002/GBR/seed_2027/global_hcp/calibrator.json": "d8d989f880a51798b4c61408d5699ffbb4020a491c274614321b8dacd210edd1",
+      "experiments/calibration/fitted/FD002/GBR/seed_2027/regime_hcp/calibrator.json": "bbedfb8f87e59136fea7bcdd5fca81e4335b811e02d89004e6934c5c8a2c33c4",
+      "experiments/calibration/fitted/FD002/GBR/seed_2028/decision_aware_hcp/calibrator.json": "c4e3c417f4dae0e8c29b2664b9605cc278baa1e9d82ad072e819361f0dfa9b79",
+      "experiments/calibration/fitted/FD002/GBR/seed_2028/global_hcp/calibrator.json": "05021844ed6c413c292e5e96c0caf1859d608971405b59ed68574cf2b9702fdd",
+      "experiments/calibration/fitted/FD002/GBR/seed_2028/regime_hcp/calibrator.json": "8b0f96264b56b35e2de64c3ac4e584a6e1087a825cb9dc23205325d8fb3f3fae",
+      "experiments/calibration/fitted/FD002/GBR/seed_2029/decision_aware_hcp/calibrator.json": "ace24199c5421f02010dbe8a6b4e5e253337f634692fde4803ab3a5f4b06b521",
+      "experiments/calibration/fitted/FD002/GBR/seed_2029/global_hcp/calibrator.json": "95c88f52d6d048cb88802855792531aad10de4662a2e6c66dc44d8711fa64b2e",
+      "experiments/calibration/fitted/FD002/GBR/seed_2029/regime_hcp/calibrator.json": "ab8c90fe07df2347dddb41ef6d48e765a7d345ba9ede517076512d83abc39e68",
+      "experiments/calibration/fitted/FD002/GBR/seed_2030/decision_aware_hcp/calibrator.json": "2c823826bc28e5cc3e6ab4d5851c13013c91528039625a4b64c2f2adad617114",
+      "experiments/calibration/fitted/FD002/GBR/seed_2030/global_hcp/calibrator.json": "92a1bba3500ff010c7ebc3bec4cf5aa92c0eb1587427fc5abd724ed6be493c06",
+      "experiments/calibration/fitted/FD002/GBR/seed_2030/regime_hcp/calibrator.json": "6761b0dd31e1084227ec5b604203d1fcf44f571673416d6a817b7675461994ba",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2026/decision_aware_hcp/calibrator.json": "bba93040a44f85507cee8f57594d3943cd374cd097413daca8f404084db66460",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2026/global_hcp/calibrator.json": "c3323f2bedefde6e377fdb1ebdf5487341992095b5f56779a7d31cb8ada27adf",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2026/regime_hcp/calibrator.json": "db2c0afa35c4c0ba254fd467518bd80090ec35148b6c9fd7e6c48e32dbbc38fb",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2027/decision_aware_hcp/calibrator.json": "ee0ffd9b3b2d3c4acf4942a24cc1d3433010353e9744e5fcefeb182a48c50616",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2027/global_hcp/calibrator.json": "c5abaa9715c78256a3047ec0df0b0d656d305bb7c5313f84c19e2c5e32dcd755",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2027/regime_hcp/calibrator.json": "3cd9fd071ef1e6dd46592b0096664b2cb214451b63b4a4a4260901c2a360b252",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2028/decision_aware_hcp/calibrator.json": "62938cc30a6777904453acf926bed655b42155b402e510b954333ddf3fa21dd6",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2028/global_hcp/calibrator.json": "79903d9513a703cdc4dfbd60626dd9be17d844d29897c7167300dea5e51807ef",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2028/regime_hcp/calibrator.json": "3240dbf251e6175c37573e7faa75880c620fa14ad33879e09475c52551a09a48",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2029/decision_aware_hcp/calibrator.json": "47fc6584ea7b38d4daf93c66259ee8317cc77dc6a04642dd2d6167da13252793",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2029/global_hcp/calibrator.json": "4feea38d515ff5e9cc1fd061aa51059999bea4f420401a1fa485457412489674",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2029/regime_hcp/calibrator.json": "35d217ad1ff711bf9401b7f9a4e91ce8c7b7f25b646c29474545a323cda07a2b",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2030/decision_aware_hcp/calibrator.json": "1c23fc88fe9db2ae417dcba12b8e6d4df58a9821de2bb8dc43bafb07fd24c79f",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2030/global_hcp/calibrator.json": "981b3f34a177fe79a6b20aa168c085297479cbd4f1a41b3008ecad20f7ae0169",
+      "experiments/calibration/fitted/FD002/LSTM/seed_2030/regime_hcp/calibrator.json": "cde556d4a57abc61ee213724f652bf0cc2cb08e1c0c784692ce3b788ebd8b06d",
+      "experiments/calibration/fitted/FD004/GBR/seed_2026/decision_aware_hcp/calibrator.json": "5b1759051fa8595d36a086d5db7508a923421c17f89d697305431ba4bd16b73b",
+      "experiments/calibration/fitted/FD004/GBR/seed_2026/global_hcp/calibrator.json": "82f33d6619c1d874a1824258f8c90e161f1fa9c9f7e51d41e555ac827d2c27a3",
+      "experiments/calibration/fitted/FD004/GBR/seed_2026/regime_hcp/calibrator.json": "0c438810ef53cf43bdd64ab1d84cba9c7424889fab0e9866ace6955b3c1aff26",
+      "experiments/calibration/fitted/FD004/GBR/seed_2027/decision_aware_hcp/calibrator.json": "a4b286364d453b4e255fd0b3e242bb5c3bdeabcec0d5db6d74c02eabe4545dc6",
+      "experiments/calibration/fitted/FD004/GBR/seed_2027/global_hcp/calibrator.json": "6cb5caee766e2a0f5643711c92f65e12ef6538a4952ef6cd3c6f31e7b6bd8984",
+      "experiments/calibration/fitted/FD004/GBR/seed_2027/regime_hcp/calibrator.json": "cb4e62e6e275a061adce824552a0b9f96bbc50b20182beac9e7fcec77cf07788",
+      "experiments/calibration/fitted/FD004/GBR/seed_2028/decision_aware_hcp/calibrator.json": "35201bc009683d163f957c408567458fdd6b096cdfc5877e69c13732d3083f2e",
+      "experiments/calibration/fitted/FD004/GBR/seed_2028/global_hcp/calibrator.json": "00385e0f9cdf67065602dee2e39d4b1211ffde3b64424a43d6defe9b4e79728d",
+      "experiments/calibration/fitted/FD004/GBR/seed_2028/regime_hcp/calibrator.json": "34da1cd4b581e5cd92040785a359b631932cc9fac4c1742b474f8727fb939d97",
+      "experiments/calibration/fitted/FD004/GBR/seed_2029/decision_aware_hcp/calibrator.json": "8e49ae6728b66f0a7c51b4ab6291b66ecddd7cb3f1fadd44ede6f461fc642258",
+      "experiments/calibration/fitted/FD004/GBR/seed_2029/global_hcp/calibrator.json": "c75ed4fe8063d1f558f8ed6443829bf5f45d263805edf5368ecd9cbd7acf2fcb",
+      "experiments/calibration/fitted/FD004/GBR/seed_2029/regime_hcp/calibrator.json": "4bcb91ecdd2b5b3d000c246bcec97569eb8182d29faacd46f6a2ab5b5c81ea39",
+      "experiments/calibration/fitted/FD004/GBR/seed_2030/decision_aware_hcp/calibrator.json": "5e223d886ba1e7b4dd2cad2a567de5ca019229d1929f8588c5a1c1c6c0842949",
+      "experiments/calibration/fitted/FD004/GBR/seed_2030/global_hcp/calibrator.json": "cbf683b69deff0ba5e3b310964a683e98ec1ceeffcba290bd65138e7da7146d5",
+      "experiments/calibration/fitted/FD004/GBR/seed_2030/regime_hcp/calibrator.json": "e5611257bcc818a4733fef03cf1fe3e3e141a323a762fd3c17935d026d33e06a",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2026/decision_aware_hcp/calibrator.json": "c8c66a93474a8c6de990bfea7f3101bed03e6580156a970291bb410845545b64",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2026/global_hcp/calibrator.json": "bcaffaa384eb3e66d0d51cd439ca5e005d808a044d418be4418e95ac460fc805",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2026/regime_hcp/calibrator.json": "c21d504a808462989187985627cd2372106f5ab893cd7692c4a92ad6f8602c4d",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2027/decision_aware_hcp/calibrator.json": "4373696305960c418918fa51a5532a72c776dd04d5fa241882a5c4c14e3e1ad7",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2027/global_hcp/calibrator.json": "0bb52065a86335ae4659e8828292c42f98c397d39e0ecfb1236397d8586e1ace",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2027/regime_hcp/calibrator.json": "6ed29f195c1f93854fa1980e238e6545cd157f76a755b9b29093d67a8bc6c58e",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2028/decision_aware_hcp/calibrator.json": "687ab48d9337dd4493ceb34a369572978c264e5ecdf8b841cbf78a10fb42ced2",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2028/global_hcp/calibrator.json": "2e5cf28b1ca87af1c2a73439135bd4e78eec483e76dbc3a69d1ba896cbe87162",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2028/regime_hcp/calibrator.json": "2ca83bd3c186226a9e3b728625e8f60a7acb1a158aab88a4af72f9d73fc1f949",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2029/decision_aware_hcp/calibrator.json": "d947523d004429f38549e1373065124e10cb425abd91cde89d350a5c2a1344cc",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2029/global_hcp/calibrator.json": "365f5f6eb70a17cbf6568acd8b9456c5d9f1470a945be49d404e23e936e7373a",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2029/regime_hcp/calibrator.json": "86330b1918f053d8acf14f23ca79b0bfa589c693703aea8b68812e3b8b013ce8",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2030/decision_aware_hcp/calibrator.json": "74779db7daad63bde80c77a177f84019cc8c1b28c17b682d723dcd079672bc78",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2030/global_hcp/calibrator.json": "61415c1b9beadc3ef174d40652369f1253781ca14641d5c4421f36b85f95818b",
+      "experiments/calibration/fitted/FD004/LSTM/seed_2030/regime_hcp/calibrator.json": "90c6aa0a65c83fe65ac51168f166813d84147f7fb7ea3c726359700061346dd3"
+    },
+    "transitive_checkpoints": {
+      "experiments/base_models/FD001/GBR/seed_2026/checkpoint": "69d2dff2370cf80cac5e7486c8db8c809a574ef92235e611b34037e19aa496be",
+      "experiments/base_models/FD001/GBR/seed_2027/checkpoint": "1e4330c72a16dfb13f989352a62e31a5dd8414b22edbfde677e4b3a17d4b62bb",
+      "experiments/base_models/FD001/GBR/seed_2028/checkpoint": "ee36b46ac0061dea40efe5a31247c0aae864971fd2b390bdd8c1a27fa68e4216",
+      "experiments/base_models/FD001/GBR/seed_2029/checkpoint": "2dc62056f3169888e3d6653c75a869073cffa4f11166580703ebc5443ad76983",
+      "experiments/base_models/FD001/GBR/seed_2030/checkpoint": "7e384e70ef5293b5d8e3ab4b2721b279f08920f09f928424d1e750631b79aa74",
+      "experiments/base_models/FD001/LSTM/seed_2026/checkpoint": "73d86fd8e4db64709a22259a6c4ee40bd9e748b2d507991270936515ed4ded36",
+      "experiments/base_models/FD001/LSTM/seed_2027/checkpoint": "d61ec08776aec2f3dac286450e69c91fd168dd4396d7336ef4cd3d432bb300dd",
+      "experiments/base_models/FD001/LSTM/seed_2028/checkpoint": "f954ae2cff91319a8cc5ff46b603afa34e907bee414e6295eb79bd9b4fc3a73f",
+      "experiments/base_models/FD001/LSTM/seed_2029/checkpoint": "a73afd2451b12e2beb368fa06570aa731fe8c194926b17810d08a4ebfa1c764f",
+      "experiments/base_models/FD001/LSTM/seed_2030/checkpoint": "6c110a9239450516d06288de97f888895dfb72834c1e51dc96ece22e7caf19f8",
+      "experiments/base_models/FD002/GBR/seed_2026/checkpoint": "6df41d7547bbea4549791faa05e85f78adadc28a4fb12d84228824c5984fe12b",
+      "experiments/base_models/FD002/GBR/seed_2027/checkpoint": "a63fa9abc22c49ff8386a8114651cf7eb065d597b466539b2e75a260f8fa2887",
+      "experiments/base_models/FD002/GBR/seed_2028/checkpoint": "11515a43318d7e54870369c4b37bb403f60e5622415af30bcde4d23ac9e261e2",
+      "experiments/base_models/FD002/GBR/seed_2029/checkpoint": "57be69eebe5c27edd08e5dd569a3f236586855bef3755a70f1dc03e319948eb2",
+      "experiments/base_models/FD002/GBR/seed_2030/checkpoint": "24374450b8b24cf5ebff7a3175b5e35025454ba2f6ae40fc9e7d4ade1e6680f8",
+      "experiments/base_models/FD002/LSTM/seed_2026/checkpoint": "3d1fa2a6f20ec664e783117c2f3979ae337ddafaaa530b9b0113e740f4c48ee1",
+      "experiments/base_models/FD002/LSTM/seed_2027/checkpoint": "f70e37ab4c4ce365e491f1dca1f87524304f5c734a52850edcb1e8c0b23880a3",
+      "experiments/base_models/FD002/LSTM/seed_2028/checkpoint": "eef24ad0b01ed715c1c2aac50b48840b7cd988328066da4bb90a2e5e8037f1d8",
+      "experiments/base_models/FD002/LSTM/seed_2029/checkpoint": "75c965c9c3046a51784540470bf7d4d6489c92eb6bed70b1a9e6a6687c2d66a2",
+      "experiments/base_models/FD002/LSTM/seed_2030/checkpoint": "284890fc6be5e71d9b239f1984756cf03c2d52c02a4cc4dcff11e45c70151edb",
+      "experiments/base_models/FD004/GBR/seed_2026/checkpoint": "006ac6d591749a6a7e878500ae6722f0c95124c11e2e6a1ec38921a95b54bcb3",
+      "experiments/base_models/FD004/GBR/seed_2027/checkpoint": "763085387e27db4ca70ff424a5f7370f81e4bedc872630c1cf1ab2a258843b65",
+      "experiments/base_models/FD004/GBR/seed_2028/checkpoint": "7f166d88a3eaa1a2b2fbc507dd860d0962aefb2014efe8947c6d7661db865a82",
+      "experiments/base_models/FD004/GBR/seed_2029/checkpoint": "82b9fdbe0b139397a9e43d224ad0f6d7f13e752d4824897c566f4a89fd26ecb1",
+      "experiments/base_models/FD004/GBR/seed_2030/checkpoint": "200b1d8fe1241c498d3e7636604ecad9db7f17a626df74af62f7541f99ae6e7f",
+      "experiments/base_models/FD004/LSTM/seed_2026/checkpoint": "31b5e180de43640ef6aded1144b98e07731c0d71bf68504f6bfbdeee1881402a",
+      "experiments/base_models/FD004/LSTM/seed_2027/checkpoint": "d1bfd82f8a43685dfba3b4243d3e73f678bdf39b022a9fe44c0e47a3cdb5248b",
+      "experiments/base_models/FD004/LSTM/seed_2028/checkpoint": "df42a2f8023d593ae5c76e3ad5b5c6fb042160651db95ec1758f54f53774416e",
+      "experiments/base_models/FD004/LSTM/seed_2029/checkpoint": "28b2161e85caa16eb4bc6db73d1f97b44431e5a69340dfd85b1cd247766a9a30",
+      "experiments/base_models/FD004/LSTM/seed_2030/checkpoint": "2c19dcad5f3d940632192012e98bc1da0cbcf5f37fc2d27ef49fe32d77968984"
+    },
+    "transitive_preprocessors": {
+      "experiments/preprocessing/FD001/preprocessor.json": "6f88491a46e2a0b5f8955df85a71e991f1cffc600c5e8becb713a1520b1e1c0a",
+      "experiments/preprocessing/FD002/preprocessor.json": "cef04b8dafc4c9f53aba7c6bcb0bc67fc981540abdafadc76fafa314684d856c",
+      "experiments/preprocessing/FD004/preprocessor.json": "fdfa4c0284c38554f8b8026c27c71f56ebd9c157a47f9acd2baf9ae34cbe0502"
+    }
+  },
+  "confirmatory_configuration": {
+    "config_path": "research/research_design/step09_confirmatory_config.json",
+    "config_sha256": "b56ff30c9214282a3cac55b94b0e2205001b0c5d6ea9ff6c5db5cb8a4774a76f",
+    "payload": {
+      "configuration_counts": {
+        "control_configurations": 120,
+        "primary_method_configurations": 810,
+        "total_matrix_configurations": 930
+      },
+      "controls_rq3": {
+        "dataset": "FD002",
+        "named_controls": [
+          "matched_width_interval",
+          "widened_interval",
+          "point_safety_margin",
+          "earlier_intervention"
+        ],
+        "nominal_coverage": 0.9,
+        "selected_parameters": {
+          "GBR": {
+            "earlier_intervention": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "h",
+              "parameter_value": 1
+            },
+            "matched_width_interval": {
+              "interval_source": "global_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 0.92
+            },
+            "point_safety_margin": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "m",
+              "parameter_value": 5
+            },
+            "widened_interval": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 1.0
+            }
+          },
+          "LSTM": {
+            "earlier_intervention": {
+              "interval_source": "global_hcp",
+              "parameter_name": "h",
+              "parameter_value": 1
+            },
+            "matched_width_interval": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 0.9
+            },
+            "point_safety_margin": {
+              "interval_source": "regime_hcp",
+              "parameter_name": "m",
+              "parameter_value": 4
+            },
+            "widened_interval": {
+              "interval_source": "global_hcp",
+              "parameter_name": "lambda",
+              "parameter_value": 1.0
+            }
+          }
+        },
+        "selection_scope": "FD002 validation partition across 5 seeds jointly"
+      },
+      "cost_scenarios": {
+        "failure_sensitive": {
+          "c_fail": 10.0,
+          "c_pm": 1.0,
+          "c_waste": 0.2,
+          "r_equal": 45.0,
+          "role": "descriptive_sensitivity"
+        },
+        "primary_reference": {
+          "c_fail": 5.0,
+          "c_pm": 1.0,
+          "c_waste": 0.2,
+          "r_equal": 20.0,
+          "role": "confirmatory_decision"
+        },
+        "waste_sensitive": {
+          "c_fail": 5.0,
+          "c_pm": 1.0,
+          "c_waste": 0.4,
+          "r_equal": 10.0,
+          "role": "descriptive_sensitivity"
+        }
+      },
+      "coverages": {
+        "all_coverages": [
+          0.8,
+          0.9,
+          0.95
+        ],
+        "confirmatory_primary": 0.9,
+        "descriptive_secondary": [
+          0.8,
+          0.95
+        ]
+      },
+      "dataset_matrix": {
+        "confirmatory_datasets": [
+          "FD001",
+          "FD002",
+          "FD004"
+        ],
+        "excluded_datasets": [
+          "FD003"
+        ]
+      },
+      "hypothesis_margins": {
+        "delta_cost_margin_scu": 0.2,
+        "delta_error_margin": 0.01,
+        "interval_score_noninferiority_margin_cycles": 1.0,
+        "max_absolute_coverage_error": 0.05,
+        "mpiw_noninferiority_margin_cycles": 1.0,
+        "robustness_cost_harm_margin_scu": -0.2,
+        "robustness_error_harm_margin": -0.01
+      },
+      "maintenance_policy": {
+        "decision_window": "endpoints 30 through T-1",
+        "evaluation_window": "endpoints 30 through T",
+        "primary_policy": "lower_bound_one_cycle_policy",
+        "rule": "MAINTAIN_NOW iff lower_rul <= 1.0, else CONTINUE"
+      },
+      "methods": {
+        "baselines": [
+          "global_hcp",
+          "regime_hcp"
+        ],
+        "primary_methods": [
+          "global_hcp",
+          "regime_hcp",
+          "decision_aware_hcp"
+        ],
+        "proposed_method": "decision_aware_hcp"
+      },
+      "model_matrix": {
+        "model_families": [
+          "GBR",
+          "LSTM"
+        ],
+        "seeds": [
+          2026,
+          2027,
+          2028,
+          2029,
+          2030
+        ]
+      },
+      "protocol_version": "step09-v1",
+      "schema_version": "step09-config-v1",
+      "statistical_inference": {
+        "bootstrap_replicates": 10000,
+        "decision_quantile_interval": [
+          0.00625,
+          0.99375
+        ],
+        "descriptive_quantile_interval": [
+          0.025,
+          0.975
+        ],
+        "quantile_interpolation": "linear",
+        "rng_algorithm": "PCG64",
+        "seed_sequence_formula": "[2026, 6, dataset_number]",
+        "subgroup_min_engines": 10
+      }
+    }
+  },
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py",
+      "--source-evidence-dir",
+      "experiments/pretest_verification_v3",
+      "--verification-dir",
+      "experiments/pretest_verification_v5",
+      "--logical-output-dir",
+      "experiments/pretest_verification_v5",
+      "--checkpoint-evidence-dir",
+      "experiments/checkpoint_verification_v1",
+      "--output-dir",
+      "C:\\Users\\shiks\\AppData\\Local\\Temp\\v5_official_staging"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.4.4",
+      "pandas": "3.0.2",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.8.0",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-22T15:33:03.168193+00:00"
+  },
+  "freeze_timestamp_utc": "2026-10-22T15:35:33.625631+00:00",
+  "git_dirty": false,
+  "held_out_status": {
+    "confirmatory_conclusions": "PENDING",
+    "execution_status": "NOT_STARTED",
+    "test_windows_prepared": false
+  },
+  "logical_bundle_path": "experiments/pretest_verification_v5",
+  "matrix_counts": {
+    "bootstrap_replicates": 10000,
+    "cell_summary_rows": 186,
+    "component_evidence_rows": 152,
+    "control_configurations": 120,
+    "outcome_rows": 19590,
+    "primary_configurations": 810,
+    "total_configurations": 930
+  },
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-freeze-v5",
+  "selected_controls": {
+    "GBR": {
+      "earlier_intervention": {
+        "achieved_mpiw": 119.49305962459299,
+        "boundary_selection": true,
+        "control_family": "earlier_intervention",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 14.899999999999999,
+          "mean_wasted_rul": 69.5,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 69.5
+        },
+        "parameter_name": "h",
+        "parameter_value": 1
+      },
+      "matched_width_interval": {
+        "achieved_mpiw": 111.22016471457295,
+        "boundary_selection": false,
+        "control_family": "matched_width_interval",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 13.992307692307692,
+          "mean_wasted_rul": 64.96153846153847,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 64.96153846153847
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 0.92,
+        "target_mpiw": 111.47487562643208,
+        "width_diff": 0.2547109118591351,
+        "width_matched_verified": true
+      },
+      "point_safety_margin": {
+        "boundary_selection": false,
+        "control_family": "point_safety_margin",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.11538461538461539,
+          "fleet_early_pm_rate": 0.038461538461538464,
+          "mean_cost": 2.7461538461538457,
+          "mean_wasted_rul": 6.423076923076923,
+          "pm_only_early_pm_rate": 0.043478260869565216,
+          "pm_rate": 0.8846153846153846,
+          "pm_wasted_rul_mean": 7.260869565217392
+        },
+        "parameter_name": "m",
+        "parameter_value": 5
+      },
+      "widened_interval": {
+        "achieved_mpiw": 119.49305962459299,
+        "boundary_selection": true,
+        "control_family": "widened_interval",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 14.899999999999999,
+          "mean_wasted_rul": 69.5,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 69.5
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 1.0
+      }
+    },
+    "LSTM": {
+      "earlier_intervention": {
+        "achieved_mpiw": 120.65230484693909,
+        "boundary_selection": true,
+        "control_family": "earlier_intervention",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 18.052307692307696,
+          "mean_wasted_rul": 85.26153846153846,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 85.26153846153846
+        },
+        "parameter_name": "h",
+        "parameter_value": 1
+      },
+      "matched_width_interval": {
+        "achieved_mpiw": 110.1206237005312,
+        "boundary_selection": false,
+        "control_family": "matched_width_interval",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 16.39846153846154,
+          "mean_wasted_rul": 76.9923076923077,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 76.99230769230769
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 0.9,
+        "target_mpiw": 110.06243104300574,
+        "width_diff": 0.05819265752545277,
+        "width_matched_verified": true
+      },
+      "point_safety_margin": {
+        "boundary_selection": false,
+        "control_family": "point_safety_margin",
+        "interval_source": "regime_hcp",
+        "metrics": {
+          "failure_rate": 0.08461538461538462,
+          "fleet_early_pm_rate": 0.0,
+          "mean_cost": 2.3846153846153846,
+          "mean_wasted_rul": 5.230769230769231,
+          "pm_only_early_pm_rate": 0.0,
+          "pm_rate": 0.9153846153846155,
+          "pm_wasted_rul_mean": 5.714285714285714
+        },
+        "parameter_name": "m",
+        "parameter_value": 4
+      },
+      "widened_interval": {
+        "achieved_mpiw": 120.65230484693909,
+        "boundary_selection": true,
+        "control_family": "widened_interval",
+        "interval_source": "global_hcp",
+        "metrics": {
+          "failure_rate": 0.0,
+          "fleet_early_pm_rate": 1.0,
+          "mean_cost": 18.052307692307696,
+          "mean_wasted_rul": 85.26153846153846,
+          "pm_only_early_pm_rate": 1.0,
+          "pm_rate": 1.0,
+          "pm_wasted_rul_mean": 85.26153846153846
+        },
+        "parameter_name": "lambda",
+        "parameter_value": 1.0
+      }
+    }
+  },
+  "source_evidence_dir": "experiments/pretest_verification_v3",
+  "source_execution_commit": "e0ea919e670d4c2d522049da5ece7230fc66df90",
+  "status": "PRETEST_FROZEN"
+}
