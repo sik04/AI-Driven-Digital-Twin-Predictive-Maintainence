@@ -10,6 +10,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+
 from intellitwin.data.artifacts import compute_sha256
 from intellitwin.evaluation.regression_audit import execute_regression_audit
 from intellitwin.evaluation.schema import (
@@ -28,6 +32,7 @@ from intellitwin.provenance import (
     write_immutable_json,
 )
 from intellitwin.uncertainty.artifacts import resolve_repo_relative_path
+from scripts.verify_checkpoint_environment import collect_protected_input_paths
 
 FROZEN_SCIENTIFIC_PROTOCOLS: tuple[str, ...] = (
     "research/hypotheses/hypothesis_framework.yaml",
@@ -218,19 +223,103 @@ def verify_partner_checkpoint_evidence(
     env_p = cp_dir / "environment_verification.json"
     with open(env_p, encoding="utf-8") as f:
         env_data = json.load(f)
-    env_pass = env_data.get("status") == "PASS" or env_data.get("overall_status") == "PASS"
-    clean_exec = env_data.get("clean_source_execution", not env_data.get("git_dirty", True))
-    checks["environment_verification"] = {
-        "status": "PASS" if env_pass else "FAIL",
-        "clean_source_execution": clean_exec,
-        "env_pass": env_pass,
-    }
-    if not env_pass:
-        failing_reasons.append("Partner environment verification did not report PASS")
-    if not clean_exec:
+
+    # Require BOTH environment status fields to be PASS
+    env_st = env_data.get("status")
+    env_overall_st = env_data.get("overall_status")
+    dual_status_pass = env_st == "PASS" and env_overall_st == "PASS"
+    if not dual_status_pass:
         failing_reasons.append(
-            "Partner evidence was not executed from clean source (git_dirty=True)"
+            f"Partner environment verification status must be PASS for both status ('{env_st}') "
+            f"and overall_status ('{env_overall_st}')"
         )
+
+    # Require clean_source_execution=true AND git_dirty=false
+    clean_source_exec = env_data.get("clean_source_execution")
+    git_dirty_val = env_data.get("git_dirty")
+    clean_exec_pass = clean_source_exec is True and git_dirty_val is False
+    if clean_source_exec is not True:
+        failing_reasons.append(
+            "Partner environment verification clean_source_execution must be true, "
+            f"got {clean_source_exec}"
+        )
+    if git_dirty_val is not False:
+        failing_reasons.append(
+            f"Partner environment verification git_dirty must be false, got {git_dirty_val}"
+        )
+
+    # Require environment_match=true, expected_versions=actual_versions,
+    # pip_check_exit_code=0, sklearn_inconsistent_version_warning_count=0,
+    # protected_inputs_unchanged=true, and empty error/warning details.
+    env_match = env_data.get("environment_match")
+    if env_match is not True:
+        failing_reasons.append(f"Partner environment_match must be true, got {env_match}")
+
+    exp_vers = env_data.get("expected_versions")
+    act_vers = env_data.get("actual_versions")
+    if (
+        not isinstance(exp_vers, dict)
+        or not isinstance(act_vers, dict)
+        or exp_vers != act_vers
+        or not exp_vers
+    ):
+        failing_reasons.append(
+            "Partner expected_versions must equal actual_versions and be non-empty "
+            f"(expected={exp_vers}, actual={act_vers})"
+        )
+
+    pip_code = env_data.get("pip_check_exit_code")
+    if pip_code != 0:
+        failing_reasons.append(f"Partner pip_check_exit_code must be 0, got {pip_code}")
+
+    sk_warn_count = env_data.get("sklearn_inconsistent_version_warning_count")
+    if sk_warn_count != 0:
+        failing_reasons.append(
+            f"Partner sklearn_inconsistent_version_warning_count must be 0, got {sk_warn_count}"
+        )
+
+    prot_unchanged = env_data.get("protected_inputs_unchanged")
+    if prot_unchanged is not True:
+        failing_reasons.append(
+            f"Partner environment protected_inputs_unchanged must be true, got {prot_unchanged}"
+        )
+
+    err_details = env_data.get("error_details")
+    if not isinstance(err_details, list) or len(err_details) != 0:
+        failing_reasons.append(
+            f"Partner environment error_details must be an empty list, got {err_details}"
+        )
+
+    warn_details = env_data.get("warning_details")
+    if not isinstance(warn_details, list) or len(warn_details) != 0:
+        failing_reasons.append(
+            f"Partner environment warning_details must be an empty list, got {warn_details}"
+        )
+
+    env_check_passed = (
+        dual_status_pass
+        and clean_exec_pass
+        and (env_match is True)
+        and (exp_vers == act_vers and isinstance(exp_vers, dict) and bool(exp_vers))
+        and pip_code == 0
+        and sk_warn_count == 0
+        and (prot_unchanged is True)
+        and isinstance(err_details, list)
+        and len(err_details) == 0
+        and isinstance(warn_details, list)
+        and len(warn_details) == 0
+    )
+    checks["environment_verification"] = {
+        "status": "PASS" if env_check_passed else "FAIL",
+        "dual_status_pass": dual_status_pass,
+        "clean_source_execution": clean_source_exec is True,
+        "git_dirty": git_dirty_val is False,
+        "environment_match": env_match is True,
+        "versions_match": exp_vers == act_vers,
+        "pip_check_exit_code": pip_code,
+        "warning_count": sk_warn_count,
+        "protected_inputs_unchanged": prot_unchanged is True,
+    }
 
     # 2. Execution Log for InconsistentVersionWarning
     log_p = cp_dir / "execution.log"
@@ -241,8 +330,21 @@ def verify_partner_checkpoint_evidence(
     if has_warning:
         failing_reasons.append("sklearn InconsistentVersionWarning detected in execution.log")
 
-    # 3. Step 8 Full Audit (60 records, max diff <= 1e-4)
+    # 3. Step 8 Full Audit Report
     s8_p = cp_dir / "step08_full_audit.json"
+    with open(s8_p, encoding="utf-8") as f:
+        s8_data = json.load(f)
+
+    # Require full Step-8 report overall_status=PASS and no checks_not_run
+    s8_overall = s8_data.get("overall_status")
+    if s8_overall != "PASS":
+        failing_reasons.append(f"Partner Step-8 overall_status must be PASS, got '{s8_overall}'")
+
+    s8_not_run = s8_data.get("checks_not_run")
+    if not isinstance(s8_not_run, list) or len(s8_not_run) != 0:
+        failing_reasons.append(f"Partner Step-8 checks_not_run must be empty, got {s8_not_run}")
+
+    # 60 records dataset/model/seed/partition check, individual PASS, max diff <= 1e-4
     s8_res = verify_step08_report_records(s8_p)
     checks["step08_reproduction_records"] = s8_res
     if not s8_res.get("match", False):
@@ -251,37 +353,131 @@ def verify_partner_checkpoint_evidence(
             f"max_err={s8_res.get('max_absolute_error')}"
         )
 
-    # 4. Input Manifest Unchanged Frozen Inputs
+    # Source-execution SHA agreement between environment report and full audit reconstruction
+    env_commit = env_data.get("source_execution_commit")
+    s8_recon = s8_data.get("current_reconstruction")
+    s8_commit = s8_recon.get("git_commit") if isinstance(s8_recon, dict) else None
+    if not env_commit or not s8_commit or env_commit != s8_commit:
+        failing_reasons.append(
+            "Partner source-execution SHA mismatch: "
+            f"environment commit '{env_commit}' != Step-8 audit commit '{s8_commit}'"
+        )
+    checks["source_execution_sha_agreement"] = {
+        "match": bool(env_commit and s8_commit and env_commit == s8_commit),
+        "environment_commit": env_commit,
+        "step08_commit": s8_commit,
+    }
+
+    # 4. Input Manifest Verification of ALL protected inputs
     input_p = cp_dir / "input_manifest.json"
     with open(input_p, encoding="utf-8") as f:
         in_manifest = json.load(f)
 
-    manifest_match = True
-    manifest_mismatches: list[str] = []
-    splits_declared = in_manifest.get("protected_inputs", {}).get("splits_and_quartiles", {})
-    for split_file, declared_h in splits_declared.items():
-        curr_p = resolve_repo_relative_path(base, split_file)
-        if not curr_p.exists() or compute_sha256(curr_p) != declared_h:
-            manifest_match = False
-            manifest_mismatches.append(split_file)
-
-    checks["frozen_inputs_match"] = {
-        "match": manifest_match,
-        "mismatches": manifest_mismatches,
-    }
-    if not manifest_match:
+    # Require manifest clean-source flags and pre_post_comparison to confirm unchanged inputs
+    manifest_clean = in_manifest.get("clean_source_execution")
+    manifest_dirty = in_manifest.get("git_dirty")
+    if manifest_clean is not True or manifest_dirty is not False:
         failing_reasons.append(
-            f"Partner input manifest has mismatched frozen inputs: {manifest_mismatches}"
+            "Partner input manifest must have clean_source_execution=true and git_dirty=false "
+            f"(got clean={manifest_clean}, dirty={manifest_dirty})"
         )
 
-    all_ok = (
-        len(failing_reasons) == 0
-        and env_pass
-        and clean_exec
-        and not has_warning
-        and s8_res.get("match", False)
-        and manifest_match
-    )
+    pre_post = in_manifest.get("pre_post_comparison")
+    if not isinstance(pre_post, dict) or pre_post.get("protected_inputs_unchanged") is not True:
+        failing_reasons.append(
+            "Partner input manifest pre_post_comparison must have protected_inputs_unchanged=true"
+        )
+    if (
+        not isinstance(pre_post, dict)
+        or not isinstance(pre_post.get("mismatches"), list)
+        or len(pre_post.get("mismatches", [])) != 0
+    ):
+        mismatches_val = pre_post.get("mismatches") if isinstance(pre_post, dict) else None
+        failing_reasons.append(
+            "Partner input manifest pre_post_comparison mismatches must be empty, "
+            f"got {mismatches_val}"
+        )
+
+    # Protected inputs inventory check using collect_protected_input_paths
+    expected_inventory_paths = collect_protected_input_paths(base)
+    expected_categories = set(expected_inventory_paths.keys())
+
+    manifest_inputs = in_manifest.get("protected_inputs")
+    if not isinstance(manifest_inputs, dict) or len(manifest_inputs) == 0:
+        failing_reasons.append("Partner input manifest protected_inputs is missing or empty")
+        manifest_inputs = {}
+
+    manifest_categories = set(manifest_inputs.keys())
+    if manifest_categories != expected_categories:
+        missing_cats = expected_categories - manifest_categories
+        extra_cats = manifest_categories - expected_categories
+        failing_reasons.append(
+            f"Partner input manifest category mismatch: missing={missing_cats}, extra={extra_cats}"
+        )
+
+    manifest_match = True
+    manifest_mismatches: list[str] = []
+    total_files_checked = 0
+
+    for cat, exp_paths in expected_inventory_paths.items():
+        cat_declared = manifest_inputs.get(cat)
+        if not isinstance(cat_declared, dict):
+            manifest_match = False
+            manifest_mismatches.append(f"Category {cat} missing or not a dict in manifest")
+            continue
+
+        exp_rel_paths = set()
+        for p in exp_paths:
+            try:
+                rel = p.relative_to(base).as_posix()
+            except ValueError:
+                rel = p.as_posix()
+            exp_rel_paths.add(rel)
+
+        dec_rel_paths = set(cat_declared.keys())
+        if dec_rel_paths != exp_rel_paths:
+            manifest_match = False
+            missing_paths = exp_rel_paths - dec_rel_paths
+            extra_paths = dec_rel_paths - exp_rel_paths
+            manifest_mismatches.append(
+                f"Category {cat} path mismatch: missing={missing_paths}, extra={extra_paths}"
+            )
+
+        for rel_path in dec_rel_paths:
+            try:
+                validate_portable_artifact_path(rel_path, f"manifest {cat}")
+            except Exception as exc:
+                manifest_match = False
+                manifest_mismatches.append(f"Invalid path format '{rel_path}': {exc}")
+                continue
+
+            curr_p = resolve_repo_relative_path(base, rel_path)
+            if not curr_p.exists():
+                manifest_match = False
+                manifest_mismatches.append(f"Missing file in repository: {rel_path}")
+                continue
+
+            declared_h = cat_declared[rel_path]
+            actual_h = compute_sha256(curr_p)
+            total_files_checked += 1
+            if actual_h != declared_h:
+                manifest_match = False
+                manifest_mismatches.append(
+                    f"Hash mismatch for {rel_path}: actual={actual_h} != declared={declared_h}"
+                )
+
+    checks["frozen_inputs_match"] = {
+        "match": manifest_match and (manifest_categories == expected_categories),
+        "total_files_checked": total_files_checked,
+        "mismatches": manifest_mismatches,
+    }
+    if not manifest_match or manifest_categories != expected_categories:
+        sample_mismatches = manifest_mismatches[:10]
+        failing_reasons.append(
+            f"Partner input manifest has mismatched or incomplete inputs: {sample_mismatches}"
+        )
+
+    all_ok = len(failing_reasons) == 0
 
     file_hashes = {f: compute_sha256(cp_dir / f) for f in REQUIRED_PARTNER_CHECKPOINT_FILES}
 
@@ -1065,6 +1261,58 @@ def verify_saved_freeze(
         else:
             s_dir = v_dir
 
+    # Derive expected memberships for v5
+    expected_dict_bindings: dict[str, set[str]] = {}
+    if is_v5:
+        # Scientific protocols
+        expected_dict_bindings["scientific_protocols"] = set(FROZEN_SCIENTIFIC_PROTOCOLS)
+        # Splits and quartiles
+        expected_dict_bindings["splits_and_quartiles"] = set(FROZEN_SPLIT_AND_QUARTILE_FILES)
+        # Smoke evidence files
+        expected_dict_bindings["smoke_evidence_files"] = set(REQUIRED_SMOKE_FILES)
+        # Core source files
+        expected_dict_bindings["source_hashes"] = set(CORE_SOURCE_FILES)
+        # Transitive preprocessors
+        expected_dict_bindings["transitive_preprocessors"] = {
+            f"experiments/preprocessing/{ds}/preprocessor.json" for ds in CONFIRMATORY_DATASETS
+        }
+        # Checkpoints from base model registry
+        model_reg_p = resolve_repo_relative_path(
+            base, "experiments/base_models/model_registry.json"
+        )
+        with open(model_reg_p, encoding="utf-8") as f:
+            m_reg = json.load(f)
+        exp_cp_paths: set[str] = set()
+        if isinstance(m_reg, list):
+            for entry in m_reg:
+                p_rel = entry.get("checkpoint_path", "")
+                if p_rel:
+                    exp_cp_paths.add(p_rel)
+        elif isinstance(m_reg, dict):
+            for entry in m_reg.get("checkpoints", {}).values():
+                p_rel = entry.get("checkpoint_path", "")
+                if p_rel:
+                    exp_cp_paths.add(p_rel)
+        expected_dict_bindings["transitive_checkpoints"] = exp_cp_paths
+
+        # Calibrators from calibration registry
+        cal_reg_p = resolve_repo_relative_path(
+            base, "experiments/calibration/calibration_registry.json"
+        )
+        with open(cal_reg_p, encoding="utf-8") as f:
+            c_reg = json.load(f)
+        exp_cal_paths: set[str] = set()
+        for entry in c_reg.get("entries", {}).values():
+            c_rel = entry.get("calibrator_artifact_path", "")
+            if c_rel:
+                exp_cal_paths.add(c_rel)
+        expected_dict_bindings["transitive_calibrators"] = exp_cal_paths
+
+        # Partner checkpoint verification hashes
+        expected_dict_bindings["partner_checkpoint_verification_hashes"] = set(
+            REQUIRED_PARTNER_CHECKPOINT_FILES
+        )
+
     # 1. Verify dict-valued bindings
     for group_name in (
         "scientific_protocols",
@@ -1074,16 +1322,40 @@ def verify_saved_freeze(
         "transitive_preprocessors",
         "transitive_calibrators",
     ):
-        for k, h in bindings.get(group_name, {}).items():
-            p = resolve_repo_relative_path(base, k)
-            actual_h = compute_sha256(p)
-            verified_bindings[f"{group_name}:{k}"] = actual_h == h
+        group_dict = bindings.get(group_name)
+        if is_v5:
+            if not isinstance(group_dict, dict) or len(group_dict) == 0:
+                verified_bindings[f"{group_name}:present"] = False
+                continue
+            exp_keys = expected_dict_bindings.get(group_name, set())
+            act_keys = set(group_dict.keys())
+            verified_bindings[f"{group_name}:membership_complete"] = act_keys == exp_keys
+
+        if isinstance(group_dict, dict):
+            for k, h in group_dict.items():
+                p = resolve_repo_relative_path(base, k)
+                actual_h = compute_sha256(p) if p.exists() else None
+                verified_bindings[f"{group_name}:{k}"] = actual_h == h
+        elif not is_v5:
+            pass
 
     # 2. Verify smoke evidence hashes from source_evidence_dir
     smoke_dir = s_dir / "validation_smoke"
-    for f_name, h in bindings.get("smoke_evidence_files", {}).items():
-        actual_h = compute_sha256(smoke_dir / f_name)
-        verified_bindings[f"smoke:{f_name}"] = actual_h == h
+    smoke_dict = bindings.get("smoke_evidence_files")
+    if is_v5:
+        if not isinstance(smoke_dict, dict) or len(smoke_dict) == 0:
+            verified_bindings["smoke_evidence_files:present"] = False
+        else:
+            exp_smoke = expected_dict_bindings.get("smoke_evidence_files", set())
+            verified_bindings["smoke_evidence_files:membership_complete"] = (
+                set(smoke_dict.keys()) == exp_smoke
+            )
+
+    if isinstance(smoke_dict, dict):
+        for f_name, h in smoke_dict.items():
+            smoke_f = smoke_dir / f_name
+            actual_h = compute_sha256(smoke_f) if smoke_f.exists() else None
+            verified_bindings[f"smoke:{f_name}"] = actual_h == h
 
     # 3. Verify single file bindings
     single_bindings = [
@@ -1107,14 +1379,18 @@ def verify_saved_freeze(
         ("control_selection_FD002_LSTM_sha256", s_dir / "controls/FD002/LSTM/selection.json"),
         ("content_verification_sha256", v_dir / "content_verification.json"),
     ]
-    if "regression_test_report_sha256" in bindings:
+    if "regression_test_report_sha256" in bindings or is_v5:
         single_bindings.append(
             ("regression_test_report_sha256", v_dir / "regression_test_report.json")
         )
 
     for b_key, p in single_bindings:
-        single_h = compute_sha256(p) if p.exists() else None
-        verified_bindings[b_key] = single_h == bindings.get(b_key)
+        declared_h = bindings.get(b_key)
+        if not declared_h:
+            verified_bindings[b_key] = False
+        else:
+            single_h = compute_sha256(p) if p.exists() else None
+            verified_bindings[b_key] = bool(single_h and single_h == declared_h)
 
     # 4. Mandatory content verification re-execution
     content_res = verify_validation_smoke_matrix(smoke_dir=smoke_dir, base_dir=base)
@@ -1176,11 +1452,31 @@ def verify_saved_freeze(
         partner_audit = verify_partner_checkpoint_evidence(checkpoint_evidence_dir, base_dir=base)
         partner_pass = partner_audit.get("match", False) is True
         verified_bindings["partner_checkpoint_verification"] = partner_pass
-        if partner_pass and "partner_checkpoint_verification_hashes" in bindings:
+
+        partner_hashes_dict = bindings.get("partner_checkpoint_verification_hashes")
+        if not isinstance(partner_hashes_dict, dict) or len(partner_hashes_dict) == 0:
+            verified_bindings["partner_checkpoint_verification_hashes:present"] = False
+            partner_pass = False
+        else:
+            exp_partner_files = expected_dict_bindings.get(
+                "partner_checkpoint_verification_hashes", set()
+            )
+            act_partner_files = set(partner_hashes_dict.keys())
+            complete_partner = act_partner_files == exp_partner_files
+            verified_bindings["partner_checkpoint_verification_hashes:membership_complete"] = (
+                complete_partner
+            )
+            if not complete_partner:
+                partner_pass = False
+
             # Check bound partner hashes
-            for pf, ph in bindings["partner_checkpoint_verification_hashes"].items():
+            for pf in exp_partner_files:
+                declared_ph = partner_hashes_dict.get(pf)
                 actual_ph = partner_audit.get("file_hashes", {}).get(pf)
-                verified_bindings[f"partner:{pf}"] = actual_ph == ph
+                match_ph = bool(declared_ph and actual_ph and declared_ph == actual_ph)
+                verified_bindings[f"partner:{pf}"] = match_ph
+                if not match_ph:
+                    partner_pass = False
 
     # 8. Anti-leakage verification
     test_artifacts = list(base.glob("experiments/**/test_*.csv")) + list(

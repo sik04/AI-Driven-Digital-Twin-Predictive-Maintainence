@@ -547,3 +547,230 @@ def test_verify_only_leaves_tracked_files_unchanged() -> None:
     ).stdout
 
     assert git_diff_before == git_diff_after
+
+
+# =============================================================================
+# 10. Genuine Partner Checkpoint Evidence and Mutation Suite
+# =============================================================================
+
+
+def _copy_partner_fixture(target_dir: Path) -> Path:
+    target_dir.mkdir(parents=True, exist_ok=True)
+    src_dir = Path("experiments/checkpoint_verification_v1")
+    for f in src_dir.glob("*"):
+        if f.is_file():
+            shutil.copy2(f, target_dir / f.name)
+    return target_dir
+
+
+def test_genuine_merged_checkpoint_evidence_passes() -> None:
+    """Genuine merged checkpoint evidence passes without mutations."""
+    res = verify_partner_checkpoint_evidence(
+        checkpoint_dir="experiments/checkpoint_verification_v1",
+        base_dir=".",
+    )
+    assert res["status"] == "PASS"
+    assert res["match"] is True
+    assert len(res["failing_reasons"]) == 0
+    assert len(res["file_hashes"]) == 6
+    assert res["checks"]["environment_verification"]["status"] == "PASS"
+    assert res["checks"]["frozen_inputs_match"]["match"] is True
+    assert res["checks"]["frozen_inputs_match"]["total_files_checked"] == 233
+
+
+def test_partner_checkpoint_empty_manifest_fails(tmp_path: Path) -> None:
+    """Empty manifest in partner checkpoint evidence is rejected."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_empty_manifest")
+    (cp_dir / "input_manifest.json").write_text(
+        json.dumps(
+            {
+                "clean_source_execution": True,
+                "git_dirty": False,
+                "pre_post_comparison": {"protected_inputs_unchanged": True, "mismatches": []},
+                "protected_inputs": {},
+            }
+        ),
+        encoding="utf-8",
+    )
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("missing or empty" in r or "category mismatch" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_omitted_category_fails(tmp_path: Path) -> None:
+    """Omitted category in input manifest causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_omitted_cat")
+    with open(cp_dir / "input_manifest.json", encoding="utf-8") as f:
+        data = json.load(f)
+    del data["protected_inputs"]["verification_sources"]
+    (cp_dir / "input_manifest.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("category mismatch" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_omitted_file_fails(tmp_path: Path) -> None:
+    """Omitted file within a category in input manifest causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_omitted_file")
+    with open(cp_dir / "input_manifest.json", encoding="utf-8") as f:
+        data = json.load(f)
+    # Remove one checkpoint file
+    cp_dict = data["protected_inputs"]["checkpoints"]
+    first_k = next(iter(cp_dict.keys()))
+    del cp_dict[first_k]
+    (cp_dir / "input_manifest.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any(
+        "path membership mismatch" in r or "mismatched or incomplete" in r
+        for r in res["failing_reasons"]
+    )
+
+
+def test_partner_checkpoint_changed_hash_outside_splits_fails(tmp_path: Path) -> None:
+    """Changed hash in a non-splits category (e.g. checkpoints) causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_changed_hash")
+    with open(cp_dir / "input_manifest.json", encoding="utf-8") as f:
+        data = json.load(f)
+    # Mutate a hash in checkpoints
+    cp_dict = data["protected_inputs"]["checkpoints"]
+    first_k = next(iter(cp_dict.keys()))
+    cp_dict[first_k] = "0" * 64
+    (cp_dir / "input_manifest.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any(
+        "Hash mismatch" in r or "mismatched or incomplete" in r for r in res["failing_reasons"]
+    )
+
+
+def test_partner_checkpoint_conflicting_environment_status_fails(tmp_path: Path) -> None:
+    """Conflicting status (e.g. status=PASS, overall_status=FAIL) causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_conflict_status")
+    with open(cp_dir / "environment_verification.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["overall_status"] = "FAIL"
+    (cp_dir / "environment_verification.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("both status" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_dirty_source_fails(tmp_path: Path) -> None:
+    """Dirty source (clean_source_execution=true but git_dirty=true) causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_dirty_src")
+    with open(cp_dir / "environment_verification.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["git_dirty"] = True
+    (cp_dir / "environment_verification.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("git_dirty must be false" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_incompatible_versions_fails(tmp_path: Path) -> None:
+    """Incompatible runtime package versions cause verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_incompat_vers")
+    with open(cp_dir / "environment_verification.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["actual_versions"]["scikit-learn"] = "1.2.0"
+    (cp_dir / "environment_verification.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("expected_versions must equal actual_versions" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_failed_pip_check_fails(tmp_path: Path) -> None:
+    """Failed pip check (pip_check_exit_code != 0) causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_pip_fail")
+    with open(cp_dir / "environment_verification.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["pip_check_exit_code"] = 1
+    (cp_dir / "environment_verification.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("pip_check_exit_code must be 0" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_nonzero_warning_count_fails(tmp_path: Path) -> None:
+    """Nonzero sklearn warning count causes verification failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_nonzero_warn")
+    with open(cp_dir / "environment_verification.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["sklearn_inconsistent_version_warning_count"] = 2
+    (cp_dir / "environment_verification.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any(
+        "sklearn_inconsistent_version_warning_count must be 0" in r for r in res["failing_reasons"]
+    )
+
+
+def test_partner_checkpoint_failed_full_audit_or_skipped_check_fails(tmp_path: Path) -> None:
+    """Failed full audit overall status or skipped mandatory checks causes failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_audit_skipped")
+    with open(cp_dir / "step08_full_audit.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["checks_not_run"] = ["checkpoint_prediction_reproduction"]
+    (cp_dir / "step08_full_audit.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("checks_not_run must be empty" in r for r in res["failing_reasons"])
+
+
+def test_partner_checkpoint_inconsistent_source_shas_fails(tmp_path: Path) -> None:
+    """Inconsistent source-execution SHA between environment and full audit causes failure."""
+    cp_dir = _copy_partner_fixture(tmp_path / "partner_inconsistent_sha")
+    with open(cp_dir / "step08_full_audit.json", encoding="utf-8") as f:
+        data = json.load(f)
+    data["current_reconstruction"]["git_commit"] = "0" * 40
+    (cp_dir / "step08_full_audit.json").write_text(json.dumps(data), encoding="utf-8")
+
+    res = verify_partner_checkpoint_evidence(checkpoint_dir=cp_dir, base_dir=".")
+    assert res["status"] == "FAIL"
+    assert res["match"] is False
+    assert any("Partner source-execution SHA mismatch" in r for r in res["failing_reasons"])
+
+
+def test_saved_freeze_v5_missing_or_empty_bindings_fails(tmp_path: Path) -> None:
+    """Missing or empty v5 partner, regression, or source bindings must FAIL."""
+    bundle_dir = tmp_path / "bundle_v5_missing_bindings"
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+
+    fake_freeze = {
+        "schema_version": "step09-freeze-v5",
+        "source_evidence_dir": "experiments/pretest_verification_v3",
+        "bindings": {
+            # Omit partner hashes, regression report, and source hashes
+        },
+    }
+    (bundle_dir / "protocol_freeze.json").write_text(json.dumps(fake_freeze), encoding="utf-8")
+
+    audit = verify_saved_freeze(
+        freeze_path=bundle_dir / "protocol_freeze.json",
+        source_evidence_dir="experiments/pretest_verification_v3",
+        base_dir=".",
+        allow_dirty=True,
+        rerun_regression=False,
+    )
+    assert audit["overall_status"] == "FAIL"
+    assert audit["bindings_passed"] is False
