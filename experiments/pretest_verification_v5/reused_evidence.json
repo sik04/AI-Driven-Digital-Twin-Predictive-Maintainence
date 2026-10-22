@@ -1,0 +1,132 @@
+{
+  "control_selections": {
+    "FD002_GBR": {
+      "candidate_metrics_csv": {
+        "sha256": "7da37abfd746c2f1407308ad24c665b26aa7a83494ac6d4b995c921e9133b281",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/GBR/candidate_metrics.csv"
+      },
+      "engine_seed_outcomes_csv": {
+        "sha256": "66202a34d1f11a8844824d7390c1c361d713140688e70da7b2a679476ef56ed6",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/GBR/engine_seed_outcomes.csv"
+      },
+      "selection_json": {
+        "sha256": "3c6ba6609b8d72d1116155090175897204de7124c4aacbd4fd4d3afb5320ec8d",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/GBR/selection.json"
+      }
+    },
+    "FD002_LSTM": {
+      "candidate_metrics_csv": {
+        "sha256": "6338bedb6db1cd64fc104b92fc20a4a6ae1bf4519fc6f89c501ac5dbfd4d740d",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/LSTM/candidate_metrics.csv"
+      },
+      "engine_seed_outcomes_csv": {
+        "sha256": "0b74ddda91af892b1bd5e590042eb186d3969aa4aa7ee0b3361614036d983531",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/LSTM/engine_seed_outcomes.csv"
+      },
+      "selection_json": {
+        "sha256": "918a2f56dd2ada4f55a073b8bded269dfceb46b65c7493b600eb740b71079cd7",
+        "source_path": "experiments/pretest_verification_v3/controls/FD002/LSTM/selection.json"
+      }
+    },
+    "control_reconstruction": {
+      "sha256": "3fe91090831174cb4c4ec356df0ba70d3b898aab735de8335d55361c84b2ef86",
+      "source_path": "experiments/pretest_verification_v3/control_reconstruction.json"
+    }
+  },
+  "description": "Explicit references to preserved numerical evidence in Step 9 v3, verified by repaired independent reference verifier",
+  "logical_bundle_path": "experiments/pretest_verification_v5",
+  "preserved_historical_bundles": [
+    "experiments/pretest_verification_v2",
+    "experiments/pretest_verification_v3",
+    "experiments/pretest_verification_v4"
+  ],
+  "schema_version": "step09-reused-evidence-v3",
+  "source_evidence_dir": "experiments/pretest_verification_v3",
+  "step08_full_audit": {
+    "sha256": "a7234fd2bbc911cd5c667af950013c70c12925beee9ccfb08ff01faeec9d508d",
+    "source_path": "experiments/pretest_verification_v3/step08_full_audit.json",
+    "verification_rules": {
+      "all_records_pass": true,
+      "max_abs_error_allowed": 0.0001,
+      "partitions_permitted": [
+        "validation",
+        "calibration"
+      ],
+      "unique_records_count": 60
+    }
+  },
+  "step08_selection_freeze": {
+    "sha256": "cf14166c696044170beb2c78980fb42a0f6d0c67ef8419b5401081407ebb5aa0",
+    "source_path": "experiments/calibration/selection/selection_freeze.json"
+  },
+  "validation_smoke": {
+    "bootstrap_draws_FD001.npz": {
+      "sha256": "8c8f6a4ca76b0fb660ace977126c91809e4c6a0025c2a4949897f8830949a297",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_draws_FD001.npz"
+    },
+    "bootstrap_draws_FD002.npz": {
+      "sha256": "818d11252f676747afd8471c5bca5c5aa1006d548869e5995c39e9051dfb5a33",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_draws_FD002.npz"
+    },
+    "bootstrap_draws_FD004.npz": {
+      "sha256": "e0cf7d075d366faca7b121867ae03158e890d56935a3b04bb5d111c22eeec169",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_draws_FD004.npz"
+    },
+    "bootstrap_statistics_FD001.npz": {
+      "sha256": "33a5d92b6b0ba8158e0927f7dc72c85be529a55df1d127c848369202b6e36636",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_statistics_FD001.npz"
+    },
+    "bootstrap_statistics_FD002.npz": {
+      "sha256": "744a1a4531ef2bbe1285e20c48e4cf6dba7fb3f0989a9be0a67ce13cbc00bd63",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_statistics_FD002.npz"
+    },
+    "bootstrap_statistics_FD004.npz": {
+      "sha256": "2889f45188205995b9b41ac100cb41325ddf802c184f5cefef3af801a2c7a8bf",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_statistics_FD004.npz"
+    },
+    "bootstrap_statistics_RQ4.npz": {
+      "sha256": "9171da5e9f2cefa9cfb8d0e55eedd3e37c269716c94b73d08b4daa1da7ec12dc",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/bootstrap_statistics_RQ4.npz"
+    },
+    "cell_summary.csv": {
+      "sha256": "3cc8a859d9e5d7c9be16a7e913e523c881dd36f92b86735544445113b80253d7",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/cell_summary.csv"
+    },
+    "component_evidence.csv": {
+      "sha256": "e60d655fbebfd86e4c8144ec0e0cca533d3bee3e5054e9269bc8c9d3748a2421",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/component_evidence.csv"
+    },
+    "contrast_intervals.csv": {
+      "sha256": "dce74da43ece8834565d7aaa1dcba994195d388aca0574a1ef17400cab8e6328",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/contrast_intervals.csv"
+    },
+    "decision_traces.csv": {
+      "sha256": "0db95d1e487a77d2f0a62632a68f9e0c870e6534988c77b98ae07f837adf051e",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/decision_traces.csv"
+    },
+    "engine_metrics.csv": {
+      "sha256": "b0461ff1b5282ec4acb6ae876b91dfaeb240434dbb8479518d2d75bef73da5fe",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/engine_metrics.csv"
+    },
+    "engine_seed_outcomes.csv": {
+      "sha256": "2316f59a165ea2aa72d513d0509894e13198fb42ffa71b259db8aa829aebf53c",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/engine_seed_outcomes.csv"
+    },
+    "execution_manifest.json": {
+      "sha256": "02333cece043fbb576e475192b737b734e925b3c5a37deaccda6df65613eea35",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/execution_manifest.json"
+    },
+    "interval_predictions.csv": {
+      "sha256": "b14aba2e3cb8cf0061115a819fc4a63c4c000909b21c966fd3c6ae74f543638f",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/interval_predictions.csv"
+    },
+    "point_predictions.csv": {
+      "sha256": "8072d570cebe9cb550011b0879ca90bc63fa2635f3fdc1b4c5861e35e9a006e6",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/point_predictions.csv"
+    },
+    "subgroup_metrics.csv": {
+      "sha256": "10e9a8daca739ea22e342c6814c5b4b45248c7e50d34199281ee4b168827e9b7",
+      "source_path": "experiments/pretest_verification_v3/validation_smoke/subgroup_metrics.csv"
+    }
+  }
+}

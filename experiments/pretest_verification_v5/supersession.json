@@ -1,0 +1,99 @@
+{
+  "environment": {
+    "command_args": [
+      "scripts/audit_step09_freeze.py",
+      "--source-evidence-dir",
+      "experiments/pretest_verification_v3",
+      "--verification-dir",
+      "experiments/pretest_verification_v5",
+      "--logical-output-dir",
+      "experiments/pretest_verification_v5",
+      "--checkpoint-evidence-dir",
+      "experiments/checkpoint_verification_v1",
+      "--output-dir",
+      "C:\\Users\\shiks\\AppData\\Local\\Temp\\v5_official_staging"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.4.4",
+      "pandas": "3.0.2",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.8.0",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.13.9 | packaged by Anaconda, Inc. | (main, Oct 21 2025, 19:09:58) [MSC v.1929 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-22T15:33:03.168193+00:00"
+  },
+  "git_dirty": false,
+  "logical_bundle_path": "experiments/pretest_verification_v5",
+  "prior_supersession_history": [
+    {
+      "historical_path": "experiments/pretest_verification_v3/protocol_freeze.json",
+      "historical_sha256": "534af28ae5b95447508390fef4ba6da28c480ece0ba5aefb67fbabcaaefb375e",
+      "reason_superseded": "v3 pre-test readiness verification relied on an unverified assumption of evidence integrity that allowed 5 false-PASS mutations, and protocol_freeze was generated with git_dirty=true. Superseded by v4 which binds preserved numerical evidence rechecked by independent reference reconstruction verifier with clean git status (git_dirty=false).",
+      "replacement_evidence_path": "C:\\Users\\Mayank\\AppData\\Local\\Temp\\pretest_v4_staging/protocol_freeze.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v3/pretest_audit.json",
+      "historical_sha256": "2418a05f3ca5f1d1b937358d4ebc70981c74625289f20055dbef9d79d58d9c00",
+      "reason_superseded": "Accepted unverified validation evidence due to missing reference reconstruction and permissive verifier behavior; superseded by v4 audit with fail-closed gates.",
+      "replacement_evidence_path": "C:\\Users\\Mayank\\AppData\\Local\\Temp\\pretest_v4_staging/pretest_audit.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v3/content_verification.json",
+      "historical_sha256": "4df88269b059310bf729e4f730933941791c01d8ea529a2885dd8e4a7e370b6a",
+      "reason_superseded": "Superseded by authoritative independent reference reconstruction report covering full numerical, decision, and bootstrap verification.",
+      "replacement_evidence_path": "C:\\Users\\Mayank\\AppData\\Local\\Temp\\pretest_v4_staging/content_verification.json"
+    }
+  ],
+  "protocol_version": "step09-v1",
+  "schema_version": "step09-supersession-v4",
+  "source_execution_commit": "e0ea919e670d4c2d522049da5ece7230fc66df90",
+  "superseded_count": 7,
+  "superseded_records": [
+    {
+      "historical_path": "experiments/pretest_verification_v4/protocol_freeze.json",
+      "historical_sha256": "ddbe522d9a8b51ea24045e68260fa5ca483403f6146a2faca3433e675eb510f6",
+      "reason_superseded": "v4 pre-test readiness verification contained mock regression test records, used non-portable external staging paths, and lacked fresh checkpoint verification. Superseded by v5 which binds actual executed regression evidence, corrected linear quantiles for Mutation 5, portable normalized repository-relative paths, and fresh environment-compatible checkpoint audit. Scientific protocols, models, calibrators, and control selections remain unchanged.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/protocol_freeze.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/pretest_audit.json",
+      "historical_sha256": "8a0b2be6cabc9568658f83b731571e52a2dab2a9f567a7f5f47616e498ae0ca8",
+      "reason_superseded": "Superseded by v5 audit incorporating executed regression audit verification and environment-compatible checkpoint audit reproduction.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/pretest_audit.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/content_verification.json",
+      "historical_sha256": "dff2c52350807bf4efec01a8e9f890ee08cf0a8246865d8b6e7bfcf9c2e84c40",
+      "reason_superseded": "Superseded by v5 authoritative independent reference reconstruction report with portable repository-relative provenance.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/content_verification.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/regression_test_report.json",
+      "historical_sha256": "1800124eb1e7868ce19d3c63f313c7343257b73734265da151a2b578704ba73e",
+      "reason_superseded": "v4 regression report contained static mock records; superseded by v5 executed regression evidence verifying baseline pass and empirical rejection of all 5 isolated mutations.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/regression_test_report.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/input_manifest.json",
+      "historical_sha256": "9e43f78cabd76c29ab4b31c0de99bd09e65acb6b975623c2fdad883f4d0a7c6d",
+      "reason_superseded": "Superseded by v5 input manifest binding updated core verification sources.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/input_manifest.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/reused_evidence.json",
+      "historical_sha256": "7c81590c9510aeb2d4592df82f2825b6c7e1849bca6bd301e6aae5a5c82e2fc1",
+      "reason_superseded": "Superseded by v5 reused evidence catalog with portable normalized references.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/reused_evidence.json"
+    },
+    {
+      "historical_path": "experiments/pretest_verification_v4/supersession.json",
+      "historical_sha256": "a02610951e13179d3ab0f08f09d1e730d03773efb655aeab62d56257d246f6cd",
+      "reason_superseded": "Superseded by v5 supersession chain preserving full multi-version history.",
+      "replacement_evidence_path": "experiments/pretest_verification_v5/supersession.json"
+    }
+  ],
+  "timestamp_utc": "2026-10-22T15:35:33.848573+00:00"
+}
