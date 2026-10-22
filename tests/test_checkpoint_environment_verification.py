@@ -129,6 +129,10 @@ def test_sklearn_version_warnings_fail_audit(tmp_path: Path) -> None:
             return_value=(0, "No broken requirements found."),
         ),
         patch(
+            "scripts.verify_checkpoint_environment.hash_raw_files",
+            return_value={"data/raw/cmapss/train_FD001.txt": "dummy_hash"},
+        ),
+        patch(
             "scripts.verify_checkpoint_environment.run_step08_audit",
             side_effect=mock_run_step08_audit,
         ),
@@ -264,6 +268,14 @@ def test_modified_protected_inputs_prevent_pass(tmp_path: Path) -> None:
         patch(
             "scripts.verify_checkpoint_environment.execute_pip_check",
             return_value=(0, "No broken requirements found."),
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.hash_raw_files",
+            return_value={"data/raw/cmapss/train_FD001.txt": "dummy_hash"},
+        ),
+        patch(
+            "scripts.verify_checkpoint_environment.run_step08_audit",
+            return_value={"overall_status": "PASS", "details": {}},
         ),
         patch(
             "scripts.verify_checkpoint_environment.hash_protected_inputs",
