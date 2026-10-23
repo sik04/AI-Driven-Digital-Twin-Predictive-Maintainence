@@ -1,0 +1,2009 @@
+"""Execution runner for confirmatory evaluation across the frozen 930-configuration matrix.
+
+This module provides an explicit, self-contained adaptation of the Step 9 evaluation
+runner, with:
+- Dynamic manifest-derived engine and outcome row counts (validation: 19,590; test: 39,180).
+- Support for both validation (pre-exposure equivalence) and test (held-out confirmatory).
+- Strict provenance capture, git clean-tree verification, and pretest-audit verification.
+- Authoritative RQ1–RQ4 hypothesis classification and decision output.
+- Sequential CPU inference with 2-thread cap and single-model memory cleanup.
+- Immutability enforcement on outputs (rejects non-empty destination directories).
+"""
+
+from __future__ import annotations
+
+import json
+import logging
+import time
+import uuid
+from collections import defaultdict
+from collections.abc import Sequence
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+import torch
+
+from intellitwin.confirmatory.data import (
+    FROZEN_RAW_SOURCE_HASHES,
+    load_or_generate_point_predictions,
+    verify_raw_data_hashes,
+)
+from intellitwin.data.artifacts import compute_sha256
+from intellitwin.data.splits import load_split_manifest
+from intellitwin.evaluation.bootstrap import (
+    compute_bootstrap_ci,
+    generate_stratified_bootstrap_draws,
+)
+from intellitwin.evaluation.decisions import (
+    DecisionStatus,
+    aggregate_rq_decision,
+    evaluate_failure_safeguard,
+    evaluate_improvement,
+    evaluate_noninferiority,
+    get_rq_component_manifest,
+    validate_component_manifest_completeness,
+)
+from intellitwin.evaluation.evidence_schema import (
+    map_component_to_evidence_spec,
+)
+from intellitwin.evaluation.inference import (
+    SimulationTraceOutcome,
+    reprice_simulation_outcome,
+    simulate_engine_policy,
+)
+from intellitwin.evaluation.metrics import (
+    compute_equal_engine_metric,
+    compute_interval_score,
+)
+from intellitwin.evaluation.schema import (
+    ALL_NOMINAL_COVERAGES,
+    CONFIRMATORY_DATASETS,
+    CONFIRMATORY_METHODS,
+    CONFIRMATORY_MODELS,
+    CONFIRMATORY_SEEDS,
+    CONTROL_EARLIER_INTERVENTION,
+    CONTROL_MATCHED_WIDTH,
+    CONTROL_SAFETY_MARGIN,
+    CONTROL_WIDENED,
+    COST_SCENARIOS,
+    DECISION_QUANTILES,
+    DESCRIPTIVE_QUANTILES,
+    INTERVENTION_THRESHOLD_CYCLES,
+    PRIMARY_COST_SCENARIO,
+    PRIMARY_NOMINAL_COVERAGE,
+    PROTOCOL_VERSION,
+    SUBGROUP_MIN_ENGINES,
+)
+from intellitwin.evaluation.validation import (
+    assert_permitted_partition_only,
+    validate_trajectory,
+)
+from intellitwin.provenance import (
+    capture_environment_metadata,
+    get_git_info,
+    write_immutable_csv,
+    write_immutable_json,
+    write_immutable_npz,
+)
+from intellitwin.simulator.types import MaintenanceAction, PredictionState
+from intellitwin.uncertainty.artifacts import (
+    load_frozen_calibrator,
+    resolve_repo_relative_path,
+)
+
+logger = logging.getLogger("intellitwin.confirmatory.runner")
+
+PROTECTED_INPUT_PATHS: tuple[str, ...] = (
+    "research/hypotheses/hypothesis_framework.yaml",
+    "research/research_design/statistical_inference_protocol.md",
+    "research/research_design/data_evaluation_protocol.md",
+    "research/research_design/maintenance_cost_scenarios.yaml",
+    "research/research_design/step09_confirmatory_protocol.md",
+    "research/research_design/step09_confirmatory_config.json",
+    "research/research_design/step09_control_selection.md",
+    "data/splits/fd001_engine_split_seed_2026.json",
+    "data/splits/fd002_engine_split_seed_2026.json",
+    "data/splits/fd002_lifetime_quartile_provenance.json",
+    "data/splits/fd004_engine_split_seed_2026.json",
+    "experiments/base_models/model_registry.json",
+    "experiments/calibration/calibration_registry.json",
+)
+
+
+def compute_subgroup_bounds(
+    multiplicity_matrix: np.ndarray[Any, Any],  # shape (B, N)
+    eng_to_idx: dict[int, int],
+    cov_map_by_group: dict[str, dict[int, float]],
+    eligible_groups: Sequence[str],
+    nominal_coverage: float = PRIMARY_NOMINAL_COVERAGE,
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+    """Compute replicate lower and upper worst-group error bounds under the missing-group protocol.
+
+    Rules:
+    - If represented (weight > 0): error interval is [abs(cov - nominal), abs(cov - nominal)].
+    - If absent (weight == 0): error interval is [0.0, nominal_coverage].
+    - Worst group family bounds: lower = max(group lower bounds), upper = max(group upper bounds).
+    - If no eligible groups exist: returns ([0.0, ...], [nominal_coverage, ...]).
+    """
+    n_bootstrap = multiplicity_matrix.shape[0]
+    if len(eligible_groups) == 0:
+        return np.zeros(n_bootstrap, dtype=float), np.full(
+            n_bootstrap, nominal_coverage, dtype=float
+        )
+
+    all_low: list[np.ndarray[Any, Any]] = []
+    all_up: list[np.ndarray[Any, Any]] = []
+
+    for grp in eligible_groups:
+        cov_map = cov_map_by_group.get(grp, {})
+        grp_units = sorted(cov_map.keys())
+
+        if len(grp_units) == 0:
+            low = np.zeros(n_bootstrap, dtype=float)
+            up = np.full(n_bootstrap, nominal_coverage, dtype=float)
+        else:
+            w_grp = np.zeros(multiplicity_matrix.shape[1], dtype=float)
+            cov_vals = np.zeros(multiplicity_matrix.shape[1], dtype=float)
+            for u in grp_units:
+                idx = eng_to_idx[u]
+                w_grp[idx] = 1.0
+                cov_vals[idx] = cov_map[u]
+
+            total_grp_weight = multiplicity_matrix @ w_grp  # shape (B,)
+            weighted_cov = multiplicity_matrix @ (w_grp * cov_vals)  # shape (B,)
+
+            represented = total_grp_weight > 0
+            rep_cov = np.zeros(n_bootstrap, dtype=float)
+            np.divide(weighted_cov, total_grp_weight, out=rep_cov, where=represented)
+            rep_err = np.abs(rep_cov - nominal_coverage)
+
+            low = np.where(represented, rep_err, 0.0)
+            up = np.where(represented, rep_err, nominal_coverage)
+
+        all_low.append(low)
+        all_up.append(up)
+
+    worst_lower = np.max(all_low, axis=0)
+    worst_upper = np.max(all_up, axis=0)
+    return worst_lower, worst_upper
+
+
+def snapshot_protected_input_hashes(base_dir: Path) -> dict[str, str]:
+    """Compute and record SHA-256 hashes of all protected input files."""
+    hashes: dict[str, str] = {}
+    for rel_path in PROTECTED_INPUT_PATHS:
+        p = resolve_repo_relative_path(base_dir, rel_path)
+        if p.exists():
+            hashes[rel_path] = compute_sha256(p)
+        else:
+            hashes[rel_path] = "MISSING"
+    return hashes
+
+
+def run_confirmatory_evaluation(
+    partition: str,
+    output_dir: Path | str,
+    pretest_dir: Path | str = "experiments/pretest_verification_v6",
+    raw_data_dir: Path | str = "data/raw/cmapss",
+    controls_dir: Path | str = "experiments/pretest_verification_v2/controls",
+    base_dir: Path | str = ".",
+    n_bootstrap: int = 10000,
+    confirm_held_out: bool = False,
+    use_validation_cache: bool = True,
+    allow_dirty: bool = False,
+    run_id: str | None = None,
+) -> dict[str, Any]:
+    """Execute complete confirmatory evaluation matrix on the specified partition.
+
+    Parameters
+    ----------
+    partition : str
+        'validation' (for equivalence verification) or 'test' (for official held-out evaluation).
+    output_dir : Path or str
+        Destination directory. Must be empty or non-existent prior to execution.
+    pretest_dir : Path or str
+        Directory containing passing pre-test verification bundle (v6).
+    raw_data_dir : Path or str
+        Directory containing raw C-MAPSS training text files.
+    controls_dir : Path or str
+        Directory containing verified FD002 control selections.
+    base_dir : Path or str
+        Repository root directory.
+    n_bootstrap : int
+        Number of stratified bootstrap replicates (default: 10,000).
+    confirm_held_out : bool
+        Mandatory explicit flag when partition == 'test'.
+    use_validation_cache : bool
+        Whether to use existing validation caches when partition == 'validation'.
+    allow_dirty : bool
+        Permit execution on dirty git working tree (strictly forbidden for test partition).
+    run_id : str, optional
+        Unique run identifier. Generated if not supplied.
+
+    Returns
+    -------
+    dict[str, Any]
+        Complete execution manifest with counts, hashes, and RQ decisions.
+    """
+    start_time_utc = datetime.now(timezone.utc).isoformat()
+    t0 = time.time()
+    base = Path(base_dir).resolve()
+    out_dir = Path(output_dir).resolve()
+
+    if run_id is None:
+        run_id = f"confirmatory_{partition}_{int(time.time())}_{uuid.uuid4().hex[:8]}"
+
+    # Validate partition
+    if partition not in ("validation", "test"):
+        raise ValueError(f"Invalid partition '{partition}': must be 'validation' or 'test'.")
+
+    # Anti-leakage / Pre-test gates for held-out test execution
+    if partition == "test":
+        if not confirm_held_out:
+            raise PermissionError(
+                "CRITICAL: Held-out test evaluation strictly requires "
+                "--confirm-held-out. Execution halted."
+            )
+        if allow_dirty:
+            raise PermissionError(
+                "CRITICAL: Confirmatory test evaluation cannot be run with "
+                "--allow-dirty. Working tree must be clean."
+            )
+
+    # Immutability check: output directory must be empty if it exists
+    if out_dir.exists() and any(out_dir.iterdir()):
+        raise FileExistsError(
+            f"Output directory {out_dir} is not empty. "
+            "Confirmatory evaluation strictly forbids overwriting or "
+            "polluting an existing directory."
+        )
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # Setup file logging
+    log_p = out_dir / "execution.log"
+    file_handler = logging.FileHandler(log_p, encoding="utf-8")
+    file_handler.setLevel(logging.INFO)
+    formatter = logging.Formatter("[%(asctime)s][%(levelname)s] %(message)s")
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    logger.setLevel(logging.INFO)
+
+    logger.info("=" * 80)
+    logger.info("IntelliTwin Step 9 Confirmatory Evaluation")
+    logger.info(f"Run ID:                  {run_id}")
+    logger.info(f"Partition:               {partition.upper()}")
+    logger.info(f"Protocol:                {PROTOCOL_VERSION}")
+    logger.info(f"Start Time (UTC):        {start_time_utc}")
+    logger.info(f"Output Directory:        {out_dir}")
+    logger.info(f"Pre-Test Directory:      {pretest_dir}")
+    logger.info(f"Bootstrap Replicates:    {n_bootstrap}")
+    logger.info(f"Confirm Held-Out:        {confirm_held_out}")
+    logger.info(f"Use Validation Cache:    {use_validation_cache}")
+    logger.info("=" * 80)
+
+    # Check git provenance
+    git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
+    if partition == "test" and git_dirty:
+        raise RuntimeError("FATAL: Git tree is dirty. Held-out test execution requires clean tree.")
+    env_meta = capture_environment_metadata(device="cpu")
+
+    # Verify pretest readiness evidence
+    pretest_p = resolve_repo_relative_path(base, pretest_dir)
+    pretest_audit_f = pretest_p / "pretest_audit.json"
+    if not pretest_audit_f.exists():
+        raise FileNotFoundError(f"Pretest audit file missing: {pretest_audit_f}")
+    with open(pretest_audit_f, encoding="utf-8") as f:
+        pretest_audit = json.load(f)
+    if (
+        pretest_audit.get("overall_status") != "PASS"
+        or pretest_audit.get("pretest_readiness_status") != "PRETEST_READY"
+    ):
+        raise RuntimeError(
+            f"Pretest audit status invalid: "
+            f"overall={pretest_audit.get('overall_status')}, "
+            f"readiness={pretest_audit.get('pretest_readiness_status')}. "
+            "Must be PASS / PRETEST_READY."
+        )
+    logger.info("Verified pre-test readiness evidence: PASS (PRETEST_READY)")
+
+    # Snapshot pre-execution protected input hashes
+    pre_protected_hashes = snapshot_protected_input_hashes(base)
+
+    # Verify raw C-MAPSS training file hashes
+    raw_dir_resolved = resolve_repo_relative_path(base, raw_data_dir)
+    raw_fd001 = raw_dir_resolved / "train_FD001.txt"
+    if raw_fd001.exists():
+        raw_hashes = verify_raw_data_hashes(raw_data_dir=raw_data_dir, base_dir=base)
+        logger.info(f"Verified raw C-MAPSS source hashes across {len(raw_hashes)} datasets.")
+    elif partition == "validation" and use_validation_cache:
+        raw_hashes = dict(FROZEN_RAW_SOURCE_HASHES)
+        logger.info(
+            "Raw data absent in synthetic CI; using frozen hashes for validation equivalence."
+        )
+    else:
+        raise FileNotFoundError(f"Raw C-MAPSS file missing: {raw_fd001}")
+    logger.info(f"Verified raw C-MAPSS source file hashes across {len(raw_hashes)} datasets.")
+
+    # Verify controls directory and load selected controls
+    ctrl_base = resolve_repo_relative_path(base, controls_dir)
+    selected_controls_by_fam: dict[str, dict[str, Any]] = {}
+    for fam in ("GBR", "LSTM"):
+        sel_json_p = ctrl_base / "FD002" / fam / "selection.json"
+        if not sel_json_p.exists():
+            raise FileNotFoundError(f"Control selection file missing: {sel_json_p}")
+        with open(sel_json_p, encoding="utf-8") as f:
+            c_data = json.load(f)
+        selected_controls_by_fam[fam] = c_data["selected_controls"]
+
+    # Verify control parameters against step09_confirmatory_config.json
+    cfg_p = resolve_repo_relative_path(
+        base, "research/research_design/step09_confirmatory_config.json"
+    )
+    with open(cfg_p, encoding="utf-8") as f:
+        step09_cfg = json.load(f)
+    cfg_controls = step09_cfg["controls_rq3"]["selected_parameters"]
+    for fam in ("GBR", "LSTM"):
+        for ctrl_k, exp_spec in cfg_controls[fam].items():
+            act_spec = selected_controls_by_fam[fam][ctrl_k]
+            if act_spec["parameter_value"] != exp_spec["parameter_value"]:
+                raise ValueError(
+                    f"Control parameter mismatch for {fam}/{ctrl_k}: "
+                    f"selection has {act_spec['parameter_value']}, "
+                    f"config has {exp_spec['parameter_value']}"
+                )
+    logger.info("Verified agreement of selected control parameters with Step 9 config.")
+
+    # CPU threading constraint: max 2 threads
+    torch.set_num_threads(2)
+
+    point_pred_rows: list[dict[str, Any]] = []
+    interval_pred_rows: list[dict[str, Any]] = []
+    trace_rows: list[dict[str, Any]] = []
+    engine_seed_outcome_rows: list[dict[str, Any]] = []
+    engine_metric_rows: list[dict[str, Any]] = []
+    subgroup_metric_rows: list[dict[str, Any]] = []
+    cell_summary_rows: list[dict[str, Any]] = []
+
+    fleet_engine_costs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_covs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_cov_errs: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_mpiws: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_iscores: dict[tuple[Any, ...], dict[int, float]] = defaultdict(dict)
+    fleet_engine_regime_covs: dict[tuple[Any, ...], dict[str, dict[int, float]]] = defaultdict(
+        lambda: defaultdict(dict)
+    )
+    fleet_engine_stage_covs: dict[tuple[Any, ...], dict[str, dict[int, float]]] = defaultdict(
+        lambda: defaultdict(dict)
+    )
+
+    bootstrap_draws_dict: dict[str, np.ndarray[Any, Any]] = {}
+    partition_engines_dict: dict[str, list[int]] = {}
+    eligible_regimes_dict: dict[str, list[str]] = {}
+    eligible_stages_dict: dict[str, list[str]] = {}
+
+    status_tag = "CONFIRMATORY_TEST_EVIDENCE" if partition == "test" else "DEVELOPMENT_SMOKE_ONLY"
+
+    for ds in CONFIRMATORY_DATASETS:
+        logger.info(f"Processing dataset {ds} on partition '{partition}'...")
+        split_p = resolve_repo_relative_path(
+            base, f"data/splits/{ds.lower()}_engine_split_seed_2026.json"
+        )
+        split_manifest = load_split_manifest(split_p)
+        part_engines = sorted(split_manifest.get_partition(partition))
+        partition_engines_dict[ds] = part_engines
+        n_engs_ds = len(part_engines)
+        logger.info(f"  Partition engine count for {ds}: {n_engs_ds} engines")
+
+        # Generate 10,000 stratified bootstrap draws
+        draws = generate_stratified_bootstrap_draws(
+            dataset=ds,
+            partition_engines=part_engines,
+            base_dir=base,
+            n_replicates=n_bootstrap,
+        )
+        bootstrap_draws_dict[ds] = draws
+        draws_p = out_dir / f"bootstrap_draws_{ds}.npz"
+        write_immutable_npz(
+            draws_p,
+            arrays={"draws": draws, "engines": np.array(part_engines, dtype=int)},
+            metadata={
+                "dataset": ds,
+                "partition": partition,
+                "n_replicates": n_bootstrap,
+                "engine_count": n_engs_ds,
+                "status": status_tag,
+            },
+        )
+
+        for fam in CONFIRMATORY_MODELS:
+            logger.info(f"  Evaluating cell {ds} x {fam}...")
+            # Load or generate point predictions across 5 seeds
+            dfs = []
+            for seed in CONFIRMATORY_SEEDS:
+                df_s = load_or_generate_point_predictions(
+                    dataset=ds,
+                    model_family=fam,
+                    seed=seed,
+                    partition=partition,
+                    raw_data_dir=raw_data_dir,
+                    base_dir=base,
+                    confirm_held_out=confirm_held_out,
+                    use_validation_cache=use_validation_cache,
+                )
+                df_s_copy = df_s.copy()
+                df_s_copy["seed"] = seed
+                dfs.append(df_s_copy)
+
+            df_cell = pd.concat(dfs, ignore_index=True)
+
+            # Assert strict partition membership
+            assert_permitted_partition_only(
+                actual_units=df_cell["unit"].unique(),
+                expected_units=part_engines,
+                partition_name=f"{ds} {partition}",
+            )
+
+            # Pre-compute true terminal lifetimes T
+            engine_lifetimes: dict[int, int] = {}
+            for unit, grp in df_cell.groupby("unit"):
+                max_cyc = int(grp["endpoint_cycle"].max())
+                rul_max = float(grp.loc[grp["endpoint_cycle"] == max_cyc, "rul_true"].iloc[0])
+                engine_lifetimes[int(unit)] = max_cyc + int(round(rul_max))
+
+            # Validate trajectories
+            for (u, _s), grp in df_cell.groupby(["unit", "seed"]):
+                grp_sort = grp.sort_values("endpoint_cycle")
+                validate_trajectory(
+                    unit=int(u),
+                    cycles=grp_sort["endpoint_cycle"].to_numpy(),
+                    predictions=grp_sort["prediction"].to_numpy(),
+                    regimes=grp_sort["regime"].to_numpy(),
+                    terminal_cycle=engine_lifetimes[int(u)],
+                    rul_trues=grp_sort["rul_true"].to_numpy(),
+                )
+
+            # Record point predictions (all five seeds)
+            for row in df_cell.itertuples():
+                point_pred_rows.append(
+                    {
+                        "dataset": ds,
+                        "model_family": fam,
+                        "seed": int(row.seed),
+                        "unit": int(row.unit),
+                        "endpoint_cycle": int(row.endpoint_cycle),
+                        "prediction": float(row.prediction),
+                        "rul_true": float(row.rul_true),
+                        "regime": str(row.regime),
+                        "lifecycle_stage": str(row.lifecycle_stage),
+                    }
+                )
+
+            # Pre-determine eligible regimes and stages (>= 10 engines in partition)
+            reg_counts = df_cell.groupby("regime")["unit"].nunique()
+            el_regimes = sorted([r for r, c in reg_counts.items() if c >= SUBGROUP_MIN_ENGINES])
+            eligible_regimes_dict[ds] = el_regimes
+
+            stage_counts = df_cell.groupby("lifecycle_stage")["unit"].nunique()
+            el_stages = sorted([st for st, c in stage_counts.items() if c >= SUBGROUP_MIN_ENGINES])
+            eligible_stages_dict[ds] = el_stages
+
+            # -----------------------------------------------------------------
+            # Primary Methods: 3 methods x 3 coverages x 3 scenarios
+            # -----------------------------------------------------------------
+            for method in CONFIRMATORY_METHODS:
+                for cov in ALL_NOMINAL_COVERAGES:
+                    df_cell_eval = df_cell.copy()
+                    lowers: list[float] = []
+                    uppers: list[float] = []
+                    for seed in CONFIRMATORY_SEEDS:
+                        df_seed = df_cell[df_cell["seed"] == seed]
+                        cal = load_frozen_calibrator(
+                            dataset=ds,
+                            model_family=fam,
+                            seed=seed,
+                            method_id=method,
+                            base_dir=base,
+                        )
+                        low, upp, _ = cal.predict_intervals(
+                            predictions=df_seed["prediction"].to_numpy(),
+                            regimes=df_seed["regime"].to_numpy(),
+                            nominal_coverage=cov,
+                        )
+                        lowers.extend(low)
+                        uppers.extend(upp)
+
+                    df_cell_eval["lower"] = lowers
+                    df_cell_eval["upper"] = uppers
+                    df_cell_eval["covered"] = (
+                        (df_cell_eval["rul_true"] >= df_cell_eval["lower"])
+                        & (df_cell_eval["rul_true"] <= df_cell_eval["upper"])
+                    ).astype(float)
+                    df_cell_eval["width"] = df_cell_eval["upper"] - df_cell_eval["lower"]
+                    df_cell_eval["interval_score"] = compute_interval_score(
+                        y_true=df_cell_eval["rul_true"].to_numpy(),
+                        lower=df_cell_eval["lower"].to_numpy(),
+                        upper=df_cell_eval["upper"].to_numpy(),
+                        nominal_coverage=cov,
+                    )
+
+                    # Log interval predictions (seed 2026 once)
+                    if cov == PRIMARY_NOMINAL_COVERAGE:
+                        sub_log = df_cell_eval[df_cell_eval["seed"] == 2026]
+                        for row in sub_log.itertuples():
+                            interval_pred_rows.append(
+                                {
+                                    "dataset": ds,
+                                    "model_family": fam,
+                                    "seed": 2026,
+                                    "method_or_control_id": method,
+                                    "nominal_coverage": cov,
+                                    "unit": int(row.unit),
+                                    "endpoint_cycle": int(row.endpoint_cycle),
+                                    "lower": float(row.lower),
+                                    "upper": float(row.upper),
+                                    "covered": float(row.covered),
+                                    "width": float(row.width),
+                                    "interval_score": float(row.interval_score),
+                                }
+                            )
+
+                    # Simulation under primary scenario
+                    primary_scen = COST_SCENARIOS[PRIMARY_COST_SCENARIO]
+                    sim_outcomes_by_seed_unit: dict[tuple[int, int], SimulationTraceOutcome] = {}
+
+                    for (u, s), grp in df_cell_eval.groupby(["unit", "seed"]):
+                        grp_sort = grp.sort_values("endpoint_cycle")
+                        out = simulate_engine_policy(
+                            unit=int(u),
+                            seed=int(s),
+                            configuration_id=f"{ds}_{fam}_{method}_{cov}",
+                            method_or_control_id=method,
+                            cycles=grp_sort["endpoint_cycle"].to_numpy(),
+                            predictions=grp_sort["prediction"].to_numpy(),
+                            lower_bounds=grp_sort["lower"].to_numpy(),
+                            upper_bounds=grp_sort["upper"].to_numpy(),
+                            regimes=grp_sort["regime"].to_numpy(),
+                            failure_cycle=engine_lifetimes[int(u)],
+                            policy_fn=lambda st: (
+                                MaintenanceAction.MAINTAIN_NOW
+                                if st.lower_rul <= INTERVENTION_THRESHOLD_CYCLES
+                                else MaintenanceAction.CONTINUE
+                            ),
+                            scenario=primary_scen,
+                        )
+                        sim_outcomes_by_seed_unit[(int(u), int(s))] = out
+
+                        if cov == PRIMARY_NOMINAL_COVERAGE and s == 2026:
+                            for cyc, act in out.decision_trace:
+                                trace_rows.append(
+                                    {
+                                        "dataset": ds,
+                                        "model_family": fam,
+                                        "seed": s,
+                                        "method_or_control_id": method,
+                                        "nominal_coverage": cov,
+                                        "scenario_id": PRIMARY_COST_SCENARIO,
+                                        "unit": int(u),
+                                        "cycle": cyc,
+                                        "action": act,
+                                    }
+                                )
+
+                    # Precompute per-(unit, seed) metrics
+                    unit_seed_metrics: dict[tuple[int, int], dict[str, float]] = {}
+                    for (u_val, s_val), grp_us in df_cell_eval.groupby(["unit", "seed"]):
+                        cov_us = float(grp_us["covered"].mean())
+                        w_us = float(grp_us["width"].mean())
+                        is_us = float(grp_us["interval_score"].mean())
+                        rmse_us = float(
+                            np.sqrt(np.mean((grp_us["prediction"] - grp_us["rul_true"]) ** 2))
+                        )
+                        unit_seed_metrics[(int(u_val), int(s_val))] = {
+                            "cov": cov_us,
+                            "mpiw": w_us,
+                            "interval_score": is_us,
+                            "rmse": rmse_us,
+                        }
+
+                    # Reprice across all 3 cost scenarios
+                    for scen_id, scenario in COST_SCENARIOS.items():
+                        cfg_key = (ds, fam, method, cov, scen_id)
+                        outcomes_for_scen = [
+                            reprice_simulation_outcome(out, scenario)
+                            for out in sim_outcomes_by_seed_unit.values()
+                        ]
+
+                        for o in outcomes_for_scen:
+                            m_us = unit_seed_metrics[(o.unit, o.seed)]
+                            engine_seed_outcome_rows.append(
+                                {
+                                    "dataset": ds,
+                                    "model_family": fam,
+                                    "seed": o.seed,
+                                    "method_or_control_id": method,
+                                    "nominal_coverage": cov,
+                                    "scenario_id": scen_id,
+                                    "unit": o.unit,
+                                    "terminal_event": o.terminal_event,
+                                    "intervention_cycle": o.intervention_cycle,
+                                    "failed": o.failed,
+                                    "pm": o.pm_occurred,
+                                    "wasted_rul": o.wasted_rul,
+                                    "total_cost": o.total_cost,
+                                    "is_cost_inefficient_early_pm": (
+                                        o.is_cost_inefficient_early_pm
+                                    ),
+                                }
+                            )
+                            engine_metric_rows.append(
+                                {
+                                    "dataset": ds,
+                                    "model_family": fam,
+                                    "seed": o.seed,
+                                    "method_or_control_id": method,
+                                    "nominal_coverage": cov,
+                                    "scenario_id": scen_id,
+                                    "unit": o.unit,
+                                    "coverage": m_us["cov"],
+                                    "mpiw": m_us["mpiw"],
+                                    "mean_interval_score": m_us["interval_score"],
+                                    "rmse": m_us["rmse"],
+                                    "total_cost": o.total_cost,
+                                    "failed": 1.0 if o.failed else 0.0,
+                                    "pm": 1.0 if o.pm_occurred else 0.0,
+                                    "wasted_rul": o.wasted_rul,
+                                }
+                            )
+
+                        df_o = pd.DataFrame(
+                            [
+                                {
+                                    "unit": o.unit,
+                                    "seed": o.seed,
+                                    "cost": o.total_cost,
+                                    "failed": 1.0 if o.failed else 0.0,
+                                    "pm": 1.0 if o.pm_occurred else 0.0,
+                                    "wasted": o.wasted_rul,
+                                    "early_pm": 1.0 if o.is_cost_inefficient_early_pm else 0.0,
+                                }
+                                for o in outcomes_for_scen
+                            ]
+                        )
+                        e_avgs = df_o.groupby("unit").mean()
+                        mean_cost = float(e_avgs["cost"].mean())
+                        fail_rate = float(e_avgs["failed"].mean())
+                        pm_rate = float(e_avgs["pm"].mean())
+                        mean_wasted = float(e_avgs["wasted"].mean())
+                        fleet_early_pm = float(e_avgs["early_pm"].mean())
+                        pm_sub = df_o[df_o["pm"] > 0]
+                        pm_only_early = (
+                            float(pm_sub["early_pm"].mean()) if len(pm_sub) > 0 else float("nan")
+                        )
+
+                        marg_cov = compute_equal_engine_metric(df_cell_eval, "covered")
+                        mpiw = compute_equal_engine_metric(df_cell_eval, "width")
+                        int_score = compute_equal_engine_metric(df_cell_eval, "interval_score")
+
+                        for u_idx, c_val in e_avgs["cost"].items():
+                            fleet_engine_costs[cfg_key][int(u_idx)] = float(c_val)
+
+                        cell_summary_rows.append(
+                            {
+                                "dataset": ds,
+                                "model_family": fam,
+                                "method_or_control_id": method,
+                                "nominal_coverage": cov,
+                                "scenario_id": scen_id,
+                                "mean_cost": mean_cost,
+                                "failure_rate": fail_rate,
+                                "pm_rate": pm_rate,
+                                "mean_wasted_rul": mean_wasted,
+                                "fleet_early_pm_rate": fleet_early_pm,
+                                "pm_only_early_pm_rate": pm_only_early,
+                                "marginal_coverage": marg_cov,
+                                "marginal_coverage_abs_error": abs(marg_cov - cov),
+                                "mpiw": mpiw,
+                                "interval_score": int_score,
+                                "status": status_tag,
+                            }
+                        )
+
+                    # Subgroup metrics
+                    for reg in el_regimes:
+                        sub_reg = df_cell_eval[df_cell_eval["regime"] == reg]
+                        n_engs_sub = int(sub_reg["unit"].nunique())
+                        cov_sub = (
+                            compute_equal_engine_metric(sub_reg, "covered")
+                            if len(sub_reg) > 0
+                            else float("nan")
+                        )
+                        subgroup_metric_rows.append(
+                            {
+                                "dataset": ds,
+                                "model_family": fam,
+                                "method_id": method,
+                                "nominal_coverage": cov,
+                                "subgroup_family": "regime",
+                                "subgroup_id": reg,
+                                "engine_count": n_engs_sub,
+                                "coverage": cov_sub,
+                                "coverage_abs_error": abs(cov_sub - cov)
+                                if not np.isnan(cov_sub)
+                                else float("nan"),
+                                "is_eligible": n_engs_sub >= SUBGROUP_MIN_ENGINES,
+                            }
+                        )
+                    for stg in el_stages:
+                        sub_stg = df_cell_eval[df_cell_eval["lifecycle_stage"] == stg]
+                        n_engs_sub = int(sub_stg["unit"].nunique())
+                        cov_sub = (
+                            compute_equal_engine_metric(sub_stg, "covered")
+                            if len(sub_stg) > 0
+                            else float("nan")
+                        )
+                        subgroup_metric_rows.append(
+                            {
+                                "dataset": ds,
+                                "model_family": fam,
+                                "method_id": method,
+                                "nominal_coverage": cov,
+                                "subgroup_family": "lifecycle_stage",
+                                "subgroup_id": stg,
+                                "engine_count": n_engs_sub,
+                                "coverage": cov_sub,
+                                "coverage_abs_error": abs(cov_sub - cov)
+                                if not np.isnan(cov_sub)
+                                else float("nan"),
+                                "is_eligible": n_engs_sub >= SUBGROUP_MIN_ENGINES,
+                            }
+                        )
+
+                    engine_covs = (
+                        df_cell_eval.groupby(["unit", "seed"])["covered"]
+                        .mean()
+                        .groupby("unit")
+                        .mean()
+                    )
+                    engine_w = (
+                        df_cell_eval.groupby(["unit", "seed"])["width"]
+                        .mean()
+                        .groupby("unit")
+                        .mean()
+                    )
+                    engine_s = (
+                        df_cell_eval.groupby(["unit", "seed"])["interval_score"]
+                        .mean()
+                        .groupby("unit")
+                        .mean()
+                    )
+
+                    for u_idx in part_engines:
+                        for scen_id in COST_SCENARIOS:
+                            cfg_k = (ds, fam, method, cov, scen_id)
+                            fleet_engine_covs[cfg_k][u_idx] = float(engine_covs[u_idx])
+                            fleet_engine_cov_errs[cfg_k][u_idx] = abs(
+                                float(engine_covs[u_idx]) - cov
+                            )
+                            fleet_engine_mpiws[cfg_k][u_idx] = float(engine_w[u_idx])
+                            fleet_engine_iscores[cfg_k][u_idx] = float(engine_s[u_idx])
+
+                    for reg in el_regimes:
+                        sub_reg = df_cell_eval[df_cell_eval["regime"] == reg]
+                        if len(sub_reg) > 0:
+                            reg_u_cov = (
+                                sub_reg.groupby(["unit", "seed"])["covered"]
+                                .mean()
+                                .groupby("unit")
+                                .mean()
+                            )
+                            for u_idx, cv in reg_u_cov.items():
+                                for scen_id in COST_SCENARIOS:
+                                    cfg_k = (ds, fam, method, cov, scen_id)
+                                    fleet_engine_regime_covs[cfg_k][reg][int(u_idx)] = float(cv)
+
+                    for stg in el_stages:
+                        sub_stg = df_cell_eval[df_cell_eval["lifecycle_stage"] == stg]
+                        if len(sub_stg) > 0:
+                            stg_u_cov = (
+                                sub_stg.groupby(["unit", "seed"])["covered"]
+                                .mean()
+                                .groupby("unit")
+                                .mean()
+                            )
+                            for u_idx, cv in stg_u_cov.items():
+                                for scen_id in COST_SCENARIOS:
+                                    cfg_k = (ds, fam, method, cov, scen_id)
+                                    fleet_engine_stage_covs[cfg_k][stg][int(u_idx)] = float(cv)
+
+            # -----------------------------------------------------------------
+            # Benchmark Controls (FD002 Only, 4 controls x 1 coverage x 3 scenarios)
+            # -----------------------------------------------------------------
+            if ds == "FD002":
+                ctrl_dict = selected_controls_by_fam[fam]
+                for ctrl_id, ctrl_info in ctrl_dict.items():
+                    param_val = ctrl_info["parameter_value"]
+                    src = ctrl_info.get("interval_source", "regime_hcp")
+
+                    df_ctrl_eval = df_cell.copy()
+                    lowers_src: list[float] = []
+                    uppers_src: list[float] = []
+                    for seed in CONFIRMATORY_SEEDS:
+                        df_seed = df_cell[df_cell["seed"] == seed]
+                        cal_src = load_frozen_calibrator(
+                            dataset="FD002",
+                            model_family=fam,
+                            seed=seed,
+                            method_id=src,
+                            base_dir=base,
+                        )
+                        l_s, u_s, _ = cal_src.predict_intervals(
+                            predictions=df_seed["prediction"].to_numpy(),
+                            regimes=df_seed["regime"].to_numpy(),
+                            nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                        )
+                        lowers_src.extend(l_s)
+                        uppers_src.extend(u_s)
+
+                    df_ctrl_eval["source_lower"] = lowers_src
+                    df_ctrl_eval["source_upper"] = uppers_src
+
+                    if ctrl_id in (CONTROL_MATCHED_WIDTH, CONTROL_WIDENED):
+                        lam = float(param_val)
+                        q_half = (
+                            df_ctrl_eval["source_upper"] - df_ctrl_eval["prediction"]
+                        ).to_numpy()
+                        df_ctrl_eval["lower"] = np.maximum(
+                            0.0, df_ctrl_eval["prediction"] - lam * q_half
+                        )
+                        df_ctrl_eval["upper"] = df_ctrl_eval["prediction"] + lam * q_half
+                        df_ctrl_eval["covered"] = (
+                            (df_ctrl_eval["rul_true"] >= df_ctrl_eval["lower"])
+                            & (df_ctrl_eval["rul_true"] <= df_ctrl_eval["upper"])
+                        ).astype(float)
+                        df_ctrl_eval["width"] = df_ctrl_eval["upper"] - df_ctrl_eval["lower"]
+                        df_ctrl_eval["interval_score"] = compute_interval_score(
+                            y_true=df_ctrl_eval["rul_true"].to_numpy(),
+                            lower=df_ctrl_eval["lower"].to_numpy(),
+                            upper=df_ctrl_eval["upper"].to_numpy(),
+                            nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                        )
+
+                        def policy_fn_interval(st: PredictionState) -> MaintenanceAction:
+                            return (
+                                MaintenanceAction.MAINTAIN_NOW
+                                if st.lower_rul <= INTERVENTION_THRESHOLD_CYCLES
+                                else MaintenanceAction.CONTINUE
+                            )
+
+                        policy_fn = policy_fn_interval
+                    elif ctrl_id == CONTROL_SAFETY_MARGIN:
+                        m_val = float(param_val)
+                        df_ctrl_eval["lower"] = float("nan")
+                        df_ctrl_eval["upper"] = float("nan")
+                        df_ctrl_eval["covered"] = float("nan")
+                        df_ctrl_eval["width"] = float("nan")
+                        df_ctrl_eval["interval_score"] = float("nan")
+
+                        def policy_fn_safety(
+                            st: PredictionState, m: float = m_val
+                        ) -> MaintenanceAction:
+                            return (
+                                MaintenanceAction.MAINTAIN_NOW
+                                if st.point_rul <= (1.0 + m)
+                                else MaintenanceAction.CONTINUE
+                            )
+
+                        policy_fn = policy_fn_safety
+                    elif ctrl_id == CONTROL_EARLIER_INTERVENTION:
+                        h_val = float(param_val)
+                        df_ctrl_eval["lower"] = df_ctrl_eval["source_lower"]
+                        df_ctrl_eval["upper"] = df_ctrl_eval["source_upper"]
+                        df_ctrl_eval["covered"] = (
+                            (df_ctrl_eval["rul_true"] >= df_ctrl_eval["lower"])
+                            & (df_ctrl_eval["rul_true"] <= df_ctrl_eval["upper"])
+                        ).astype(float)
+                        df_ctrl_eval["width"] = df_ctrl_eval["upper"] - df_ctrl_eval["lower"]
+                        df_ctrl_eval["interval_score"] = compute_interval_score(
+                            y_true=df_ctrl_eval["rul_true"].to_numpy(),
+                            lower=df_ctrl_eval["lower"].to_numpy(),
+                            upper=df_ctrl_eval["upper"].to_numpy(),
+                            nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                        )
+
+                        def policy_fn_earlier(
+                            st: PredictionState, h: float = h_val
+                        ) -> MaintenanceAction:
+                            return (
+                                MaintenanceAction.MAINTAIN_NOW
+                                if st.lower_rul <= h
+                                else MaintenanceAction.CONTINUE
+                            )
+
+                        policy_fn = policy_fn_earlier
+                    else:
+                        raise ValueError(f"Unknown control family: {ctrl_id}")
+
+                    sim_outcomes_ctrl: dict[tuple[int, int], SimulationTraceOutcome] = {}
+                    for (u, s), grp in df_ctrl_eval.groupby(["unit", "seed"]):
+                        grp_sort = grp.sort_values("endpoint_cycle")
+                        out = simulate_engine_policy(
+                            unit=int(u),
+                            seed=int(s),
+                            configuration_id=f"FD002_{fam}_{ctrl_id}",
+                            method_or_control_id=ctrl_id,
+                            cycles=grp_sort["endpoint_cycle"].to_numpy(),
+                            predictions=grp_sort["prediction"].to_numpy(),
+                            lower_bounds=grp_sort["lower"].to_numpy()
+                            if ctrl_id != CONTROL_SAFETY_MARGIN
+                            else None,
+                            upper_bounds=grp_sort["upper"].to_numpy()
+                            if ctrl_id != CONTROL_SAFETY_MARGIN
+                            else None,
+                            regimes=grp_sort["regime"].to_numpy(),
+                            failure_cycle=engine_lifetimes[int(u)],
+                            policy_fn=policy_fn,
+                            scenario=primary_scen,
+                        )
+                        sim_outcomes_ctrl[(int(u), int(s))] = out
+
+                    unit_seed_ctrl_metrics: dict[tuple[int, int], dict[str, float]] = {}
+                    for (u_val, s_val), grp_us in df_ctrl_eval.groupby(["unit", "seed"]):
+                        rmse_us = float(
+                            np.sqrt(np.mean((grp_us["prediction"] - grp_us["rul_true"]) ** 2))
+                        )
+                        if ctrl_id == CONTROL_SAFETY_MARGIN:
+                            unit_seed_ctrl_metrics[(int(u_val), int(s_val))] = {
+                                "cov": float("nan"),
+                                "mpiw": float("nan"),
+                                "interval_score": float("nan"),
+                                "rmse": rmse_us,
+                            }
+                        else:
+                            unit_seed_ctrl_metrics[(int(u_val), int(s_val))] = {
+                                "cov": float(grp_us["covered"].mean()),
+                                "mpiw": float(grp_us["width"].mean()),
+                                "interval_score": float(grp_us["interval_score"].mean()),
+                                "rmse": rmse_us,
+                            }
+
+                    for scen_id, scenario in COST_SCENARIOS.items():
+                        cfg_key = ("FD002", fam, ctrl_id, PRIMARY_NOMINAL_COVERAGE, scen_id)
+                        outcomes_for_scen = [
+                            reprice_simulation_outcome(out, scenario)
+                            for out in sim_outcomes_ctrl.values()
+                        ]
+
+                        for o in outcomes_for_scen:
+                            m_us = unit_seed_ctrl_metrics[(o.unit, o.seed)]
+                            engine_seed_outcome_rows.append(
+                                {
+                                    "dataset": "FD002",
+                                    "model_family": fam,
+                                    "seed": o.seed,
+                                    "method_or_control_id": ctrl_id,
+                                    "nominal_coverage": PRIMARY_NOMINAL_COVERAGE,
+                                    "scenario_id": scen_id,
+                                    "unit": o.unit,
+                                    "terminal_event": o.terminal_event,
+                                    "intervention_cycle": o.intervention_cycle,
+                                    "failed": o.failed,
+                                    "pm": o.pm_occurred,
+                                    "wasted_rul": o.wasted_rul,
+                                    "total_cost": o.total_cost,
+                                    "is_cost_inefficient_early_pm": (
+                                        o.is_cost_inefficient_early_pm
+                                    ),
+                                }
+                            )
+                            engine_metric_rows.append(
+                                {
+                                    "dataset": "FD002",
+                                    "model_family": fam,
+                                    "seed": o.seed,
+                                    "method_or_control_id": ctrl_id,
+                                    "nominal_coverage": PRIMARY_NOMINAL_COVERAGE,
+                                    "scenario_id": scen_id,
+                                    "unit": o.unit,
+                                    "coverage": m_us["cov"],
+                                    "mpiw": m_us["mpiw"],
+                                    "mean_interval_score": m_us["interval_score"],
+                                    "rmse": m_us["rmse"],
+                                    "total_cost": o.total_cost,
+                                    "failed": 1.0 if o.failed else 0.0,
+                                    "pm": 1.0 if o.pm_occurred else 0.0,
+                                    "wasted_rul": o.wasted_rul,
+                                }
+                            )
+
+                        df_o = pd.DataFrame(
+                            [
+                                {
+                                    "unit": o.unit,
+                                    "seed": o.seed,
+                                    "cost": o.total_cost,
+                                    "failed": 1.0 if o.failed else 0.0,
+                                    "pm": 1.0 if o.pm_occurred else 0.0,
+                                    "wasted": o.wasted_rul,
+                                    "early_pm": 1.0 if o.is_cost_inefficient_early_pm else 0.0,
+                                }
+                                for o in outcomes_for_scen
+                            ]
+                        )
+                        e_avgs = df_o.groupby("unit").mean()
+                        mean_cost = float(e_avgs["cost"].mean())
+                        fail_rate = float(e_avgs["failed"].mean())
+                        pm_rate = float(e_avgs["pm"].mean())
+                        mean_wasted = float(e_avgs["wasted"].mean())
+                        fleet_early_pm = float(e_avgs["early_pm"].mean())
+                        pm_sub = df_o[df_o["pm"] > 0]
+                        pm_only_early = (
+                            float(pm_sub["early_pm"].mean()) if len(pm_sub) > 0 else float("nan")
+                        )
+
+                        if ctrl_id == CONTROL_SAFETY_MARGIN:
+                            marg_cov = float("nan")
+                            abs_err = float("nan")
+                            mpiw_val = float("nan")
+                            is_val = float("nan")
+                        else:
+                            marg_cov = compute_equal_engine_metric(df_ctrl_eval, "covered")
+                            abs_err = abs(marg_cov - PRIMARY_NOMINAL_COVERAGE)
+                            mpiw_val = compute_equal_engine_metric(df_ctrl_eval, "width")
+                            is_val = compute_equal_engine_metric(df_ctrl_eval, "interval_score")
+
+                        for u_idx, c_val in e_avgs["cost"].items():
+                            fleet_engine_costs[cfg_key][int(u_idx)] = float(c_val)
+
+                        cell_summary_rows.append(
+                            {
+                                "dataset": "FD002",
+                                "model_family": fam,
+                                "method_or_control_id": ctrl_id,
+                                "nominal_coverage": PRIMARY_NOMINAL_COVERAGE,
+                                "scenario_id": scen_id,
+                                "mean_cost": mean_cost,
+                                "failure_rate": fail_rate,
+                                "pm_rate": pm_rate,
+                                "mean_wasted_rul": mean_wasted,
+                                "fleet_early_pm_rate": fleet_early_pm,
+                                "pm_only_early_pm_rate": pm_only_early,
+                                "marginal_coverage": marg_cov,
+                                "marginal_coverage_abs_error": abs_err,
+                                "mpiw": mpiw_val,
+                                "interval_score": is_val,
+                                "status": status_tag,
+                            }
+                        )
+
+    # -------------------------------------------------------------------------
+    # Apply Bootstrap Draws to Compute Replicate Statistics & Contrasts
+    # -------------------------------------------------------------------------
+    logger.info("Evaluating 10,000 bootstrap draws and contrast intervals...")
+    contrast_records: list[dict[str, Any]] = []
+    dataset_stats_arrays: dict[str, dict[str, np.ndarray[Any, Any]]] = {
+        ds: {} for ds in CONFIRMATORY_DATASETS
+    }
+
+    for ds in CONFIRMATORY_DATASETS:
+        draws = bootstrap_draws_dict[ds]  # shape: (B, N)
+        engines = partition_engines_dict[ds]
+        n_engs = len(engines)
+        eng_to_idx = {u: i for i, u in enumerate(engines)}
+
+        M = np.zeros((n_bootstrap, n_engs), dtype=float)
+        for b in range(n_bootstrap):
+            for u in draws[b]:
+                M[b, eng_to_idx[u]] += 1.0
+
+        for fam in CONFIRMATORY_MODELS:
+            prop_key = (
+                ds,
+                fam,
+                "decision_aware_hcp",
+                PRIMARY_NOMINAL_COVERAGE,
+                PRIMARY_COST_SCENARIO,
+            )
+            prop_cost_vec = np.array(
+                [fleet_engine_costs[prop_key][u] for u in engines], dtype=float
+            )
+            rep_cost_prop = (M @ prop_cost_vec) / n_engs
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_cost"] = rep_cost_prop
+
+            prop_cov_vec = np.array([fleet_engine_covs[prop_key][u] for u in engines], dtype=float)
+            rep_marg_cov = (M @ prop_cov_vec) / n_engs
+            rep_marg_cov_err = np.abs(rep_marg_cov - PRIMARY_NOMINAL_COVERAGE)
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_marginal_coverage_error"] = (
+                rep_marg_cov_err
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_marginal_coverage_error"] = (
+                rep_marg_cov_err
+            )
+
+            prop_reg_low, prop_reg_up = compute_subgroup_bounds(
+                multiplicity_matrix=M,
+                eng_to_idx=eng_to_idx,
+                cov_map_by_group=fleet_engine_regime_covs[prop_key],
+                eligible_groups=eligible_regimes_dict[ds],
+                nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+            )
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_lower"] = prop_reg_low
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_regime_error_upper"] = prop_reg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_lower"] = (
+                prop_reg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_regime_error_upper"] = (
+                prop_reg_up
+            )
+
+            prop_stg_low, prop_stg_up = compute_subgroup_bounds(
+                multiplicity_matrix=M,
+                eng_to_idx=eng_to_idx,
+                cov_map_by_group=fleet_engine_stage_covs[prop_key],
+                eligible_groups=eligible_stages_dict[ds],
+                nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+            )
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_lower"] = prop_stg_low
+            dataset_stats_arrays[ds][f"{fam}_decision_aware_hcp_stage_error_upper"] = prop_stg_up
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_lower"] = (
+                prop_stg_low
+            )
+            dataset_stats_arrays[ds][f"{ds}_{fam}_decision_aware_hcp_stage_error_upper"] = (
+                prop_stg_up
+            )
+
+            for base_id in ("global_hcp", "regime_hcp"):
+                base_key = (ds, fam, base_id, PRIMARY_NOMINAL_COVERAGE, PRIMARY_COST_SCENARIO)
+                base_cost_vec = np.array(
+                    [fleet_engine_costs[base_key][u] for u in engines], dtype=float
+                )
+                rep_cost_base = (M @ base_cost_vec) / n_engs
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_cost"] = rep_cost_base
+
+                delta_cost = rep_cost_base - rep_cost_prop
+                c_name = f"{ds}_{fam}_{base_id}_cost_improvement"
+                dataset_stats_arrays[ds][c_name] = delta_cost
+
+                ci_95 = compute_bootstrap_ci(delta_cost, quantiles=DESCRIPTIVE_QUANTILES)
+                ci_dec = compute_bootstrap_ci(delta_cost, quantiles=DECISION_QUANTILES)
+
+                contrast_records.append(
+                    {
+                        "contrast_id": c_name,
+                        "dataset": ds,
+                        "model_family": fam,
+                        "comparator": base_id,
+                        "metric": "delta_cost",
+                        "mean": float(np.mean(delta_cost)),
+                        "median": float(np.median(delta_cost)),
+                        "ci_95_low": ci_95[0],
+                        "ci_95_high": ci_95[1],
+                        "ci_decision_low": ci_dec[0],
+                        "ci_decision_high": ci_dec[1],
+                        "margin": 0.20,
+                        "status": status_tag,
+                    }
+                )
+
+                base_reg_low, base_reg_up = compute_subgroup_bounds(
+                    multiplicity_matrix=M,
+                    eng_to_idx=eng_to_idx,
+                    cov_map_by_group=fleet_engine_regime_covs[base_key],
+                    eligible_groups=eligible_regimes_dict[ds],
+                    nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                )
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_regime_error_lower"] = base_reg_low
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_regime_error_upper"] = base_reg_up
+
+                delta_reg_low = base_reg_low - prop_reg_up
+                delta_reg_up = base_reg_up - prop_reg_low
+                c_reg_name = f"{ds}_{fam}_{base_id}_regime_error_improvement"
+                dataset_stats_arrays[ds][f"{c_reg_name}_lower"] = delta_reg_low
+                dataset_stats_arrays[ds][f"{c_reg_name}_upper"] = delta_reg_up
+
+                ci_95_r = (
+                    float(np.quantile(delta_reg_low, 0.025, method="linear")),
+                    float(np.quantile(delta_reg_up, 0.975, method="linear")),
+                )
+                ci_dec_r = (
+                    float(np.quantile(delta_reg_low, 0.00625, method="linear")),
+                    float(np.quantile(delta_reg_up, 0.99375, method="linear")),
+                )
+                contrast_records.append(
+                    {
+                        "contrast_id": c_reg_name,
+                        "dataset": ds,
+                        "model_family": fam,
+                        "comparator": base_id,
+                        "metric": "delta_regime_error",
+                        "mean": float(np.mean(0.5 * (delta_reg_low + delta_reg_up))),
+                        "median": float(np.median(0.5 * (delta_reg_low + delta_reg_up))),
+                        "ci_95_low": ci_95_r[0],
+                        "ci_95_high": ci_95_r[1],
+                        "ci_decision_low": ci_dec_r[0],
+                        "ci_decision_high": ci_dec_r[1],
+                        "margin": 0.01,
+                        "status": status_tag,
+                    }
+                )
+
+                base_stg_low, base_stg_up = compute_subgroup_bounds(
+                    multiplicity_matrix=M,
+                    eng_to_idx=eng_to_idx,
+                    cov_map_by_group=fleet_engine_stage_covs[base_key],
+                    eligible_groups=eligible_stages_dict[ds],
+                    nominal_coverage=PRIMARY_NOMINAL_COVERAGE,
+                )
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_stage_error_lower"] = base_stg_low
+                dataset_stats_arrays[ds][f"{fam}_{base_id}_stage_error_upper"] = base_stg_up
+
+                delta_stg_low = base_stg_low - prop_stg_up
+                delta_stg_up = base_stg_up - prop_stg_low
+                c_stg_name = f"{ds}_{fam}_{base_id}_stage_error_improvement"
+                dataset_stats_arrays[ds][f"{c_stg_name}_lower"] = delta_stg_low
+                dataset_stats_arrays[ds][f"{c_stg_name}_upper"] = delta_stg_up
+
+                ci_95_s = (
+                    float(np.quantile(delta_stg_low, 0.025, method="linear")),
+                    float(np.quantile(delta_stg_up, 0.975, method="linear")),
+                )
+                ci_dec_s = (
+                    float(np.quantile(delta_stg_low, 0.00625, method="linear")),
+                    float(np.quantile(delta_stg_up, 0.99375, method="linear")),
+                )
+                contrast_records.append(
+                    {
+                        "contrast_id": c_stg_name,
+                        "dataset": ds,
+                        "model_family": fam,
+                        "comparator": base_id,
+                        "metric": "delta_stage_error",
+                        "mean": float(np.mean(0.5 * (delta_stg_low + delta_stg_up))),
+                        "median": float(np.median(0.5 * (delta_stg_low + delta_stg_up))),
+                        "ci_95_low": ci_95_s[0],
+                        "ci_95_high": ci_95_s[1],
+                        "ci_decision_low": ci_dec_s[0],
+                        "ci_decision_high": ci_dec_s[1],
+                        "margin": 0.01,
+                        "status": status_tag,
+                    }
+                )
+
+                prop_w_vec = np.array(
+                    [fleet_engine_mpiws[prop_key][u] for u in engines], dtype=float
+                )
+                base_w_vec = np.array(
+                    [fleet_engine_mpiws[base_key][u] for u in engines], dtype=float
+                )
+                mpiw_det = (M @ (prop_w_vec - base_w_vec)) / n_engs
+                c_w_name = f"{ds}_{fam}_{base_id}_mpiw_deterioration"
+                dataset_stats_arrays[ds][c_w_name] = mpiw_det
+                ci_95_w = compute_bootstrap_ci(mpiw_det, quantiles=DESCRIPTIVE_QUANTILES)
+                ci_dec_w = compute_bootstrap_ci(mpiw_det, quantiles=DECISION_QUANTILES)
+                contrast_records.append(
+                    {
+                        "contrast_id": c_w_name,
+                        "dataset": ds,
+                        "model_family": fam,
+                        "comparator": base_id,
+                        "metric": "mpiw_deterioration",
+                        "mean": float(np.mean(mpiw_det)),
+                        "median": float(np.median(mpiw_det)),
+                        "ci_95_low": ci_95_w[0],
+                        "ci_95_high": ci_95_w[1],
+                        "ci_decision_low": ci_dec_w[0],
+                        "ci_decision_high": ci_dec_w[1],
+                        "margin": 1.0,
+                        "status": status_tag,
+                    }
+                )
+
+                prop_is_vec = np.array(
+                    [fleet_engine_iscores[prop_key][u] for u in engines], dtype=float
+                )
+                base_is_vec = np.array(
+                    [fleet_engine_iscores[base_key][u] for u in engines], dtype=float
+                )
+                score_det = (M @ (prop_is_vec - base_is_vec)) / n_engs
+                c_is_name = f"{ds}_{fam}_{base_id}_interval_score_deterioration"
+                dataset_stats_arrays[ds][c_is_name] = score_det
+                ci_95_is = compute_bootstrap_ci(score_det, quantiles=DESCRIPTIVE_QUANTILES)
+                ci_dec_is = compute_bootstrap_ci(score_det, quantiles=DECISION_QUANTILES)
+                contrast_records.append(
+                    {
+                        "contrast_id": c_is_name,
+                        "dataset": ds,
+                        "model_family": fam,
+                        "comparator": base_id,
+                        "metric": "interval_score_deterioration",
+                        "mean": float(np.mean(score_det)),
+                        "median": float(np.median(score_det)),
+                        "ci_95_low": ci_95_is[0],
+                        "ci_95_high": ci_95_is[1],
+                        "ci_decision_low": ci_dec_is[0],
+                        "ci_decision_high": ci_dec_is[1],
+                        "margin": 1.0,
+                        "status": status_tag,
+                    }
+                )
+
+            if ds == "FD002":
+                ctrl_dict = selected_controls_by_fam[fam]
+                for ctrl_id in ctrl_dict:
+                    ctrl_key = (
+                        "FD002",
+                        fam,
+                        ctrl_id,
+                        PRIMARY_NOMINAL_COVERAGE,
+                        PRIMARY_COST_SCENARIO,
+                    )
+                    ctrl_cost_vec = np.array(
+                        [fleet_engine_costs[ctrl_key][u] for u in engines], dtype=float
+                    )
+                    rep_cost_ctrl = (M @ ctrl_cost_vec) / n_engs
+                    dataset_stats_arrays[ds][f"{fam}_{ctrl_id}_cost"] = rep_cost_ctrl
+
+                    delta_ctrl = rep_cost_ctrl - rep_cost_prop
+                    c_ctrl_name = f"FD002_{fam}_{ctrl_id}_cost_improvement"
+                    dataset_stats_arrays[ds][c_ctrl_name] = delta_ctrl
+                    ci_95_c = compute_bootstrap_ci(delta_ctrl, quantiles=DESCRIPTIVE_QUANTILES)
+                    ci_dec_c = compute_bootstrap_ci(delta_ctrl, quantiles=DECISION_QUANTILES)
+                    contrast_records.append(
+                        {
+                            "contrast_id": c_ctrl_name,
+                            "dataset": "FD002",
+                            "model_family": fam,
+                            "comparator": ctrl_id,
+                            "metric": "delta_cost",
+                            "mean": float(np.mean(delta_ctrl)),
+                            "median": float(np.median(delta_ctrl)),
+                            "ci_95_low": ci_95_c[0],
+                            "ci_95_high": ci_95_c[1],
+                            "ci_decision_low": ci_dec_c[0],
+                            "ci_decision_high": ci_dec_c[1],
+                            "margin": 0.20,
+                            "status": status_tag,
+                        }
+                    )
+
+    # -------------------------------------------------------------------------
+    # RQ4 Equal-Six-Cell Aggregate Contrasts
+    # -------------------------------------------------------------------------
+    cells = [
+        ("FD001", "GBR"),
+        ("FD001", "LSTM"),
+        ("FD002", "GBR"),
+        ("FD002", "LSTM"),
+        ("FD004", "GBR"),
+        ("FD004", "LSTM"),
+    ]
+    rq4_stats_dict: dict[str, np.ndarray[Any, Any]] = {}
+
+    for base_id in ("global_hcp", "regime_hcp"):
+        cell_cost_contrasts = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_cost_improvement"] for d, f in cells
+        ]
+        agg_delta_cost = np.mean(cell_cost_contrasts, axis=0)
+        rq4_stats_dict[f"agg_{base_id}_cost_improvement"] = agg_delta_cost
+        rq4_stats_dict[f"aggregate_{base_id}_cost_improvement"] = agg_delta_cost
+
+        ci_95 = compute_bootstrap_ci(agg_delta_cost, quantiles=DESCRIPTIVE_QUANTILES)
+        ci_dec = compute_bootstrap_ci(agg_delta_cost, quantiles=DECISION_QUANTILES)
+
+        contrast_records.append(
+            {
+                "contrast_id": f"RQ4_aggregate_{base_id}_cost_improvement",
+                "dataset": "ALL_6_CELLS",
+                "model_family": "BOTH",
+                "comparator": base_id,
+                "metric": "aggregate_delta_cost",
+                "mean": float(np.mean(agg_delta_cost)),
+                "median": float(np.median(agg_delta_cost)),
+                "ci_95_low": ci_95[0],
+                "ci_95_high": ci_95[1],
+                "ci_decision_low": ci_dec[0],
+                "ci_decision_high": ci_dec[1],
+                "margin": 0.20,
+                "status": status_tag,
+            }
+        )
+
+        cell_reg_contrasts_low = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_regime_error_improvement_lower"]
+            for d, f in cells
+        ]
+        cell_reg_contrasts_up = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_regime_error_improvement_upper"]
+            for d, f in cells
+        ]
+        agg_delta_reg_low = np.mean(cell_reg_contrasts_low, axis=0)
+        agg_delta_reg_up = np.mean(cell_reg_contrasts_up, axis=0)
+        rq4_stats_dict[f"agg_{base_id}_regime_error_improvement_lower"] = agg_delta_reg_low
+        rq4_stats_dict[f"agg_{base_id}_regime_error_improvement_upper"] = agg_delta_reg_up
+
+        ci_95_r = (
+            float(np.quantile(agg_delta_reg_low, 0.025, method="linear")),
+            float(np.quantile(agg_delta_reg_up, 0.975, method="linear")),
+        )
+        ci_dec_r = (
+            float(np.quantile(agg_delta_reg_low, 0.00625, method="linear")),
+            float(np.quantile(agg_delta_reg_up, 0.99375, method="linear")),
+        )
+        contrast_records.append(
+            {
+                "contrast_id": f"RQ4_aggregate_{base_id}_regime_error_improvement",
+                "dataset": "ALL_6_CELLS",
+                "model_family": "BOTH",
+                "comparator": base_id,
+                "metric": "aggregate_delta_regime_error",
+                "mean": float(np.mean(0.5 * (agg_delta_reg_low + agg_delta_reg_up))),
+                "median": float(np.median(0.5 * (agg_delta_reg_low + agg_delta_reg_up))),
+                "ci_95_low": ci_95_r[0],
+                "ci_95_high": ci_95_r[1],
+                "ci_decision_low": ci_dec_r[0],
+                "ci_decision_high": ci_dec_r[1],
+                "margin": 0.01,
+                "status": status_tag,
+            }
+        )
+
+        cell_stg_contrasts_low = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_stage_error_improvement_lower"]
+            for d, f in cells
+        ]
+        cell_stg_contrasts_up = [
+            dataset_stats_arrays[d][f"{d}_{f}_{base_id}_stage_error_improvement_upper"]
+            for d, f in cells
+        ]
+        agg_delta_stg_low = np.mean(cell_stg_contrasts_low, axis=0)
+        agg_delta_stg_up = np.mean(cell_stg_contrasts_up, axis=0)
+        rq4_stats_dict[f"agg_{base_id}_stage_error_improvement_lower"] = agg_delta_stg_low
+        rq4_stats_dict[f"agg_{base_id}_stage_error_improvement_upper"] = agg_delta_stg_up
+
+        ci_95_s = (
+            float(np.quantile(agg_delta_stg_low, 0.025, method="linear")),
+            float(np.quantile(agg_delta_stg_up, 0.975, method="linear")),
+        )
+        ci_dec_s = (
+            float(np.quantile(agg_delta_stg_low, 0.00625, method="linear")),
+            float(np.quantile(agg_delta_stg_up, 0.99375, method="linear")),
+        )
+        contrast_records.append(
+            {
+                "contrast_id": f"RQ4_aggregate_{base_id}_stage_error_improvement",
+                "dataset": "ALL_6_CELLS",
+                "model_family": "BOTH",
+                "comparator": base_id,
+                "metric": "aggregate_delta_stage_error",
+                "mean": float(np.mean(0.5 * (agg_delta_stg_low + agg_delta_stg_up))),
+                "median": float(np.median(0.5 * (agg_delta_stg_low + agg_delta_stg_up))),
+                "ci_95_low": ci_95_s[0],
+                "ci_95_high": ci_95_s[1],
+                "ci_decision_low": ci_dec_s[0],
+                "ci_decision_high": ci_dec_s[1],
+                "margin": 0.01,
+                "status": status_tag,
+            }
+        )
+
+    # -------------------------------------------------------------------------
+    # Save Primary CSV Artifacts
+    # -------------------------------------------------------------------------
+    df_point_preds = pd.DataFrame(point_pred_rows)
+    df_interval_preds = pd.DataFrame(interval_pred_rows)
+    df_traces = pd.DataFrame(trace_rows)
+    df_outcomes = pd.DataFrame(engine_seed_outcome_rows)
+    df_engine_metrics = pd.DataFrame(engine_metric_rows)
+    df_subgroup_metrics = pd.DataFrame(subgroup_metric_rows)
+    df_cell_summary = pd.DataFrame(cell_summary_rows)
+    df_contrasts = pd.DataFrame(contrast_records)
+
+    write_immutable_csv(out_dir / "point_predictions.csv", df_point_preds)
+    write_immutable_csv(out_dir / "interval_predictions.csv", df_interval_preds)
+    write_immutable_csv(out_dir / "decision_traces.csv", df_traces)
+    write_immutable_csv(out_dir / "engine_seed_outcomes.csv", df_outcomes)
+    write_immutable_csv(out_dir / "engine_metrics.csv", df_engine_metrics)
+    write_immutable_csv(out_dir / "subgroup_metrics.csv", df_subgroup_metrics)
+    write_immutable_csv(out_dir / "cell_summary.csv", df_cell_summary)
+    write_immutable_csv(out_dir / "contrast_intervals.csv", df_contrasts)
+
+    # -------------------------------------------------------------------------
+    # Generate Component Evidence (152 hypothesis components) & RQ Decisions
+    # -------------------------------------------------------------------------
+    manifest_rq = get_rq_component_manifest()
+    contrast_lookup = {r["contrast_id"]: r for r in contrast_records}
+    component_evidence_rows: list[dict[str, Any]] = []
+
+    def get_failure_count(d: str, m_fam: str, comp: str) -> int:
+        sub = df_outcomes[
+            (df_outcomes["dataset"] == d)
+            & (df_outcomes["model_family"] == m_fam)
+            & (df_outcomes["method_or_control_id"] == comp)
+            & (df_outcomes["nominal_coverage"] == PRIMARY_NOMINAL_COVERAGE)
+            & (df_outcomes["scenario_id"] == PRIMARY_COST_SCENARIO)
+        ]
+        return int(sub["failed"].sum())
+
+    def get_obs_subgroup_error(d: str, m_fam: str, meth: str, fam_type: str) -> float:
+        cfg = (d, m_fam, meth, PRIMARY_NOMINAL_COVERAGE, PRIMARY_COST_SCENARIO)
+        if fam_type == "regime":
+            cov_map_all = fleet_engine_regime_covs[cfg]
+            el_grps = eligible_regimes_dict[d]
+        else:
+            cov_map_all = fleet_engine_stage_covs[cfg]
+            el_grps = eligible_stages_dict[d]
+        if len(el_grps) == 0:
+            return 0.90
+        max_err = 0.0
+        for grp in el_grps:
+            cov_map = cov_map_all.get(grp, {})
+            if len(cov_map) > 0:
+                c_val = float(np.mean(list(cov_map.values())))
+                err_g = abs(c_val - PRIMARY_NOMINAL_COVERAGE)
+                if err_g > max_err:
+                    max_err = err_g
+        return max_err
+
+    # Component decision evaluations
+    component_decisions_map: dict[str, DecisionStatus] = {}
+
+    for rq in ("RQ1", "RQ2", "RQ3", "RQ4"):
+        for comp in manifest_rq[rq]:
+            ev_kind, stat_id = map_component_to_evidence_spec(
+                component_id=comp.component_id,
+                rq_id=comp.rq_id,
+                model_family=comp.model_family,
+                dataset=comp.dataset,
+                comparator=comp.comparator,
+                metric=comp.metric,
+                rule_type=comp.rule_type,
+            )
+
+            obs_low: float = float("nan")
+            obs_up: float = float("nan")
+            ci_95_l: float = float("nan")
+            ci_95_h: float = float("nan")
+            ci_dec_l: float = float("nan")
+            ci_dec_h: float = float("nan")
+            prop_fails: int | float = float("nan")
+            comp_fails: int | float = float("nan")
+
+            if ev_kind == "observed_failure":
+                assert comp.dataset is not None and comp.model_family is not None
+                prop_fails = get_failure_count(
+                    comp.dataset, comp.model_family, "decision_aware_hcp"
+                )
+                comp_fails = get_failure_count(comp.dataset, comp.model_family, comp.comparator)
+                c_status = evaluate_failure_safeguard(prop_fails, comp_fails)
+            elif comp.comparator == "nominal_90":
+                assert comp.dataset is not None and comp.model_family is not None
+                if comp.metric == "marginal_coverage_abs_error":
+                    obs_prop_cov = float(
+                        np.mean(
+                            [
+                                fleet_engine_covs[
+                                    (
+                                        comp.dataset,
+                                        comp.model_family,
+                                        "decision_aware_hcp",
+                                        PRIMARY_NOMINAL_COVERAGE,
+                                        PRIMARY_COST_SCENARIO,
+                                    )
+                                ][u]
+                                for u in partition_engines_dict[comp.dataset]
+                            ]
+                        )
+                    )
+                    obs_low = abs(obs_prop_cov - PRIMARY_NOMINAL_COVERAGE)
+                    obs_up = obs_low
+                    rep_arr = dataset_stats_arrays[comp.dataset][stat_id]
+                    q95 = compute_bootstrap_ci(rep_arr, quantiles=DESCRIPTIVE_QUANTILES)
+                    qdec = compute_bootstrap_ci(rep_arr, quantiles=DECISION_QUANTILES)
+                    ci_95_l, ci_95_h = q95[0], q95[1]
+                    ci_dec_l, ci_dec_h = qdec[0], qdec[1]
+                elif comp.metric == "worst_regime_coverage_error":
+                    obs_err = get_obs_subgroup_error(
+                        comp.dataset, comp.model_family, "decision_aware_hcp", "regime"
+                    )
+                    obs_low = obs_err
+                    obs_up = obs_err
+                    low_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_lower"]
+                    up_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_upper"]
+                    ci_95_l = float(np.quantile(low_arr, 0.025, method="linear"))
+                    ci_95_h = float(np.quantile(up_arr, 0.975, method="linear"))
+                    ci_dec_l = float(np.quantile(low_arr, 0.00625, method="linear"))
+                    ci_dec_h = float(np.quantile(up_arr, 0.99375, method="linear"))
+                elif comp.metric == "worst_stage_coverage_error":
+                    obs_err = get_obs_subgroup_error(
+                        comp.dataset, comp.model_family, "decision_aware_hcp", "stage"
+                    )
+                    obs_low = obs_err
+                    obs_up = obs_err
+                    low_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_lower"]
+                    up_arr = dataset_stats_arrays[comp.dataset][f"{stat_id}_upper"]
+                    ci_95_l = float(np.quantile(low_arr, 0.025, method="linear"))
+                    ci_95_h = float(np.quantile(up_arr, 0.975, method="linear"))
+                    ci_dec_l = float(np.quantile(low_arr, 0.00625, method="linear"))
+                    ci_dec_h = float(np.quantile(up_arr, 0.99375, method="linear"))
+                c_status = evaluate_noninferiority(ci_dec_l, ci_dec_h, comp.margin)
+            else:
+                c_row = contrast_lookup[stat_id]
+                ci_95_l = float(c_row["ci_95_low"])
+                ci_95_h = float(c_row["ci_95_high"])
+                ci_dec_l = float(c_row["ci_decision_low"])
+                ci_dec_h = float(c_row["ci_decision_high"])
+
+                if comp.rq_id == "RQ4" and comp.dataset is None:
+                    if comp.metric == "aggregate_delta_cost":
+                        obs_vals = [
+                            float(
+                                np.mean(
+                                    [
+                                        fleet_engine_costs[
+                                            (
+                                                d,
+                                                f,
+                                                comp.comparator,
+                                                PRIMARY_NOMINAL_COVERAGE,
+                                                PRIMARY_COST_SCENARIO,
+                                            )
+                                        ][u]
+                                        for u in partition_engines_dict[d]
+                                    ]
+                                )
+                            )
+                            - float(
+                                np.mean(
+                                    [
+                                        fleet_engine_costs[
+                                            (
+                                                d,
+                                                f,
+                                                "decision_aware_hcp",
+                                                PRIMARY_NOMINAL_COVERAGE,
+                                                PRIMARY_COST_SCENARIO,
+                                            )
+                                        ][u]
+                                        for u in partition_engines_dict[d]
+                                    ]
+                                )
+                            )
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals))
+                        obs_up = obs_low
+                    elif comp.metric == "aggregate_delta_regime_error":
+                        obs_vals_r = [
+                            get_obs_subgroup_error(d, f, comp.comparator, "regime")
+                            - get_obs_subgroup_error(d, f, "decision_aware_hcp", "regime")
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals_r))
+                        obs_up = obs_low
+                    elif comp.metric == "aggregate_delta_stage_error":
+                        obs_vals_s = [
+                            get_obs_subgroup_error(d, f, comp.comparator, "stage")
+                            - get_obs_subgroup_error(d, f, "decision_aware_hcp", "stage")
+                            for d, f in cells
+                        ]
+                        obs_low = float(np.mean(obs_vals_s))
+                        obs_up = obs_low
+                else:
+                    assert comp.dataset is not None and comp.model_family is not None
+                    d = comp.dataset
+                    fam = comp.model_family
+                    if comp.metric in ("delta_cost", "cell_delta_cost"):
+                        obs_base = float(
+                            np.mean(
+                                [
+                                    fleet_engine_costs[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_prop = float(
+                            np.mean(
+                                [
+                                    fleet_engine_costs[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_base - obs_prop
+                        obs_up = obs_low
+                    elif comp.metric in ("delta_regime_error", "cell_delta_regime_error"):
+                        obs_base_r = get_obs_subgroup_error(d, fam, comp.comparator, "regime")
+                        obs_prop_r = get_obs_subgroup_error(d, fam, "decision_aware_hcp", "regime")
+                        obs_low = obs_base_r - obs_prop_r
+                        obs_up = obs_low
+                    elif comp.metric in ("delta_stage_error", "cell_delta_stage_error"):
+                        obs_base_s = get_obs_subgroup_error(d, fam, comp.comparator, "stage")
+                        obs_prop_s = get_obs_subgroup_error(d, fam, "decision_aware_hcp", "stage")
+                        obs_low = obs_base_s - obs_prop_s
+                        obs_up = obs_low
+                    elif comp.metric == "mpiw_deterioration":
+                        obs_prop_w = float(
+                            np.mean(
+                                [
+                                    fleet_engine_mpiws[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_base_w = float(
+                            np.mean(
+                                [
+                                    fleet_engine_mpiws[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_prop_w - obs_base_w
+                        obs_up = obs_low
+                    elif comp.metric == "interval_score_deterioration":
+                        obs_prop_is = float(
+                            np.mean(
+                                [
+                                    fleet_engine_iscores[
+                                        (
+                                            d,
+                                            fam,
+                                            "decision_aware_hcp",
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_base_is = float(
+                            np.mean(
+                                [
+                                    fleet_engine_iscores[
+                                        (
+                                            d,
+                                            fam,
+                                            comp.comparator,
+                                            PRIMARY_NOMINAL_COVERAGE,
+                                            PRIMARY_COST_SCENARIO,
+                                        )
+                                    ][u]
+                                    for u in partition_engines_dict[d]
+                                ]
+                            )
+                        )
+                        obs_low = obs_prop_is - obs_base_is
+                        obs_up = obs_low
+
+                if comp.rule_type == "improvement":
+                    c_status = evaluate_improvement(ci_dec_l, ci_dec_h, comp.margin)
+                elif comp.rule_type == "noninferiority":
+                    c_status = evaluate_noninferiority(ci_dec_l, ci_dec_h, comp.margin)
+                else:
+                    raise ValueError(f"Unknown rule_type: {comp.rule_type}")
+
+            component_decisions_map[comp.component_id] = c_status
+
+            component_evidence_rows.append(
+                {
+                    "component_id": comp.component_id,
+                    "rq_id": comp.rq_id,
+                    "dataset": comp.dataset if comp.dataset is not None else "ALL_6_CELLS",
+                    "model_family": comp.model_family if comp.model_family is not None else "BOTH",
+                    "comparator": comp.comparator,
+                    "metric": comp.metric,
+                    "rule_type": comp.rule_type,
+                    "margin": comp.margin,
+                    "evidence_kind": ev_kind,
+                    "statistic_id": stat_id,
+                    "observed_lower": obs_low,
+                    "observed_upper": obs_up,
+                    "ci_95_low": ci_95_l,
+                    "ci_95_high": ci_95_h,
+                    "ci_decision_low": ci_dec_l,
+                    "ci_decision_high": ci_dec_h,
+                    "proposed_failure_count": prop_fails,
+                    "comparator_failure_count": comp_fails,
+                    "status": status_tag,
+                }
+            )
+
+    validate_component_manifest_completeness([r["component_id"] for r in component_evidence_rows])
+    df_comp_evidence = pd.DataFrame(component_evidence_rows)
+    write_immutable_csv(out_dir / "component_evidence.csv", df_comp_evidence)
+
+    # Aggregate RQ status
+    rq_results: dict[str, dict[str, Any]] = {}
+    for rq in ("RQ1", "RQ2", "RQ3", "RQ4"):
+        rq_comps = manifest_rq[rq]
+        statuses = [component_decisions_map[c.component_id] for c in rq_comps]
+        overall_rq_status = aggregate_rq_decision(statuses)
+
+        failing_comps = [
+            c.component_id
+            for c in rq_comps
+            if component_decisions_map[c.component_id] == DecisionStatus.FAIL
+        ]
+        indet_comps = [
+            c.component_id
+            for c in rq_comps
+            if component_decisions_map[c.component_id] == DecisionStatus.INDETERMINATE
+        ]
+        passing_comps = [
+            c.component_id
+            for c in rq_comps
+            if component_decisions_map[c.component_id] == DecisionStatus.PASS
+        ]
+
+        rq_results[rq] = {
+            "status": overall_rq_status.value,
+            "total_components": len(rq_comps),
+            "pass_count": len(passing_comps),
+            "fail_count": len(failing_comps),
+            "indeterminate_count": len(indet_comps),
+            "failing_components": failing_comps,
+            "indeterminate_components": indet_comps,
+        }
+        logger.info(
+            f"{rq} Overall Status: {overall_rq_status.value} "
+            f"(PASS: {len(passing_comps)}, FAIL: {len(failing_comps)}, INDET: {len(indet_comps)})"
+        )
+
+    # Save Bootstrap Statistics NPZs
+    npz_hashes: dict[str, str] = {}
+    for ds in CONFIRMATORY_DATASETS:
+        ds_stats_p = out_dir / f"bootstrap_statistics_{ds}.npz"
+        h = write_immutable_npz(
+            ds_stats_p,
+            arrays=dataset_stats_arrays[ds],
+            metadata={
+                "dataset": ds,
+                "partition": partition,
+                "n_replicates": n_bootstrap,
+                "status": status_tag,
+            },
+        )
+        npz_hashes[f"bootstrap_statistics_{ds}"] = h
+
+    rq4_p = out_dir / "bootstrap_statistics_RQ4.npz"
+    h_rq4 = write_immutable_npz(
+        rq4_p,
+        arrays=rq4_stats_dict,
+        metadata={
+            "description": "Equal-six-cell aggregate contrast distributions",
+            "partition": partition,
+            "n_replicates": n_bootstrap,
+            "status": status_tag,
+        },
+    )
+    npz_hashes["bootstrap_statistics_RQ4"] = h_rq4
+
+    # Verify post-execution protected input hashes
+    post_protected_hashes = snapshot_protected_input_hashes(base)
+    for k, pre_h in pre_protected_hashes.items():
+        post_h = post_protected_hashes.get(k)
+        if post_h != pre_h:
+            raise RuntimeError(
+                f"FATAL: Protected input '{k}' altered during execution! "
+                f"(pre: {pre_h}, post: {post_h})"
+            )
+    logger.info("Verified all protected inputs remained unmodified during execution.")
+
+    # Write input_manifest.json
+    input_manifest = {
+        "execution_run_id": run_id,
+        "partition": partition,
+        "pre_execution_protected_hashes": pre_protected_hashes,
+        "post_execution_protected_hashes": post_protected_hashes,
+        "raw_source_hashes": raw_hashes,
+        "hash_consistency_verified": True,
+    }
+    write_immutable_json(out_dir / "input_manifest.json", input_manifest)
+
+    # Write rq_decisions.json (always written for transparency, essential for test)
+    rq_decisions_data = {
+        "run_id": run_id,
+        "partition": partition,
+        "status": status_tag,
+        "protocol_version": PROTOCOL_VERSION,
+        "git_commit": git_sha,
+        "git_dirty": git_dirty,
+        "execution_timestamp_utc": start_time_utc,
+        "rq_classifications": {rq: rq_results[rq]["status"] for rq in rq_results},
+        "rq_details": rq_results,
+        "component_decisions": {c_id: st.value for c_id, st in component_decisions_map.items()},
+    }
+    write_immutable_json(out_dir / "rq_decisions.json", rq_decisions_data)
+
+    end_time_utc = datetime.now(timezone.utc).isoformat()
+    duration_sec = time.time() - t0
+
+    # Counts
+    total_outcomes = len(engine_seed_outcome_rows)
+    total_summaries = len(cell_summary_rows)
+
+    manifest = {
+        "run_id": run_id,
+        "protocol_version": PROTOCOL_VERSION,
+        "schema_version": "confirmatory-manifest-v1",
+        "status": status_tag,
+        "partition": partition,
+        "source_execution_commit": git_sha,
+        "git_dirty": git_dirty,
+        "start_time_utc": start_time_utc,
+        "end_time_utc": end_time_utc,
+        "duration_seconds": round(duration_sec, 2),
+        "environment": env_meta,
+        "counts": {
+            "primary_configurations": 810,
+            "control_configurations": 120,
+            "total_configurations": 930,
+            "total_outcome_rows": total_outcomes,
+            "total_summary_rows": total_summaries,
+            "component_evidence_rows": len(component_evidence_rows),
+            "bootstrap_replicates": n_bootstrap,
+            "engine_counts": {ds: len(partition_engines_dict[ds]) for ds in CONFIRMATORY_DATASETS},
+        },
+        "rq_classifications": {rq: rq_results[rq]["status"] for rq in rq_results},
+        "artifact_hashes": {
+            "point_predictions_csv": compute_sha256(out_dir / "point_predictions.csv"),
+            "interval_predictions_csv": compute_sha256(out_dir / "interval_predictions.csv"),
+            "decision_traces_csv": compute_sha256(out_dir / "decision_traces.csv"),
+            "engine_seed_outcomes_csv": compute_sha256(out_dir / "engine_seed_outcomes.csv"),
+            "engine_metrics_csv": compute_sha256(out_dir / "engine_metrics.csv"),
+            "subgroup_metrics_csv": compute_sha256(out_dir / "subgroup_metrics.csv"),
+            "cell_summary_csv": compute_sha256(out_dir / "cell_summary.csv"),
+            "contrast_intervals_csv": compute_sha256(out_dir / "contrast_intervals.csv"),
+            "component_evidence_csv": compute_sha256(out_dir / "component_evidence.csv"),
+            "input_manifest_json": compute_sha256(out_dir / "input_manifest.json"),
+            "rq_decisions_json": compute_sha256(out_dir / "rq_decisions.json"),
+            "bootstrap_draws_FD001": compute_sha256(out_dir / "bootstrap_draws_FD001.npz"),
+            "bootstrap_draws_FD002": compute_sha256(out_dir / "bootstrap_draws_FD002.npz"),
+            "bootstrap_draws_FD004": compute_sha256(out_dir / "bootstrap_draws_FD004.npz"),
+            **npz_hashes,
+        },
+    }
+
+    manifest_p = out_dir / "execution_manifest.json"
+    write_immutable_json(manifest_p, manifest)
+
+    logger.info(f"Execution complete in {duration_sec:.1f}s. Manifest written to {manifest_p}")
+    logger.removeHandler(file_handler)
+    file_handler.close()
+
+    return manifest
