@@ -1,0 +1,79 @@
+{
+  "artifact_hashes": {
+    "bootstrap_draws_FD001": "3eea9a9866903dbabc69be5d9db7fdde27edb657ebf429f9d39043e2b0313bef",
+    "bootstrap_draws_FD002": "be3955e0688164af2156c4ea989466b2b7efd2dfe19c1344d94fd83b0561fc36",
+    "bootstrap_draws_FD004": "d1f69560e757f50d354e9065ed65dd220d10ae1062fdee4f65cd7f3b8bdcb2e5",
+    "bootstrap_statistics_FD001": "7b81348ba8313819c518a62e7d0c3c662cb65c82f23eb0f6bfde9be771c80670",
+    "bootstrap_statistics_FD002": "2e6302d5d98f6635df7cb2197a98314607331d1a510183687e2916351edc8ad8",
+    "bootstrap_statistics_FD004": "130a08da80a4761183a1cf19d2a3d9d5870bbe42081c54b2146e90c447ad030f",
+    "bootstrap_statistics_RQ4": "7e82aadc8a5d8b74c28ddf3b644eb2bb33b36a74dce9ed7ebbaff3e8fbc8ace8",
+    "cell_summary_csv": "ae9135640c2be0b2dd59473bdeec84de305075b25da8579c90406042751329ab",
+    "component_evidence_csv": "c78ce629f0380b7829ac03ce01ec35269290a540920dd1e8b67e922a3cb5f143",
+    "contrast_intervals_csv": "a73896a6db357616529e334fd87afcc334215e0484b311e9b3647ec24c653ad0",
+    "decision_traces_csv": "a6d29bcaeeb257ce5a8a13ad4c34d203ab07a81e7ef28493d368d7c28672d4f5",
+    "engine_metrics_csv": "61ab11e1715449b53cd08a54f9640283b44462aebfb91d6a752581956b7c7fae",
+    "engine_seed_outcomes_csv": "a18a6824efe29832ac6fb7693072e282c1237ed7f39e4e16f78d2937193aa8ab",
+    "input_manifest_json": "375cf3629e67ff5950fe6f50ccd282f2ba9fd920441f0d4d9891f2162b19134f",
+    "interval_predictions_csv": "c0fee2c63db2b74b2917d296e451077a70358e246847ae7f01b7489c8769173f",
+    "point_predictions_csv": "5fae8e1e8abec2ee5ccc64cfefac974597bf157a69b4dc6c652a103e543458de",
+    "rq_decisions_json": "5ee723db6187d64aa0b9cbaa392d9457cd9dbf9b6aa84e03b7068d0d5e931bf4",
+    "subgroup_metrics_csv": "0c0b6540235bc4f89117ec3ab26e8de9634810b587977f0ef116ff28f148ead9"
+  },
+  "counts": {
+    "bootstrap_replicates": 10000,
+    "component_evidence_rows": 152,
+    "control_configurations": 120,
+    "engine_counts": {
+      "FD001": 20,
+      "FD002": 52,
+      "FD004": 50
+    },
+    "primary_configurations": 810,
+    "total_configurations": 930,
+    "total_outcome_rows": 39180,
+    "total_summary_rows": 186
+  },
+  "duration_seconds": 65.11,
+  "end_time_utc": "2026-10-23T17:21:46.583350+00:00",
+  "environment": {
+    "command_args": [
+      "scripts/run_confirmatory_evaluation.py",
+      "--partition",
+      "test",
+      "--confirm-held-out",
+      "--pretest-dir",
+      "experiments/pretest_verification_v6",
+      "--raw-data-dir",
+      "data/raw/cmapss",
+      "--output-dir",
+      "C:\\www\\intellitwin-confirmatory-v1-staging",
+      "--n-bootstrap",
+      "10000"
+    ],
+    "device": "cpu",
+    "packages": {
+      "numpy": "2.5.3",
+      "pandas": "3.0.6",
+      "pyyaml": "6.0.3",
+      "scikit_learn": "1.9.1",
+      "torch": "2.14.1+cpu"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.14.0 (main, Nov 19 2025, 22:43:52) [MSC v.1944 64 bit (AMD64)]",
+    "timestamp_utc": "2026-10-23T17:20:41.629395+00:00"
+  },
+  "git_dirty": false,
+  "partition": "test",
+  "protocol_version": "step09-v1",
+  "rq_classifications": {
+    "RQ1": "UNSUPPORTED",
+    "RQ2": "UNSUPPORTED",
+    "RQ3": "UNSUPPORTED",
+    "RQ4": "UNSUPPORTED"
+  },
+  "run_id": "confirmatory_test_1792776041_c4d1c6c2",
+  "schema_version": "confirmatory-manifest-v1",
+  "source_execution_commit": "67b96453bfc9b2786ce39bd5c6b510acea10c3d7",
+  "start_time_utc": "2026-10-23T17:20:41.476812+00:00",
+  "status": "CONFIRMATORY_TEST_EVIDENCE"
+}

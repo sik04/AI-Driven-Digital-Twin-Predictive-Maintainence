@@ -5,7 +5,7 @@
 - **Stage**: Phase 7 — Confirmatory Held-Out Execution Architecture
 - **Date**: 2026-10-23
 - **Baseline Review SHA**: `1afb9e5`
-- **Status**: Implemented & Pre-Test Verified
+- **Status**: Executed & Independently Verified (Audit Status: PASS)
 
 ---
 
@@ -108,3 +108,28 @@ python scripts/audit_confirmatory_evaluation.py \
   --evidence-dir experiments/confirmatory_v1 \
   --partition test
 ```
+
+---
+
+## 6. Official Held-Out Test Evaluation & Audit Outcomes
+
+The official confirmatory evaluation was executed on the held-out test partition in accordance with preregistered protocol `step09-v1`:
+
+- **Execution Commit SHA**: `67b96453bfc9b2786ce39bd5c6b510acea10c3d7`
+- **Execution Timestamp**: `2026-10-23T17:20:41.476812+00:00`
+- **Evaluated Engines**: 122 test engines (20 in FD001, 52 in FD002, 50 in FD004)
+- **Matrix Dimensions**: 930 configurations (810 methods + 120 controls), 186 cell summaries, 39,180 engine-seed outcome rows
+- **Hypothesis Components**: 152 pre-specified components evaluated across 10,000 stratified bootstrap draws
+- **Independent Reference Audit**: `PASS` (0 failing reasons, all protected inputs unchanged, bitwise array reconstruction exact)
+
+### Summary of Authoritative Research Question Decisions
+
+| Research Question | Hypothesized Effect | Evaluated Components | Pass | Fail | Indeterminate | Authoritative Decision |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
+| **RQ1** | Maintenance cost improvement ($\Delta_{\text{cost}} > 0.20$ SCU) & reliability | 14 | 9 | 2 | 3 | **UNSUPPORTED** |
+| **RQ2** | Conditional subgroup reliability ($\Delta_{\text{error}} > 0.01$) without MPIW blowup | 20 | 10 | 4 | 6 | **UNSUPPORTED** |
+| **RQ3** | Decision value vs 4 matched controls ($\Delta_{\text{cost}} > 0.20$ SCU) | 22 | 15 | 4 | 3 | **UNSUPPORTED** |
+| **RQ4** | Robustness across 6 multi-dataset cells & non-harm | 96 | 71 | 9 | 16 | **UNSUPPORTED** |
+
+Evidence artifacts are permanently archived in `experiments/confirmatory_v1/` and reporting synthesis artifacts in `research/results/confirmatory_v1/`.
+

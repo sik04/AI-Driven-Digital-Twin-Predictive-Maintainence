@@ -163,8 +163,8 @@ This document outlines the master research and development roadmap for the Intel
 
 ---
 
-### Phase 7: Uncertainty and Maintenance Decision Experiments (Step 9 Preparation & Confirmatory Evaluation)
-- **Status**: In Progress (Step 9 / Phase 7 pre-test confirmatory preparation, control selection, complete validation smoke across 930 configurations and 152 hypothesis components, pure independent reference reconstruction, and fail-closed protocol freeze verified under ADR-024, ADR-025, and ADR-026; official held-out test execution NOT STARTED; confirmatory RQ1–RQ4 outcomes PENDING)
+### Phase 7: Uncertainty and Maintenance Decision Experiments (Step 9 Confirmatory Evaluation & Audit)
+- **Status**: Completed (Confirmatory held-out test evaluation completed on 122 test engines across 930 configurations and 152 hypothesis components with 10,000 stratified bootstrap draws; independent reference verification audit PASSED with zero failing reasons; RQ1–RQ4 outcomes determined as UNSUPPORTED under preregistered Bonferroni/IUT decision rules; evidence and synthesis committed in `experiments/confirmatory_v1/` and `research/results/confirmatory_v1/`). Historical pre-test bundles (`experiments/pretest_verification_v5/` and `v6/`) and their historical `NOT_STARTED` pre-exposure readiness statements remain preserved unchanged.
 - **Objective**: Implement confirmatory evaluation machinery, freeze matched-conservatism benchmark controls on validation data, lock the complete pre-test evaluation protocol, and subsequently evaluate conformal prediction intervals and maintenance decision policies inside the frozen simulator across Experiments A through D (RQ1–RQ4).
 - **Expected Deliverables**:
   - Pre-test confirmatory evaluation protocol and configuration (`research/research_design/step09_confirmatory_protocol.md`, `step09_confirmatory_config.json`).
@@ -177,14 +177,16 @@ This document outlines the master research and development roadmap for the Intel
   - Validation-only smoke evaluation records labeled `DEVELOPMENT_SMOKE_ONLY`.
   - Executed regression audit runner and mutation rejection verification (`src/intellitwin/evaluation/regression_audit.py`, `docs/development/verification_repairs.md`).
   - Portable readiness bundle (`experiments/pretest_verification_v6/`) incorporating empirical regression evidence, corrected mutation fixtures, partner checkpoint evidence (`experiments/checkpoint_verification_v1/`), and import-clean freeze audit (preserving historical `v5` bundle).
-  - Future held-out test predictions, simulation traces, stratified bootstrap draws, and IUT decision outcomes.
+  - Confirmatory held-out test predictions, simulation traces, stratified bootstrap draws, and IUT decision outcomes in `experiments/confirmatory_v1/`.
+  - Independent reference verification audit report in `experiments/confirmatory_v1/independent_audit.json`.
+  - Synthesis reporting, CSV tables, and publication figures in `research/results/confirmatory_v1/`.
 - **Acceptance Criteria**:
   - Completion requires valid execution, reproducibility, and honest reporting.
   - Completion must NOT require favorable hypotheses, target coverage achievement, or demonstrated "risk-bounded operational advantages."
   - All confirmatory hypothesis decisions (Supported, Unsupported, Inconclusive) strictly follow the frozen Bonferroni / IUT decision rules.
-  - Confirmatory test outcomes remain strictly PENDING until held-out test execution.
+  - Confirmatory test outcomes recorded honestly from empirical held-out test evidence.
 - **Dependencies**: Phase 6 / Step 8.
-- **Research Observations to Record**: Pre-test control selections: GBR matched-width ($\lambda=0.92$, global), widened ($\lambda=1.00$, regime), safety margin ($m=5$, regime), earlier intervention ($h=1$, regime); LSTM matched-width ($\lambda=0.90$, regime), widened ($\lambda=1.00$, global), safety margin ($m=4$, regime), earlier intervention ($h=1$, global). Validation smoke across all 930 configurations, 19,590 rows, and 152 hypothesis components completed with 100% exact independent reference reconstruction and CI verification; decisive rejection of all 5 confirmed false-PASS mutations verified. Verification repairs completed: executed regression evidence runner implemented in `regression_audit.py`, Mutation 5 corrected with linear quantiles [0.025, 0.975] and [0.00625, 0.99375] with mean/median updates, portable repository-relative POSIX artifact locators enforced, partner checkpoint verification (`experiments/checkpoint_verification_v1/`) fully integrated and verified across 6 files and 233 protected inputs, and official v6 pre-test verification bundle (`experiments/pretest_verification_v6/`) produced with status `PRETEST_READY` (overall status PASS) following an import-only repair resolving Ruff E402 order violations in `scripts/audit_step09_freeze.py` while preserving the historical v5 bundle unchanged. Confirmatory held-out test execution remains strictly NOT_STARTED; confirmatory RQ1–RQ4 outcomes remain strictly PENDING.
+- **Research Observations to Record**: Official held-out test evaluation completed on 122 test engines (39,180 outcome rows, 186 cell summaries, 152 hypothesis components) under protocol `step09-v1`. Independent reference audit passed all integrity, continuity, manifest, reconstruction, and decision checks. Formal hypothesis outcomes: RQ1 UNSUPPORTED (9 PASS, 2 FAIL, 3 INDETERMINATE; failing components RQ1_C03 and RQ1_C04 due to decision intervals falling below 0.20 SCU margin); RQ2 UNSUPPORTED (10 PASS, 4 FAIL, 6 INDETERMINATE; failing components RQ2_C01, RQ2_C02, RQ2_C09, RQ2_C10); RQ3 UNSUPPORTED (15 PASS, 4 FAIL, 3 INDETERMINATE; failing components RQ3_C03, RQ3_C04, RQ3_C15, RQ3_C16 vs matched-width and widened controls); RQ4 UNSUPPORTED (71 PASS, 9 FAIL, 16 INDETERMINATE; failing components RQ4_C11, RQ4_C12, RQ4_C15, RQ4_C16, RQ4_C19, RQ4_C20, RQ4_C23, RQ4_C24, RQ4_C27). All results and reports verified and committed in `experiments/confirmatory_v1/` and `research/results/confirmatory_v1/`.
 
 
 ---

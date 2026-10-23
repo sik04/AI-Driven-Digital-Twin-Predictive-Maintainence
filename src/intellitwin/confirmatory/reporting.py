@@ -379,7 +379,7 @@ def generate_figure2_subgroup_coverage(
     pdf.set_color(0.2, 0.6, 0.2, stroke=False)
     pdf.text(x_90 - 15, y_top + 5, "Target 0.90", size=8)
 
-    rows = sub_cell.to_dict(orient="records")
+    rows = [r for r in sub_cell.to_dict(orient="records") if pd.notna(r.get("marginal_coverage"))]
     step_y = (y_top - y_bottom) / (len(rows) + 1)
 
     for idx, r in enumerate(rows):
