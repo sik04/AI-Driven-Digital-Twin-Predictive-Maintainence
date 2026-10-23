@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IntelliTwin — Engine Replay</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">IntelliTwin — Engine Replay</h1>
+        <span class="confirmatory-notice-pill">Validation replay — not confirmatory results</span>
+      </div>
+      <div class="header-right">
+        <div class="coverage-badge">
+          <span class="badge-label">Prediction Interval:</span>
+          <span class="badge-value">90% nominal prediction interval</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Disclaimer / Educational Banner -->
+    <section class="educational-banner" aria-label="Scope explanation">
+      <p>
+        <strong>Notice:</strong> This telemetry-replay digital-twin prototype evaluates historical run-to-failure validation trajectories.
+        The 90% nominal prediction interval reflects calibrated population coverage across validation engines and is not a 90% probability guarantee for an individual engine.
+        Validation playback does not constitute confirmatory research performance evidence or claim physical bidirectional synchronization.
+      </p>
+    </section>
+
+    <!-- Main Grid Layout -->
+    <main class="dashboard-grid">
+      <!-- Sidebar / Configuration & Controls -->
+      <aside class="control-panel card" aria-label="Replay Controls">
+        <h2 class="card-title">Configuration & Session</h2>
+        
+        <form id="config-form" class="config-form" onsubmit="return false;">
+          <div class="form-group">
+            <label for="dataset-select">Dataset</label>
+            <select id="dataset-select" name="dataset" aria-label="Select Dataset">
+              <!-- Populated by JavaScript -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="engine-select">Validation Engine ID</label>
+            <select id="engine-select" name="engine_id" aria-label="Select Validation Engine">
+              <!-- Populated by JavaScript -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="model-select">Predictor Family</label>
+            <select id="model-select" name="model_family" aria-label="Select Model Family">
+              <option value="GBR">GBR (Gradient Boosting)</option>
+              <option value="LSTM">LSTM (Deep Sequence)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="method-select">Uncertainty Calibration</label>
+            <select id="method-select" name="method_id" aria-label="Select Calibration Method">
+              <option value="decision_aware_hcp">Decision-Aware HCP</option>
+              <option value="regime_hcp">Regime HCP</option>
+              <option value="global_hcp">Global HCP</option>
+            </select>
+          </div>
+
+          <div class="button-row">
+            <button type="button" id="btn-create-session" class="btn btn-primary">Apply & Load Session</button>
+            <button type="button" id="btn-release-session" class="btn btn-outline" disabled>Release</button>
+          </div>
+        </form>
+
+        <hr class="separator">
+
+        <h2 class="card-title">Playback Controls</h2>
+        <div class="playback-controls">
+          <div class="form-group">
+            <label for="playback-speed">Playback Speed</label>
+            <select id="playback-speed" aria-label="Playback Speed">
+              <option value="1">1 cycle / second</option>
+              <option value="2">2 cycles / second</option>
+              <option value="5">5 cycles / second</option>
+            </select>
+          </div>
+
+          <div class="button-group">
+            <button type="button" id="btn-play-pause" class="btn btn-action" disabled>Start Playback</button>
+            <button type="button" id="btn-step" class="btn btn-secondary" disabled>Next Cycle</button>
+            <button type="button" id="btn-reset" class="btn btn-secondary" disabled>Reset</button>
+          </div>
+
+          <div class="download-container">
+            <button type="button" id="btn-download-trace" class="btn btn-outline full-width" disabled>
+              Download Trace (CSV)
+            </button>
+          </div>
+        </div>
+
+        <div id="status-alert" class="status-alert" role="alert" style="display: none;"></div>
+      </aside>
+
+      <!-- Center / Telemetry & Decision Display -->
+      <section class="telemetry-panel">
+        <!-- Top Metric Cards -->
+        <div class="metric-cards-row">
+          <div class="metric-card card">
+            <div class="metric-label">Current Cycle</div>
+            <div id="val-cycle" class="metric-value">0</div>
+            <div id="val-warmup" class="metric-subtext">Waiting for session</div>
+          </div>
+
+          <div class="metric-card card">
+            <div class="metric-label">Operating Regime</div>
+            <div id="val-regime" class="metric-value">—</div>
+            <div class="metric-subtext">Centroid assignment</div>
+          </div>
+
+          <div class="metric-card card">
+            <div class="metric-label">Predicted RUL</div>
+            <div id="val-prediction" class="metric-value">—</div>
+            <div id="val-rul-unit" class="metric-subtext">cycles</div>
+          </div>
+
+          <div class="metric-card card">
+            <div class="metric-label">90% Prediction Interval</div>
+            <div id="val-interval" class="metric-value">—</div>
+            <div id="val-lower-bound" class="metric-subtext">Lower bound: —</div>
+          </div>
+        </div>
+
+        <!-- Decision Banner -->
+        <div id="decision-banner" class="decision-banner card state-ready">
+          <div class="decision-header">
+            <span class="decision-status-label">Operational Status:</span>
+            <span id="decision-action-badge" class="action-badge badge-ready">READY</span>
+          </div>
+          <div id="decision-explanation" class="decision-explanation">
+            Select a validation engine and create a session to start replay.
+          </div>
+        </div>
+
+        <!-- Charts Area -->
+        <div class="charts-container">
+          <!-- RUL Trajectory Chart -->
+          <div class="chart-card card">
+            <div class="chart-header">
+              <h3 class="chart-title">RUL Trajectory & 90% Nominal Prediction Interval</h3>
+              <span class="chart-legend-text">Cycles elapsed vs RUL bounds</span>
+            </div>
+            <div class="chart-svg-wrapper">
+              <svg id="rul-chart-svg" viewBox="0 0 700 240" preserveAspectRatio="none" role="img" aria-label="RUL history chart with shaded uncertainty band"></svg>
+            </div>
+          </div>
+
+          <!-- Sensor Trajectory Chart -->
+          <div class="chart-card card">
+            <div class="chart-header">
+              <h3 class="chart-title">Observed Sensor Telemetry</h3>
+              <div class="sensor-selectors">
+                <label for="sensor-select-1">Sensors:</label>
+                <select id="sensor-select-1" class="sensor-select" aria-label="Sensor 1 Select"></select>
+                <select id="sensor-select-2" class="sensor-select" aria-label="Sensor 2 Select"></select>
+                <select id="sensor-select-3" class="sensor-select" aria-label="Sensor 3 Select"></select>
+              </div>
+            </div>
+            <div class="chart-svg-wrapper">
+              <svg id="sensor-chart-svg" viewBox="0 0 700 240" preserveAspectRatio="none" role="img" aria-label="Sensor history chart"></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expandable Artifact Provenance -->
+        <details class="provenance-accordion card" id="provenance-details">
+          <summary class="provenance-summary">
+            <strong>Artifact Provenance & Cryptographic Verification</strong>
+          </summary>
+          <div class="provenance-content" id="provenance-content">
+            <p class="text-muted">No active session loaded.</p>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>IntelliTwin Telemetry-Replay Prototype &bull; Seed 2026 Validation Replay</span>
+      <span>Confirmatory experiments run independently on another branch</span>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
