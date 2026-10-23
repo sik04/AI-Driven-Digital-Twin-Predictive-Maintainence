@@ -10,10 +10,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
 from intellitwin.data.artifacts import compute_sha256
 from intellitwin.evaluation.regression_audit import execute_regression_audit
 from intellitwin.evaluation.schema import (
@@ -32,7 +28,10 @@ from intellitwin.provenance import (
     write_immutable_json,
 )
 from intellitwin.uncertainty.artifacts import resolve_repo_relative_path
-from scripts.verify_checkpoint_environment import collect_protected_input_paths
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 FROZEN_SCIENTIFIC_PROTOCOLS: tuple[str, ...] = (
     "research/hypotheses/hypothesis_framework.yaml",
@@ -399,6 +398,8 @@ def verify_partner_checkpoint_evidence(
         )
 
     # Protected inputs inventory check using collect_protected_input_paths
+    from scripts.verify_checkpoint_environment import collect_protected_input_paths
+
     expected_inventory_paths = collect_protected_input_paths(base)
     expected_categories = set(expected_inventory_paths.keys())
 
