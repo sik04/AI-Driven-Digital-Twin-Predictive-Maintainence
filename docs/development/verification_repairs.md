@@ -90,7 +90,9 @@ The repair suite is thoroughly validated by unit and integration tests:
 - **Verification Completion Status**:
   - Partner checkpoint reproduction evidence (`experiments/checkpoint_verification_v1/`) merged via PR #32 (`14f5f57`).
   - Strict verification audit in `scripts/audit_step09_freeze.py` requires both environment status fields to be PASS, clean execution (`clean_source_execution=true`, `git_dirty=false`), exact version matches, exit code 0, 0 sklearn warnings, 60-record reproduction report PASS with max absolute diff $\le 10^{-4}$, source-execution SHA agreement, and exact category/path membership with SHA-256 hash validation across all 11 categories / 233 protected input files.
-  - Final official v5 verification bundle generated from clean source (`experiments/pretest_verification_v5/`) with `pretest_audit.json` status `PRETEST_READY` and `overall_status`: `PASS`.
+  - Successor verification bundle generated from clean source (`experiments/pretest_verification_v6/`) with `pretest_audit.json` status `PRETEST_READY` and `overall_status`: `PASS`.
+  - Import-only repair in `scripts/audit_step09_freeze.py`: Resolved Ruff E402 module-level import violations by placing `sys.path` setup below `intellitwin` package imports and moving `collect_protected_input_paths` inside `verify_partner_checkpoint_evidence`.
+  - Historical verification bundles (`experiments/pretest_verification_v4/` and `experiments/pretest_verification_v5/`) remain immutably preserved.
   - All empirical regression mutations decisively rejected.
   - Held-out test execution remains strictly **NOT_STARTED**; confirmatory RQ outcomes remain strictly **PENDING**.
 
@@ -100,5 +102,5 @@ The repair suite is thoroughly validated by unit and integration tests:
 
 - Scientific protocol version: `step09-v1` (unchanged).
 - Base models (30 models), calibrator bundles (90 bundles), split manifests, and selected controls remain byte-for-byte unchanged.
-- Historical bundles (`v2`, `v3`, `v4`) preserved byte-for-byte.
+- Historical bundles (`v2`, `v3`, `v4`, `v5`) preserved byte-for-byte.
 - Held-out test execution remains strictly **NOT_STARTED**; confirmatory RQ outcomes remain strictly **PENDING**.
