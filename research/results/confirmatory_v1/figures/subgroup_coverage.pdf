@@ -1,0 +1,142 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 792 612] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+5 0 obj
+<< /Length 3731 >>
+stream
+0.100 0.100 0.200 rg
+BT /F1 14.0 Tf 50.00 560.00 Td (Figure 2: Marginal and Subgroup Coverage Reliability at 90% Target Coverage) Tj ET
+0.400 0.400 0.400 rg
+BT /F1 10.0 Tf 50.00 545.00 Td (Target Coverage = 0.90. Acceptance Band = [0.85, 0.95] \(Max absolute error 0.05\).) Tj ET
+0.920 0.960 0.920 rg
+450.00 80.00 180.00 430.00 re f
+0.200 0.600 0.200 RG
+1.50 w
+540.00 80.00 m 540.00 510.00 l S
+0.700 0.700 0.700 RG
+0.80 w
+450.00 80.00 m 450.00 510.00 l S
+630.00 80.00 m 630.00 510.00 l S
+0.200 0.600 0.200 rg
+BT /F1 8.0 Tf 525.00 515.00 Td (Target 0.90) Tj ET
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 489.80 Td (FD001 GBR global_hcp) Tj ET
+0.588 0.588 0.588 rg
+657.89 489.80 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 472.60 Td (FD001 GBR regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+657.89 472.60 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 455.40 Td (FD001 GBR decision_aware) Tj ET
+0.118 0.392 0.784 rg
+656.95 455.40 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 438.20 Td (FD001 LSTM global_hcp) Tj ET
+0.588 0.588 0.588 rg
+657.27 438.20 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 421.00 Td (FD001 LSTM regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+657.27 421.00 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 403.80 Td (FD001 LSTM decision_awar) Tj ET
+0.118 0.392 0.784 rg
+651.64 403.80 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 386.60 Td (FD002 GBR global_hcp) Tj ET
+0.588 0.588 0.588 rg
+582.32 386.60 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 369.40 Td (FD002 GBR regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+580.11 369.40 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 352.20 Td (FD002 GBR decision_aware) Tj ET
+0.118 0.392 0.784 rg
+588.73 352.20 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 335.00 Td (FD002 GBR earlier_interv) Tj ET
+0.588 0.588 0.588 rg
+580.11 335.00 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 317.80 Td (FD002 GBR matched_width_) Tj ET
+0.588 0.588 0.588 rg
+561.88 317.80 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 300.60 Td (FD002 GBR widened_interv) Tj ET
+0.588 0.588 0.588 rg
+580.11 300.60 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 283.40 Td (FD002 LSTM global_hcp) Tj ET
+0.588 0.588 0.588 rg
+590.01 283.40 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 266.20 Td (FD002 LSTM regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+590.23 266.20 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 249.00 Td (FD002 LSTM decision_awar) Tj ET
+0.118 0.392 0.784 rg
+588.87 249.00 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 231.80 Td (FD002 LSTM earlier_inter) Tj ET
+0.588 0.588 0.588 rg
+590.01 231.80 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 214.60 Td (FD002 LSTM matched_width) Tj ET
+0.588 0.588 0.588 rg
+561.68 214.60 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 197.40 Td (FD002 LSTM widened_inter) Tj ET
+0.588 0.588 0.588 rg
+590.01 197.40 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 180.20 Td (FD004 GBR global_hcp) Tj ET
+0.588 0.588 0.588 rg
+564.81 180.20 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 163.00 Td (FD004 GBR regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+565.34 163.00 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 145.80 Td (FD004 GBR decision_aware) Tj ET
+0.118 0.392 0.784 rg
+558.90 145.80 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 128.60 Td (FD004 LSTM global_hcp) Tj ET
+0.588 0.588 0.588 rg
+564.82 128.60 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 111.40 Td (FD004 LSTM regime_hcp) Tj ET
+0.588 0.588 0.588 rg
+565.19 111.40 6.00 6.00 re f
+0.200 0.200 0.200 rg
+BT /F1 8.0 Tf 50.00 94.20 Td (FD004 LSTM decision_awar) Tj ET
+0.118 0.392 0.784 rg
+560.03 94.20 6.00 6.00 re f
+endstream
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000000311 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+4094
+%%EOF
