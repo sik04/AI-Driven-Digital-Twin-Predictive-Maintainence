@@ -197,17 +197,21 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: Planned
-- **Objective**: Perform component ablations, sensor noise injection, operating condition perturbations, and statistical evaluation (e.g., engine-level confidence intervals and optional secondary paired tests).
+- **Status**: In Progress (Locked Exploratory Protocol `phase08-v1`)
+- **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
-  - Systematic ablation experiment records.
-  - Noise robustness stress-testing report.
-  - Effect sizes and engine-level confidence intervals, with statistical hypothesis tests and p-values used only as secondary supporting evidence where appropriate.
+  - Systematic factorial component ablation records (240 cells across 122 test engines).
+  - Engineering stress testing report (1,620 method evaluations under 18 stream conditions).
+  - Paired lifetime-stratified engine bootstrap intervals (10,000 draws, PCG64).
+  - Independent reference audit verifying cell coverage, threshold reconstructions, bootstrap draws, and perturbation hashes.
+  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v1/`.
 - **Acceptance Criteria**:
-  - Every proposed architectural component empirically justified by ablation.
-  - Primary effects are reported with effect sizes and engine-level confidence intervals and interpreted using the pre-specified Supported / Unsupported / Inconclusive decision rules across the planned robustness evaluation.
+  - Each specified component evaluated through controlled ablation, with positive, negative and inconclusive findings reported.
+  - Phase 8 intervals and conclusions are exploratory post-confirmatory; original confirmatory RQ1–RQ4 classifications remain unchanged (`UNSUPPORTED`).
+  - No new model training, architecture search, threshold selection on test engines, cost-scenario search, or production recalibration.
+  - Independent reference audit passes with zero failing reasons.
 - **Dependencies**: Phase 7.
-- **Research Observations to Record**: Sensitivity to sensor dropout, noise tolerance boundaries.
+- **Research Observations to Record**: Controlled $2 \times 2 \times 2$ factorial evaluation of scale dilation ($\gamma$), score asymmetry ($\beta$), and regime routing. Engineering stress probe degradation boundaries under Gaussian sensor noise, causal forward-fill sensor dropout, and operating setting bias. All Phase 8 intervals are exploratory and unadjusted for multiple comparisons; they do not alter or overturn frozen Step 9 confirmatory outcomes.
 
 ---
 
