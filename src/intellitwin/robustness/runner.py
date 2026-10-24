@@ -1127,14 +1127,28 @@ def execute_phase08_evaluation(
         .shape[0]
     )
 
+    cfg_p = base / "research" / "research_design" / "phase08_exploratory_config.json"
+    cfg_hash = compute_sha256(cfg_p) if cfg_p.exists() else ""
+    src_hashes = {
+        p.relative_to(base).as_posix(): compute_sha256(p)
+        for p in sorted((base / "src" / "intellitwin" / "robustness").glob("*.py"))
+    }
+
     execution_manifest = {
         "protocol_version": "phase08-v1",
         "schema_version": "phase08-manifest-v2",
         "status": "EXPLORATORY_POST_CONFIRMATORY",
+        "run_id": f"phase08_run_{start_time_utc.replace(':', '').replace('-', '').replace('.', '')}",
         "git_commit": git_sha,
         "git_dirty": git_dirty,
+        "command": list(sys.argv),
         "platform": platform.platform(),
         "python_version": platform.python_version(),
+        "device": "cpu",
+        "thread_configuration": {"torch_threads": 2},
+        "seeds": list(CONFIRMATORY_SEEDS),
+        "config_hash": cfg_hash,
+        "source_file_hashes": src_hashes,
         "start_time_utc": start_time_utc,
         "end_time_utc": end_time_utc,
         "duration_seconds": round(duration_sec, 2),
