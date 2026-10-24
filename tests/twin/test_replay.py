@@ -1,9 +1,12 @@
 """Tests for IntelliTwin replay engine, causal windowing, and invariants."""
 
+import numpy as np
 import pandas as pd
 import pytest
 
 from intellitwin.data.schema import SENSOR_COLUMNS
+from intellitwin.decision.policies import lower_bound_one_cycle_policy
+from intellitwin.simulator.types import MaintenanceAction, PredictionState
 from intellitwin.twin.artifacts import ArtifactManager
 from intellitwin.twin.replay import ReplayConflictError, ReplaySession
 
@@ -303,3 +306,51 @@ def test_real_prediction_parity_and_calibrators_across_all_cells() -> None:
                 assert resp.upper_rul is not None
                 assert 0.0 <= resp.lower_rul <= resp.prediction + 1e-6
                 assert resp.prediction - 1e-6 <= resp.upper_rul
+
+                # Check interval bounds match direct frozen-calibrator calculations
+                assert resp.regime is not None
+                direct_lows, direct_upps, _ = artifacts.calibrator.predict_intervals(
+                    predictions=np.array([cached_pred], dtype=np.float64),
+                    regimes=[resp.regime],
+                    nominal_coverage=0.90,
+                )
+                assert abs(resp.lower_rul - direct_lows[0]) < 1e-4, (
+                    f"Lower bound mismatch: {resp.lower_rul} vs {direct_lows[0]}"
+                )
+                assert abs(resp.upper_rul - direct_upps[0]) < 1e-4, (
+                    f"Upper bound mismatch: {resp.upper_rul} vs {direct_upps[0]}"
+                )
+
+                # Check action agrees with existing lower-bound maintenance policy
+                state_obj = PredictionState(
+                    engine_id=min_engine,
+                    cycle=30,
+                    point_rul=resp.prediction,
+                    lower_rul=resp.lower_rul,
+                    upper_rul=resp.upper_rul,
+                    regime=None,
+                )
+                expected_act = lower_bound_one_cycle_policy(state_obj)
+                expected_act_str = (
+                    "MAINTAIN_NOW" if expected_act == MaintenanceAction.MAINTAIN_NOW else "CONTINUE"
+                )
+                assert resp.action == expected_act_str
+
+                # Check future-row changes do not affect earlier outputs
+                telem_corrupt = telemetry.copy()
+                telem_corrupt.loc[telem_corrupt["cycle"] > 30, list(SENSOR_COLUMNS)] = 9999.0
+                sess_corrupt = ReplaySession(
+                    session_id=f"parity-corrupt-{ds}-{mod}-{meth}",
+                    dataset=ds,
+                    engine_id=min_engine,
+                    model_family=mod,
+                    method_id=meth,
+                    artifacts=artifacts,
+                    telemetry=telem_corrupt,
+                )
+                for c in range(30):
+                    resp_corrupt = sess_corrupt.advance(expected_cycle=c)
+                assert resp_corrupt.prediction == resp.prediction
+                assert resp_corrupt.lower_rul == resp.lower_rul
+                assert resp_corrupt.upper_rul == resp.upper_rul
+                assert resp_corrupt.action == resp.action

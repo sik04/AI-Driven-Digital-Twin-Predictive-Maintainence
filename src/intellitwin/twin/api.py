@@ -68,7 +68,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     err_msg = "; ".join([f"{err['loc'][-1]}: {err['msg']}" for err in exc.errors()])
     return Response(
         content=f'{{"code":"UNPROCESSABLE_ENTITY","message":"{err_msg}"}}',
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=422,
         media_type="application/json",
     )
 
@@ -80,7 +80,7 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> Respon
         code = "NOT_FOUND"
     elif exc.status_code == status.HTTP_409_CONFLICT:
         code = "CONFLICT"
-    elif exc.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY:
+    elif exc.status_code == 422:
         code = "UNPROCESSABLE_ENTITY"
     elif exc.status_code == status.HTTP_503_SERVICE_UNAVAILABLE:
         code = "SERVICE_UNAVAILABLE"
@@ -112,8 +112,11 @@ def get_health() -> HealthResponse:
     try:
         model_reg = REPO_ROOT / "experiments/base_models/model_registry.json"
         calib_reg = REPO_ROOT / "experiments/calibration/calibration_registry.json"
-        split_reg = REPO_ROOT / "data/splits/fd002_engine_split_seed_2026.json"
-        if model_reg.exists() and calib_reg.exists() and split_reg.exists():
+        split_regs = [
+            REPO_ROOT / f"data/splits/{ds.lower()}_engine_split_seed_2026.json"
+            for ds in ALLOWED_DATASETS
+        ]
+        if model_reg.exists() and calib_reg.exists() and all(p.exists() for p in split_regs):
             artifacts_ready = True
     except Exception:
         artifacts_ready = False
@@ -158,13 +161,9 @@ def create_session(body: SessionCreateRequest) -> SessionStateResponse:
     except ReplayConflictError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
     except PermissionError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
-        ) from exc
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except (ValueError, KeyError) as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
-        ) from exc
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except FileNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=f"Artifact missing: {exc}"

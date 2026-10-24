@@ -145,7 +145,14 @@ function populateEngineDropdown(dataset) {
 async function checkHealthAndActiveSession() {
   try {
     const res = await fetch('/api/health');
+    if (!res.ok) {
+      showError(`Backend health check failed (HTTP ${res.status}).`);
+      return;
+    }
     const data = await res.json();
+    if (data.status !== 'ok') {
+      showError(`Backend status degraded: dependencies_ready=${data.dependencies_ready}, artifacts_ready=${data.artifacts_ready}`);
+    }
     if (data.active_session_id) {
       // Resume or fetch active session
       const sRes = await fetch(`/api/sessions/${data.active_session_id}`);
@@ -156,12 +163,19 @@ async function checkHealthAndActiveSession() {
     }
   } catch (err) {
     console.warn('Initial health check notice:', err);
+    showError(`Cannot connect to backend server: ${err.message}. Ensure backend is running at http://127.0.0.1:8000.`);
   }
 }
 
 async function onCreateSession() {
   clearError();
   pausePlayback();
+
+  const engineId = parseInt(dom.engineSelect.value, 10);
+  if (!state.catalog || !dom.datasetSelect.value || isNaN(engineId)) {
+    showError('Please select a valid dataset and validation engine ID.');
+    return;
+  }
 
   // If there is an existing active session, release it first so the new session succeeds
   if (state.activeSession) {
@@ -170,11 +184,22 @@ async function onCreateSession() {
     } catch (e) {
       console.warn('Could not cleanly release previous session before creation', e);
     }
+  } else {
+    // Check if an orphaned session exists on the backend
+    try {
+      const hRes = await fetch('/api/health');
+      if (hRes.ok) {
+        const hData = await hRes.json();
+        if (hData.active_session_id) {
+          await fetch(`/api/sessions/${hData.active_session_id}`, { method: 'DELETE' });
+        }
+      }
+    } catch (_) {}
   }
 
   const payload = {
     dataset: dom.datasetSelect.value,
-    engine_id: parseInt(dom.engineSelect.value, 10),
+    engine_id: engineId,
     model_family: dom.modelSelect.value,
     method_id: dom.methodSelect.value,
   };
@@ -232,6 +257,7 @@ async function advanceSingleCycle() {
   }
 
   state.inFlight = true;
+  dom.btnStep.disabled = true;
   clearError();
 
   const expectedCycle = state.activeSession.cycle;
@@ -263,6 +289,8 @@ async function advanceSingleCycle() {
     showError(err.message);
   } finally {
     state.inFlight = false;
+    const isTerminal = state.activeSession && (state.activeSession.state === 'maintained' || state.activeSession.state === 'failed');
+    dom.btnStep.disabled = isTerminal || !state.activeSession;
   }
 }
 
@@ -277,6 +305,12 @@ function togglePlayback() {
 function startPlayback() {
   if (!state.activeSession) return;
   if (state.activeSession.state === 'maintained' || state.activeSession.state === 'failed') return;
+  if (state.isPlaying) return;
+
+  if (state.playbackTimer) {
+    clearInterval(state.playbackTimer);
+    state.playbackTimer = null;
+  }
 
   state.isPlaying = true;
   dom.btnPlayPause.textContent = 'Pause Playback';
@@ -286,7 +320,7 @@ function startPlayback() {
   const intervalMs = Math.round(1000 / speedHz);
 
   state.playbackTimer = setInterval(() => {
-    if (!state.inFlight) {
+    if (!state.inFlight && state.isPlaying) {
       advanceSingleCycle();
     }
   }, intervalMs);
@@ -420,6 +454,11 @@ function updateSessionState(session) {
   dom.decisionActionBadge.className = `action-badge badge-${session.state}`;
   dom.decisionActionBadge.textContent = (session.action || session.state).toUpperCase();
   dom.decisionExplanation.textContent = session.explanation;
+
+  // Controls availability
+  const isTerminal = session.state === 'maintained' || session.state === 'failed';
+  dom.btnPlayPause.disabled = isTerminal;
+  dom.btnStep.disabled = isTerminal;
 
   // Provenance
   renderProvenance(session.artifact_provenance);

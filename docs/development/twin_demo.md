@@ -133,10 +133,40 @@ http://127.0.0.1:8000
 
 ---
 
-## 7. Resource & Hardware Performance
+## 7. Resource & Hardware Performance (Local Demo Measurements)
 
-- **Memory Footprint:** In-memory footprint is constrained to the single active model and calibrator (~15 MB for GBR, ~25 MB for LSTM). Releasing or switching sessions releases existing models via garbage collection.
-- **CPU Inference Latency:** Single-cycle inference runs in < 2 ms on modern x86_64 CPUs, supporting real-time playback rates of 1, 2, or 5 cycles/second smoothly without CPU throttling.
+> [!NOTE]
+> **Scope & Characterization Notice:**
+> The following figures represent empirical measurements of the local demo process on the development workstation.
+> They are strictly local demo engineering measurements, **not research accuracy results, statistical evidence, or performance guarantees on other hardware**.
+
+### Measurement Environment
+- **Operating System:** Windows 10 (10.0.19045)
+- **CPU:** Intel64 Family 6 Model 60 Stepping 3, GenuineIntel
+- **RAM:** 7.90 GB Total Physical RAM
+- **Runtime Stack:** CPython 3.14.0 (Windows x86_64), NumPy 2.5.4, Pandas 3.0.6, Scikit-Learn 1.9.1, PyTorch 2.14.1+cpu, FastAPI 0.162.0, Uvicorn 0.54.0
+- **Git Commit:** Recorded in `docs/development/twin_verification.md`
+
+### Measured Process Memory Footprint (Resident Working Set)
+- **Server Process at Idle (Python + ML packages loaded):** ~328.8 MB
+- **Active with FD002 GBR + Calibrator:** ~336.3 MB (incremental resident delta: ~7.5 MB)
+- **Active with FD002 LSTM + Calibrator:** ~335.1 MB (incremental resident delta: ~6.3 MB)
+- In-memory footprint is constrained by maintaining at most one active session; releasing or deleting the session releases the active model and calibrator.
+
+### Model Loading Times
+- **FD002 GBR Model + Decision-Aware Calibrator:** ~79.6 ms
+- **FD002 LSTM Model + Decision-Aware Calibrator:** ~18.3 ms
+
+### Single-Cycle Inference Latency
+Measured across 100 complete single-cycle execution calls after 10 warm-ups using a fixed validation window (FD002 validation engine 9 at cycle 30), timed with Python's monotonic high-resolution timer (`time.perf_counter`). Each call includes causal window extraction, preprocessor transform, feature matrix formatting, point-model prediction, conformal interval inversion, and policy evaluation (excluding HTTP transport and model loading):
+- **FD002 GBR + `decision_aware_hcp`:**
+  - Median Latency: **18.66 ms**
+  - 95th Percentile ($p_{95}$): **34.32 ms**
+- **FD002 LSTM + `decision_aware_hcp`:**
+  - Median Latency: **17.36 ms**
+  - 95th Percentile ($p_{95}$): **27.51 ms**
+
+These latencies easily sustain the interactive playback rates (1, 2, or 5 cycles/second, corresponding to period intervals of 1000 ms, 500 ms, and 200 ms) without CPU throttling or thread contention.
 
 ---
 

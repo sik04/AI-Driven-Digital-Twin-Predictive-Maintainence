@@ -15,9 +15,9 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
 | **Phase 6** | Decision-Aware Conformal Calibration Development | Completed | Step 8 calibration matrix, validation selection, and reverified audit (ADR-021, ADR-022) |
-| **Phase 7** | Uncertainty and Maintenance Decision Experiments (Step 9) | In Progress (Pre-Test Frozen) | Pre-test confirmatory protocol freeze, matched controls, stratified bootstrap, decision evaluation (ADR-023) |
+| **Phase 7** | Uncertainty and Maintenance Decision Experiments (Step 9) | Completed | Completed held-out evaluation on 122 test engines; independent audit passed; RQ1–RQ4 outcomes recorded as UNSUPPORTED under preregistered Bonferroni/IUT rules (ADR-026) |
 | **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
-| **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
+| **Phase 9** | Digital Twin Software Implementation | In Progress (Replay Prototype Tested) | Validation telemetry-replay prototype, REST API, interactive dashboard, and real-time playback verified in parallel while Phase 8 remains pending |
 | **Phase 10** | Final Validation and Reproducibility Release | Planned | End-to-end audit, artifact release, environment pinning |
 | **Phase 11** | Complete Research Paper and Thesis | Planned | Final manuscript synthesis, camera-ready preparation |
 | **Phase 12** | Defense, Release, and Research Portfolio | Planned | Public dissemination, oral defense, portfolio release |
@@ -212,17 +212,21 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 9: Digital Twin Software Implementation
-- **Status**: Planned
-- **Objective**: Implement the digital twin software layer, providing bi-directional asset state simulation, calibrated prognostic displays, and decision alerts.
-- **Expected Deliverables**:
-  - Digital twin service module under `src/intellitwin/twin/`.
-  - Interactive demonstration interface and API endpoints.
-  - Real-time simulation and telemetry synchronization tests.
-- **Acceptance Criteria**:
-  - Visual and state synchronization accurately reflects underlying model outputs.
-  - Software operates independently from model training pipelines.
-- **Dependencies**: Phase 7, Phase 8.
-- **Research Observations to Record**: Real-time inference latency, synchronization fidelity, user interaction feedback.
+- **Status**: In Progress (Validation Telemetry-Replay Prototype Tested)
+- **Objective**: Implement the digital twin software layer, providing validation telemetry replay, causal lookback window inference, calibrated prognostic bounds, decision policy alerts, and an interactive local dashboard.
+- **Parallel Development Note**: Prototype development and testing proceeded in parallel with the research pipeline to validate telemetry replay interfaces and user controls on the validation partition; Phase 8 (ablation, robustness, and statistical analysis) remains pending and not completed.
+- **Delivered & Tested Prototype Components**:
+  - Digital twin backend service module under `src/intellitwin/twin/` (`schemas.py`, `artifacts.py`, `replay.py`, `api.py`).
+  - Interactive browser demonstration interface under `apps/twin_dashboard/` (`index.html`, `styles.css`, `app.js`).
+  - Strict anti-leakage 30-cycle causal lookback windowing, sequential advance under lock, and lower-bound maintenance policy.
+  - Integration parity verified across all 18 benchmark cells (3 datasets × 2 model families × 3 calibration methods) with zero tolerance violations against cached validation predictions ($\text{atol} \le 10^{-4}, \text{rtol} = 0$).
+  - Full automated and browser verification covering warm-up (cycles 1–29), active prediction and uncertainty visualization (cycles 30+), play/pause anti-duplicate locking, reset clearing, and CSV trace downloading.
+- **Scope & Governance Boundary**:
+  - The software operates strictly as a validation telemetry-replay digital-twin prototype.
+  - It does not establish bidirectional physical synchronization with live aircraft turbofans.
+  - Validation replay does not constitute confirmatory research performance evidence or claim research superiority.
+- **Dependencies**: Phase 6 / Phase 7 (Validation artifacts and frozen models).
+- **Research Observations to Record**: Local demo CPU inference latency (~17–19 ms median, ~27–34 ms p95), resident process memory (~335–336 MB working set), and smooth interactive playback (1, 2, 5 cycles/second).
 
 ---
 
