@@ -367,9 +367,7 @@ def execute_phase08_evaluation(
                             df_pred_method["seed"] = seed
                             df_pred_method["lower"] = low
                             df_pred_method["upper"] = upp
-                            df_pred_method["fallback_used"] = fallback
-
-                            sim_rows: list[dict[str, Any]] = []
+                            stress_sim_rows: list[dict[str, Any]] = []
                             for unit in partition_engines_by_ds[ds]:
                                 df_eng = df_pred_method[df_pred_method["unit"] == unit].sort_values(
                                     "endpoint_cycle"
@@ -395,7 +393,7 @@ def execute_phase08_evaluation(
                                     policy_fn=lower_bound_one_cycle_policy,
                                     scenario=cost_scenario,
                                 )
-                                sim_rows.append(
+                                stress_sim_rows.append(
                                     {
                                         "unit": int(unit),
                                         "seed": int(seed),
@@ -407,7 +405,7 @@ def execute_phase08_evaluation(
                                     }
                                 )
 
-                            df_sim_method = pd.DataFrame(sim_rows)
+                            df_sim_method = pd.DataFrame(stress_sim_rows)
                             eng_summary = compute_engine_summary_records(
                                 df_pred_method, df_sim_method, nominal_coverage=0.90
                             )
