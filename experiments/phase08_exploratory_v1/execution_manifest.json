@@ -1,0 +1,23 @@
+{
+  "artifact_hashes": {
+    "ablation_engine_metrics_csv": "5c7ab2d5a1debb9bb33c7193d157d7bad01e42c0c192540172c6bb6c945e6bdd",
+    "ablation_summary_csv": "32b2d6456bdf638ad9f10756b1a9351e642a0dbc2779bb6ef4b1a140690516b6",
+    "input_manifest_json": "9c1d4889f1d615dde33d03fd354879043333edeef1f05482403c96384aaaa98e",
+    "paired_contrasts_csv": "98600f378ce4ac8191bad86733fac07a5196a3fa3fda27a0a96ca502e62a2815",
+    "perturbation_manifest_json": "1524b6170936a4f504f23329861a47df91ecadba73405192822e74fe704a18c8",
+    "stress_engine_metrics_csv": "f896753db5e627ccfd6e3639780b8cb620775a74dd968ee1c2e6fb25a72024ec",
+    "stress_summary_csv": "c8437988d5390e18f5c9c48e86232c40aa86b30810859aa372b77f097286ad72",
+    "subgroup_metrics_csv": "7d31eeea7ab82ca187fd002f18ef11cea23e8cb8d4960b586ee0c646ada5fcc0"
+  },
+  "counts": {
+    "ablation_configurations": 240,
+    "bootstrap_replicates": 10000,
+    "datasets": 3,
+    "models": 2,
+    "seeds": 5,
+    "stress_evaluations": 1620
+  },
+  "protocol_version": "phase08-v1",
+  "schema_version": "phase08-manifest-v1",
+  "status": "EXPLORATORY_POST_CONFIRMATORY"
+}

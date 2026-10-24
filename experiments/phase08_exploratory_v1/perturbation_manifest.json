@@ -1,0 +1,78 @@
+{
+  "conditions": [
+    {
+      "condition_id": "clean",
+      "condition_type": "clean",
+      "is_deterministic": true,
+      "param_value": null,
+      "replicates": 1
+    },
+    {
+      "condition_id": "noise_std_005",
+      "condition_type": "sensor_gaussian_noise",
+      "is_deterministic": false,
+      "param_value": 0.05,
+      "replicates": 3
+    },
+    {
+      "condition_id": "noise_std_010",
+      "condition_type": "sensor_gaussian_noise",
+      "is_deterministic": false,
+      "param_value": 0.1,
+      "replicates": 3
+    },
+    {
+      "condition_id": "noise_std_020",
+      "condition_type": "sensor_gaussian_noise",
+      "is_deterministic": false,
+      "param_value": 0.2,
+      "replicates": 3
+    },
+    {
+      "condition_id": "dropout_prob_005",
+      "condition_type": "sensor_dropout",
+      "is_deterministic": false,
+      "param_value": 0.05,
+      "replicates": 3
+    },
+    {
+      "condition_id": "dropout_prob_010",
+      "condition_type": "sensor_dropout",
+      "is_deterministic": false,
+      "param_value": 0.1,
+      "replicates": 3
+    },
+    {
+      "condition_id": "setting1_bias_plus_020",
+      "condition_type": "setting1_bias",
+      "is_deterministic": true,
+      "param_value": 0.2,
+      "replicates": 1
+    },
+    {
+      "condition_id": "setting1_bias_minus_020",
+      "condition_type": "setting1_bias",
+      "is_deterministic": true,
+      "param_value": -0.2,
+      "replicates": 1
+    }
+  ],
+  "seed_sequence_formula": "[2026, 8, dataset_number, engine_id, perturbation_family, replicate_id]",
+  "sensor_columns": [
+    "s2",
+    "s3",
+    "s4",
+    "s7",
+    "s8",
+    "s9",
+    "s11",
+    "s12",
+    "s13",
+    "s14",
+    "s15",
+    "s17",
+    "s20",
+    "s21"
+  ],
+  "total_stream_conditions": 18
+}

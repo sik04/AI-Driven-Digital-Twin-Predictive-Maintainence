@@ -1,0 +1,9 @@
+{
+  "calibration_cache_dir": "experiments/calibration/point_predictions/calibration",
+  "clean_point_predictions_sha256": "5fae8e1e8abec2ee5ccc64cfefac974597bf157a69b4dc6c652a103e543458de",
+  "raw_source_hashes": {
+    "FD001": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+    "FD002": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+    "FD004": "27ef6160b6a1dcb2613a88de9c239f763b223f02cdc41dc5cdedc5dc189b6218"
+  }
+}

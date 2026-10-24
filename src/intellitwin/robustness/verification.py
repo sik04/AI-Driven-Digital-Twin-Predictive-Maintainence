@@ -173,9 +173,12 @@ def independently_verify_phase08_evidence(
 
                         # Verify 0.90 threshold
                         exp_q = reconstructed_cal.coverage_bundles[0.90].global_threshold
-                        saved_bundles = saved_cal_data.get("coverage_bundles", {})
+                        saved_bundles = saved_cal_data.get("threshold_bundles", {})
                         saved_bundle_90 = (
-                            saved_bundles.get("0.9") or saved_bundles.get("0.90") or {}
+                            saved_bundles.get("coverage_90")
+                            or saved_bundles.get("0.9")
+                            or saved_bundles.get("0.90")
+                            or {}
                         )
                         act_q = saved_bundle_90.get("global_threshold")
 

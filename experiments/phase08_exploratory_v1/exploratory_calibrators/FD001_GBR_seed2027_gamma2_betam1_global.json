@@ -1,0 +1,65 @@
+{
+  "schema_version": "phase08-exploratory-calibrator-v1",
+  "status": "EXPLORATORY_POST_CONFIRMATORY",
+  "method_id": "decision_aware_hcp",
+  "variant_id": "gamma2_betam1_global",
+  "gamma": 2,
+  "beta_code": -1,
+  "routing": "global",
+  "dataset": "FD001",
+  "model_family": "GBR",
+  "model_seed": 2027,
+  "threshold_bundles": {
+    "coverage_80": {
+      "nominal_coverage": 0.8,
+      "coverage_fraction": "4/5",
+      "global_threshold": 13.03099198310689,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 13.03099198310689,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_90": {
+      "nominal_coverage": 0.9,
+      "coverage_fraction": "9/10",
+      "global_threshold": 23.030747526709686,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 23.030747526709686,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_95": {
+      "nominal_coverage": 0.95,
+      "coverage_fraction": "19/20",
+      "global_threshold": 45.5180174397362,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 45.5180174397362,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    }
+  }
+}

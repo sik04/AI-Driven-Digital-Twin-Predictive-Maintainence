@@ -16,7 +16,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
 | **Phase 6** | Decision-Aware Conformal Calibration Development | Completed | Step 8 calibration matrix, validation selection, and reverified audit (ADR-021, ADR-022) |
 | **Phase 7** | Uncertainty and Maintenance Decision Experiments (Step 9) | In Progress (Pre-Test Frozen) | Pre-test confirmatory protocol freeze, matched controls, stratified bootstrap, decision evaluation (ADR-023) |
-| **Phase 8** | Ablation, Robustness, and Statistical Analysis | Planned | Component ablations, noise stress-testing, significance tests |
+| **Phase 8** | Ablation, Robustness, and Statistical Analysis | Completed | Factorial component ablation (240 cells), stress testing (1,620 evals), paired bootstrap, independent audit |
 | **Phase 9** | Digital Twin Software Implementation | Planned | State synchronization, telemetry streaming, user interface |
 | **Phase 10** | Final Validation and Reproducibility Release | Planned | End-to-end audit, artifact release, environment pinning |
 | **Phase 11** | Complete Research Paper and Thesis | Planned | Final manuscript synthesis, camera-ready preparation |
@@ -197,7 +197,7 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: In Progress (Locked Exploratory Protocol `phase08-v1`)
+- **Status**: Completed (Exploratory Protocol `phase08-v1` Executed and Independently Audited)
 - **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
   - Systematic factorial component ablation records (240 cells across 122 test engines).
