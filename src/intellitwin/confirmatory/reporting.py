@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 """Report and visualization generator for Step 9 confirmatory evaluation results.
 
 Produces authoritative scientific reports and figures directly from verified confirmatory artifacts:
