@@ -103,8 +103,12 @@ def _gather_protected_input_paths(
         paths.append(reg_p)
         with open(reg_p, encoding="utf-8") as f:
             reg_data = json.load(f)
-        for entry in reg_data.get("entries", {}).values():
-            paths.append(resolve_repo_relative_path(base, entry["checkpoint_path"]))
+        if isinstance(reg_data, list):
+            for entry in reg_data:
+                paths.append(resolve_repo_relative_path(base, entry["checkpoint_path"]))
+        elif isinstance(reg_data, dict):
+            for entry in reg_data.get("entries", {}).values():
+                paths.append(resolve_repo_relative_path(base, entry["checkpoint_path"]))
 
     # 5. Clean point predictions cache from confirmatory
     paths.append(base / confirmatory_dir / "point_predictions.csv")
