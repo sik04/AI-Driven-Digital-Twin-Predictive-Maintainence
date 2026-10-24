@@ -32,7 +32,7 @@ from intellitwin.evaluation.schema import (
     CONFIRMATORY_DATASETS,
     CONFIRMATORY_MODELS,
     CONFIRMATORY_SEEDS,
-    CostScenario,
+    COST_SCENARIOS,
 )
 from intellitwin.provenance import write_immutable_csv, write_immutable_json
 from intellitwin.robustness.ablation import (
@@ -91,16 +91,10 @@ def execute_phase08_evaluation(
     raw_hashes = verify_raw_data_hashes(raw_data_dir=raw_data_dir, base_dir=base)
 
     # Load frozen cost scenario
-    cost_scenario_obj = load_primary_reference_cost(
+    _ = load_primary_reference_cost(
         base / "research/research_design/maintenance_cost_scenarios.yaml"
     )
-    cost_scenario = CostScenario(
-        scenario_id="primary_reference",
-        c_fail=cost_scenario_obj.failure_cost,
-        c_pm=cost_scenario_obj.preventive_cost,
-        c_waste=cost_scenario_obj.wasted_rul_cost_per_cycle,
-        r_equal=cost_scenario_obj.r_equal,
-    )
+    cost_scenario = COST_SCENARIOS["primary_reference"]
 
     # Load clean held-out point predictions from confirmatory_v1
     clean_point_preds_p = conf_dir / "point_predictions.csv"
