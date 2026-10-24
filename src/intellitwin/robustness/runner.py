@@ -54,7 +54,6 @@ from intellitwin.robustness.statistics import (
 from intellitwin.uncertainty.artifacts import (
     load_calibrator_from_artifact,
     resolve_repo_relative_path,
-    serialize_calibrator_artifact,
 )
 from intellitwin.uncertainty.calibration import Calibrator
 
@@ -151,11 +150,23 @@ def execute_phase08_evaluation(
                         base_dir=base,
                     )
 
-                    # Save calibrator artifact
-                    cal_art = serialize_calibrator_artifact(
-                        calibrator=cal,
-                        git_commit="EXPLORATORY_POST_CONFIRMATORY",
-                    )
+                    # Save exploratory calibrator artifact (Phase 8 exploratory only)
+                    bundles_data: dict[str, Any] = {}
+                    for cov, b in cal.coverage_bundles.items():
+                        bundles_data[f"coverage_{int(cov * 100)}"] = b.to_dict()
+                    cal_art = {
+                        "schema_version": "phase08-exploratory-calibrator-v1",
+                        "status": "EXPLORATORY_POST_CONFIRMATORY",
+                        "method_id": cal.method_id,
+                        "variant_id": variant.variant_id,
+                        "gamma": variant.gamma,
+                        "beta_code": variant.beta_code,
+                        "routing": variant.routing,
+                        "dataset": cal.dataset_name,
+                        "model_family": cal.model_family,
+                        "model_seed": cal.model_seed,
+                        "threshold_bundles": bundles_data,
+                    }
                     cal_path = (
                         calibrators_out_dir / f"{ds}_{mf}_seed{seed}_{variant.variant_id}.json"
                     )
