@@ -18,7 +18,7 @@ def main() -> None:
     parser.add_argument(
         "--evidence-dir",
         type=str,
-        default="experiments/phase08_exploratory_v1",
+        default="experiments/phase08_exploratory_v2",
         help="Directory containing Phase 8 evaluation artifacts to audit.",
     )
     parser.add_argument(
