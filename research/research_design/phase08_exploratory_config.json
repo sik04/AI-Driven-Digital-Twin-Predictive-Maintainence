@@ -1,0 +1,125 @@
+{
+  "protocol_version": "phase08-v1",
+  "schema_version": "phase08-config-v1",
+  "stage": "Exploratory Post-Confirmatory Ablation and Robustness Analysis",
+  "designed_after_test_exposure": true,
+  "original_rq_status": "UNSUPPORTED",
+  "datasets": [
+    "FD001",
+    "FD002",
+    "FD004"
+  ],
+  "model_families": [
+    "GBR",
+    "LSTM"
+  ],
+  "seeds": [
+    2026,
+    2027,
+    2028,
+    2029,
+    2030
+  ],
+  "nominal_coverage": 0.90,
+  "cost_scenario": "primary_reference",
+  "maintenance_policy": "lower_bound_one_cycle_policy",
+  "reserved_test_engine_counts": {
+    "FD001": 20,
+    "FD002": 52,
+    "FD004": 50
+  },
+  "experiment_a_ablation": {
+    "factors": {
+      "gamma": [0, 2],
+      "beta_code": [0, -1],
+      "routing": ["global", "regime"]
+    },
+    "variants": [
+      {
+        "variant_id": "gamma0_beta0_global",
+        "gamma": 0,
+        "beta_code": 0,
+        "routing": "global",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma0_beta0_regime",
+        "gamma": 0,
+        "beta_code": 0,
+        "routing": "regime",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma0_betam1_global",
+        "gamma": 0,
+        "beta_code": -1,
+        "routing": "global",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma0_betam1_regime",
+        "gamma": 0,
+        "beta_code": -1,
+        "routing": "regime",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma2_beta0_global",
+        "gamma": 2,
+        "beta_code": 0,
+        "routing": "global",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma2_beta0_regime",
+        "gamma": 2,
+        "beta_code": 0,
+        "routing": "regime",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma2_betam1_global",
+        "gamma": 2,
+        "beta_code": -1,
+        "routing": "global",
+        "is_full_method": false
+      },
+      {
+        "variant_id": "gamma2_betam1_regime",
+        "gamma": 2,
+        "beta_code": -1,
+        "routing": "regime",
+        "is_full_method": true
+      }
+    ],
+    "expected_cells": 240
+  },
+  "experiment_b_stress": {
+    "methods": [
+      "global_hcp",
+      "regime_hcp",
+      "decision_aware_hcp"
+    ],
+    "conditions": [
+      {"condition_id": "clean", "type": "clean", "replicates": 1},
+      {"condition_id": "noise_std_005", "type": "sensor_gaussian_noise", "param": 0.05, "replicates": 3},
+      {"condition_id": "noise_std_010", "type": "sensor_gaussian_noise", "param": 0.10, "replicates": 3},
+      {"condition_id": "noise_std_020", "type": "sensor_gaussian_noise", "param": 0.20, "replicates": 3},
+      {"condition_id": "dropout_prob_005", "type": "sensor_dropout", "param": 0.05, "replicates": 3},
+      {"condition_id": "dropout_prob_010", "type": "sensor_dropout", "param": 0.10, "replicates": 3},
+      {"condition_id": "setting1_bias_plus_020", "type": "setting1_bias", "param": 0.20, "replicates": 1},
+      {"condition_id": "setting1_bias_minus_020", "type": "setting1_bias", "param": -0.20, "replicates": 1}
+    ],
+    "total_stream_conditions": 18,
+    "expected_method_evaluations": 1620
+  },
+  "statistical_inference": {
+    "bootstrap_replicates": 10000,
+    "rng_algorithm": "PCG64",
+    "seed_sequence_formula": "[2026, 8, dataset_number]",
+    "quantile_interpolation": "linear",
+    "ci_interval": [0.025, 0.975],
+    "subgroup_min_engines": 10,
+    "paired_contrasts": true
+  }
+}
