@@ -1,0 +1,40 @@
+{
+  "execution_run_id": "confirmatory_test_1792776041_c4d1c6c2",
+  "hash_consistency_verified": true,
+  "partition": "test",
+  "post_execution_protected_hashes": {
+    "data/splits/fd001_engine_split_seed_2026.json": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+    "data/splits/fd002_engine_split_seed_2026.json": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+    "data/splits/fd002_lifetime_quartile_provenance.json": "10e80c73ef6af621aff7194f24b71374a98d91aae84d1500c51d3195a331f33a",
+    "data/splits/fd004_engine_split_seed_2026.json": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2",
+    "experiments/base_models/model_registry.json": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
+    "experiments/calibration/calibration_registry.json": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
+    "research/hypotheses/hypothesis_framework.yaml": "25d65001f76f07d03c685384d7dc1572a7c59603363d033d5d80ff7820c5e432",
+    "research/research_design/data_evaluation_protocol.md": "fbc94e9a298973fc29d45672689a372e4c64f1ac17afb7f565448c9a08605715",
+    "research/research_design/maintenance_cost_scenarios.yaml": "c36743a2ebe40e56d972cf84fd7419ec938347181abc1aaae8a031e5140a9d79",
+    "research/research_design/statistical_inference_protocol.md": "6e70a67cb063b8aff03b0ec2e88292de7c62e696722060e99b7c560ab01d0a39",
+    "research/research_design/step09_confirmatory_config.json": "b56ff30c9214282a3cac55b94b0e2205001b0c5d6ea9ff6c5db5cb8a4774a76f",
+    "research/research_design/step09_confirmatory_protocol.md": "a1db333bcee5f15280540b23f1012093821572bbdd3149b302ce05b9341be88f",
+    "research/research_design/step09_control_selection.md": "385a011d654d880d9a795f09391fe362a762bee36f6bc035c97a4cfa5d5cd2fc"
+  },
+  "pre_execution_protected_hashes": {
+    "data/splits/fd001_engine_split_seed_2026.json": "9b8a9c3a14e6f44f4f76f443ab974166511193476d3d5119f069918b31afaa56",
+    "data/splits/fd002_engine_split_seed_2026.json": "57c815e4c97d9016bbfe9c91ab90738df0f3487910df889a0c631dde71894e41",
+    "data/splits/fd002_lifetime_quartile_provenance.json": "10e80c73ef6af621aff7194f24b71374a98d91aae84d1500c51d3195a331f33a",
+    "data/splits/fd004_engine_split_seed_2026.json": "7ed99876dd045c0a6e6dabb0c27e66b92b8232aa4221901ddf04981678601dc2",
+    "experiments/base_models/model_registry.json": "e4773f46c8856388be53efb17316bfd9dfb61256e00732fc4e6b5ef84f40cf68",
+    "experiments/calibration/calibration_registry.json": "652d1eeb7b913de12dba277abac5016a83663c9c8145f0f02fba1f0c8dbb7d74",
+    "research/hypotheses/hypothesis_framework.yaml": "25d65001f76f07d03c685384d7dc1572a7c59603363d033d5d80ff7820c5e432",
+    "research/research_design/data_evaluation_protocol.md": "fbc94e9a298973fc29d45672689a372e4c64f1ac17afb7f565448c9a08605715",
+    "research/research_design/maintenance_cost_scenarios.yaml": "c36743a2ebe40e56d972cf84fd7419ec938347181abc1aaae8a031e5140a9d79",
+    "research/research_design/statistical_inference_protocol.md": "6e70a67cb063b8aff03b0ec2e88292de7c62e696722060e99b7c560ab01d0a39",
+    "research/research_design/step09_confirmatory_config.json": "b56ff30c9214282a3cac55b94b0e2205001b0c5d6ea9ff6c5db5cb8a4774a76f",
+    "research/research_design/step09_confirmatory_protocol.md": "a1db333bcee5f15280540b23f1012093821572bbdd3149b302ce05b9341be88f",
+    "research/research_design/step09_control_selection.md": "385a011d654d880d9a795f09391fe362a762bee36f6bc035c97a4cfa5d5cd2fc"
+  },
+  "raw_source_hashes": {
+    "FD001": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+    "FD002": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+    "FD004": "27ef6160b6a1dcb2613a88de9c239f763b223f02cdc41dc5cdedc5dc189b6218"
+  }
+}

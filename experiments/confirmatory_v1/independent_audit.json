@@ -1,0 +1,72 @@
+{
+  "audit_timestamp_utc": "2026-10-23T17:21:46.583350+00:00",
+  "checks": {
+    "bootstrap_draws_reconstruction": {
+      "status": "PASS"
+    },
+    "component_manifest_completeness": {
+      "report": {
+        "all_valid": true,
+        "rq1_components_count": 14,
+        "rq2_components_count": 20,
+        "rq3_components_count": 22,
+        "rq4_components_count": 96,
+        "total_components_count": 152
+      },
+      "status": "PASS"
+    },
+    "input_manifest_consistency": {
+      "status": "PASS"
+    },
+    "manifest_counts_match": {
+      "actual_components": 152,
+      "actual_configs": 930,
+      "actual_outcomes": 39180,
+      "actual_summaries": 186,
+      "expected_components": 152,
+      "expected_configs": 930,
+      "expected_outcomes": 39180,
+      "expected_summaries": 186,
+      "status": "PASS"
+    },
+    "raw_source_hashes": {
+      "hashes": {
+        "FD001": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+        "FD002": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+        "FD004": "27ef6160b6a1dcb2613a88de9c239f763b223f02cdc41dc5cdedc5dc189b6218"
+      },
+      "status": "PASS"
+    },
+    "required_files_present": {
+      "missing_files": [],
+      "status": "PASS"
+    },
+    "rq_reconstructed_classifications": {
+      "RQ1": "UNSUPPORTED",
+      "RQ2": "UNSUPPORTED",
+      "RQ3": "UNSUPPORTED",
+      "RQ4": "UNSUPPORTED"
+    },
+    "saved_vs_reconstructed_rq_classifications": {
+      "classifications": {
+        "RQ1": "UNSUPPORTED",
+        "RQ2": "UNSUPPORTED",
+        "RQ3": "UNSUPPORTED",
+        "RQ4": "UNSUPPORTED"
+      },
+      "status": "PASS"
+    },
+    "trajectory_continuity": {
+      "status": "PASS"
+    }
+  },
+  "failing_reasons": [],
+  "overall_status": "PASS",
+  "partition": "test",
+  "rq_classifications": {
+    "RQ1": "UNSUPPORTED",
+    "RQ2": "UNSUPPORTED",
+    "RQ3": "UNSUPPORTED",
+    "RQ4": "UNSUPPORTED"
+  }
+}
