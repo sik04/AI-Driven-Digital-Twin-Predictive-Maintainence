@@ -364,6 +364,7 @@ def execute_phase08_evaluation(
                                 nominal_coverage=0.90,
                             )
                             df_pred_method = df_pred_stressed.copy()
+                            df_pred_method["seed"] = seed
                             df_pred_method["lower"] = low
                             df_pred_method["upper"] = upp
                             df_pred_method["fallback_used"] = fallback
