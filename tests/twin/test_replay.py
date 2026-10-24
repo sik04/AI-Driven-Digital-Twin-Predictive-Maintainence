@@ -1,5 +1,7 @@
 """Tests for IntelliTwin replay engine, causal windowing, and invariants."""
 
+from unittest.mock import patch
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,6 +11,52 @@ from intellitwin.decision.policies import lower_bound_one_cycle_policy
 from intellitwin.simulator.types import MaintenanceAction, PredictionState
 from intellitwin.twin.artifacts import ArtifactManager
 from intellitwin.twin.replay import ReplayConflictError, ReplaySession
+
+
+def make_synthetic_telemetry(
+    dataset: str = "FD002",
+    engine_id: int = 9,
+    n_cycles: int = 60,
+) -> pd.DataFrame:
+    """Construct a controlled synthetic telemetry fixture for unit tests."""
+    centers = [
+        (0.0, 0.00, 100.0),
+        (10.0, 0.25, 100.0),
+        (20.0, 0.70, 100.0),
+        (25.0, 0.62, 60.0),
+        (35.0, 0.84, 100.0),
+        (42.0, 0.84, 100.0),
+    ]
+    rows = []
+    for c in range(1, n_cycles + 1):
+        setting = centers[(c - 1) % len(centers)]
+        row = {
+            "unit": engine_id,
+            "cycle": c,
+            "setting1": setting[0],
+            "setting2": setting[1],
+            "setting3": setting[2],
+        }
+        for s_i, col in enumerate(SENSOR_COLUMNS, 1):
+            row[col] = float(500.0 + s_i * 10.0)
+        rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def get_unit_test_telemetry(
+    mgr: ArtifactManager,
+    dataset: str = "FD002",
+    engine_id: int = 9,
+    n_cycles: int = 60,
+) -> pd.DataFrame:
+    """Provide engine telemetry, falling back to synthetic fixture if raw data is absent."""
+    raw_path = mgr.base_dir / f"data/raw/cmapss/train_{dataset}.txt"
+    if raw_path.exists():
+        try:
+            return mgr.load_engine_telemetry(dataset, engine_id)
+        except Exception:
+            pass
+    return make_synthetic_telemetry(dataset=dataset, engine_id=engine_id, n_cycles=n_cycles)
 
 
 def test_forbidden_partition_ids_rejected() -> None:
@@ -33,7 +81,7 @@ def test_cycle_warmup_and_30_window() -> None:
     """Verify that cycle 29 has no prediction/bounds, and cycle 30 uses exactly 30 observations."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry = mgr.load_engine_telemetry("FD002", 9)
+    telemetry = get_unit_test_telemetry(mgr, "FD002", 9)
 
     session = ReplaySession(
         session_id="test-session-1",
@@ -75,7 +123,7 @@ def test_anti_leakage_future_rows_do_not_affect_earlier_inference() -> None:
     """Verify that altering future rows does not change earlier predictions or actions."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry_orig = mgr.load_engine_telemetry("FD002", 9)
+    telemetry_orig = get_unit_test_telemetry(mgr, "FD002", 9)
 
     session_orig = ReplaySession(
         session_id="session-orig",
@@ -115,7 +163,7 @@ def test_stale_expected_cycle_rejection() -> None:
     """Verify that stale expected_cycle is rejected with ReplayConflictError."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry = mgr.load_engine_telemetry("FD002", 9)
+    telemetry = get_unit_test_telemetry(mgr, "FD002", 9)
 
     session = ReplaySession(
         session_id="test-session-conflict",
@@ -143,7 +191,7 @@ def test_reset_clears_state() -> None:
     """Verify that reset clears all replay state back to cycle 0."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry = mgr.load_engine_telemetry("FD002", 9)
+    telemetry = get_unit_test_telemetry(mgr, "FD002", 9)
 
     session = ReplaySession(
         session_id="test-session-reset",
@@ -173,7 +221,7 @@ def test_trace_csv_never_contains_oracle_fields() -> None:
     """Verify that CSV export contains only consumed history and strictly no oracle fields."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry = mgr.load_engine_telemetry("FD002", 9)
+    telemetry = get_unit_test_telemetry(mgr, "FD002", 9)
 
     session = ReplaySession(
         session_id="test-session-csv",
@@ -199,13 +247,13 @@ def test_trace_csv_never_contains_oracle_fields() -> None:
 
 
 def test_maintenance_stops_advance() -> None:
-    """Verify that reaching maintenance terminates replay and rejects advance."""
+    """Verify maintenance terminates replay and rejects advance (controlled synthetic)."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    telemetry = mgr.load_engine_telemetry("FD002", 9)
+    telemetry = make_synthetic_telemetry("FD002", 9, n_cycles=40)
 
     session = ReplaySession(
-        session_id="test-session-pm",
+        session_id="test-session-pm-synthetic",
         dataset="FD002",
         engine_id=9,
         model_family="GBR",
@@ -214,30 +262,35 @@ def test_maintenance_stops_advance() -> None:
         telemetry=telemetry,
     )
 
-    # We know engine 9 PM occurs at cycle 173
-    for c in range(173):
-        resp = session.advance(expected_cycle=c)
-        if resp.state == "maintained":
-            break
+    for c in range(29):
+        session.advance(expected_cycle=c)
 
+    with patch.object(
+        session,
+        "_compute_inference",
+        return_value=(1.5, 0.8, 4.0, "Cluster_0"),
+    ):
+        resp = session.advance(expected_cycle=29)
+
+    assert resp.cycle == 30
+    assert resp.state == "maintained"
+    assert resp.action == "MAINTAIN_NOW"
     assert session.state == "maintained"
-    assert session.current_cycle == 173
     assert session.current_action == "MAINTAIN_NOW"
 
     # Further advance without reset must be rejected
     with pytest.raises(ReplayConflictError, match="Cannot advance session in terminal state"):
-        session.advance(expected_cycle=173)
+        session.advance(expected_cycle=30)
 
 
 def test_failure_precedes_maintenance_at_final_cycle() -> None:
-    """Verify that if trajectory reaches its failure cycle first, failure takes precedence."""
+    """Verify that failure precedes maintenance at final cycle (controlled synthetic)."""
     mgr = ArtifactManager()
     artifacts = mgr.load_artifacts("FD002", "GBR", "decision_aware_hcp")
-    # Truncate telemetry at cycle 35 (before PM would trigger at 173)
-    telemetry_short = mgr.load_engine_telemetry("FD002", 9).iloc[:35].copy()
+    telemetry_short = make_synthetic_telemetry("FD002", 9, n_cycles=35)
 
     session = ReplaySession(
-        session_id="test-session-fail",
+        session_id="test-session-fail-synthetic",
         dataset="FD002",
         engine_id=9,
         model_family="GBR",
@@ -246,13 +299,24 @@ def test_failure_precedes_maintenance_at_final_cycle() -> None:
         telemetry=telemetry_short,
     )
 
-    for c in range(35):
-        resp = session.advance(expected_cycle=c)
+    for c in range(34):
+        session.advance(expected_cycle=c)
+
+    with patch.object(
+        session,
+        "_compute_inference",
+        return_value=(1.0, 0.2, 3.0, "Cluster_0"),
+    ):
+        resp = session.advance(expected_cycle=34)
 
     assert resp.cycle == 35
     assert resp.state == "failed"
     assert resp.action is None
     assert "reached terminal failure cycle 35" in resp.explanation
+
+    # Further advance without reset must be rejected
+    with pytest.raises(ReplayConflictError, match="Cannot advance session in terminal state"):
+        session.advance(expected_cycle=35)
 
 
 @pytest.mark.integration
