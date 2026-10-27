@@ -33,6 +33,7 @@ from intellitwin.data.windowing import WindowDataset, construct_windows
 from intellitwin.models.registry import (
     EXPECTED_FAMILIES,
     EXPECTED_SEEDS,
+    FrozenBaseModel,
     load_frozen_base_model,
 )
 from intellitwin.uncertainty.artifacts import (
@@ -241,6 +242,7 @@ def generate_predictions_for_cell(
     model_family: str,
     seed: int,
     base_dir: Path | str = ".",
+    frozen_model: FrozenBaseModel | None = None,
 ) -> pd.DataFrame:
     """Generate base model point predictions on prepared causal windows on CPU in batches of 256.
 
@@ -256,6 +258,8 @@ def generate_predictions_for_cell(
         Model training seed (2026, 2027, 2028, 2029, 2030).
     base_dir : Path or str
         Root repository directory.
+    frozen_model : FrozenBaseModel, optional
+        Pre-loaded frozen model instance to avoid reloading from disk on each call.
 
     Returns
     -------
@@ -269,13 +273,14 @@ def generate_predictions_for_cell(
     if seed not in EXPECTED_SEEDS:
         raise ValueError(f"Unsupported seed: {seed}")
 
-    base = Path(base_dir).resolve()
-    frozen_model = load_frozen_base_model(
-        dataset=dataset,
-        model_family=model_family,
-        seed=seed,
-        base_dir=base,
-    )
+    if frozen_model is None:
+        base = Path(base_dir).resolve()
+        frozen_model = load_frozen_base_model(
+            dataset=dataset,
+            model_family=model_family,
+            seed=seed,
+            base_dir=base,
+        )
 
     # Set CPU inference constraints
     torch.set_num_threads(2)

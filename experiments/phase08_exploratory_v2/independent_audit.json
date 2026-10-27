@@ -1,0 +1,68 @@
+{
+  "checks": {
+    "artifact_inventory_integrity": {
+      "hash_mismatches": [],
+      "status": "PASS",
+      "total_inventoried": 265,
+      "unsafe_paths": []
+    },
+    "bootstrap_draws_reconstruction": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "calibrator_threshold_reconstruction": {
+      "checked_calibrators": 240,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "equal_engine_subgroup_reconstruction": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "equivalence_gates": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "exact_keys_and_duplicates": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "no_misleading_interpretations": {
+      "status": "PASS"
+    },
+    "paired_contrasts_and_bootstrap_statistics": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "perturbation_generation_integrity": {
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "protected_inputs_consistency": {
+      "count": 163,
+      "status": "PASS"
+    },
+    "raw_source_hashes": {
+      "hashes": {
+        "FD001": "963b5e22825b34d8b21c69e1aeb4af3e647050eb672ee8834ba4b5d91d2de0f8",
+        "FD002": "dac6c4dbc4e7c1bdeb5747da3d313d05c395bb99801b44a002b26a2ba13d788f",
+        "FD004": "27ef6160b6a1dcb2613a88de9c239f763b223f02cdc41dc5cdedc5dc189b6218"
+      },
+      "status": "PASS"
+    },
+    "required_files_present": {
+      "missing_files": [],
+      "status": "PASS"
+    },
+    "simulation_terminal_precedence": {
+      "status": "PASS",
+      "violations": []
+    },
+    "summary_aggregation_reconstruction": {
+      "mismatches": [],
+      "status": "PASS"
+    }
+  },
+  "failing_reasons": [],
+  "overall_status": "PASS"
+}

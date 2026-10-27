@@ -113,13 +113,15 @@ def apply_stream_perturbation(
 
     # Noise or dropout applies engine-by-engine
     sensor_list = list(SENSOR_COLUMNS)
-    units = df_perturbed["unit"].unique()
+    values_matrix = df_perturbed[sensor_list].to_numpy(dtype=np.float64, copy=True)
+    unit_arr = df_perturbed["unit"].to_numpy()
+    cycle_arr = df_perturbed["cycle"].to_numpy()
 
-    for unit in units:
-        mask_unit = df_perturbed["unit"] == unit
-        df_unit = df_perturbed.loc[mask_unit].sort_values("cycle")
-        idx_order = df_unit.index
-        n_cyc = len(df_unit)
+    for unit in sorted(np.unique(unit_arr)):
+        idx_order = np.flatnonzero(unit_arr == unit)
+        sort_perm = np.argsort(cycle_arr[idx_order])
+        sorted_indices = idx_order[sort_perm]
+        n_cyc = len(sorted_indices)
 
         if condition.condition_type == "sensor_gaussian_noise":
             sigma = float(condition.param_value if condition.param_value is not None else 0.0)
@@ -129,10 +131,7 @@ def apply_stream_perturbation(
                 replicate_id=replicate_id,
                 n_cycles=n_cyc,
             )
-            noise_scaled = sigma * z
-            # Add noise to sensor columns
-            curr_vals = df_unit[sensor_list].to_numpy(dtype=np.float64)
-            df_perturbed.loc[idx_order, sensor_list] = curr_vals + noise_scaled
+            values_matrix[sorted_indices] += sigma * z
 
         elif condition.condition_type == "sensor_dropout":
             prob = float(condition.param_value if condition.param_value is not None else 0.0)
@@ -143,18 +142,19 @@ def apply_stream_perturbation(
                 n_cycles=n_cyc,
             )
             dropout_mask = u < prob  # True where sensor is dropped
-
-            # Causal forward-fill per sensor
-            for j, col in enumerate(sensor_list):
-                s = df_unit[col].copy()
-                col_mask = dropout_mask[:, j]
-                s.iloc[col_mask] = np.nan
-                # Forward fill within engine, then fill initial cycle with 0.0
-                s = s.ffill().fillna(0.0)
-                df_perturbed.loc[idx_order, col] = s.to_numpy()
+            eng_vals = values_matrix[sorted_indices]
+            for j in range(len(sensor_list)):
+                last_val = 0.0
+                for c in range(n_cyc):
+                    if dropout_mask[c, j]:
+                        eng_vals[c, j] = last_val
+                    else:
+                        last_val = eng_vals[c, j]
+            values_matrix[sorted_indices] = eng_vals
         else:
             raise ValueError(f"Unknown condition type: {condition.condition_type}")
 
+    df_perturbed[sensor_list] = values_matrix
     return df_perturbed
 
 

@@ -16,7 +16,7 @@ The application implemented in `src/intellitwin/twin/` and `apps/twin_dashboard/
 - **Processor:** Intel(R) Core(TM) i7-4790 CPU @ 3.60GHz (4 physical cores, 8 logical threads)
 - **System Memory:** 8.00 GB DDR3
 - **Python Version:** Python 3.14.0 (`tags/v3.14.0:eb13e22`, Oct 7 2025, 64-bit AMD64)
-- **Git Commit (Head):** `feat/twin-replay-demo` tracking merged `origin/main`
+- **Git Commit (Head):** Original execution SHA unrecorded (measured on branch `feat/twin-replay-demo` prior to merge)
 - **Frozen Machine Learning Dependencies:**
   - `numpy==2.5.4`
   - `pandas==3.0.6`
@@ -124,19 +124,19 @@ The dashboard was validated using a headless browser subagent interacting with t
 
 | Requirement | Observed Behavior | Status | Evidence Artifact |
 | :--- | :--- | :---: | :--- |
-| **Clean Initial Load** | Loads immediately with 0 browser console errors or network failures. | PASS | [desktop_initial_load.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/desktop_initial_load_1792847905711.png) |
-| **Catalog & Engine Selectors** | Populates dataset selectors (`FD001`, `FD002`, `FD004`), validation engine IDs (`3`, `4`, `5`...), models, and calibration methods. | PASS | [desktop_initial_load.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/desktop_initial_load_1792847905711.png) |
-| **Cycle 0 Initialization** | Session starts at cycle 0 with blank charts and cryptographic SHA-256 provenance hashes displayed. | PASS | [session_cycle_0.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_cycle_0_1792847938365.png), [session_provenance.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_cycle_0_provenance_1792847961620.png) |
-| **Warm-up Cycles (1–29)** | Ingests telemetry into circular buffer; displays `Warm-up (cycle < 30) - buffering telemetry`; no RUL or intervals displayed. | PASS | [session_cycle_29_warmup.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_cycle_29_warmup_1792848011980.png) |
-| **Active Inference (Cycle 30)** | RUL point prediction, 90% conformal interval, policy action, and trajectory chart with shaded uncertainty region appear. | PASS | [session_cycle_30_active.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_cycle_30_active_1792848031364.png) |
-| **Step / Play / Pause Controls** | Step advances exactly one cycle; Play initiates smooth autoplay; Pause stops playback without skipping cycles. | PASS | [session_playback_pause.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_playback_pause_1792848059171.png) |
+| **Clean Initial Load** | Loads immediately with 0 browser console errors or network failures. | PASS | [desktop_initial_load.png](screenshots/desktop_initial_load_1792847905711.png) |
+| **Catalog & Engine Selectors** | Populates dataset selectors (`FD001`, `FD002`, `FD004`), validation engine IDs (`3`, `4`, `5`...), models, and calibration methods. | PASS | [desktop_initial_load.png](screenshots/desktop_initial_load_1792847905711.png) |
+| **Cycle 0 Initialization** | Session starts at cycle 0 with blank charts and cryptographic SHA-256 provenance hashes displayed. | PASS | [session_cycle_0.png](screenshots/session_cycle_0_1792847938365.png), [session_provenance.png](screenshots/session_cycle_0_provenance_1792847961620.png) |
+| **Warm-up Cycles (1–29)** | Ingests telemetry into circular buffer; displays `Warm-up (cycle < 30) - buffering telemetry`; no RUL or intervals displayed. | PASS | [session_cycle_29_warmup.png](screenshots/session_cycle_29_warmup_1792848011980.png) |
+| **Active Inference (Cycle 30)** | RUL point prediction, 90% conformal interval, policy action, and trajectory chart with shaded uncertainty region appear. | PASS | [session_cycle_30_active.png](screenshots/session_cycle_30_active_1792848031364.png) |
+| **Step / Play / Pause Controls** | Step advances exactly one cycle; Play initiates smooth autoplay; Pause stops playback without skipping cycles. | PASS | [session_playback_pause.png](screenshots/session_playback_pause_1792848059171.png) |
 | **Anti-Duplicate Guard** | Rapid button clicks do not duplicate advance requests or desynchronize cycle sequences. | PASS | Verified in browser execution |
-| **Reset Functionality** | Reset button clears trajectory charts, telemetry history, and returns engine state to cycle 0. | PASS | [session_reset_cycle_0.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_reset_cycle_0_1792848084513.png) |
-| **Session Reconfiguration** | Switching catalog (e.g., to FD001 / Unit 3 / LSTM) cleanly releases previous session and starts a new session. | PASS | [session_fd001_lstm_cycle_30.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/session_fd001_lstm_cycle_30_1792848133982.png) |
+| **Reset Functionality** | Reset button clears trajectory charts, telemetry history, and returns engine state to cycle 0. | PASS | [session_reset_cycle_0.png](screenshots/session_reset_cycle_0_1792848084513.png) |
+| **Session Reconfiguration** | Switching catalog (e.g., to FD001 / Unit 3 / LSTM) cleanly releases previous session and starts a new session. | PASS | [session_fd001_lstm_cycle_30.png](screenshots/session_fd001_lstm_cycle_30_1792848133982.png) |
 | **Telemetry CSV Export** | Exported CSV file contains consumed observations only; zero oracle fields, no future observations leaked. | PASS | Verified via client download |
-| **Mobile Responsiveness** | Responsive layout verified at 375x667 viewport; control panel wraps, charts adjust cleanly. | PASS | [mobile_responsive_view.png](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/mobile_responsive_view_1792848140527.png) |
+| **Mobile Responsiveness** | Responsive layout verified at 375x667 viewport; control panel wraps, charts adjust cleanly. | PASS | [mobile_responsive_view.png](screenshots/mobile_responsive_view_1792848140527.png) |
 | **Keyboard Accessibility** | Interactive elements have explicit `:focus-visible` styling and are navigatable via Tab and Enter keys. | PASS | Verified via styles & DOM navigation |
-| **Full Session Recording** | Complete multi-step interaction recorded to WebP artifact. | PASS | [twin_browser_test.webp](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/docs/development/screenshots/twin_browser_test_1792847799416.webp) |
+| **Full Session Recording** | Recording unavailable; interactive verification completed via individual step screenshots above. | UNAVAILABLE | Recording unavailable (individual step screenshots verified above) |
 
 ---
 
@@ -171,4 +171,4 @@ Performance measurements were gathered directly on the local Windows workstation
 1. **Single-Session Lock:** The backend engine supports one active telemetry session at a time per server process to maintain strict determinism and state isolation.
 2. **Replay Only:** Ingestion is restricted to pre-recorded validation engine units from the C-MAPSS dataset. Live physical sensor feeds are not supported.
 3. **Partition Isolation:** Training and calibration engines cannot be selected; attempting to access non-validation engines raises an explicit `PermissionError` (HTTP 422).
-4. **Unsupported Research Questions:** The dashboard visualizes decision-aware conformal prediction intervals, but held-out scientific evaluation (Phase 7) confirmed that decision-aware calibration did not demonstrate statistically significant superiority over baseline methods.
+4. **Unsupported Research Questions:** The dashboard visualizes decision-aware conformal prediction intervals. The frozen confirmatory decision rules classified RQ1–RQ4 as UNSUPPORTED; this does not establish equivalence or universal inferiority.

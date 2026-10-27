@@ -98,10 +98,13 @@ Total method evaluations = $18 \times 3 \text{ datasets} \times 2 \text{ models}
 
 ## 4. Statistical Inference and Exploratory Contrasts
 
-### 4.1 Statistical Unit and Averaging Hierarchy
+### 4.1 Statistical Unit, Averaging Hierarchy, and Subgroup Weighting
 - **Statistical Unit**: The engine ($i = 1, \dots, N$).
 - **Seed Averaging**: Model seeds $s \in \{2026, \dots, 2030\}$ are averaged within each engine.
-- **Replicate Averaging**: For stochastic stress conditions, perturbation replicates $r \in \{0, 1, 2\}$ are averaged within each engine. Model seeds and perturbation replicates are never treated as independent engines.
+- **Replicate Averaging**: For stochastic stress conditions, perturbation replicates $r \in \{0, 1, 2\}$ are averaged within each engine. Model seeds and perturbation replicates are never treated as independent experimental units.
+- **Subgroup Weighting**: Subgroup coverage and lower/upper-tail miss rates are computed within each engine/group first, seeds and perturbation replicates are averaged within each engine, and the resulting engine-level values are averaged equally across distinct engines. Endpoint rows are not pooled or averaged directly.
+- **Subgroup Accounting**: Endpoint counts, distinct-engine counts ($N_g$), and eligibility ($N_g \ge 10$) are recorded explicitly. Subgroup eligibility is determined from clean original trajectories. Operating-regime and lifecycle-stage groups are evaluated and reported separately. Missing groups or undefined results are preserved with explicit accounting rather than silently discarded or converted to zero.
+- **Subgroup Evidence Scope**: Subgroup evidence is generated for all eight ablation variants and all 18 stress stream conditions across all three frozen methods. Per-engine subgroup records (`subgroup_metrics_by_engine.csv`) are preserved to permit independent reconstruction.
 
 ### 4.2 Paired Stratified Bootstrap
 - **Replicates**: $B = 10,000$.
@@ -110,16 +113,19 @@ Total method evaluations = $18 \times 3 \text{ datasets} \times 2 \text{ models}
 - **Pairing**: Replicate draws are identical across all variants and stress conditions within each dataset.
 - **Quantiles**: 95% empirical percentile confidence intervals via `numpy.quantile(..., method="linear")` with $\alpha = [0.025, 0.975]$.
 - **Contrasts**:
-  - Ablations: Variant minus Full Method ($\Delta = \text{Metric}_{\text{variant}} - \text{Metric}_{\text{full}}$).
+  - Ablations: 7 non-trivial Variant minus Full Method ($\Delta = \text{Metric}_{\text{variant}} - \text{Metric}_{\text{full}}$) contrasts. Full-minus-full is retained strictly as a separate zero-difference sanity check.
   - Factor Main Effects: On-minus-Off contrast averaged equally across the four matched settings of the other two factors.
   - Stress Degradation: Stressed minus Clean ($\Delta = \text{Metric}_{\text{stressed}} - \text{Metric}_{\text{clean}}$).
-- **Subgroup Eligibility**: Minimum 10 distinct engines required in clean evaluation data. Missing groups contribute conservative bounds $[0, 0.90]$.
+  - Signed reporting: Differences are reported with explicit signs without assuming higher coverage or narrower width is automatically better. Calibration is evaluated relative to nominal coverage ($90\%$) and interval score.
+- **Bootstrap Storage**: Bootstrap draws and replicate draw matrices are stored alongside summary statistics (`bootstrap_replicates.npz`). Undefined conditional metrics retain explicit NaN representation with documented denominators.
 
 ---
 
-## 5. Acceptance and Audit Criteria
+## 5. Successor Runs and Acceptance/Audit Criteria
 
-1. **Pre-Execution Lock**: Configuration and protocol committed prior to execution.
-2. **Equivalence Verification**: Exact reproduction of baseline intervals at `atol=1e-10`.
-3. **Artifact Integrity**: All 14 specified files generated under `experiments/phase08_exploratory_v1/`.
-4. **Independent Audit**: Complete reference verification confirming thresholds, metrics, bootstrap draws, and perturbation hashes with zero failing reasons.
+1. **Pre-Execution Lock**: Configuration, protocol, and code committed prior to execution.
+2. **Successor Versioning**: Historical v1 evidence is preserved unchanged in `experiments/phase08_exploratory_v1/`. The corrected run outputs to `experiments/phase08_exploratory_v2/` and `research/results/phase08_exploratory_v2/`.
+3. **Equivalence Verification**: Exact reproduction of baseline intervals at `atol=1e-10, rtol=0`.
+4. **Independent Reference Audit**: Reconstructs thresholds, cycle counts, perturbation streams, model predictions, interval inversions, maintenance decisions, costs, engine metrics, subgroup metrics, contrast statistics, and bootstrap confidence intervals using independent reference implementations rather than production execution functions.
+5. **Artifact & Manifest Integrity**: Non-empty `artifact_hashes` mapping with safe POSIX relative paths. Strict exit on any discrepancy or missing evidence.
+

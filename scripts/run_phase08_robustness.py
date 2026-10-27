@@ -19,13 +19,13 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="experiments/phase08_exploratory_v1",
+        default="experiments/phase08_exploratory_v2",
         help="Directory to write Phase 8 evidence artifacts.",
     )
     parser.add_argument(
         "--report-dir",
         type=str,
-        default="research/results/phase08_exploratory_v1",
+        default="research/results/phase08_exploratory_v2",
         help="Directory to write synthesis reports and figures.",
     )
     parser.add_argument(

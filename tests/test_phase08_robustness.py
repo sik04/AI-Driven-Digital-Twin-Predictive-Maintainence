@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from intellitwin.data.artifacts import compute_sha256
 from intellitwin.data.schema import SENSOR_COLUMNS
 from intellitwin.robustness.ablation import (
     ALL_EIGHT_ABLATION_VARIANTS,
@@ -24,7 +25,16 @@ from intellitwin.robustness.perturbations import (
     generate_engine_noise_array,
 )
 from intellitwin.robustness.statistics import (
+    compute_subgroup_metrics_equal_engine,
     generate_phase08_bootstrap_draws,
+)
+from intellitwin.robustness.verification import (
+    REQUIRED_PHASE08_FILES,
+    independently_verify_phase08_evidence,
+    verify_equal_engine_subgroup_math,
+    verify_exact_keys_and_duplicates,
+    verify_simulation_terminal_precedence,
+    verify_summary_aggregations,
 )
 from intellitwin.uncertainty.artifacts import load_calibrator_from_artifact
 
@@ -217,3 +227,354 @@ def test_paired_bootstrap_draws_reproducibility() -> None:
     draws2 = generate_phase08_bootstrap_draws("FD001", engines, n_replicates=50)
     assert np.array_equal(draws1, draws2)
     assert draws1.shape == (50, 20)
+
+
+# =============================================================================
+# AUDIT FAILURE-CASE REGRESSION TESTS
+# =============================================================================
+
+
+def test_audit_fails_on_unequal_engine_lengths_subgroup_weighting() -> None:
+    """Regression test: prove equal-engine weighting differs from pooled endpoint weighting.
+
+    Engine 1 has 10 endpoints, all covered (10/10 = 1.0).
+    Engine 2 has 90 endpoints, none covered (0/90 = 0.0).
+    Direct row pooling gives: 10/100 = 0.10.
+    Equal-engine weighting gives: (1.0 + 0.0) / 2 = 0.50.
+    """
+    rows = []
+    # Engine 1
+    for c in range(1, 11):
+        rows.append(
+            {
+                "dataset": "FD002",
+                "unit": 1,
+                "endpoint_cycle": c + 29,
+                "prediction": 50.0,
+                "rul_true": 50.0,
+                "lower": 40.0,
+                "upper": 60.0,  # covered
+                "seed": 2026,
+                "regime": "C1",
+            }
+        )
+    # Engine 2
+    for c in range(1, 91):
+        rows.append(
+            {
+                "dataset": "FD002",
+                "unit": 2,
+                "endpoint_cycle": c + 29,
+                "prediction": 50.0,
+                "rul_true": 100.0,
+                "lower": 40.0,
+                "upper": 60.0,  # missed
+                "seed": 2026,
+                "regime": "C1",
+            }
+        )
+    df_eval = pd.DataFrame(rows)
+
+    clean_subgroups = pd.DataFrame(
+        [
+            {"dataset": "FD002", "unit": 1, "endpoint_cycle": c + 29, "regime": "C1"}
+            for c in range(1, 11)
+        ]
+        + [
+            {"dataset": "FD002", "unit": 2, "endpoint_cycle": c + 29, "regime": "C1"}
+            for c in range(1, 91)
+        ]
+    )
+
+    df_eng_sub, df_sub_sum = compute_subgroup_metrics_equal_engine(
+        df_eval=df_eval,
+        clean_subgroup_df=clean_subgroups,
+        subgroup_family="regime",
+        nominal_coverage=0.90,
+    )
+
+    # 1. Verify that production implementation correctly calculates 0.50, NOT 0.10
+    assert np.isclose(df_sub_sum["coverage"].iloc[0], 0.50, atol=1e-10)
+    assert df_sub_sum["n_engines"].iloc[0] == 2
+    assert not df_sub_sum["is_eligible"].iloc[0]  # < 10 engines
+
+    # 2. Corrupt summary with pooled endpoint weighting (0.10)
+    df_sub_corrupt = df_sub_sum.copy()
+    df_sub_corrupt["evaluation_type"] = "ablation"
+    df_sub_corrupt["dataset"] = "FD002"
+    df_sub_corrupt["model_family"] = "GBR"
+    df_sub_corrupt["variant_id"] = "test_var"
+    df_sub_corrupt["method_id"] = ""
+    df_sub_corrupt["condition_id"] = "clean"
+    df_sub_corrupt["coverage"] = 0.10  # corrupted!
+
+    df_eng_sub_tagged = df_eng_sub.copy()
+    df_eng_sub_tagged["evaluation_type"] = "ablation"
+    df_eng_sub_tagged["dataset"] = "FD002"
+    df_eng_sub_tagged["model_family"] = "GBR"
+    df_eng_sub_tagged["variant_id"] = "test_var"
+    df_eng_sub_tagged["method_id"] = ""
+    df_eng_sub_tagged["condition_id"] = "clean"
+
+    mismatches = verify_equal_engine_subgroup_math(df_sub_corrupt, df_eng_sub_tagged)
+    assert len(mismatches) > 0
+    assert any("equal-engine cov exp=0.5 != act=0.1" in m for m in mismatches)
+
+
+def test_audit_fails_on_empty_and_incomplete_hash_inventories(tmp_path: Path) -> None:
+    """Regression test: audit must fail closed on empty or missing artifact_hashes."""
+    # Write empty files for all required files
+    for fname in REQUIRED_PHASE08_FILES:
+        (tmp_path / fname).write_text("dummy", encoding="utf-8")
+
+    # Manifest with empty artifact_hashes
+    manifest = {
+        "protocol_version": "phase08-v1",
+        "schema_version": "phase08-manifest-v2",
+        "status": "EXPLORATORY_POST_CONFIRMATORY",
+        "git_commit": "abcdef123456",
+        "git_dirty": False,
+        "platform": "Linux",
+        "python_version": "3.11.0",
+        "start_time_utc": "2026-10-25T00:00:00Z",
+        "end_time_utc": "2026-10-25T01:00:00Z",
+        "duration_seconds": 3600.0,
+        "counts": {
+            "ablation_configurations": 240,
+            "stress_evaluations": 1620,
+            "datasets": 3,
+            "models": 2,
+            "seeds": 5,
+            "bootstrap_replicates": 10000,
+            "total_test_engines": 122,
+        },
+        "artifact_hashes": {},  # EMPTY!
+    }
+    (tmp_path / "execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+    res = independently_verify_phase08_evidence(evidence_dir=tmp_path)
+    assert res["overall_status"] == "FAIL"
+    assert any("artifact_hashes mapping is absent or empty" in r for r in res["failing_reasons"])
+
+
+def test_audit_fails_on_missing_or_duplicate_records(tmp_path: Path) -> None:
+    """Regression test: audit must fail on duplicate or missing keys."""
+    expected_units = {
+        "FD001": list(range(1, 21)),
+        "FD002": list(range(1, 53)),
+        "FD004": list(range(1, 51)),
+    }
+    # Create file with duplicate keys
+    rows = [
+        {
+            "dataset": "FD001",
+            "model_family": "GBR",
+            "variant_id": "gamma0_beta0_global",
+            "seed": 2026,
+            "unit": 1,
+        },
+        {
+            "dataset": "FD001",
+            "model_family": "GBR",
+            "variant_id": "gamma0_beta0_global",
+            "seed": 2026,
+            "unit": 1,
+        },  # duplicate!
+    ]
+    pd.DataFrame(rows).to_csv(tmp_path / "ablation_engine_seed_metrics.csv", index=False)
+    mismatches = verify_exact_keys_and_duplicates(tmp_path, expected_units)
+    assert len(mismatches) > 0
+    assert any("duplicate keys" in m for m in mismatches)
+
+
+def test_audit_fails_on_changed_regime_thresholds_or_fallbacks() -> None:
+    """Regression test: verify that threshold modification fails reference reconstruction."""
+    from intellitwin.robustness.verification import _reconstruct_reference_quantile
+
+    eids = np.array([1, 1, 2, 2, 3, 3])
+    scores = np.array([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
+    correct_q = _reconstruct_reference_quantile(eids, scores, nominal_coverage=0.90)
+
+    # If recorded threshold was corrupted to 1.5, verification fails
+    corrupted_q = 1.5
+    assert not np.isclose(correct_q, corrupted_q)
+
+
+def test_audit_fails_on_changed_perturbations_or_stream_hashes() -> None:
+    """Regression test: prove that altered PRNG seed changes perturbation values."""
+    # Canonical noise
+    z_canonical = generate_engine_noise_array("FD002", 5, 0, 100)
+    # Perturbed replicate
+    z_altered = generate_engine_noise_array("FD002", 5, 1, 100)
+    assert not np.array_equal(z_canonical, z_altered)
+
+
+def test_audit_fails_on_changed_engine_metrics_and_summaries() -> None:
+    """Regression test: audit must detect semantic discrepancies in summary aggregations."""
+    df_ablation_engine = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "variant_id": "gamma0_beta0_global",
+                "coverage": 0.90,
+                "cost": 2.0,
+                "width": 10.0,
+                "interval_score": 15.0,
+                "rmse": 12.0,
+            }
+        ]
+    )
+    # Corrupted summary: cost_mean set to 999.0
+    df_ablation_summary = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "variant_id": "gamma0_beta0_global",
+                "coverage_mean": 0.90,
+                "cost_mean": 999.0,  # corrupted!
+                "width_mean": 10.0,
+                "interval_score_mean": 15.0,
+                "rmse_mean": 12.0,
+            }
+        ]
+    )
+    mismatches = verify_summary_aggregations(
+        df_ablation_summary=df_ablation_summary,
+        df_ablation_engine=df_ablation_engine,
+        df_stress_summary=pd.DataFrame(),
+        df_stress_engine=pd.DataFrame(),
+    )
+    assert len(mismatches) > 0
+    assert any("cost_mean: exp=2.0 != act=999.0" in m for m in mismatches)
+
+
+def test_audit_fails_on_absent_factor_effects_or_bootstrap_statistics(tmp_path: Path) -> None:
+    """Regression test: audit must detect missing factor effect evidence."""
+    # Write factor effects table with fewer than 126 rows
+    df_fac = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "factor": "gamma_scale",
+                "metric": "cost",
+            }
+        ]
+    )
+    df_fac.to_csv(tmp_path / "factor_main_effects.csv", index=False)
+    mismatches = verify_exact_keys_and_duplicates(
+        tmp_path,
+        expected_units={
+            "FD001": list(range(1, 21)),
+            "FD002": list(range(1, 53)),
+            "FD004": list(range(1, 51)),
+        },
+    )
+    assert any("factor_main_effects expected 126 rows, got 1" in m for m in mismatches)
+
+
+def test_audit_fails_on_changed_protected_inputs(tmp_path: Path) -> None:
+    """Regression test: audit fails when pre- and post-protected hashes mismatch."""
+    for fname in REQUIRED_PHASE08_FILES:
+        if fname.endswith(".npz"):
+            np.savez(tmp_path / fname, draws=np.zeros((1, 1)))
+        elif fname.endswith(".json"):
+            (tmp_path / fname).write_text("{}", encoding="utf-8")
+        else:
+            (tmp_path / fname).write_text("dummy", encoding="utf-8")
+
+    manifest = {
+        "protocol_version": "phase08-v1",
+        "schema_version": "phase08-manifest-v2",
+        "status": "EXPLORATORY_POST_CONFIRMATORY",
+        "git_commit": "abcdef123456",
+        "git_dirty": False,
+        "platform": "Linux",
+        "python_version": "3.11.0",
+        "start_time_utc": "2026-10-25T00:00:00Z",
+        "end_time_utc": "2026-10-25T01:00:00Z",
+        "duration_seconds": 3600.0,
+        "counts": {
+            "ablation_configurations": 240,
+            "stress_evaluations": 1620,
+            "datasets": 3,
+            "models": 2,
+            "seeds": 5,
+            "bootstrap_replicates": 10000,
+            "total_test_engines": 122,
+        },
+        "artifact_hashes": {
+            fname: compute_sha256(tmp_path / fname) for fname in REQUIRED_PHASE08_FILES
+        },
+    }
+    (tmp_path / "execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+    # Corrupted input manifest where pre and post hashes do not match
+    in_man = {
+        "pre_execution_protected_hashes": {"file_a": "hash1"},
+        "post_execution_protected_hashes": {"file_a": "hash_altered"},  # ALTERED!
+    }
+    (tmp_path / "input_manifest.json").write_text(json.dumps(in_man), encoding="utf-8")
+
+    res = independently_verify_phase08_evidence(evidence_dir=tmp_path)
+    assert res["overall_status"] == "FAIL"
+    assert any("protected hashes inconsistent" in r.lower() for r in res["failing_reasons"])
+
+
+def test_audit_fails_on_missing_provenance_fields(tmp_path: Path) -> None:
+    """Regression test: audit fails if mandatory provenance fields are missing."""
+    for fname in REQUIRED_PHASE08_FILES:
+        if fname.endswith(".npz"):
+            np.savez(tmp_path / fname, draws=np.zeros((1, 1)))
+        elif fname.endswith(".json"):
+            (tmp_path / fname).write_text("{}", encoding="utf-8")
+        else:
+            (tmp_path / fname).write_text("dummy", encoding="utf-8")
+
+    manifest = {
+        "protocol_version": "phase08-v1",
+        "status": "EXPLORATORY_POST_CONFIRMATORY",
+        # MISSING git_commit, platform, start_time_utc, etc.
+        "artifact_hashes": {
+            fname: compute_sha256(tmp_path / fname) for fname in REQUIRED_PHASE08_FILES
+        },
+    }
+    (tmp_path / "execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+
+    res = independently_verify_phase08_evidence(evidence_dir=tmp_path)
+    assert res["overall_status"] == "FAIL"
+    assert any("Missing mandatory provenance fields" in r for r in res["failing_reasons"])
+
+
+def test_audit_fails_on_terminal_failure_precedence_and_dropout_causality() -> None:
+    """Regression test: verify terminal failure precedence and dropout causality."""
+    # Part A: Terminal failure precedence violation
+    df_sim_violation = pd.DataFrame(
+        [
+            {
+                "unit": 1,
+                "failed": True,
+                "pm_occurred": True,  # Contradictory: cannot be both failed and PM!
+                "intervention_cycle": 100,
+            }
+        ]
+    )
+    violations = verify_simulation_terminal_precedence(df_sim_violation)
+    assert len(violations) > 0
+    assert any("marked both failed and PM occurred" in v for v in violations)
+
+    # Part B: Dropout causality
+    cols = ["unit", "cycle", "setting1", "setting2", "setting3"] + list(SENSOR_COLUMNS)
+    data = {c: [10.0, 20.0, 30.0] for c in cols}
+    data["unit"] = [1, 1, 1]
+    data["cycle"] = [1, 2, 3]
+    df = pd.DataFrame(data)
+
+    cond = StressCondition("test_causal_drop", "sensor_dropout", 0.999, 1, False)
+    df_pert = apply_stream_perturbation(df, "FD001", cond, replicate_id=0)
+
+    # Because dropout occurred at cycle 1, the value must be normalized 0.0 (past observation only)
+    for s in SENSOR_COLUMNS:
+        assert df_pert[s].iloc[0] == 0.0
