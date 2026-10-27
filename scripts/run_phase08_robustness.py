@@ -9,6 +9,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from intellitwin.data.artifacts import compute_sha256
 from intellitwin.provenance import write_immutable_json
 from intellitwin.robustness.reporting import generate_phase08_reports_and_figures
 from intellitwin.robustness.runner import execute_phase08_evaluation
@@ -85,6 +86,29 @@ def main() -> None:
             base_dir=args.base_dir,
         )
         print(f"Generated {len(rep_res['figures'])} figure files in {args.report_dir}/figures")
+
+        # Generate non-circular final receipt
+        receipt_items: dict[str, str] = {
+            "independent_audit.json": compute_sha256(audit_path),
+        }
+        report_dir_path = Path(args.report_dir).resolve()
+        for rep_f in sorted(report_dir_path.rglob("*")):
+            if rep_f.is_file() and rep_f.name != "final_receipt.json":
+                rel = rep_f.relative_to(report_dir_path).as_posix()
+                receipt_items[rel] = compute_sha256(rep_f)
+
+        final_receipt = {
+            "protocol_version": "phase08-v1",
+            "execution_manifest_sha256": audit_res.get("execution_manifest_sha256", ""),
+            "verifier_source_sha256": audit_res.get("verifier_source_sha256", ""),
+            "independent_audit_sha256": compute_sha256(audit_path),
+            "report_artifact_hashes": receipt_items,
+        }
+        write_immutable_json(ev_dir / "final_receipt.json", final_receipt, overwrite=args.overwrite)
+        write_immutable_json(
+            report_dir_path / "final_receipt.json", final_receipt, overwrite=args.overwrite
+        )
+        print("Generated final receipt with audit and report checksums.")
         print("Phase 8 execution and verification finished successfully.")
     except Exception as exc:
         print(f"\nFATAL ERROR: Phase 8 evaluation failed: {exc}")

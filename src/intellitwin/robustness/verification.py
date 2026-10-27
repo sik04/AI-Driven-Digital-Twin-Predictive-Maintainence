@@ -830,6 +830,8 @@ def independently_verify_phase08_evidence(
     # 2. Manifest Schema & Expected Artifact Inventory
     # -------------------------------------------------------------------------
     manifest_p = ev_dir / "execution_manifest.json"
+    manifest_hash = compute_sha256(manifest_p) if manifest_p.exists() else ""
+    verifier_sha = compute_sha256(Path(__file__))
     try:
         with open(manifest_p, encoding="utf-8") as f:
             manifest = json.load(f)
@@ -837,6 +839,8 @@ def independently_verify_phase08_evidence(
         failing_reasons.append(f"Could not parse execution_manifest.json: {exc}")
         return {
             "overall_status": "FAIL",
+            "execution_manifest_sha256": manifest_hash,
+            "verifier_source_sha256": verifier_sha,
             "failing_reasons": failing_reasons,
             "checks": checks,
             "max_discrepancies": {"overall": max_discrepancy_overall},
@@ -1444,6 +1448,8 @@ def independently_verify_phase08_evidence(
 
     return {
         "overall_status": overall_status,
+        "execution_manifest_sha256": manifest_hash,
+        "verifier_source_sha256": verifier_sha,
         "failing_reasons": failing_reasons,
         "max_discrepancies": {"overall": max_discrepancy_overall},
         "checks": checks,
