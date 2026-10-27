@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import gzip
-import io
 import json
 import logging
 import platform
 import subprocess
 import sys
 import time
+from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -41,6 +41,7 @@ from intellitwin.evaluation.schema import (
     CONFIRMATORY_SEEDS,
     COST_SCENARIOS,
 )
+from intellitwin.models.registry import load_frozen_base_model
 from intellitwin.provenance import (
     get_git_info,
     write_immutable_csv,
@@ -188,6 +189,11 @@ def execute_phase08_evaluation(
     # 1. Environment and Git provenance
     git_sha, git_dirty = get_git_info(allow_dirty=allow_dirty, repo_root=base)
     log(f"Git commit: {git_sha} (dirty: {git_dirty})")
+    if git_dirty and not allow_dirty:
+        raise RuntimeError(
+            "Working directory has uncommitted changes (git_dirty=True). "
+            "Authoritative Phase 8 runs must be executed from a clean commit."
+        )
 
     # Capture pip freeze & pip check
     pip_freeze_proc = subprocess.run(
@@ -220,6 +226,16 @@ def execute_phase08_evaluation(
 
     raw_hashes = verify_raw_data_hashes(raw_data_dir=raw_data_dir, base_dir=base)
     log("Protected inputs verified.")
+
+    # Preload 30 frozen base models
+    log("Preloading 30 frozen base models into memory...")
+    loaded_base_models: dict[tuple[str, str, int], Any] = {}
+    for ds_preload in CONFIRMATORY_DATASETS:
+        for mf_preload in CONFIRMATORY_MODELS:
+            for s_preload in CONFIRMATORY_SEEDS:
+                loaded_base_models[(ds_preload, mf_preload, s_preload)] = load_frozen_base_model(
+                    dataset=ds_preload, model_family=mf_preload, seed=s_preload, base_dir=base
+                )
 
     # Load frozen cost scenario
     _ = load_primary_reference_cost(
@@ -264,7 +280,12 @@ def execute_phase08_evaluation(
     log("Executing Experiment A: Component Factorial Ablation (240 cells)...")
     ablation_engine_seed_rows: list[dict[str, Any]] = []
     ablation_sim_rows: list[dict[str, Any]] = []
-    ablation_interval_rows: list[dict[str, Any]] = []
+
+    abl_gz_p = out_dir / "ablation_interval_predictions.csv.gz"
+    abl_gz_f = gzip.open(abl_gz_p, "wt", newline="", encoding="utf-8", compresslevel=1)
+    abl_gz_f.write(
+        "dataset,model_family,seed,variant_id,unit,endpoint_cycle,prediction,rul_true,lower,upper,regime,lifecycle_stage,fallback_used\n"
+    )
 
     # Per-engine subgroup metric accumulator:
     # rows of (evaluation_type, dataset, model_family, variant_id, method_id, condition_id,
@@ -343,25 +364,26 @@ def execute_phase08_evaluation(
                     df_pred_var["seed"] = seed
                     variant_eval_frames.append(df_pred_var)
 
-                    # Collect per-cycle interval predictions
-                    for r in df_pred_var.itertuples():
-                        ablation_interval_rows.append(
-                            {
-                                "dataset": ds,
-                                "model_family": mf,
-                                "seed": seed,
-                                "variant_id": variant.variant_id,
-                                "unit": int(r.unit),
-                                "endpoint_cycle": int(r.endpoint_cycle),
-                                "prediction": float(r.prediction),
-                                "rul_true": float(r.rul_true),
-                                "lower": float(r.lower),
-                                "upper": float(r.upper),
-                                "regime": str(r.regime),
-                                "lifecycle_stage": str(r.lifecycle_stage),
-                                "fallback_used": bool(r.fallback_used),
-                            }
-                        )
+                    # Stream per-cycle interval predictions directly to disk
+                    df_pred_var["dataset"] = ds
+                    df_pred_var["model_family"] = mf
+                    df_pred_var["variant_id"] = variant.variant_id
+                    abl_cols = [
+                        "dataset",
+                        "model_family",
+                        "seed",
+                        "variant_id",
+                        "unit",
+                        "endpoint_cycle",
+                        "prediction",
+                        "rul_true",
+                        "lower",
+                        "upper",
+                        "regime",
+                        "lifecycle_stage",
+                        "fallback_used",
+                    ]
+                    df_pred_var[abl_cols].to_csv(abl_gz_f, header=False, index=False)
 
                     # Simulate policy on each engine
                     cell_sim_rows: list[dict[str, Any]] = []
@@ -508,13 +530,21 @@ def execute_phase08_evaluation(
                 zip(grp["unit"], grp[col], strict=False)
             )
 
+    abl_gz_f.close()
+    log("Ablation interval prediction stream written and closed.")
+
     # =========================================================================
     # EXPERIMENT B: FROZEN-METHOD STRESS TESTS (1,620 Evaluations)
     # =========================================================================
     log("Executing Experiment B: Stress Tests (1,620 evaluations)...")
     stress_engine_seed_rows: list[dict[str, Any]] = []
     stress_sim_rows: list[dict[str, Any]] = []
-    stress_interval_rows: list[dict[str, Any]] = []
+
+    stress_gz_p = out_dir / "stress_interval_predictions.csv.gz"
+    stress_gz_f = gzip.open(stress_gz_p, "wt", newline="", encoding="utf-8", compresslevel=1)
+    stress_gz_f.write(
+        "dataset,model_family,seed,method_id,condition_id,replicate_id,unit,endpoint_cycle,prediction,rul_true,lower,upper,regime,lifecycle_stage,fallback_used\n"
+    )
 
     # Load frozen calibrators for the 3 original methods
     frozen_calibrators: dict[tuple[str, str, int, str], Calibrator] = {}
@@ -557,7 +587,9 @@ def execute_phase08_evaluation(
         clean_ds_subgroups = clean_subgroup_map[clean_subgroup_map["dataset"] == ds]
 
         for cond in ALL_STRESS_CONDITIONS:
-            # We collect all evaluations for this (ds, cond) to compute subgroup metrics per method
+            # We collect evaluations for this (ds, cond) to compute subgroup metrics per method
+            stress_subgroup_frames: dict[tuple[str, str], list[pd.DataFrame]] = defaultdict(list)
+
             for rep_id in range(cond.replicates):
                 if cond.condition_type == "clean":
                     windows = construct_windows(df_trans)
@@ -571,13 +603,14 @@ def execute_phase08_evaluation(
 
                 for mf in CONFIRMATORY_MODELS:
                     for seed in CONFIRMATORY_SEEDS:
-                        # Generate single point-prediction stream from checkpoint
+                        # Generate single point-prediction stream from preloaded checkpoint
                         df_pred_stressed = generate_predictions_for_cell(
                             windows=windows,
                             dataset=ds,
                             model_family=mf,
                             seed=seed,
                             base_dir=base,
+                            frozen_model=loaded_base_models[(ds, mf, seed)],
                         )
 
                         # Reused point-prediction stream across all three methods
@@ -594,28 +627,50 @@ def execute_phase08_evaluation(
                             df_pred_method["lower"] = low
                             df_pred_method["upper"] = upp
                             df_pred_method["fallback_used"] = fallback
+                            df_pred_method["dataset"] = ds
+                            df_pred_method["model_family"] = mf
+                            df_pred_method["method_id"] = m_id
+                            df_pred_method["condition_id"] = cond.condition_id
 
-                            # Collect interval predictions
-                            for r in df_pred_method.itertuples():
-                                stress_interval_rows.append(
-                                    {
-                                        "dataset": ds,
-                                        "model_family": mf,
-                                        "method_id": m_id,
-                                        "condition_id": cond.condition_id,
-                                        "replicate_id": rep_id,
-                                        "seed": seed,
-                                        "unit": int(r.unit),
-                                        "endpoint_cycle": int(r.endpoint_cycle),
-                                        "prediction": float(r.prediction),
-                                        "rul_true": float(r.rul_true),
-                                        "lower": float(r.lower),
-                                        "upper": float(r.upper),
-                                        "regime": str(r.regime),
-                                        "lifecycle_stage": str(r.lifecycle_stage),
-                                        "fallback_used": bool(r.fallback_used),
-                                    }
-                                )
+                            # Stream interval predictions directly to disk
+                            stress_cols = [
+                                "dataset",
+                                "model_family",
+                                "seed",
+                                "method_id",
+                                "condition_id",
+                                "replicate_id",
+                                "unit",
+                                "endpoint_cycle",
+                                "prediction",
+                                "rul_true",
+                                "lower",
+                                "upper",
+                                "regime",
+                                "lifecycle_stage",
+                                "fallback_used",
+                            ]
+                            df_pred_method[stress_cols].to_csv(
+                                stress_gz_f, header=False, index=False
+                            )
+
+                            stress_subgroup_frames[(mf, m_id)].append(
+                                df_pred_method[
+                                    [
+                                        "unit",
+                                        "endpoint_cycle",
+                                        "prediction",
+                                        "rul_true",
+                                        "lower",
+                                        "upper",
+                                        "regime",
+                                        "lifecycle_stage",
+                                        "fallback_used",
+                                        "seed",
+                                        "replicate_id",
+                                    ]
+                                ]
+                            )
 
                             stress_cell_sim_rows: list[dict[str, Any]] = []
                             for unit in partition_engines_by_ds[ds]:
@@ -677,6 +732,59 @@ def execute_phase08_evaluation(
                             eng_summary["method_id"] = m_id
                             stress_engine_seed_rows.extend(eng_summary.to_dict(orient="records"))
 
+            # Evaluate Subgroups for this stress condition across all replicates and seeds
+            for (mf, mid), frames in stress_subgroup_frames.items():
+                grp_eval = pd.concat(frames, ignore_index=True)
+                for fam_name in ("regime", "lifecycle_stage"):
+                    df_eng_sub, df_sub_sum = compute_subgroup_metrics_equal_engine(
+                        df_eval=grp_eval,
+                        clean_subgroup_df=clean_ds_subgroups,
+                        subgroup_family=fam_name,
+                        nominal_coverage=0.90,
+                    )
+                    for r_sub in df_eng_sub.itertuples():
+                        subgroup_engine_records.append(
+                            {
+                                "evaluation_type": "stress",
+                                "dataset": ds,
+                                "model_family": mf,
+                                "variant_id": "",
+                                "method_id": mid,
+                                "condition_id": cond.condition_id,
+                                "subgroup_family": fam_name,
+                                "subgroup": str(r_sub.subgroup),
+                                "unit": int(r_sub.unit),
+                                "n_endpoints": int(r_sub.n_endpoints),
+                                "coverage": float(r_sub.coverage),
+                                "lower_tail_miss": float(r_sub.lower_tail_miss),
+                                "upper_tail_miss": float(r_sub.upper_tail_miss),
+                            }
+                        )
+                    for r_sum in df_sub_sum.itertuples():
+                        subgroup_summary_records.append(
+                            {
+                                "evaluation_type": "stress",
+                                "dataset": ds,
+                                "model_family": mf,
+                                "variant_id": "",
+                                "method_id": mid,
+                                "condition_id": cond.condition_id,
+                                "subgroup_family": fam_name,
+                                "subgroup": str(r_sum.subgroup),
+                                "n_endpoints": int(r_sum.n_endpoints),
+                                "n_engines": int(r_sum.n_engines),
+                                "is_eligible": bool(r_sum.is_eligible),
+                                "coverage": float(r_sum.coverage),
+                                "coverage_abs_error": float(r_sum.coverage_abs_error),
+                                "lower_tail_miss": float(r_sum.lower_tail_miss),
+                                "upper_tail_miss": float(r_sum.upper_tail_miss),
+                            }
+                        )
+            del stress_subgroup_frames
+
+    stress_gz_f.close()
+    log("Stress interval prediction stream written and closed.")
+
     df_stress_engine_raw = pd.DataFrame(stress_engine_seed_rows)
     df_stress_engine = (
         df_stress_engine_raw.groupby(
@@ -701,59 +809,6 @@ def execute_phase08_evaluation(
             stress_metric_store[(ds, mf, mid, cid, col)] = dict(
                 zip(grp["unit"], grp[col], strict=False)
             )
-
-    # Subgroup metrics for Experiment B (stress tests)
-    log("Computing equal-engine subgroup metrics for stress tests...")
-    df_stress_intervals = pd.DataFrame(stress_interval_rows)
-    for (ds, mf, mid, cid), grp_eval in df_stress_intervals.groupby(
-        ["dataset", "model_family", "method_id", "condition_id"]
-    ):
-        clean_ds_subgroups = clean_subgroup_map[clean_subgroup_map["dataset"] == ds]
-        for fam_name in ("regime", "lifecycle_stage"):
-            df_eng_sub, df_sub_sum = compute_subgroup_metrics_equal_engine(
-                df_eval=grp_eval,
-                clean_subgroup_df=clean_ds_subgroups,
-                subgroup_family=fam_name,
-                nominal_coverage=0.90,
-            )
-            for r_sub in df_eng_sub.itertuples():
-                subgroup_engine_records.append(
-                    {
-                        "evaluation_type": "stress",
-                        "dataset": ds,
-                        "model_family": mf,
-                        "variant_id": "",
-                        "method_id": mid,
-                        "condition_id": cid,
-                        "subgroup_family": fam_name,
-                        "subgroup": str(r_sub.subgroup),
-                        "unit": int(r_sub.unit),
-                        "n_endpoints": int(r_sub.n_endpoints),
-                        "coverage": float(r_sub.coverage),
-                        "lower_tail_miss": float(r_sub.lower_tail_miss),
-                        "upper_tail_miss": float(r_sub.upper_tail_miss),
-                    }
-                )
-            for r_sum in df_sub_sum.itertuples():
-                subgroup_summary_records.append(
-                    {
-                        "evaluation_type": "stress",
-                        "dataset": ds,
-                        "model_family": mf,
-                        "variant_id": "",
-                        "method_id": mid,
-                        "condition_id": cid,
-                        "subgroup_family": fam_name,
-                        "subgroup": str(r_sum.subgroup),
-                        "n_endpoints": int(r_sum.n_endpoints),
-                        "n_engines": int(r_sum.n_engines),
-                        "is_eligible": bool(r_sum.is_eligible),
-                        "coverage": float(r_sum.coverage),
-                        "coverage_abs_error": float(r_sum.coverage_abs_error),
-                        "lower_tail_miss": float(r_sum.lower_tail_miss),
-                        "upper_tail_miss": float(r_sum.upper_tail_miss),
-                    }
-                )
 
     df_subgroup_engine = pd.DataFrame(subgroup_engine_records)
     df_subgroup_summary = pd.DataFrame(subgroup_summary_records)
@@ -1063,18 +1118,7 @@ def execute_phase08_evaluation(
     write_immutable_csv(out_dir / "ablation_simulation_outcomes.csv", df_ablation_sim)
     write_immutable_csv(out_dir / "stress_simulation_outcomes.csv", df_stress_sim)
 
-    # Compressed per-cycle interval predictions
-    log("Writing compressed interval prediction streams...")
-    df_ablation_intervals = pd.DataFrame(ablation_interval_rows)
-    buf_abl = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf_abl, mode="wb", mtime=0.0) as gz:
-        df_ablation_intervals.to_csv(gz, index=False)
-    (out_dir / "ablation_interval_predictions.csv.gz").write_bytes(buf_abl.getvalue())
-
-    buf_str = io.BytesIO()
-    with gzip.GzipFile(fileobj=buf_str, mode="wb", mtime=0.0) as gz:
-        df_stress_intervals.to_csv(gz, index=False)
-    (out_dir / "stress_interval_predictions.csv.gz").write_bytes(buf_str.getvalue())
+    log("Compressed interval prediction streams finalized.")
 
     # Perturbation manifest
     perturbation_manifest = {

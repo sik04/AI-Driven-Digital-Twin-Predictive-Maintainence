@@ -24,12 +24,14 @@ from intellitwin.robustness.perturbations import (
     generate_engine_dropout_uniforms,
     generate_engine_noise_array,
 )
+from intellitwin.robustness.reporting import generate_phase08_reports_and_figures
 from intellitwin.robustness.statistics import (
     compute_subgroup_metrics_equal_engine,
     generate_phase08_bootstrap_draws,
 )
 from intellitwin.robustness.verification import (
     REQUIRED_PHASE08_FILES,
+    _reconstruct_reference_intervals,
     independently_verify_phase08_evidence,
     verify_equal_engine_subgroup_math,
     verify_exact_keys_and_duplicates,
@@ -477,13 +479,26 @@ def test_audit_fails_on_absent_factor_effects_or_bootstrap_statistics(tmp_path: 
 
 def test_audit_fails_on_changed_protected_inputs(tmp_path: Path) -> None:
     """Regression test: audit fails when pre- and post-protected hashes mismatch."""
+    dummy_header_pred = (
+        "dataset,model_family,seed,variant_id,unit,endpoint_cycle,prediction,"
+        "rul_true,lower,upper,regime,lifecycle_stage,fallback_used\n"
+    )
+    dummy_header_eng = (
+        "dataset,model_family,variant_id,seed,unit,total_cost,failed,"
+        "pm_occurred,wasted_rul,intervention_cycle\n"
+    )
     for fname in REQUIRED_PHASE08_FILES:
         if fname.endswith(".npz"):
             np.savez(tmp_path / fname, draws=np.zeros((1, 1)))
+        elif fname.endswith(".csv.gz"):
+            import gzip
+
+            with gzip.open(tmp_path / fname, "wt") as gz:
+                gz.write(dummy_header_pred)
         elif fname.endswith(".json"):
             (tmp_path / fname).write_text("{}", encoding="utf-8")
         else:
-            (tmp_path / fname).write_text("dummy", encoding="utf-8")
+            (tmp_path / fname).write_text(dummy_header_eng, encoding="utf-8")
 
     manifest = {
         "protocol_version": "phase08-v1",
@@ -525,13 +540,26 @@ def test_audit_fails_on_changed_protected_inputs(tmp_path: Path) -> None:
 
 def test_audit_fails_on_missing_provenance_fields(tmp_path: Path) -> None:
     """Regression test: audit fails if mandatory provenance fields are missing."""
+    dummy_header_pred = (
+        "dataset,model_family,seed,variant_id,unit,endpoint_cycle,prediction,"
+        "rul_true,lower,upper,regime,lifecycle_stage,fallback_used\n"
+    )
+    dummy_header_eng = (
+        "dataset,model_family,variant_id,seed,unit,total_cost,failed,"
+        "pm_occurred,wasted_rul,intervention_cycle\n"
+    )
     for fname in REQUIRED_PHASE08_FILES:
         if fname.endswith(".npz"):
             np.savez(tmp_path / fname, draws=np.zeros((1, 1)))
+        elif fname.endswith(".csv.gz"):
+            import gzip
+
+            with gzip.open(tmp_path / fname, "wt") as gz:
+                gz.write(dummy_header_pred)
         elif fname.endswith(".json"):
             (tmp_path / fname).write_text("{}", encoding="utf-8")
         else:
-            (tmp_path / fname).write_text("dummy", encoding="utf-8")
+            (tmp_path / fname).write_text(dummy_header_eng, encoding="utf-8")
 
     manifest = {
         "protocol_version": "phase08-v1",
@@ -578,3 +606,269 @@ def test_audit_fails_on_terminal_failure_precedence_and_dropout_causality() -> N
     # Because dropout occurred at cycle 1, the value must be normalized 0.0 (past observation only)
     for s in SENSOR_COLUMNS:
         assert df_pert[s].iloc[0] == 0.0
+
+
+def test_detection_missing_regime_threshold_fails_closed(tmp_path: Path) -> None:
+    """Requirement G: Missing regime thresholds must FAIL closed, not skip comparison."""
+    # Setup dummy bundle with required files
+    for fname in REQUIRED_PHASE08_FILES:
+        fpath = tmp_path / fname
+        if fname.endswith(".npz"):
+            np.savez(fpath, draws=np.zeros((1, 1)))
+        elif fname.endswith(".csv.gz"):
+            import gzip
+
+            with gzip.open(fpath, "wt") as gz:
+                gz.write("dummy\n")
+        elif fname.endswith(".json"):
+            fpath.write_text("{}", encoding="utf-8")
+        else:
+            fpath.write_text("dummy\n", encoding="utf-8")
+
+    # Create exploratory calibrators dir with a calibrator missing regime threshold
+    cal_dir = tmp_path / "exploratory_calibrators"
+    cal_dir.mkdir(parents=True, exist_ok=True)
+    bad_cal = {
+        "candidate_parameters": {"gamma": 0, "beta_code": 0, "routing": "regime"},
+        "threshold_bundles": {
+            "coverage_90": {
+                "global_threshold": 12.5,
+                # Missing regime thresholds mapping completely!
+            }
+        },
+    }
+    cal_file = cal_dir / "FD001_GBR_seed2026_gamma0_beta0_regime.json"
+    cal_file.write_text(json.dumps(bad_cal), encoding="utf-8")
+
+    manifest = {
+        "protocol_version": "phase08-v1",
+        "schema_version": "phase08-manifest-v2",
+        "status": "EXPLORATORY_POST_CONFIRMATORY",
+        "git_commit": "abcdef123456",
+        "git_dirty": False,
+        "platform": "Linux",
+        "python_version": "3.11.0",
+        "start_time_utc": "2026-10-25T00:00:00Z",
+        "end_time_utc": "2026-10-25T01:00:00Z",
+        "duration_seconds": 3600.0,
+        "counts": {
+            "ablation_configurations": 240,
+            "stress_evaluations": 1620,
+            "datasets": 3,
+            "models": 2,
+            "seeds": 5,
+            "bootstrap_replicates": 10000,
+            "total_test_engines": 122,
+        },
+        "artifact_hashes": {
+            fname: compute_sha256(tmp_path / fname) for fname in REQUIRED_PHASE08_FILES
+        },
+    }
+    (tmp_path / "execution_manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    (tmp_path / "input_manifest.json").write_text(
+        json.dumps(
+            {
+                "pre_execution_protected_hashes": {"a": "1"},
+                "post_execution_protected_hashes": {"a": "1"},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    res = independently_verify_phase08_evidence(evidence_dir=tmp_path)
+    assert res["overall_status"] == "FAIL"
+    assert any("missing regime threshold" in r.lower() for r in res["failing_reasons"])
+
+
+def test_detection_deleted_or_replaced_engine_records_preserving_count(tmp_path: Path) -> None:
+    """Requirement G: Detect duplicated or replaced engine keys while preserving row counts."""
+    # Write paired contrasts with 1176 rows, but duplicate one row and drop another
+    row_proto = {
+        "comparison_type": "ablation",
+        "dataset": "FD001",
+        "model_family": "GBR",
+        "variant_or_condition": "gamma0_beta0_global",
+        "baseline_or_full": "gamma2_betam1_regime",
+        "metric": "cost",
+        "delta_point": 0.5,
+        "ci_95_low": 0.1,
+        "ci_95_high": 0.9,
+    }
+    rows = [dict(row_proto) for _ in range(1176)]
+    # All identical => 1175 duplicates!
+    df_contrasts = pd.DataFrame(rows)
+    df_contrasts.to_csv(tmp_path / "paired_contrasts.csv", index=False)
+
+    mismatches = verify_exact_keys_and_duplicates(
+        tmp_path,
+        expected_units={
+            "FD001": list(range(1, 21)),
+            "FD002": list(range(1, 53)),
+            "FD004": list(range(1, 51)),
+        },
+    )
+    assert any("paired_contrasts has" in m and "duplicate keys" in m for m in mismatches)
+
+
+def test_detection_incorrect_asymmetric_interval_inversion() -> None:
+    """Requirement G: Verify independent asymmetric interval reconstruction fails if altered."""
+    p = np.array([50.0, 100.0, 150.0])
+    reg = np.array(["C1", "C1", "C1"])
+
+    low_correct, upp_correct, _ = _reconstruct_reference_intervals(
+        predictions=p,
+        regimes=reg,
+        global_threshold=10.0,
+        regime_thresholds={"C1": 10.0},
+        gamma=2,
+        beta_code=-1,
+        routing="regime",
+    )
+
+    # Inverted beta_code (0 instead of -1)
+    low_wrong, upp_wrong, _ = _reconstruct_reference_intervals(
+        predictions=p,
+        regimes=reg,
+        global_threshold=10.0,
+        regime_thresholds={"C1": 10.0},
+        gamma=2,
+        beta_code=0,
+        routing="regime",
+    )
+
+    assert not np.allclose(low_correct, low_wrong)
+    assert not np.allclose(upp_correct, upp_wrong)
+
+
+def test_reporting_fails_closed_when_audit_missing_or_failing(tmp_path: Path) -> None:
+    """Requirement G: Reports must not emit PASS or complete if audit is missing or failing."""
+    ev_dir = tmp_path / "ev"
+    ev_dir.mkdir(parents=True, exist_ok=True)
+    rep_dir = tmp_path / "rep"
+
+    # Case 1: Missing audit
+    with pytest.raises(RuntimeError, match="independent audit"):
+        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+
+    # Case 2: Audit exists but failed
+    (ev_dir / "independent_audit.json").write_text(
+        json.dumps({"overall_status": "FAIL", "failing_reasons": ["Test failure"]}),
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimeError, match="independent audit"):
+        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+
+
+def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
+    """Requirement G: Changing input estimates or reversing direction dynamically changes report."""
+    ev_dir = tmp_path / "ev"
+    ev_dir.mkdir(parents=True, exist_ok=True)
+    rep_dir = tmp_path / "rep"
+
+    # Passing audit
+    (ev_dir / "independent_audit.json").write_text(
+        json.dumps({"overall_status": "PASS", "failing_reasons": []}),
+        encoding="utf-8",
+    )
+
+    # Factor effects with reversed effect (positive cost increase)
+    df_fac = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "factor": "gamma_scale",
+                "metric": "cost",
+                "effect_on_minus_off": 42.123456,  # Reversed / distinct value
+                "ci_95_low": 40.0,
+                "ci_95_high": 45.0,
+            }
+        ]
+    )
+    df_fac.to_csv(ev_dir / "factor_main_effects.csv", index=False)
+
+    # Minimal paired contrasts and summary fixtures
+    df_contrasts = pd.DataFrame(
+        [
+            {
+                "comparison_type": "ablation",
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "variant_or_condition": "gamma0_beta0_global",
+                "baseline_or_full": "gamma2_betam1_regime",
+                "metric": "cost",
+                "delta_point": 5.0,
+                "ci_95_low": 3.0,
+                "ci_95_high": 7.0,
+            }
+        ]
+    )
+    df_contrasts.to_csv(ev_dir / "paired_contrasts.csv", index=False)
+
+    df_abl_sum = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "variant_id": "gamma2_betam1_regime",
+                "coverage_mean": 0.90,
+                "cost_mean": 2.5,
+                "width_mean": 30.0,
+                "interval_score_mean": 45.0,
+                "rmse_mean": 15.0,
+                "failure_rate_mean": 0.05,
+            }
+        ]
+    )
+    df_abl_sum.to_csv(ev_dir / "ablation_summary.csv", index=False)
+
+    df_str_sum = pd.DataFrame(
+        [
+            {
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "method_id": "decision_aware_hcp",
+                "condition_id": "clean",
+                "condition_type": "clean",
+                "coverage_mean": 0.90,
+                "cost_mean": 2.5,
+                "width_mean": 30.0,
+                "interval_score_mean": 45.0,
+                "rmse_mean": 15.0,
+                "failure_rate_mean": 0.05,
+            }
+        ]
+    )
+    df_str_sum.to_csv(ev_dir / "stress_summary.csv", index=False)
+
+    df_subgroups = pd.DataFrame(
+        [
+            {
+                "evaluation_type": "ablation",
+                "dataset": "FD001",
+                "model_family": "GBR",
+                "variant_id": "gamma2_betam1_regime",
+                "method_id": "",
+                "condition_id": "clean",
+                "subgroup_family": "regime",
+                "subgroup": "C1",
+                "n_endpoints": 100,
+                "n_engines": 20,
+                "is_eligible": True,
+                "coverage": 0.91,
+                "coverage_abs_error": 0.01,
+                "lower_tail_miss": 0.05,
+                "upper_tail_miss": 0.04,
+            }
+        ]
+    )
+    df_subgroups.to_csv(ev_dir / "subgroup_metrics.csv", index=False)
+
+    res = generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+    assert Path(res["results_summary"]).exists()
+    content = Path(res["results_summary"]).read_text(encoding="utf-8")
+
+    # The dynamic value +42.1235 MUST be present in the report
+    assert "42.1235" in content or "42.12" in content
+    # The old hardcoded -10.48 or -1.42 must NOT be present as the gamma_scale value
+    assert "-1.42" not in content
