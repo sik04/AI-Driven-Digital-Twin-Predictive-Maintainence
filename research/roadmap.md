@@ -197,14 +197,14 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: Completed (Exploratory Protocol `phase08-v1` Executed and Independently Audited)
+- **Status**: Completed (Successor Bundle `phase08-v2` Executed and Independently Audited; Historic `phase08-v1` Preserved)
 - **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
   - Systematic factorial component ablation records (240 cells across 122 test engines).
   - Engineering stress testing report (1,620 method evaluations under 18 stream conditions).
   - Paired lifetime-stratified engine bootstrap intervals (10,000 draws, PCG64).
-  - Independent reference audit verifying cell coverage, threshold reconstructions, bootstrap draws, and perturbation hashes.
-  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v1/`.
+  - Successor evidence bundle in `experiments/phase08_exploratory_v2/` with full independent reference audit report in `experiments/phase08_exploratory_v2/independent_audit.json` (PASS, 0 failing reasons).
+  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v2/`.
 - **Acceptance Criteria**:
   - Each specified component evaluated through controlled ablation, with positive, negative and inconclusive findings reported.
   - Phase 8 intervals and conclusions are exploratory post-confirmatory; original confirmatory RQ1–RQ4 classifications remain unchanged (`UNSUPPORTED`).
@@ -218,7 +218,7 @@ This document outlines the master research and development roadmap for the Intel
 ### Phase 9: Digital Twin Software Implementation
 - **Status**: In Progress (Validation Telemetry-Replay Prototype Tested)
 - **Objective**: Implement the digital twin software layer, providing validation telemetry replay, causal lookback window inference, calibrated prognostic bounds, decision policy alerts, and an interactive local dashboard.
-- **Parallel Development Note**: Prototype development and testing proceeded in parallel with the research pipeline to validate telemetry replay interfaces and user controls on the validation partition; Phase 8 (ablation, robustness, and statistical analysis) remains pending and not completed.
+- **Parallel Development Note**: Prototype development and testing proceeded in parallel with the research pipeline to validate telemetry replay interfaces and user controls on the validation partition; Phase 8 (ablation, robustness, and statistical analysis) successor evidence bundle and independent reference audit are complete and passing.
 - **Delivered & Tested Prototype Components**:
   - Digital twin backend service module under `src/intellitwin/twin/` (`schemas.py`, `artifacts.py`, `replay.py`, `api.py`).
   - Interactive browser demonstration interface under `apps/twin_dashboard/` (`index.html`, `styles.css`, `app.js`).

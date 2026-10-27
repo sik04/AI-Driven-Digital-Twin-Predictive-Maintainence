@@ -713,6 +713,12 @@ def independently_verify_phase08_evidence(
     if not cal_dir.exists():
         equiv_mismatches.append(f"Missing exploratory calibrators directory: {cal_dir}")
     else:
+
+        def _get_q(c: dict[str, Any]) -> float:
+            if "threshold_bundles" in c:
+                return float(c["threshold_bundles"]["coverage_90"]["global_threshold"])
+            return float(c["coverage_bundles"]["0.9"]["global_threshold"])
+
         for ds in CONFIRMATORY_DATASETS:
             for mf in CONFIRMATORY_MODELS:
                 for s in CONFIRMATORY_SEEDS:
@@ -734,8 +740,8 @@ def independently_verify_phase08_evidence(
                         c_g0 = json.load(f)
                     with open(p_fg, encoding="utf-8") as f:
                         c_fg = json.load(f)
-                    q_g0 = c_g0["threshold_bundles"]["coverage_90"]["global_threshold"]
-                    q_fg = c_fg["coverage_bundles"]["0.9"]["global_threshold"]
+                    q_g0 = _get_q(c_g0)
+                    q_fg = _get_q(c_fg)
                     if not np.isclose(q_g0, q_fg, atol=tol_atol, rtol=tol_rtol):
                         equiv_mismatches.append(
                             f"{ds}_{mf}_seed{s}: gamma0_beta0_global != global_hcp"
@@ -759,8 +765,8 @@ def independently_verify_phase08_evidence(
                         c_r0 = json.load(f)
                     with open(p_fr, encoding="utf-8") as f:
                         c_fr = json.load(f)
-                    q_r0 = c_r0["threshold_bundles"]["coverage_90"]["global_threshold"]
-                    q_fr = c_fr["coverage_bundles"]["0.9"]["global_threshold"]
+                    q_r0 = _get_q(c_r0)
+                    q_fr = _get_q(c_fr)
                     if not np.isclose(q_r0, q_fr, atol=tol_atol, rtol=tol_rtol):
                         equiv_mismatches.append(
                             f"{ds}_{mf}_seed{s}: gamma0_beta0_regime != regime_hcp"
@@ -784,8 +790,8 @@ def independently_verify_phase08_evidence(
                         c_full = json.load(f)
                     with open(p_fd, encoding="utf-8") as f:
                         c_fd = json.load(f)
-                    q_full = c_full["threshold_bundles"]["coverage_90"]["global_threshold"]
-                    q_fd = c_fd["coverage_bundles"]["0.9"]["global_threshold"]
+                    q_full = _get_q(c_full)
+                    q_fd = _get_q(c_fd)
                     if not np.isclose(q_full, q_fd, atol=tol_atol, rtol=tol_rtol):
                         equiv_mismatches.append(
                             f"{ds}_{mf}_seed{s}: gamma2_betam1_regime != decision_aware_hcp"

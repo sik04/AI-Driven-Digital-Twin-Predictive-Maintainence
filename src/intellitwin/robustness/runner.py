@@ -1142,7 +1142,9 @@ def execute_phase08_evaluation(
         "protocol_version": "phase08-v1",
         "schema_version": "phase08-manifest-v2",
         "status": "EXPLORATORY_POST_CONFIRMATORY",
-        "run_id": f"phase08_run_{start_time_utc.replace(':', '').replace('-', '').replace('.', '')}",
+        "run_id": (
+            f"phase08_run_{start_time_utc.replace(':', '').replace('-', '').replace('.', '')}"
+        ),
         "git_commit": git_sha,
         "git_dirty": git_dirty,
         "command": list(sys.argv),

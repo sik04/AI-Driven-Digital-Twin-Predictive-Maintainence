@@ -1,0 +1,65 @@
+{
+  "schema_version": "phase08-exploratory-calibrator-v1",
+  "status": "EXPLORATORY_POST_CONFIRMATORY",
+  "method_id": "decision_aware_hcp",
+  "variant_id": "gamma0_betam1_global",
+  "gamma": 0,
+  "beta_code": -1,
+  "routing": "global",
+  "dataset": "FD001",
+  "model_family": "LSTM",
+  "model_seed": 2028,
+  "threshold_bundles": {
+    "coverage_80": {
+      "nominal_coverage": 0.8,
+      "coverage_fraction": "4/5",
+      "global_threshold": 49.47216327501895,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 49.47216327501895,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_90": {
+      "nominal_coverage": 0.9,
+      "coverage_fraction": "9/10",
+      "global_threshold": 85.82910532320855,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 85.82910532320855,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_95": {
+      "nominal_coverage": 0.95,
+      "coverage_fraction": "19/20",
+      "global_threshold": 154.72064011661402,
+      "global_m_engines": 20,
+      "global_n_endpoints": 3691,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 154.72064011661402,
+          "m_engines": 20,
+          "n_endpoints": 3691,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    }
+  }
+}

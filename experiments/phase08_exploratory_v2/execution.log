@@ -1,0 +1,76 @@
+[2026-10-25T02:52:14.000000+00:00] Starting Phase 8 Exploratory Ablation & Robustness Analysis
+[2026-10-25T02:52:14.000000+00:00] Output directory: C:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/experiments/phase08_exploratory_v2
+[2026-10-27 08:03:24 UTC] Git commit: 7daecd4da3b7eb9fee5fcfb49206b33a1e2b246f (dirty: True)
+[2026-10-27 08:03:24 UTC] Hashing protected inputs pre-execution...
+[2026-10-27 08:03:25 UTC] Protected inputs verified.
+[2026-10-27 08:03:25 UTC] ablation_interval_predictions.csv.gz already exists.
+[2026-10-27 08:03:25 UTC] Streaming stress interval predictions to disk...
+[2026-10-27 08:03:28 UTC] Preloading 30 frozen base models into memory...
+[2026-10-27 08:03:29 UTC] 30 base models preloaded.
+[2026-10-27 08:03:29 UTC] Starting stress conditions for dataset FD001...
+[2026-10-27 08:03:29 UTC]   [FD001] condition: clean (rep 1/1)
+[2026-10-27 08:05:10 UTC]   [FD001] condition: noise_std_005 (rep 1/3)
+[2026-10-27 08:09:35 UTC]   [FD001] condition: noise_std_005 (rep 2/3)
+[2026-10-27 08:16:03 UTC]   [FD001] condition: noise_std_005 (rep 3/3)
+[2026-10-27 08:21:11 UTC]   [FD001] condition: noise_std_010 (rep 1/3)
+[2026-10-27 08:30:39 UTC]   [FD001] condition: noise_std_010 (rep 2/3)
+[2026-10-27 08:42:33 UTC]   [FD001] condition: noise_std_010 (rep 3/3)
+[2026-10-27 08:50:51 UTC]   [FD001] condition: noise_std_020 (rep 1/3)
+[2026-10-27 08:58:35 UTC]   [FD001] condition: noise_std_020 (rep 2/3)
+[2026-10-27 09:06:54 UTC]   [FD001] condition: noise_std_020 (rep 3/3)
+[2026-10-27 09:14:35 UTC]   [FD001] condition: dropout_prob_005 (rep 1/3)
+[2026-10-27 09:23:53 UTC]   [FD001] condition: dropout_prob_005 (rep 2/3)
+[2026-10-27 09:31:38 UTC]   [FD001] condition: dropout_prob_005 (rep 3/3)
+[2026-10-27 09:36:51 UTC]   [FD001] condition: dropout_prob_010 (rep 1/3)
+[2026-10-27 09:45:02 UTC]   [FD001] condition: dropout_prob_010 (rep 2/3)
+[2026-10-27 09:53:40 UTC]   [FD001] condition: dropout_prob_010 (rep 3/3)
+[2026-10-27 10:00:20 UTC]   [FD001] condition: setting1_bias_plus_020 (rep 1/1)
+[2026-10-27 10:05:50 UTC]   [FD001] condition: setting1_bias_minus_020 (rep 1/1)
+[2026-10-27 10:12:35 UTC] Dataset FD001 stress intervals streamed. Current total: 1875420 rows.
+[2026-10-27 10:12:35 UTC] Starting stress conditions for dataset FD002...
+[2026-10-27 10:12:35 UTC]   [FD002] condition: clean (rep 1/1)
+[2026-10-27 10:20:40 UTC]   [FD002] condition: noise_std_005 (rep 1/3)
+[2026-10-27 10:24:52 UTC]   [FD002] condition: noise_std_005 (rep 2/3)
+[2026-10-27 10:43:34 UTC]   [FD002] condition: noise_std_005 (rep 3/3)
+[2026-10-27 10:47:47 UTC]   [FD002] condition: noise_std_010 (rep 1/3)
+[2026-10-27 10:48:01 UTC]   [FD002] condition: noise_std_010 (rep 2/3)
+[2026-10-27 10:48:14 UTC]   [FD002] condition: noise_std_010 (rep 3/3)
+[2026-10-27 10:48:27 UTC]   [FD002] condition: noise_std_020 (rep 1/3)
+[2026-10-27 10:48:41 UTC]   [FD002] condition: noise_std_020 (rep 2/3)
+[2026-10-27 10:49:07 UTC]   [FD002] condition: noise_std_020 (rep 3/3)
+[2026-10-27 10:50:51 UTC]   [FD002] condition: dropout_prob_005 (rep 1/3)
+[2026-10-27 11:09:58 UTC]   [FD002] condition: dropout_prob_005 (rep 2/3)
+[2026-10-27 11:24:43 UTC]   [FD002] condition: dropout_prob_005 (rep 3/3)
+[2026-10-27 11:29:05 UTC]   [FD002] condition: dropout_prob_010 (rep 1/3)
+[2026-10-27 11:29:16 UTC]   [FD002] condition: dropout_prob_010 (rep 2/3)
+[2026-10-27 11:29:28 UTC]   [FD002] condition: dropout_prob_010 (rep 3/3)
+[2026-10-27 11:29:37 UTC]   [FD002] condition: setting1_bias_plus_020 (rep 1/1)
+[2026-10-27 11:29:47 UTC]   [FD002] condition: setting1_bias_minus_020 (rep 1/1)
+[2026-10-27 11:29:57 UTC] Dataset FD002 stress intervals streamed. Current total: 6927120 rows.
+[2026-10-27 11:29:57 UTC] Starting stress conditions for dataset FD004...
+[2026-10-27 11:29:57 UTC]   [FD004] condition: clean (rep 1/1)
+[2026-10-27 11:30:09 UTC]   [FD004] condition: noise_std_005 (rep 1/3)
+[2026-10-27 11:30:21 UTC]   [FD004] condition: noise_std_005 (rep 2/3)
+[2026-10-27 11:30:35 UTC]   [FD004] condition: noise_std_005 (rep 3/3)
+[2026-10-27 11:50:27 UTC]   [FD004] condition: noise_std_010 (rep 1/3)
+[2026-10-27 11:59:27 UTC]   [FD004] condition: noise_std_010 (rep 2/3)
+[2026-10-27 11:59:39 UTC]   [FD004] condition: noise_std_010 (rep 3/3)
+[2026-10-27 11:59:51 UTC]   [FD004] condition: noise_std_020 (rep 1/3)
+[2026-10-27 12:00:03 UTC]   [FD004] condition: noise_std_020 (rep 2/3)
+[2026-10-27 12:00:15 UTC]   [FD004] condition: noise_std_020 (rep 3/3)
+[2026-10-27 12:00:28 UTC]   [FD004] condition: dropout_prob_005 (rep 1/3)
+[2026-10-27 12:00:40 UTC]   [FD004] condition: dropout_prob_005 (rep 2/3)
+[2026-10-27 12:00:52 UTC]   [FD004] condition: dropout_prob_005 (rep 3/3)
+[2026-10-27 12:01:04 UTC]   [FD004] condition: dropout_prob_010 (rep 1/3)
+[2026-10-27 12:01:16 UTC]   [FD004] condition: dropout_prob_010 (rep 2/3)
+[2026-10-27 12:01:29 UTC]   [FD004] condition: dropout_prob_010 (rep 3/3)
+[2026-10-27 12:01:41 UTC]   [FD004] condition: setting1_bias_plus_020 (rep 1/1)
+[2026-10-27 12:01:53 UTC]   [FD004] condition: setting1_bias_minus_020 (rep 1/1)
+[2026-10-27 12:02:05 UTC] Dataset FD004 stress intervals streamed. Current total: 12921660 rows.
+[2026-10-27 12:02:05 UTC] Wrote perturbation_manifest.json.
+[2026-10-27 12:02:05 UTC] Verifying protected inputs post-execution...
+[2026-10-27 12:02:10 UTC] Wrote input_manifest.json.
+[2026-10-27 12:02:10 UTC] Computing artifact inventory hashes for execution manifest...
+[2026-10-27 12:02:23 UTC] Wrote execution_manifest.json.
+[2026-10-27 12:02:23 UTC] Phase 8 execution completed in 2954.22 seconds.
+[2026-10-27 12:02:23 UTC] Evaluated 240 ablation cells and 1,620 stress cells.
