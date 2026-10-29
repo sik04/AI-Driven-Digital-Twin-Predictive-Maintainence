@@ -897,4 +897,71 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Authorized held-out confirmatory evaluation execution.
 
+---
+
+### ADR-027: Preregistered Confirmatory Evaluation Execution, Independent Reference Audit, and Formal RQ1–RQ4 UNSUPPORTED Outcomes
+- **Date**: 2026-10-16
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: PR #33 and PR #34 merged; execution of preregistered Step 9 confirmatory evaluation and independent reference audit.
+- **Context and Motivation**:
+  - Following the pre-test verification freeze (ADR-025, ADR-026), the held-out test evaluation was authorized and executed across all 122 held-out engines from datasets FD001, FD002, and FD004.
+  - The confirmatory experiment evaluated all 930 configurations (810 primary + 120 controls), 39,180 engine outcome records, 186 cell summaries, and all 152 preregistered hypothesis components.
+  - Resampling utilized 10,000 lifetime-stratified cluster bootstrap draws per dataset using PCG64 PRNG seeded by `[2026, 6, dataset_number]` with 98.75% Bonferroni family-wise decision intervals and intersection-union testing (IUT).
+- **Decisions**:
+  1. **Confirmatory Research Question Outcomes**:
+     - **RQ1 (Maintenance Utility with Reliability Safeguards)**: Formally **UNSUPPORTED** (9 PASS, 2 FAIL, 3 INDETERMINATE). While all four cost-improvement components passed ($\Delta_{\text{cost}} > 0.20$ SCU), both required worst-stage coverage ceiling safeguards failed ($E < 0.05$).
+     - **RQ2 (Conditional Reliability and Interval Sharpness)**: Formally **UNSUPPORTED** (10 PASS, 4 FAIL, 6 INDETERMINATE; failing components: regime error improvements and worst-stage ceilings).
+     - **RQ3 (Attribution Against Matched-Conservatism Controls)**: Formally **UNSUPPORTED** (15 PASS, 4 FAIL, 3 INDETERMINATE; failing point safety margin cost improvement components and worst-stage coverage safeguards).
+     - **RQ4 (Robustness Across Datasets and Model Families)**: Formally **UNSUPPORTED** (71 PASS, 9 FAIL, 16 INDETERMINATE; failing aggregate regime error improvements and cross-cell worst-stage ceilings).
+  2. **Independent Reference Audit & Artifact Preservation**:
+     - Full independent reference audit passed with zero failing reasons (`experiments/confirmatory_v1/independent_audit.json`).
+     - All confirmatory evidence and reports frozen in `experiments/confirmatory_v1/` and `research/results/confirmatory_v1/`.
+     - Raw data, engine splits, 30 base models, fitted calibrators, and confirmatory protocols remain strictly immutable.
+  3. **Research Protocol Boundaries**:
+     - Negative and unsupported outcomes are reported transparently and faithfully under the preregistered research design; no post-hoc tuning, model retraining, or hypothesis rewriting is permitted.
+- **Expected Implications**:
+  - Primary confirmatory hypothesis testing is permanently closed. Subsequent Phase 8 exploratory robustness and ablation investigations cannot overturn or replace these confirmatory outcomes.
+- **Follow-up Review Date / Trigger**:
+  - Phase 8 exploratory ablation and robustness investigation.
+
+---
+
+### ADR-028: Phase 8 Exploratory Ablation, Stress Testing, Independent Reference Verification, and Authoritative Successor v3 Freeze
+- **Date**: 2026-10-28
+- **Status**: Accepted
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: Execution, independent reference audit, and verification of authoritative successor bundle `phase08_exploratory_v3`.
+- **Context and Motivation**:
+  - Phase 8 investigates post-confirmatory mechanisms: a $2 \times 2 \times 2$ factorial component ablation (scale dilation $\gamma$, score asymmetry $\beta$, regime routing across 240 cells) and an engineering stress degradation battery (1,620 evaluations across 18 stream conditions: Gaussian noise, causal forward-fill sensor dropout, and operating setting bias).
+  - An audit of earlier Phase 8 bundles revealed:
+    1. Historical v1/v2 bundles suffered from execution provenance deficiencies (v2 was executed with `--allow-dirty`, had multi-day timestamp spans, and reused ablation evidence).
+    2. `reporting.py` contained hardcoded literal conclusions (`-1.42`, `+0.18`, `-0.09` SCU, 85% boundary) rather than dynamically deriving metrics from independently verified tables.
+    3. `verification.py` lacked complete independent reference paths for quantile reconstruction, interval inversion, policy simulation (failure precedence, wasted RUL, cost), and bootstrap contrast reproduction without calling production runner or simulation functions.
+- **Decisions**:
+  1. **Dynamic Reporting and Audit Gate**:
+     - Removed all hardcoded conclusions, literals, and unsupported interpretations from `reporting.py`.
+     - Required independent verification audit to pass (0 failing reasons) before generating reports; fail-closed on missing or failing audit.
+     - Displays full cell-level variation across all 6 dataset/model cells; unweighted 6-cell means are explicitly labeled descriptive; clearly distinguishes RUL interval misses from physical simulator failures.
+  2. **Complete Independent Reference Verifier (`verification.py`)**:
+     - Implemented independent mathematical reference routines for quantile calculation, interval inversion, sequential policy simulation with terminal failure precedence, streaming perturbations, and paired bootstrap contrasts.
+     - Never calls production runner, fitting, or simulation functions.
+     - Fails closed if regime thresholds are missing; verifies exact key sets and metadata across all 240 calibrators and 122 held-out engines.
+  3. **Authoritative Successor Bundle `phase08_exploratory_v3`**:
+     - Executed from a clean git checkout (`git_dirty = false`, commit `2e8acb156e26eb0aeec3d0ed93e4d84b0e612355`), writing all outputs to an external staging area to prevent checkout contamination during execution.
+     - Full matrix evaluated: 3 datasets $\times$ 2 models $\times$ 5 seeds $\times$ 8 ablations = 240 configurations; 18 stress streams $\times$ 3 methods = 1,620 stress evaluations across 122 held-out engines.
+     - Independent reference audit passed with zero failing reasons (`experiments/phase08_exploratory_v3/independent_audit.json`).
+     - Cryptographic, non-circular `final_receipt.json` hashes the audit and generated reports.
+  4. **Preservation and Provenance Review**:
+     - `phase08_exploratory_v1` and `phase08_exploratory_v2` preserved byte-for-byte as historical, superseded evidence bundles.
+     - Authored `docs/development/phase08_v2_provenance_review.md` recording historical evidence limitations.
+  5. **Exploratory Status and Handoff**:
+     - Phase 8 findings remain strictly `EXPLORATORY_POST_CONFIRMATORY` and do not alter frozen confirmatory outcomes (ADR-027).
+     - Authored `research/results/phase08_exploratory_v3/writing_handoff.md` and updated `paper/claims_evidence_matrix.csv` to govern manuscript preparation.
+- **Expected Implications**:
+  - Phase 8 is formally complete, verified, and locked. Trustworthy, traceable evidence is established for writing the research paper and synopsis.
+- **Follow-up Review Date / Trigger**:
+  - Phase 10 / Phase 11 manuscript writing and reproducibility package assembly.
+
+
 

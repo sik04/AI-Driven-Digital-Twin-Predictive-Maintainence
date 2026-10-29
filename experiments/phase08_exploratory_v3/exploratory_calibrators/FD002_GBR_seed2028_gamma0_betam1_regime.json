@@ -1,0 +1,185 @@
+{
+  "schema_version": "phase08-exploratory-calibrator-v1",
+  "status": "EXPLORATORY_POST_CONFIRMATORY",
+  "method_id": "decision_aware_hcp",
+  "variant_id": "gamma0_betam1_regime",
+  "gamma": 0,
+  "beta_code": -1,
+  "routing": "regime",
+  "dataset": "FD002",
+  "model_family": "GBR",
+  "model_seed": 2028,
+  "threshold_bundles": {
+    "coverage_80": {
+      "nominal_coverage": 0.8,
+      "coverage_fraction": "4/5",
+      "global_threshold": 40.47142397915684,
+      "global_m_engines": 52,
+      "global_n_endpoints": 9272,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 39.88369276252964,
+          "m_engines": 52,
+          "n_endpoints": 1376,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C2": {
+          "regime": "C2",
+          "threshold": 39.39325033198243,
+          "m_engines": 52,
+          "n_endpoints": 1401,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C3": {
+          "regime": "C3",
+          "threshold": 39.7518923282022,
+          "m_engines": 52,
+          "n_endpoints": 1392,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C4": {
+          "regime": "C4",
+          "threshold": 39.79021175546698,
+          "m_engines": 52,
+          "n_endpoints": 1379,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C5": {
+          "regime": "C5",
+          "threshold": 41.467411087901304,
+          "m_engines": 52,
+          "n_endpoints": 1368,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C6": {
+          "regime": "C6",
+          "threshold": 41.6210365246743,
+          "m_engines": 52,
+          "n_endpoints": 2356,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_90": {
+      "nominal_coverage": 0.9,
+      "coverage_fraction": "9/10",
+      "global_threshold": 65.6869339934704,
+      "global_m_engines": 52,
+      "global_n_endpoints": 9272,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 64.18248236046843,
+          "m_engines": 52,
+          "n_endpoints": 1376,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C2": {
+          "regime": "C2",
+          "threshold": 62.887311624136125,
+          "m_engines": 52,
+          "n_endpoints": 1401,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C3": {
+          "regime": "C3",
+          "threshold": 65.08226872229548,
+          "m_engines": 52,
+          "n_endpoints": 1392,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C4": {
+          "regime": "C4",
+          "threshold": 65.85456567135452,
+          "m_engines": 52,
+          "n_endpoints": 1379,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C5": {
+          "regime": "C5",
+          "threshold": 64.40358891177436,
+          "m_engines": 52,
+          "n_endpoints": 1368,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C6": {
+          "regime": "C6",
+          "threshold": 67.74568985940881,
+          "m_engines": 52,
+          "n_endpoints": 2356,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    },
+    "coverage_95": {
+      "nominal_coverage": 0.95,
+      "coverage_fraction": "19/20",
+      "global_threshold": 103.51708307324716,
+      "global_m_engines": 52,
+      "global_n_endpoints": 9272,
+      "regime_thresholds": {
+        "C1": {
+          "regime": "C1",
+          "threshold": 104.66171079709687,
+          "m_engines": 52,
+          "n_endpoints": 1376,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C2": {
+          "regime": "C2",
+          "threshold": 96.8345534039334,
+          "m_engines": 52,
+          "n_endpoints": 1401,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C3": {
+          "regime": "C3",
+          "threshold": 107.54446978624233,
+          "m_engines": 52,
+          "n_endpoints": 1392,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C4": {
+          "regime": "C4",
+          "threshold": 103.81607355406855,
+          "m_engines": 52,
+          "n_endpoints": 1379,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C5": {
+          "regime": "C5",
+          "threshold": 101.96922595338584,
+          "m_engines": 52,
+          "n_endpoints": 1368,
+          "fallback_used": false,
+          "fallback_reason": null
+        },
+        "C6": {
+          "regime": "C6",
+          "threshold": 104.304645665828,
+          "m_engines": 52,
+          "n_endpoints": 2356,
+          "fallback_used": false,
+          "fallback_reason": null
+        }
+      }
+    }
+  }
+}

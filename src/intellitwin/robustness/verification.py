@@ -680,14 +680,18 @@ def verify_all_bootstrap_contrasts_and_effects(
             mf = r.model_family
             metric = r.metric
 
-            if comp_type == "ablation":
+            if comp_type in ("ablation", "ablation_vs_full"):
                 vid = r.variant_or_condition
                 stat_key = f"ablation_{ds}_{mf}_{vid}_minus_full_{metric}"
                 dict_a = abl_store.get((ds, mf, vid, metric))
                 dict_b = abl_store.get((ds, mf, "gamma2_betam1_regime", metric))
             else:
-                cid = r.variant_or_condition
-                mid = r.baseline_or_full
+                var_cond = str(r.variant_or_condition)
+                if ":" in var_cond:
+                    mid, cid = var_cond.split(":", 1)
+                else:
+                    cid = var_cond
+                    mid = str(r.baseline_or_full).split(":", 1)[0]
                 stat_key = f"stress_{ds}_{mf}_{mid}_{cid}_minus_clean_{metric}"
                 dict_a = stress_store.get((ds, mf, mid, cid, metric))
                 dict_b = stress_store.get((ds, mf, mid, "clean", metric))
@@ -1082,20 +1086,24 @@ def independently_verify_phase08_evidence(
 
                         # Metadata assertions
                         elig_act = act_reg_rec.get("eligible_engines")
+                        if elig_act is None:
+                            elig_act = act_reg_rec.get("m_engines")
                         if elig_act != distinct_engs:
                             cal_mismatches.append(
                                 f"{cal_fname} reg {reg_str}: eligible_engines "
                                 f"act={elig_act} != exp={distinct_engs}"
                             )
                         is_elig_act = act_reg_rec.get("is_eligible")
-                        if is_elig_act != (distinct_engs >= 10):
+                        if is_elig_act is None and "fallback_used" in act_reg_rec:
+                            is_elig_act = not act_reg_rec["fallback_used"]
+                        if is_elig_act is not None and is_elig_act != (distinct_engs >= 10):
                             cal_mismatches.append(
                                 f"{cal_fname} reg {reg_str}: is_eligible "
                                 f"act={is_elig_act} != exp={distinct_engs >= 10}"
                             )
 
                     # Candidate parameter assertions
-                    cand_params = saved_cal.get("candidate_parameters", {})
+                    cand_params = saved_cal.get("candidate_parameters", saved_cal)
                     if cand_params.get("gamma") != variant.gamma:
                         cal_mismatches.append(f"{cal_fname}: candidate gamma mismatch")
                     if cand_params.get("beta_code") != variant.beta_code:

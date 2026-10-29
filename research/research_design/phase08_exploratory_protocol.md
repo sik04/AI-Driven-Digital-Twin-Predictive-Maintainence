@@ -124,8 +124,10 @@ Total method evaluations = $18 \times 3 \text{ datasets} \times 2 \text{ models}
 ## 5. Successor Runs and Acceptance/Audit Criteria
 
 1. **Pre-Execution Lock**: Configuration, protocol, and code committed prior to execution.
-2. **Successor Versioning**: Historical v1 evidence is preserved unchanged in `experiments/phase08_exploratory_v1/`. The corrected run outputs to `experiments/phase08_exploratory_v2/` and `research/results/phase08_exploratory_v2/`.
+2. **Successor Versioning & Historical Preservation**:
+   - Historical `phase08_exploratory_v1` and `phase08_exploratory_v2` evidence bundles are preserved byte-for-byte as historical, superseded material (with v2 anomalies documented in `docs/development/phase08_v2_provenance_review.md`).
+   - The authoritative successor bundle is `experiments/phase08_exploratory_v3/` and `research/results/phase08_exploratory_v3/`, executed under clean commit `2e8acb156e26eb0aeec3d0ed93e4d84b0e612355` (`git_dirty: false`).
 3. **Equivalence Verification**: Exact reproduction of baseline intervals at `atol=1e-10, rtol=0`.
 4. **Independent Reference Audit**: Reconstructs thresholds, cycle counts, perturbation streams, model predictions, interval inversions, maintenance decisions, costs, engine metrics, subgroup metrics, contrast statistics, and bootstrap confidence intervals using independent reference implementations rather than production execution functions.
-5. **Artifact & Manifest Integrity**: Non-empty `artifact_hashes` mapping with safe POSIX relative paths. Strict exit on any discrepancy or missing evidence.
+5. **Artifact & Manifest Integrity**: Non-empty `artifact_hashes` mapping with safe POSIX relative paths. Strict exit on any discrepancy or missing evidence. Non-circular final receipt (`final_receipt.json`) linking audit report and report artifacts.
 
