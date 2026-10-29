@@ -15,7 +15,10 @@ import json
 from pathlib import Path
 from typing import Any
 
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ModuleNotFoundError:  # pragma: no cover
+    plt = None  # type: ignore[assignment]
 import numpy as np
 import pandas as pd
 
