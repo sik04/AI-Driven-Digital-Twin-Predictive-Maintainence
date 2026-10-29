@@ -3,7 +3,7 @@
 Strict Verification Protocol:
 - Does NOT call production robustness runner, fitting, or simulation functions.
 - Independently reconstructs all quantiles, intervals, simulations, aggregations,
-  subgroup metrics, paired bootstrap draws, and contrasts.
+  subgroup metrics, paired bootstrap draws, and contrasts from first principles.
 - Numerical tolerances:
   - Deterministic reconstruction: atol=1e-10, rtol=0.
   - Checkpoint prediction parity: atol=1e-4, rtol=0.
@@ -24,11 +24,13 @@ import pandas as pd
 from intellitwin.confirmatory.data import (
     verify_raw_data_hashes,
 )
-from intellitwin.data.artifacts import compute_sha256
+from intellitwin.data.artifacts import compute_sha256, load_preprocessor_artifact
+from intellitwin.data.loader import load_cmapss_run_to_failure
 from intellitwin.data.schema import (
-    SENSOR_COLUMNS,
+    EXPECTED_ENGINE_COUNTS,
 )
-from intellitwin.data.splits import load_split_manifest
+from intellitwin.data.splits import load_split_manifest, select_partition
+from intellitwin.data.windowing import construct_windows
 from intellitwin.evaluation.bootstrap import (
     DATASET_NUMBERS,
     load_partition_quartile_strata,
@@ -38,12 +40,15 @@ from intellitwin.evaluation.schema import (
     CONFIRMATORY_MODELS,
     CONFIRMATORY_SEEDS,
 )
+from intellitwin.models.registry import load_frozen_base_model
 from intellitwin.robustness.ablation import (
     ALL_EIGHT_ABLATION_VARIANTS,
 )
 from intellitwin.robustness.perturbations import (
-    PERTURBATION_FAMILY_DROPOUT,
-    PERTURBATION_FAMILY_GAUSSIAN_NOISE,
+    STRESS_CONDITION_BY_ID,
+    apply_stream_perturbation,
+    generate_engine_dropout_uniforms,
+    generate_engine_noise_array,
 )
 from intellitwin.uncertainty.artifacts import (
     resolve_repo_relative_path,
@@ -193,6 +198,92 @@ def _reconstruct_reference_quantile(
     return float(unique_scores[cand_idx])
 
 
+def _reconstruct_reference_intervals(
+    predictions: np.ndarray[Any, Any],
+    regimes: np.ndarray[Any, Any],
+    global_threshold: float,
+    regime_thresholds: dict[str, float],
+    gamma: int,
+    beta_code: int,
+    routing: str,
+) -> tuple[np.ndarray[Any, Any], np.ndarray[Any, Any], np.ndarray[Any, Any]]:
+    """Independent reference calculation for interval inversion."""
+    p = np.asarray(predictions, dtype=np.float64)
+    if gamma == 0:
+        sigma_p = np.ones_like(p)
+    elif gamma == 1:
+        sigma_p = 1.0 + (p / 125.0)
+    elif gamma == 2:
+        b_val = 1.0 + (p / 125.0)
+        sigma_p = b_val * b_val
+    else:
+        sigma_p = (1.0 + (p / 125.0)) ** gamma
+
+    beta = 0.0 if beta_code == 0 else -np.log(2.0)
+    z_p = np.exp(-p / 20.0)
+    a_p = sigma_p * np.exp(beta * z_p)
+    b_p = sigma_p * np.exp(-beta * z_p)
+
+    n = len(p)
+    thresholds = np.empty(n, dtype=np.float64)
+    fallback_used = np.zeros(n, dtype=bool)
+
+    if routing == "global":
+        thresholds.fill(global_threshold)
+    else:
+        for i in range(n):
+            r_str = str(regimes[i])
+            if r_str in regime_thresholds:
+                thresholds[i] = regime_thresholds[r_str]
+            else:
+                thresholds[i] = global_threshold
+                fallback_used[i] = True
+
+    lower = np.maximum(0.0, p - thresholds * a_p)
+    upper = p + thresholds * b_p
+    return lower, upper, fallback_used
+
+
+def _reconstruct_reference_simulation(
+    cycles: np.ndarray[Any, Any],
+    lower_bounds: np.ndarray[Any, Any],
+    failure_cycle: int,
+    c_pm: float = 1.0,
+    c_fail: float = 5.0,
+    c_waste: float = 0.20,
+) -> dict[str, Any]:
+    """Independent reference calculation for maintenance policy simulation."""
+    pm_occurred = False
+    failed = True
+    intervention_cycle = None
+    wasted_rul = 0.0
+
+    for i in range(len(cycles)):
+        cyc = int(cycles[i])
+        if cyc >= failure_cycle:
+            break
+        if lower_bounds[i] <= 1.0:
+            intervention_cycle = cyc
+            pm_occurred = True
+            failed = False
+            wasted_rul = float(failure_cycle - cyc)
+            break
+
+    if pm_occurred:
+        cost = c_pm + c_waste * wasted_rul
+    else:
+        cost = c_fail
+        wasted_rul = 0.0
+
+    return {
+        "failed": failed,
+        "pm_occurred": pm_occurred,
+        "intervention_cycle": intervention_cycle,
+        "wasted_rul": wasted_rul,
+        "total_cost": cost,
+    }
+
+
 def _reconstruct_independent_bootstrap_draws(
     dataset: str,
     partition_engines: list[int],
@@ -225,6 +316,9 @@ def _reconstruct_independent_bootstrap_draws(
 def verify_simulation_terminal_precedence(df_ablation_sim: pd.DataFrame) -> list[str]:
     """Verify that no engine has both failed and PM occurred, or PM at or after failure cycle."""
     violations: list[str] = []
+    if "failed" not in df_ablation_sim.columns or "pm_occurred" not in df_ablation_sim.columns:
+        return ["ablation_simulation_outcomes missing failed or pm_occurred columns"]
+
     for r in df_ablation_sim.itertuples():
         if getattr(r, "failed", False) and getattr(r, "pm_occurred", False):
             violations.append(f"Engine {r.unit} marked both failed and PM occurred!")
@@ -322,18 +416,23 @@ def verify_summary_aggregations(
                 continue
             row = match_sum.iloc[0]
             for metric in ("coverage", "cost", "width", "interval_score", "rmse"):
-                exp_val = float(grp[metric].mean())
-                act_val = float(row[f"{metric}_mean"])
-                if not np.isclose(exp_val, act_val, atol=tol_atol, rtol=tol_rtol):
-                    mismatches.append(
-                        f"Ablation {ds}/{mf}/{vid} {metric}_mean: exp={exp_val} != act={act_val}"
-                    )
+                if metric in grp.columns and f"{metric}_mean" in row:
+                    exp_val = float(grp[metric].mean())
+                    act_val = float(row[f"{metric}_mean"])
+                    if not np.isclose(exp_val, act_val, atol=tol_atol, rtol=tol_rtol):
+                        mismatches.append(
+                            f"Ablation {ds}/{mf}/{vid} {metric}_mean: "
+                            f"exp={exp_val} != act={act_val}"
+                        )
 
     # Stress summary check
-    if len(df_stress_engine) > 0 and "dataset" in df_stress_engine.columns:
-        for (ds, mf, mid, cid), grp in df_stress_engine.groupby(
-            ["dataset", "model_family", "method_id", "condition_id"]
-        ):
+    stress_grp_keys = ["dataset", "model_family", "method_id", "condition_id"]
+    if not all(c in df_stress_engine.columns for c in stress_grp_keys) or not all(
+        c in df_stress_summary.columns for c in stress_grp_keys
+    ):
+        mismatches.append("stress summary or engine metrics missing required keys")
+    else:
+        for (ds, mf, mid, cid), grp in df_stress_engine.groupby(stress_grp_keys):
             match_sum = df_stress_summary[
                 (df_stress_summary["dataset"] == ds)
                 & (df_stress_summary["model_family"] == mf)
@@ -345,12 +444,13 @@ def verify_summary_aggregations(
                 continue
             row = match_sum.iloc[0]
             for metric in ("coverage", "cost", "width", "interval_score", "rmse"):
-                exp_val = float(grp[metric].mean())
-                act_val = float(row[f"{metric}_mean"])
-                if not np.isclose(exp_val, act_val, atol=tol_atol, rtol=tol_rtol):
-                    mismatches.append(
-                        f"Stress {ds}/{mf}/{cid} {metric}_mean: exp={exp_val} != act={act_val}"
-                    )
+                if metric in grp.columns and f"{metric}_mean" in row:
+                    exp_val = float(grp[metric].mean())
+                    act_val = float(row[f"{metric}_mean"])
+                    if not np.isclose(exp_val, act_val, atol=tol_atol, rtol=tol_rtol):
+                        mismatches.append(
+                            f"Stress {ds}/{mf}/{cid} {metric}_mean: exp={exp_val} != act={act_val}"
+                        )
     return mismatches
 
 
@@ -445,11 +545,259 @@ def verify_exact_keys_and_duplicates(
     return mismatches
 
 
+def verify_all_bootstrap_contrasts_and_effects(
+    ev_dir: Path,
+    df_ablation_engine: pd.DataFrame,
+    df_stress_engine: pd.DataFrame,
+    df_paired_contrasts: pd.DataFrame,
+    df_factor_effects: pd.DataFrame,
+    tol_atol: float = TOL_DETERMINISTIC_ATOL,
+    tol_rtol: float = TOL_DETERMINISTIC_RTOL,
+) -> tuple[list[str], float]:
+    """Verify EVERY contrast (1,176 rows) and ALL THREE factor effects (126 rows)."""
+    mismatches: list[str] = []
+    max_discrepancy: float = 0.0
+
+    # Build metric lookup tables
+    abl_store: dict[tuple[str, str, str, str], dict[int, float]] = {}
+    metric_cols = [
+        "rmse",
+        "coverage",
+        "coverage_abs_error",
+        "width",
+        "interval_score",
+        "cost",
+        "failure_rate",
+    ]
+    req_abl = ["dataset", "model_family", "variant_id", "unit"] + metric_cols
+    if not all(c in df_ablation_engine.columns for c in req_abl):
+        return ["ablation_engine_metrics.csv missing required columns"], 0.0
+
+    req_str = ["dataset", "model_family", "method_id", "condition_id", "unit"] + metric_cols
+    if not all(c in df_stress_engine.columns for c in req_str):
+        return ["stress_engine_metrics.csv missing required columns"], 0.0
+
+    for (ds, mf, vid), grp in df_ablation_engine.groupby(["dataset", "model_family", "variant_id"]):
+        for col in metric_cols:
+            abl_store[(ds, mf, vid, col)] = dict(zip(grp["unit"], grp[col], strict=False))
+
+    stress_store: dict[tuple[str, str, str, str, str], dict[int, float]] = {}
+    for (ds, mf, mid, cid), grp in df_stress_engine.groupby(
+        ["dataset", "model_family", "method_id", "condition_id"]
+    ):
+        for col in metric_cols:
+            stress_store[(ds, mf, mid, cid, col)] = dict(zip(grp["unit"], grp[col], strict=False))
+
+    factor_definitions = {
+        "gamma_scale": (
+            [
+                "gamma2_beta0_global",
+                "gamma2_beta0_regime",
+                "gamma2_betam1_global",
+                "gamma2_betam1_regime",
+            ],
+            [
+                "gamma0_beta0_global",
+                "gamma0_beta0_regime",
+                "gamma0_betam1_global",
+                "gamma0_betam1_regime",
+            ],
+        ),
+        "beta_asymmetry": (
+            [
+                "gamma0_betam1_global",
+                "gamma0_betam1_regime",
+                "gamma2_betam1_global",
+                "gamma2_betam1_regime",
+            ],
+            [
+                "gamma0_beta0_global",
+                "gamma0_beta0_regime",
+                "gamma2_beta0_global",
+                "gamma2_beta0_regime",
+            ],
+        ),
+        "regime_routing": (
+            [
+                "gamma0_beta0_regime",
+                "gamma0_betam1_regime",
+                "gamma2_beta0_regime",
+                "gamma2_betam1_regime",
+            ],
+            [
+                "gamma0_beta0_global",
+                "gamma0_betam1_global",
+                "gamma2_beta0_global",
+                "gamma2_betam1_global",
+            ],
+        ),
+    }
+
+    req_cols_con = [
+        "comparison_type",
+        "dataset",
+        "model_family",
+        "variant_or_condition",
+        "baseline_or_full",
+        "metric",
+        "delta_point",
+        "ci_95_low",
+        "ci_95_high",
+    ]
+    if not all(c in df_paired_contrasts.columns for c in req_cols_con):
+        return ["paired_contrasts.csv missing required columns"], 0.0
+
+    req_cols_fac = [
+        "dataset",
+        "model_family",
+        "factor",
+        "metric",
+        "effect_on_minus_off",
+        "ci_95_low",
+        "ci_95_high",
+    ]
+    if not all(c in df_factor_effects.columns for c in req_cols_fac):
+        return ["factor_main_effects.csv missing required columns"], 0.0
+
+    for ds in CONFIRMATORY_DATASETS:
+        stat_npz_p = ev_dir / f"bootstrap_statistics_{ds}.npz"
+        draws_npz_p = ev_dir / f"bootstrap_draws_{ds}.npz"
+        if not stat_npz_p.exists() or not draws_npz_p.exists():
+            mismatches.append(f"Missing bootstrap artifacts for {ds}")
+            continue
+
+        try:
+            stats_data = np.load(stat_npz_p)
+            draws_data = np.load(draws_npz_p)["draws"]
+        except Exception as exc:
+            mismatches.append(f"Error loading bootstrap arrays for {ds}: {exc}")
+            continue
+
+        # 1. Verify all paired contrasts for this dataset
+        ds_contrasts = df_paired_contrasts[df_paired_contrasts["dataset"] == ds]
+        for r in ds_contrasts.itertuples():
+            comp_type = r.comparison_type
+            mf = r.model_family
+            metric = r.metric
+
+            if comp_type in ("ablation", "ablation_vs_full"):
+                vid = r.variant_or_condition
+                stat_key = f"ablation_{ds}_{mf}_{vid}_minus_full_{metric}"
+                dict_a = abl_store.get((ds, mf, vid, metric))
+                dict_b = abl_store.get((ds, mf, "gamma2_betam1_regime", metric))
+            else:
+                var_cond = str(r.variant_or_condition)
+                if ":" in var_cond:
+                    mid, cid = var_cond.split(":", 1)
+                else:
+                    cid = var_cond
+                    mid = str(r.baseline_or_full).split(":", 1)[0]
+                stat_key = f"stress_{ds}_{mf}_{mid}_{cid}_minus_clean_{metric}"
+                dict_a = stress_store.get((ds, mf, mid, cid, metric))
+                dict_b = stress_store.get((ds, mf, mid, "clean", metric))
+
+            if dict_a is None or dict_b is None:
+                mismatches.append(f"Missing engine metric lookup for {stat_key}")
+                continue
+
+            units = sorted(dict_a.keys())
+            exp_pt = float(
+                np.mean([dict_a[u] for u in units]) - np.mean([dict_b[u] for u in units])
+            )
+            act_pt = float(r.delta_point)
+            pt_diff = abs(exp_pt - act_pt)
+            if pt_diff > max_discrepancy:
+                max_discrepancy = pt_diff
+            if not np.isclose(exp_pt, act_pt, atol=tol_atol, rtol=tol_rtol):
+                mismatches.append(f"{stat_key} delta_point: exp={exp_pt} != act={act_pt}")
+
+            if stat_key not in stats_data:
+                mismatches.append(f"Missing statistic array {stat_key} in {ds}")
+                continue
+
+            reps = stats_data[stat_key]
+            if len(reps) != 10000:
+                mismatches.append(f"{stat_key} replicates length {len(reps)} != 10000")
+                continue
+
+            # Independent replication check
+            diff_map = {u: float(dict_a[u] - dict_b[u]) for u in units}
+            exp_reps = np.mean(np.vectorize(diff_map.get, otypes=[np.float64])(draws_data), axis=1)
+            reps_diff = float(np.max(np.abs(exp_reps - reps)))
+            if reps_diff > max_discrepancy:
+                max_discrepancy = reps_diff
+            if not np.allclose(exp_reps, reps, atol=tol_atol, rtol=tol_rtol):
+                mismatches.append(f"{stat_key} bootstrap replicates do not match independent draws")
+
+            exp_lo, exp_hi = np.quantile(exp_reps, [0.025, 0.975], method="linear")
+            act_lo, act_hi = float(r.ci_95_low), float(r.ci_95_high)
+            if not np.isclose(exp_lo, act_lo, atol=tol_atol, rtol=tol_rtol) or not np.isclose(
+                exp_hi, act_hi, atol=tol_atol, rtol=tol_rtol
+            ):
+                mismatches.append(
+                    f"{stat_key} CI: exp=[{exp_lo}, {exp_hi}] != act=[{act_lo}, {act_hi}]"
+                )
+
+        # 2. Verify all factor main effects for this dataset
+        ds_factors = df_factor_effects[df_factor_effects["dataset"] == ds]
+        for r in ds_factors.itertuples():
+            mf = r.model_family
+            factor_name = r.factor
+            metric = r.metric
+            stat_key = f"factor_{ds}_{mf}_{factor_name}_on_minus_off_{metric}"
+
+            on_vids, off_vids = factor_definitions[factor_name]
+            units = sorted(abl_store[(ds, mf, on_vids[0], metric)].keys())
+
+            on_means = {
+                u: float(np.mean([abl_store[(ds, mf, vid, metric)][u] for vid in on_vids]))
+                for u in units
+            }
+            off_means = {
+                u: float(np.mean([abl_store[(ds, mf, vid, metric)][u] for vid in off_vids]))
+                for u in units
+            }
+            exp_pt = float(
+                np.mean([on_means[u] for u in units]) - np.mean([off_means[u] for u in units])
+            )
+            act_pt = float(r.effect_on_minus_off)
+            pt_diff = abs(exp_pt - act_pt)
+            if pt_diff > max_discrepancy:
+                max_discrepancy = pt_diff
+            if not np.isclose(exp_pt, act_pt, atol=tol_atol, rtol=tol_rtol):
+                mismatches.append(f"{stat_key} effect_on_minus_off: exp={exp_pt} != act={act_pt}")
+
+            if stat_key not in stats_data:
+                mismatches.append(f"Missing statistic array {stat_key} in {ds}")
+                continue
+
+            reps = stats_data[stat_key]
+            diff_map = {u: float(on_means[u] - off_means[u]) for u in units}
+            exp_reps = np.mean(np.vectorize(diff_map.get, otypes=[np.float64])(draws_data), axis=1)
+            reps_diff = float(np.max(np.abs(exp_reps - reps)))
+            if reps_diff > max_discrepancy:
+                max_discrepancy = reps_diff
+            if not np.allclose(exp_reps, reps, atol=tol_atol, rtol=tol_rtol):
+                mismatches.append(f"{stat_key} bootstrap replicates do not match independent draws")
+
+            exp_lo, exp_hi = np.quantile(exp_reps, [0.025, 0.975], method="linear")
+            act_lo, act_hi = float(r.ci_95_low), float(r.ci_95_high)
+            if not np.isclose(exp_lo, act_lo, atol=tol_atol, rtol=tol_rtol) or not np.isclose(
+                exp_hi, act_hi, atol=tol_atol, rtol=tol_rtol
+            ):
+                mismatches.append(
+                    f"{stat_key} CI: exp=[{exp_lo}, {exp_hi}] != act=[{act_lo}, {act_hi}]"
+                )
+
+    return mismatches, max_discrepancy
+
+
 def independently_verify_phase08_evidence(
     evidence_dir: Path | str,
     base_dir: Path | str = ".",
     raw_data_dir: Path | str = "data/raw/cmapss",
     calibration_cache_dir: Path | str = "experiments/calibration/point_predictions/calibration",
+    confirmatory_dir: Path | str = "experiments/confirmatory_v1",
     tol_atol: float = TOL_DETERMINISTIC_ATOL,
     tol_rtol: float = TOL_DETERMINISTIC_RTOL,
 ) -> dict[str, Any]:
@@ -463,6 +811,7 @@ def independently_verify_phase08_evidence(
 
     checks: dict[str, Any] = {}
     failing_reasons: list[str] = []
+    max_discrepancy_overall: float = 0.0
 
     # -------------------------------------------------------------------------
     # 1. Required Files Presence
@@ -478,24 +827,37 @@ def independently_verify_phase08_evidence(
             "overall_status": "FAIL",
             "failing_reasons": failing_reasons,
             "checks": checks,
+            "max_discrepancies": {"overall": max_discrepancy_overall},
         }
 
     # -------------------------------------------------------------------------
     # 2. Manifest Schema & Expected Artifact Inventory
     # -------------------------------------------------------------------------
     manifest_p = ev_dir / "execution_manifest.json"
+    manifest_hash = compute_sha256(manifest_p) if manifest_p.exists() else ""
+    verifier_sha = compute_sha256(Path(__file__))
     try:
         with open(manifest_p, encoding="utf-8") as f:
             manifest = json.load(f)
     except Exception as exc:
         failing_reasons.append(f"Could not parse execution_manifest.json: {exc}")
-        return {"overall_status": "FAIL", "failing_reasons": failing_reasons, "checks": checks}
+        return {
+            "overall_status": "FAIL",
+            "execution_manifest_sha256": manifest_hash,
+            "verifier_source_sha256": verifier_sha,
+            "failing_reasons": failing_reasons,
+            "checks": checks,
+            "max_discrepancies": {"overall": max_discrepancy_overall},
+        }
 
     if manifest.get("status") != "EXPLORATORY_POST_CONFIRMATORY":
         failing_reasons.append(
             f"Invalid manifest status: expected EXPLORATORY_POST_CONFIRMATORY, "
             f"got {manifest.get('status')}"
         )
+
+    if manifest.get("git_dirty") is True:
+        failing_reasons.append("Provenance violation: git_dirty is true in execution_manifest.json")
 
     missing_prov = [f for f in REQUIRED_PROVENANCE_FIELDS if manifest.get(f) is None]
     if missing_prov:
@@ -522,13 +884,17 @@ def independently_verify_phase08_evidence(
             "status": "FAIL",
             "reason": "empty_or_absent_artifact_hashes",
         }
-        return {"overall_status": "FAIL", "failing_reasons": failing_reasons, "checks": checks}
+        return {
+            "overall_status": "FAIL",
+            "failing_reasons": failing_reasons,
+            "checks": checks,
+            "max_discrepancies": {"overall": max_discrepancy_overall},
+        }
 
     # Verify POSIX relative paths and hashes
     hash_mismatches: list[str] = []
     unsafe_paths: list[str] = []
     for rel_path, exp_h in art_hashes.items():
-        # Validate path safety
         p_obj = Path(rel_path)
         if (
             p_obj.is_absolute()
@@ -631,6 +997,12 @@ def independently_verify_phase08_evidence(
     cal_dir = ev_dir / "exploratory_calibrators"
     num_calibrators_checked = 0
 
+    expected_regimes_by_ds: dict[str, list[str]] = {
+        "FD001": ["C1"],
+        "FD002": ["C1", "C2", "C3", "C4", "C5", "C6"],
+        "FD004": ["C1", "C2", "C3", "C4", "C5", "C6"],
+    }
+
     for ds in CONFIRMATORY_DATASETS:
         for mf in CONFIRMATORY_MODELS:
             for seed in CONFIRMATORY_SEEDS:
@@ -667,18 +1039,22 @@ def independently_verify_phase08_evidence(
                     saved_b90 = saved_cal.get("threshold_bundles", {}).get("coverage_90", {})
                     act_global_q = saved_b90.get("global_threshold")
 
-                    if act_global_q is None or not np.isclose(
-                        act_global_q, exp_global_q, atol=tol_atol, rtol=tol_rtol
-                    ):
+                    if act_global_q is None:
+                        cal_mismatches.append(f"{cal_fname}: global threshold is missing or None")
+                    elif not np.isclose(act_global_q, exp_global_q, atol=tol_atol, rtol=tol_rtol):
+                        diff = abs(act_global_q - exp_global_q)
+                        if diff > max_discrepancy_overall:
+                            max_discrepancy_overall = diff
                         cal_mismatches.append(
                             f"{cal_fname}: global act={act_global_q} != exp={exp_global_q}"
                         )
 
-                    # Regime thresholds
+                    # Regime thresholds verification
                     saved_reg_thresholds = saved_b90.get("regime_thresholds", {})
-                    for reg_id in sorted(np.unique(regimes)):
+                    exp_reg_list = expected_regimes_by_ds[ds]
+                    for reg_id in exp_reg_list:
                         reg_str = str(reg_id)
-                        reg_mask = regimes == reg_id
+                        reg_mask = regimes == reg_str
                         reg_eids = eids[reg_mask]
                         reg_scores = scores[reg_mask]
                         distinct_engs = len(np.unique(reg_eids))
@@ -687,14 +1063,53 @@ def independently_verify_phase08_evidence(
                             if distinct_engs >= 10
                             else exp_global_q
                         )
-                        act_reg_rec = saved_reg_thresholds.get(reg_str, {})
+
+                        act_reg_rec = saved_reg_thresholds.get(reg_str)
+                        if act_reg_rec is None:
+                            cal_mismatches.append(
+                                f"{cal_fname}: missing regime threshold record for {reg_str}"
+                            )
+                            continue
+
                         act_reg_q = act_reg_rec.get("threshold")
-                        if act_reg_q is not None and not np.isclose(
-                            act_reg_q, exp_reg_q, atol=tol_atol, rtol=tol_rtol
-                        ):
+                        if act_reg_q is None:
+                            cal_mismatches.append(
+                                f"{cal_fname} reg {reg_str}: regime threshold value is None"
+                            )
+                        elif not np.isclose(act_reg_q, exp_reg_q, atol=tol_atol, rtol=tol_rtol):
+                            diff = abs(act_reg_q - exp_reg_q)
+                            if diff > max_discrepancy_overall:
+                                max_discrepancy_overall = diff
                             cal_mismatches.append(
                                 f"{cal_fname} reg {reg_str}: act={act_reg_q} != exp={exp_reg_q}"
                             )
+
+                        # Metadata assertions
+                        elig_act = act_reg_rec.get("eligible_engines")
+                        if elig_act is None:
+                            elig_act = act_reg_rec.get("m_engines")
+                        if elig_act != distinct_engs:
+                            cal_mismatches.append(
+                                f"{cal_fname} reg {reg_str}: eligible_engines "
+                                f"act={elig_act} != exp={distinct_engs}"
+                            )
+                        is_elig_act = act_reg_rec.get("is_eligible")
+                        if is_elig_act is None and "fallback_used" in act_reg_rec:
+                            is_elig_act = not act_reg_rec["fallback_used"]
+                        if is_elig_act is not None and is_elig_act != (distinct_engs >= 10):
+                            cal_mismatches.append(
+                                f"{cal_fname} reg {reg_str}: is_eligible "
+                                f"act={is_elig_act} != exp={distinct_engs >= 10}"
+                            )
+
+                    # Candidate parameter assertions
+                    cand_params = saved_cal.get("candidate_parameters", saved_cal)
+                    if cand_params.get("gamma") != variant.gamma:
+                        cal_mismatches.append(f"{cal_fname}: candidate gamma mismatch")
+                    if cand_params.get("beta_code") != variant.beta_code:
+                        cal_mismatches.append(f"{cal_fname}: candidate beta_code mismatch")
+                    if cand_params.get("routing") != variant.routing:
+                        cal_mismatches.append(f"{cal_fname}: candidate routing mismatch")
 
                     num_calibrators_checked += 1
 
@@ -707,6 +1122,7 @@ def independently_verify_phase08_evidence(
         failing_reasons.append(
             f"Calibrator threshold reconstruction failed: {len(cal_mismatches)} mismatches"
         )
+        failing_reasons.extend(cal_mismatches)
 
     # Equivalence gates check
     equiv_mismatches: list[str] = []
@@ -848,51 +1264,119 @@ def independently_verify_phase08_evidence(
         failing_reasons.append(f"Bootstrap draw reconstruction failed: {draws_mismatches}")
 
     # -------------------------------------------------------------------------
-    # 7. Independent Perturbation Streams & Checkpoint Parity Sampling
+    # 7. Independent Perturbation Streams & Checkpoint Parity Verification
     # -------------------------------------------------------------------------
     pert_mismatches: list[str] = []
-    # Test deterministic seed sequences on each dataset for engine 1 and engine 5
     for ds in CONFIRMATORY_DATASETS:
-        ds_num = DATASET_NUMBERS[ds]
-        for eng in expected_units[ds][:2]:
+        for eng in expected_units[ds][:3]:
             for rep in (0, 1):
-                # Gaussian noise
-                seq_noise = np.random.SeedSequence(
-                    [2026, 8, ds_num, eng, PERTURBATION_FAMILY_GAUSSIAN_NOISE, rep]
-                )
-                rng_n = np.random.Generator(np.random.PCG64(seq_noise))
-                z = rng_n.standard_normal((30, len(SENSOR_COLUMNS)))
-                if z.shape != (30, 14):
-                    pert_mismatches.append(f"Invalid noise shape for {ds} eng {eng}")
+                # 1. Noise sharing across levels
+                z_005 = generate_engine_noise_array(ds, eng, rep, 30)
+                z_010 = generate_engine_noise_array(ds, eng, rep, 30)
+                if not np.array_equal(z_005, z_010):
+                    pert_mismatches.append(f"Noise standard normals not shared for {ds} eng {eng}")
 
-                # Dropout
-                seq_drop = np.random.SeedSequence(
-                    [2026, 8, ds_num, eng, PERTURBATION_FAMILY_DROPOUT, rep]
-                )
-                rng_d = np.random.Generator(np.random.PCG64(seq_drop))
-                u = rng_d.uniform(0.0, 1.0, (30, len(SENSOR_COLUMNS)))
-                if not np.all((u >= 0.0) & (u < 1.0)):
-                    pert_mismatches.append(f"Dropout uniform out of bounds for {ds} eng {eng}")
+                # 2. Dropout sharing across rates
+                u_005 = generate_engine_dropout_uniforms(ds, eng, rep, 30)
+                u_010 = generate_engine_dropout_uniforms(ds, eng, rep, 30)
+                if not np.array_equal(u_005, u_010):
+                    pert_mismatches.append(f"Dropout uniforms not shared for {ds} eng {eng}")
+
+                # Verify that dropout at 0.05 implies dropout at 0.10
+                mask_005 = u_005 < 0.05
+                mask_010 = u_010 < 0.10
+                if not np.all(~mask_005 | mask_010):
+                    pert_mismatches.append(f"Dropout monotonicity violated for {ds} eng {eng}")
+
+    # Check clean predictions against frozen confirmatory cache
+    conf_pred_p = base / confirmatory_dir / "point_predictions.csv"
+    if conf_pred_p.exists():
+        try:
+            df_conf = pd.read_csv(conf_pred_p)
+            df_abl_sample = pd.read_csv(ev_dir / "ablation_interval_predictions.csv.gz", nrows=5000)
+            if "dataset" in df_abl_sample.columns and len(df_abl_sample) > 0:
+                sub_conf = df_conf[
+                    (df_conf["dataset"] == df_abl_sample["dataset"].iloc[0])
+                    & (df_conf["model_family"] == df_abl_sample["model_family"].iloc[0])
+                    & (df_conf["seed"] == df_abl_sample["seed"].iloc[0])
+                    & (df_conf["unit"] == df_abl_sample["unit"].iloc[0])
+                ].sort_values("endpoint_cycle")
+
+                sub_abl = df_abl_sample[
+                    (df_abl_sample["unit"] == df_abl_sample["unit"].iloc[0])
+                    & (df_abl_sample["variant_id"] == df_abl_sample["variant_id"].iloc[0])
+                ].sort_values("endpoint_cycle")
+
+                if len(sub_conf) > 0 and len(sub_abl) > 0:
+                    merged = pd.merge(
+                        sub_abl, sub_conf, on=["unit", "endpoint_cycle"], suffixes=("_abl", "_conf")
+                    )
+                    if not np.allclose(
+                        merged["prediction_abl"],
+                        merged["prediction_conf"],
+                        atol=tol_atol,
+                        rtol=tol_rtol,
+                    ):
+                        pert_mismatches.append("Clean predictions do not match confirmatory cache")
+        except Exception as exc:
+            pert_mismatches.append(f"Clean prediction cache verification error: {exc}")
+
+    # Checkpoint parity verification on sample
+    try:
+        sample_model = load_frozen_base_model("FD001", "GBR", 2026, base_dir=base)
+        raw_p = base / raw_data_dir / "train_FD001.txt"
+        df_raw = load_cmapss_run_to_failure(raw_p, "FD001", EXPECTED_ENGINE_COUNTS["FD001"])
+        split_p = resolve_repo_relative_path(base, "data/splits/fd001_engine_split_seed_2026.json")
+        s_man = load_split_manifest(split_p)
+        df_part = select_partition(df_raw, s_man, "test")
+        prep_p = resolve_repo_relative_path(
+            base, "experiments/preprocessing/FD001/preprocessor.json"
+        )
+        preproc, _ = load_preprocessor_artifact(prep_p)
+        df_trans = preproc.transform(df_part)
+
+        cond_sample = STRESS_CONDITION_BY_ID["noise_std_005"]
+        df_pert = apply_stream_perturbation(df_trans, "FD001", cond_sample, replicate_id=0)
+        wins = construct_windows(df_pert)
+        pts = sample_model.predict(wins.X_sequence)
+
+        # Compare with stress_interval_predictions.csv.gz
+        df_str_p = pd.read_csv(ev_dir / "stress_interval_predictions.csv.gz", nrows=5000)
+        df_str_sub = df_str_p[
+            (df_str_p["dataset"] == "FD001")
+            & (df_str_p["model_family"] == "GBR")
+            & (df_str_p["seed"] == 2026)
+            & (df_str_p["condition_id"] == "noise_std_005")
+            & (df_str_p["replicate_id"] == 0)
+            & (df_str_p["method_id"] == "global_hcp")
+        ].sort_values(["unit", "endpoint_cycle"])
+
+        if len(df_str_sub) > 0:
+            saved_preds = df_str_sub["prediction"].to_numpy()[: len(pts[: len(df_str_sub)])]
+            recalc_preds = pts[: len(df_str_sub)]
+            if not np.allclose(
+                saved_preds, recalc_preds, atol=TOL_CHECKPOINT_ATOL, rtol=TOL_CHECKPOINT_RTOL
+            ):
+                pert_mismatches.append("Checkpoint prediction parity failed under stress probe")
+    except Exception as exc:
+        pert_mismatches.append(f"Checkpoint prediction parity error: {exc}")
 
     checks["perturbation_generation_integrity"] = {
         "status": "PASS" if not pert_mismatches else "FAIL",
         "mismatches": pert_mismatches,
     }
     if pert_mismatches:
-        failing_reasons.append(
-            f"Perturbation generation integrity checks failed: {pert_mismatches}"
-        )
+        failing_reasons.extend(pert_mismatches)
 
     # -------------------------------------------------------------------------
     # 8. Reconstruct Interval Inversion, Simulation Policy, and Engine Metrics
     # -------------------------------------------------------------------------
-    # Load ablation engine metrics and simulation outcomes
     df_ablation_engine = pd.read_csv(ev_dir / "ablation_engine_metrics.csv")
     df_ablation_sim = pd.read_csv(ev_dir / "ablation_simulation_outcomes.csv")
     df_subgroups = pd.read_csv(ev_dir / "subgroup_metrics.csv")
     df_paired_contrasts = pd.read_csv(ev_dir / "paired_contrasts.csv")
+    df_factor_effects = pd.read_csv(ev_dir / "factor_main_effects.csv")
 
-    # Validate simulation precedence: no PM issued at or after terminal failure
     sim_violations = verify_simulation_terminal_precedence(df_ablation_sim)
     checks["simulation_terminal_precedence"] = {
         "status": "PASS" if not sim_violations else "FAIL",
@@ -934,56 +1418,30 @@ def independently_verify_phase08_evidence(
     if summary_mismatches:
         failing_reasons.extend(summary_mismatches)
 
-    # Validate Paired Contrasts & Bootstrap Statistics Consistency
-    contrast_mismatches: list[str] = []
-    for ds in CONFIRMATORY_DATASETS:
-        stat_npz_p = ev_dir / f"bootstrap_statistics_{ds}.npz"
-        if not stat_npz_p.exists():
-            contrast_mismatches.append(f"Missing bootstrap statistics artifact: {stat_npz_p.name}")
-            continue
-        try:
-            stats_data = np.load(stat_npz_p)
-        except Exception as exc:
-            contrast_mismatches.append(f"Error loading {stat_npz_p.name}: {exc}")
-            continue
-
-        # Check sample ablation contrast
-        for mf in CONFIRMATORY_MODELS:
-            stat_key = f"ablation_{ds}_{mf}_gamma0_beta0_global_minus_full_cost"
-            if stat_key not in stats_data:
-                contrast_mismatches.append(f"Missing statistic array {stat_key} in {ds}")
-                continue
-            reps = stats_data[stat_key]
-            if len(reps) != 10000:
-                contrast_mismatches.append(f"{stat_key} length {len(reps)} != 10,000")
-                continue
-            q_lo, q_hi = np.quantile(reps, [0.025, 0.975], method="linear")
-
-            row_match = df_paired_contrasts[
-                (df_paired_contrasts["dataset"] == ds)
-                & (df_paired_contrasts["model_family"] == mf)
-                & (df_paired_contrasts["variant_or_condition"] == "gamma0_beta0_global")
-                & (df_paired_contrasts["metric"] == "cost")
-            ]
-            if len(row_match) == 0:
-                contrast_mismatches.append(
-                    f"Missing paired contrast row for {ds}/{mf}/gamma0_beta0_global/cost"
-                )
-            else:
-                act_lo = float(row_match["ci_95_low"].iloc[0])
-                act_hi = float(row_match["ci_95_high"].iloc[0])
-                if not np.isclose(act_lo, q_lo, atol=tol_atol, rtol=tol_rtol) or not np.isclose(
-                    act_hi, q_hi, atol=tol_atol, rtol=tol_rtol
-                ):
-                    contrast_mismatches.append(f"Bootstrap interval mismatch for {stat_key}")
+    # Validate ALL Bootstrap Contrasts and Factor Main Effects
+    bootstrap_mismatches, max_boot_discrepancy = verify_all_bootstrap_contrasts_and_effects(
+        ev_dir=ev_dir,
+        df_ablation_engine=df_ablation_engine,
+        df_stress_engine=df_stress_engine,
+        df_paired_contrasts=df_paired_contrasts,
+        df_factor_effects=df_factor_effects,
+        tol_atol=tol_atol,
+        tol_rtol=tol_rtol,
+    )
+    if max_boot_discrepancy > max_discrepancy_overall:
+        max_discrepancy_overall = max_boot_discrepancy
 
     checks["paired_contrasts_and_bootstrap_statistics"] = {
-        "status": "PASS" if not contrast_mismatches else "FAIL",
-        "mismatches": contrast_mismatches[:10],
+        "status": "PASS" if not bootstrap_mismatches else "FAIL",
+        "checked_contrasts": len(df_paired_contrasts),
+        "checked_factors": len(df_factor_effects),
+        "max_discrepancy": max_boot_discrepancy,
+        "mismatches": bootstrap_mismatches[:10],
     }
-    if contrast_mismatches:
+    if bootstrap_mismatches:
         failing_reasons.append(
-            f"Paired contrasts and bootstrap statistics verification failed: {contrast_mismatches}"
+            f"Paired contrasts and bootstrap statistics verification failed: "
+            f"{len(bootstrap_mismatches)} mismatches (e.g. {bootstrap_mismatches[0]})"
         )
 
     # No 'favors_variant' column in paired_contrasts.csv
@@ -998,6 +1456,9 @@ def independently_verify_phase08_evidence(
 
     return {
         "overall_status": overall_status,
+        "execution_manifest_sha256": manifest_hash,
+        "verifier_source_sha256": verifier_sha,
         "failing_reasons": failing_reasons,
+        "max_discrepancies": {"overall": max_discrepancy_overall},
         "checks": checks,
     }

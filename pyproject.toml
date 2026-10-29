@@ -35,6 +35,7 @@ research = [
     "scikit-learn>=1.2.0",
     "torch>=2.2",
     "PyYAML>=6,<7",
+    "matplotlib>=3.7.0",
 ]
 dev = [
     "pytest>=7.4.0",

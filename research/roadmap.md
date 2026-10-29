@@ -16,7 +16,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
 | **Phase 6** | Decision-Aware Conformal Calibration Development | Completed | Step 8 calibration matrix, validation selection, and reverified audit (ADR-021, ADR-022) |
 | **Phase 7** | Uncertainty and Maintenance Decision Experiments (Step 9) | Completed | Completed held-out evaluation on 122 test engines; independent audit passed; RQ1–RQ4 outcomes recorded as UNSUPPORTED under preregistered Bonferroni/IUT rules (ADR-026) |
-| **Phase 8** | Ablation, Robustness, and Statistical Analysis | Completed | Factorial component ablation (240 cells), stress testing (1,620 evals), paired bootstrap, independent audit |
+| **Phase 8** | Ablation, Robustness, and Statistical Analysis | Completed | Authoritative successor bundle phase08_exploratory_v3 executed and independently audited; historical v1/v2 preserved as superseded |
 | **Phase 9** | Digital Twin Software Implementation | In Progress (Replay Prototype Tested) | Validation telemetry-replay prototype, REST API, interactive dashboard, and real-time playback verified in parallel |
 | **Phase 10** | Final Validation and Reproducibility Release | Planned | End-to-end audit, artifact release, environment pinning |
 | **Phase 11** | Complete Research Paper and Thesis | Planned | Final manuscript synthesis, camera-ready preparation |
@@ -197,14 +197,15 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: Completed (Successor Bundle `phase08-v2` Executed and Independently Audited; Historic `phase08-v1` Preserved)
+- **Status**: Completed (Authoritative Successor Bundle `phase08_exploratory_v3` Executed and Independently Audited; Historic `phase08_exploratory_v1` and `phase08_exploratory_v2` Preserved as Superseded)
 - **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
   - Systematic factorial component ablation records (240 cells across 122 test engines).
   - Engineering stress testing report (1,620 method evaluations under 18 stream conditions).
   - Paired lifetime-stratified engine bootstrap intervals (10,000 draws, PCG64).
-  - Successor evidence bundle in `experiments/phase08_exploratory_v2/` with full independent reference audit report in `experiments/phase08_exploratory_v2/independent_audit.json` (PASS, 0 failing reasons).
-  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v2/`.
+  - Authoritative successor evidence bundle in `experiments/phase08_exploratory_v3/` with full independent reference audit report in `experiments/phase08_exploratory_v3/independent_audit.json` (PASS, 0 failing reasons) and cryptographic non-circular receipt in `final_receipt.json`.
+  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v3/`.
+  - Provenance review in `docs/development/phase08_v2_provenance_review.md` documenting why v1 and v2 are preserved as historical superseded records and unsuitable for manuscript writing (v2 had dirty execution tree, multi-day span, and reused ablation evidence).
 - **Acceptance Criteria**:
   - Each specified component evaluated through controlled ablation, with positive, negative and inconclusive findings reported.
   - Phase 8 intervals and conclusions are exploratory post-confirmatory; original confirmatory RQ1–RQ4 classifications remain unchanged (`UNSUPPORTED`).

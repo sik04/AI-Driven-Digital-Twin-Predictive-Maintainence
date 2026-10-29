@@ -1,0 +1,25 @@
+{
+  "execution_manifest_sha256": "930bbf64d3e27177b9eab8137e6e17edd027ca1f33addb22afd8b9a3556c5c5f",
+  "independent_audit_sha256": "7d73891b28122d0bdd964ba77a0c7aa7fe92236f04fafedab08e79d160c9eb9a",
+  "protocol_version": "phase08-v1",
+  "report_artifact_hashes": {
+    "component_effects.csv": "e708f1dc7895ff547e0a99ded2a32df92e1eebd94db1624afd78e63300f92dae",
+    "figures/ablation_cost_vs_coverage.pdf": "2536fa700839b91113e3686298876c1f0da0c94988230fd007c60579ef4ddb72",
+    "figures/ablation_cost_vs_coverage.png": "cf1bf8624d191afd59d636ff085f62d99ab2f523123b4797ddaaaf9ebb808339",
+    "figures/dropout_degradation.pdf": "c9f2ae66e303ac49dbf0e78dd84095800087500b9777910eaa26ae03c5a47db2",
+    "figures/dropout_degradation.png": "ca4d81428b7b3c2c3a4728f4435e5498de25935f912e084a6cf87a3e29e64097",
+    "figures/lower_upper_miss_rates_by_lifecycle_stage.pdf": "1fc8b31dba142ce276d2e9887fc6471614dfdb0e459353ffa8d1a1f81c46c081",
+    "figures/lower_upper_miss_rates_by_lifecycle_stage.png": "9877f6a8b4462199031dd0f890dfd30ad0e03b94b2a6606f9c6cedc6c2a239c8",
+    "figures/noise_level_degradation.pdf": "a593ec80fc53f6670b7a47ad6ae1a30226d79a4b57940d06aa63fc6b00266653",
+    "figures/noise_level_degradation.png": "feb1212c52e28130f6a72556d78493723d3095436874fd1df10b2e4cd0dd9b62",
+    "figures/scale_asymmetry_routing_paired_effects.pdf": "c8ebb5ddd5e90dfeafb503d8fb9e4d14b0902241abd999c9b37ddbcf56100e4d",
+    "figures/scale_asymmetry_routing_paired_effects.png": "4c1cd24c0e07a16c3139a176e41c609d9fd502a6e270543daea2b59080b19665",
+    "figures/setting_bias_comparisons.pdf": "fc679fe9f7c0b7e916e1f31de8f748abb87f67d75c3de926b57eb675c6f72d6c",
+    "figures/setting_bias_comparisons.png": "1e5e4e78b6cef763c86e2bf8f60811433326637a47268153f60f15490b91c916",
+    "independent_audit.json": "7d73891b28122d0bdd964ba77a0c7aa7fe92236f04fafedab08e79d160c9eb9a",
+    "limitations.md": "0aff0e3e12439796a8f4ef8b6801e66e100676daae94ffe6222c8cc4c37407c7",
+    "results_summary.md": "ae7510fca5ce21c24440b39c4a4016de1acffa450463c57d7bd22c071360b28d",
+    "stress_degradation.csv": "a3c084a60b4861afa5c052f4decf76f86c2b24b15f256ce7d1676bfe105c8575"
+  },
+  "verifier_source_sha256": "70fbe3df135e8c66b2aa8c8617f49750b46bfe60ccbc2e66ed1efff18becee74"
+}
