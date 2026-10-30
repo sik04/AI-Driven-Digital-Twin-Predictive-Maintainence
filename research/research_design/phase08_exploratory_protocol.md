@@ -3,7 +3,7 @@
 - **Protocol Version**: `phase08-v1`
 - **Schema Version**: `phase08-protocol-v1`
 - **Stage**: Exploratory Post-Confirmatory Analysis (Designed after held-out confirmatory inspection)
-- **Status**: Active Investigation
+- **Status**: Completed & Independently Audited for Submission (ADR-029)
 - **Baseline Confirmatory SHA**: `fa1aa75783d5e675f20afffe5a8c821b04691551` / `129b3d7cdd32bba04f2b8ea64af14ee3993f7d1a`
 - **Scientific Status Note**: Held-out confirmatory results have already been inspected. All analyses under Phase 8 are strictly `EXPLORATORY_POST_CONFIRMATORY`. They do not replace, reinterpret as successful, or overwrite the frozen RQ1–RQ4 classifications (which remain `UNSUPPORTED`). No new winning model is selected, and the production system is not recalibrated.
 

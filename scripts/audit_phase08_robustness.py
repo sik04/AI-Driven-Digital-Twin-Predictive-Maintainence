@@ -67,19 +67,31 @@ def main() -> None:
             raw_data_dir=args.raw_data_dir,
         )
     except Exception as exc:
-        print(f"\nFATAL AUDIT FAILURE: Exception encountered: {exc}")
+        print(f"\nFATAL AUDIT FAILURE: Exception encountered: {exc}", file=sys.stderr)
         import traceback
 
         traceback.print_exc()
+        failure_report = {
+            "schema_version": "phase08-independent-audit-v3",
+            "overall_status": "FAIL",
+            "failing_reasons": [f"Audit execution exception: {type(exc).__name__}: {exc}"],
+            "checks": {},
+            "max_discrepancies": {"overall": None},
+        }
+        try:
+            write_immutable_json(out_audit, failure_report, overwrite=args.overwrite)
+            print(f"Wrote structured failure report to: {out_audit}", file=sys.stderr)
+        except Exception:
+            pass
         sys.exit(1)
 
     write_immutable_json(out_audit, report, overwrite=args.overwrite)
     print(f"\nSaved independent audit report to {out_audit}")
     print("=" * 80)
-    print(f"AUDIT OUTCOME: {report['overall_status']}")
-    if report["failing_reasons"]:
+    print(f"AUDIT OUTCOME: {report.get('overall_status')}")
+    if report.get("overall_status") != "PASS" or report.get("failing_reasons"):
         print("FAILING REASONS:")
-        for r in report["failing_reasons"]:
+        for r in report.get("failing_reasons", []):
             print(f"  - {r}")
         sys.exit(1)
     else:

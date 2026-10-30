@@ -1,0 +1,82 @@
+{
+  "checks": {
+    "artifact_and_provenance_integrity": {
+      "checked_count": 265,
+      "expected_count": 265,
+      "maximum_absolute_error": 0.0,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "calibration_reconstruction": {
+      "checked_count": 240,
+      "expected_count": 240,
+      "maximum_absolute_error": 0.0,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "endpoint_to_engine_metric_reconstruction": {
+      "checked_count": 83640,
+      "expected_count": 83640,
+      "maximum_absolute_error": 4.547473508864641e-13,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "exact_endpoint_membership": {
+      "checked_count": 14835980,
+      "expected_count": 14835980,
+      "maximum_absolute_error": 0.0,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "full_bootstrap_reconstruction": {
+      "checked_count": 1470,
+      "expected_count": 1470,
+      "maximum_absolute_error": 8.529288386682765e-14,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "full_checkpoint_prediction_parity": {
+      "checked_count": 540,
+      "expected_count": 540,
+      "maximum_absolute_error": 2.842170943040401e-14,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "full_interval_reconstruction": {
+      "checked_count": 14835980,
+      "expected_count": 14835980,
+      "maximum_absolute_error": 1.4210854715202004e-13,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "full_simulation_reconstruction": {
+      "checked_count": 75640,
+      "expected_count": 75640,
+      "maximum_absolute_error": 1.4210854715202004e-14,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "full_subgroup_reconstruction": {
+      "checked_count": 65280,
+      "expected_count": 65280,
+      "maximum_absolute_error": 0.0,
+      "mismatches": [],
+      "status": "PASS"
+    },
+    "protected_input_integrity": {
+      "checked_count": 163,
+      "expected_count": 163,
+      "maximum_absolute_error": 0.0,
+      "mismatches": [],
+      "status": "PASS"
+    }
+  },
+  "execution_manifest_sha256": "930bbf64d3e27177b9eab8137e6e17edd027ca1f33addb22afd8b9a3556c5c5f",
+  "failing_reasons": [],
+  "max_discrepancies": {
+    "overall": 4.547473508864641e-13
+  },
+  "overall_status": "PASS",
+  "schema_version": "phase08-independent-audit-v3",
+  "verifier_source_sha256": "ada69e841b41a5931b87174bc3f9a29f42a734ba5543401288594a48ffb8d168"
+}

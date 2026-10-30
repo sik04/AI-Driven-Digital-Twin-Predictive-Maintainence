@@ -963,5 +963,37 @@ This log documents formal architectural, methodological, and research governance
 - **Follow-up Review Date / Trigger**:
   - Phase 10 / Phase 11 manuscript writing and reproducibility package assembly.
 
+---
+
+### ADR-029: Phase 8 Submission Verification Protocol, Reference Verifier Independence, and Reporting Defect Resolution
+- **Date**: 2026-10-29
+- **Status**: Accepted (Amends ADR-028)
+- **Authors Responsible**: Mayank Singh, Shiksha Pandey, Ruchi Gupta
+- **Approval Basis**: PR and independent reference verification audit of Phase 8 submission evidence bundle.
+- **Context and Motivation**:
+  - To prepare the repository for research paper writing and submission, Phase 8 verification and reporting defects required strict resolution without feature development or research re-design.
+  - Core requirements included:
+    1. Independent reference verification protocol (`verification.py`) must never import or call production runner, perturbation, windowing, or scoring routines. It must independently reconstruct every checkpoint prediction, quantile, interval, simulation outcome, engine metric, subgroup metric, and paired bootstrap contrast across all 14.8M interval predictions, 75,640 simulations, 83,640 engine metric rows, and 1,470 bootstrap statistics.
+    2. Zero sampling or silent skips; fail-closed audit across 10 mandatory checks with `checked_count == expected_count` under schema `phase08-independent-audit-v3`.
+    3. Reporting defects in `reporting.py` required resolution: input-table hash binding against the audited execution manifest, extraction of method-prefixed stress identifiers (`variant_or_condition.str.split(":", n=1)`), Cartesian product validation for 54 noise rows and 36 dropout rows eliminating 0.0 fallbacks, dynamic reporting bound to passing audit, and creation of `writing_handoff.md` with explicit interpretive boundaries and non-circular final receipt.
+    4. Confirmatory RQ1–RQ4 `UNSUPPORTED` outcomes, raw data, splits, base models, calibrators, and historical v1/v2/v3 evidence remain strictly frozen.
+- **Decisions**:
+  1. **Strict Reference Verifier Independence**:
+     - Implemented independent mathematical reference routines in `src/intellitwin/robustness/verification.py` without calling production code (`_reconstruct_reference_score`, `_reconstruct_reference_intervals`, `_reconstruct_reference_simulation`, `_generate_reference_perturbation_stream`, `_construct_reference_windows`, `verify_all_bootstrap_contrasts_and_effects`).
+     - Vectorized group streaming via `EngineAccumulator` and `SubgroupEngineAccumulator` ensures high-throughput, memory-bounded scanning of 14,835,980 interval predictions and 75,640 simulations.
+     - Handled cross-platform line-ending normalization for text artifact SHA-256 hashes against manifest records.
+  2. **Reporting Defect Resolution & Precondition Enforcement**:
+     - In `src/intellitwin/robustness/reporting.py`, enforced fail-closed preconditions: audit file must exist, match `phase08-independent-audit-v3`, have `overall_status == "PASS"`, empty `failing_reasons`, all 10 mandatory checks PASS with `checked_count == expected_count`, and valid execution manifest SHA-256 binding.
+     - Replaced fragile substring matching with exact prefix splitting `variant_or_condition.str.split(":", n=1, expand=True)` to extract `method_id` and `condition_id`. Cartesian product keys match exactly 54 noise rows and 36 dropout rows, eliminating unselected 0.0 fallbacks.
+     - Emitted authoritative `writing_handoff.md` establishing true confirmatory files, exploratory effects, gamma/beta mathematical clarifications, frozen RQ1–RQ4 standing, and Digital Twin telemetry replay boundaries.
+  3. **Dedicated Submission Artifacts**:
+     - Independent reference audit executed on `experiments/phase08_exploratory_v3/` and written to `experiments/phase08_submission_verification_v1/independent_audit.json`: PASS, 0 failing reasons, all 10 checks passing with maximum discrepancy $\le 4.55 \times 10^{-13}$.
+     - Finalized reports written to `research/results/phase08_submission_v1/` with 6 publication figures (PDF and PNG), `results_summary.md`, `writing_handoff.md`, `limitations.md`, `stress_degradation.csv`, `component_effects.csv`, and non-circular `final_receipt.json`.
+- **Expected Implications**:
+  - Phase 8 verification and reporting defects are completely resolved.
+  - The repository is fully verified, audited, and ready for research paper and synopsis writing.
+- **Follow-up Review Date / Trigger**:
+  - Paper manuscript writing and synopsis generation.
+
 
 
