@@ -748,7 +748,9 @@ def test_reporting_fails_closed_when_audit_missing_or_failing(tmp_path: Path) ->
 
     # Case 1: Missing audit
     with pytest.raises(RuntimeError, match="independent audit"):
-        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+        generate_phase08_reports_and_figures(
+            evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+        )
 
     # Case 2: Audit exists but failed
     (ev_dir / "independent_audit.json").write_text(
@@ -756,7 +758,9 @@ def test_reporting_fails_closed_when_audit_missing_or_failing(tmp_path: Path) ->
         encoding="utf-8",
     )
     with pytest.raises(RuntimeError, match="independent audit"):
-        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+        generate_phase08_reports_and_figures(
+            evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+        )
 
 
 def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
@@ -928,7 +932,14 @@ def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
     }
     (ev_dir / "independent_audit.json").write_text(json.dumps(audit_data), encoding="utf-8")
 
-    res = generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+    conf_dir = tmp_path / "experiments/confirmatory_v1"
+    conf_dir.mkdir(parents=True, exist_ok=True)
+    for f in ["rq_decisions.json", "component_evidence.csv", "independent_audit.json"]:
+        (conf_dir / f).write_text("{}", encoding="utf-8")
+
+    res = generate_phase08_reports_and_figures(
+        evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+    )
     assert Path(res["results_summary"]).exists()
     content = Path(res["results_summary"]).read_text(encoding="utf-8")
 

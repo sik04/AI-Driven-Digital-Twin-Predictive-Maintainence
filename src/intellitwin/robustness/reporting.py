@@ -26,6 +26,33 @@ import pandas as pd
 from intellitwin.data.artifacts import compute_sha256
 
 
+def resolve_repo_path(path: Path | str, base_dir: Path | str) -> Path:
+    """Resolve path against base_dir if relative, preserving absolute inputs."""
+    base = Path(base_dir).resolve()
+    p = Path(path)
+    if not p.is_absolute():
+        p = base / p
+    return p.resolve()
+
+
+def to_repo_relative_posix(path: Path | str, base_dir: Path | str) -> str:
+    """Validate that path is inside base_dir and return a repository-relative POSIX string.
+
+    Raises:
+        ValueError: If path is outside base_dir.
+    """
+    base = Path(base_dir).resolve()
+    resolved = resolve_repo_path(path, base)
+    try:
+        rel = resolved.relative_to(base)
+    except ValueError as exc:
+        raise ValueError(
+            f"Published reference path '{path}' (resolved to '{resolved}') "
+            f"is outside repository root '{base}'."
+        ) from exc
+    return rel.as_posix()
+
+
 def generate_phase08_reports_and_figures(
     evidence_dir: Path | str,
     output_report_dir: Path | str,
@@ -44,24 +71,30 @@ def generate_phase08_reports_and_figures(
 
     Raises:
         RuntimeError: If independent audit is missing, invalid, or did not pass.
-        ValueError: If evidence tables contain malformed or missing contrast records.
+        ValueError: If evidence tables contain malformed or missing contrast records,
+                    or if published paths resolve outside base_dir.
     """
     base = Path(base_dir).resolve()
-    ev_dir = Path(evidence_dir).resolve()
-    rep_dir = Path(output_report_dir).resolve()
-    fig_dir = rep_dir / "figures"
+    ev_dir = resolve_repo_path(evidence_dir, base)
+    rep_dir = resolve_repo_path(output_report_dir, base)
+    audit_p = (
+        resolve_repo_path(audit_path, base)
+        if audit_path is not None
+        else (ev_dir / "independent_audit.json")
+    )
 
+    # Validate published-reference containment BEFORE creating output directories
+    _ = to_repo_relative_posix(ev_dir, base)
+    _ = to_repo_relative_posix(rep_dir, base)
+    _ = to_repo_relative_posix(audit_p, base)
+
+    fig_dir = rep_dir / "figures"
     rep_dir.mkdir(parents=True, exist_ok=True)
     fig_dir.mkdir(parents=True, exist_ok=True)
 
     # -------------------------------------------------------------------------
     # 0. Enforce Audit Precondition
     # -------------------------------------------------------------------------
-    audit_p = (
-        Path(audit_path).resolve()
-        if audit_path is not None
-        else (ev_dir / "independent_audit.json")
-    )
     if not audit_p.exists():
         raise RuntimeError(
             f"Cannot generate reports: independent audit report missing at {audit_p}. "
@@ -646,6 +679,7 @@ def generate_phase08_reports_and_figures(
         df_factor_effects=df_factor_effects,
         noise_cost_mean=noise_cost_mean,
         drop_cov_mean=drop_cov_mean,
+        base_dir=base,
     )
 
     return {
@@ -657,12 +691,13 @@ def generate_phase08_reports_and_figures(
 
 
 def generate_phase08_writing_handoff(
-    report_dir: Path,
-    evidence_dir: Path,
-    audit_path: Path,
+    report_dir: Path | str,
+    evidence_dir: Path | str,
+    audit_path: Path | str,
     df_factor_effects: pd.DataFrame,
     noise_cost_mean: float,
     drop_cov_mean: float,
+    base_dir: Path | str = ".",
 ) -> Path:
     """Generate the authoritative writing handoff markdown file for paper synthesis."""
     cost_effects = df_factor_effects[df_factor_effects["metric"] == "cost"]
@@ -699,9 +734,10 @@ def generate_phase08_writing_handoff(
         cost_effects[cost_effects["factor"] == "regime_routing"]["effect_on_minus_off"].mean()
     )
 
-    rel_audit_path = audit_path.name if audit_path.parent == evidence_dir else str(audit_path)
-    ev_posix = evidence_dir.as_posix()
-    rep_posix = report_dir.as_posix()
+    base = Path(base_dir).resolve()
+    ev_posix = to_repo_relative_posix(evidence_dir, base)
+    rep_posix = to_repo_relative_posix(report_dir, base)
+    rel_audit_path = to_repo_relative_posix(audit_path, base)
 
     handoff_lines = [
         "# Authoritative Writing Handoff: Research Paper and Synopsis Synthesis",
@@ -716,6 +752,8 @@ def generate_phase08_writing_handoff(
             "(`overall_status: PASS`, 0 failing reasons)"
         ),
         "- **Audit Schema Version**: `phase08-independent-audit-v3`",
+        "",
+        "All paths below are relative to the repository root.",
         "",
         "---",
         "",
@@ -1026,6 +1064,6 @@ def generate_phase08_writing_handoff(
         ),
         "",
     ]
-    out_file = report_dir / "writing_handoff.md"
+    out_file = resolve_repo_path(report_dir, base) / "writing_handoff.md"
     out_file.write_text("\n".join(handoff_lines), encoding="utf-8")
     return out_file

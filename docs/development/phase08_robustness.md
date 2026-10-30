@@ -3,8 +3,8 @@
 - **Protocol**: `phase08-v1`
 - **Authoritative Evidence Location**: `experiments/phase08_exploratory_v3/`
 - **Submission Audit Location**: `experiments/phase08_submission_verification_v1/independent_audit.json`
-- **Authoritative Report Location**: `research/results/phase08_submission_v1/`
-- **Writing Handoff Document**: [`research/results/phase08_submission_v1/writing_handoff.md`](../../research/results/phase08_submission_v1/writing_handoff.md)
+- **Authoritative Report Location**: `research/results/phase08_submission_v2/`
+- **Writing Handoff Document**: [`research/results/phase08_submission_v2/writing_handoff.md`](../../research/results/phase08_submission_v2/writing_handoff.md)
 - **Execution Commit SHA**: `2e8acb156e26eb0aeec3d0ed93e4d84b0e612355` (`git_dirty: false`)
 
 ---
@@ -25,7 +25,8 @@ To protect scientific integrity and traceability, earlier exploratory bundles ar
 - **v2 Bundle (`experiments/phase08_exploratory_v2/`)**: Intermediate evaluation bundle. Preserved byte-for-byte as historical material. As documented in [`docs/development/phase08_v2_provenance_review.md`](phase08_v2_provenance_review.md), v2 was executed with `--allow-dirty` (`git_dirty: true`), had execution timestamps spanning over 48 hours while recording ~49 minutes duration, and reused prior log entries. It is unsuitable as the final authoritative manuscript evidence source.
 - **v3 Authoritative Bundle (`experiments/phase08_exploratory_v3/`)**: The clean, authoritative successor executed from clean commit `2e8acb156e26eb0aeec3d0ed93e4d84b0e612355` without dirty flags. Outputs were staged externally to avoid dirtying the source tree.
 - **Submission Verification Bundle (`experiments/phase08_submission_verification_v1/`)**: Fully audited with independent reference verifier under schema `phase08-independent-audit-v3`, passing all 10 mandatory checks with 0 failing reasons and maximum absolute error $\le 4.55 \times 10^{-13}$.
-- **Submission Reports Bundle (`research/results/phase08_submission_v1/`)**: Authoritative reports, publication figures (PDF/PNG), `results_summary.md`, `writing_handoff.md`, and non-circular `final_receipt.json`.
+- **Submission Reports Bundle (`research/results/phase08_submission_v1/`)**: Historical initial submission reporting bundle, preserved unchanged for provenance.
+- **Submission Reports Bundle v2 (`research/results/phase08_submission_v2/`)**: Active authoritative reports, publication figures (PDF/PNG), `results_summary.md`, `writing_handoff.md`, and non-circular `final_receipt.json`. `phase08_submission_v2` corrects documentation-path portability using the same audited evidence. It does not represent a new experiment or changed result.
 
 ---
 
@@ -44,25 +45,55 @@ The implementation is located under `src/intellitwin/robustness/`:
 
 ## 4. CLI Interfaces
 
-- **Run Script**: `scripts/run_phase08_robustness.py`
+### Historical Invocations (Published Artifacts)
+The following commands record the historical invocations that generated the published evidence, audit, and successor report bundles (do not rerun into published directories):
+
+- **Historical Run**:
   ```bash
   python scripts/run_phase08_robustness.py \
       --output-dir experiments/phase08_exploratory_v3 \
       --report-dir research/results/phase08_exploratory_v3
   ```
-- **Audit Script**: `scripts/audit_phase08_robustness.py`
+- **Historical Audit**:
   ```bash
   python scripts/audit_phase08_robustness.py \
       --evidence-dir experiments/phase08_exploratory_v3 \
       --output-audit experiments/phase08_submission_verification_v1/independent_audit.json
   ```
-- **Finalize Reporting Script**: `scripts/finalize_phase08_reporting.py`
+- **Historical Reporting Finalization (v2)**:
   ```bash
   python scripts/finalize_phase08_reporting.py \
+      --base-dir . \
       --evidence-dir experiments/phase08_exploratory_v3 \
       --audit-path experiments/phase08_submission_verification_v1/independent_audit.json \
-      --report-dir research/results/phase08_submission_v1
+      --report-dir research/results/phase08_submission_v2
   ```
+
+### Local Reproduction Workflow
+To reproduce Phase 8 execution, independent auditing, and reporting locally without overwriting published evidence, use new, unoccupied reproduction directories:
+
+1. **Execute Exploratory Matrix Locally**:
+   ```bash
+   python scripts/run_phase08_robustness.py \
+       --output-dir experiments/local_reproduction \
+       --report-dir research/results/local_reproduction_exploratory
+   ```
+
+2. **Run Independent Reference Audit**:
+   ```bash
+   python scripts/audit_phase08_robustness.py \
+       --evidence-dir experiments/local_reproduction \
+       --output-audit experiments/local_reproduction/independent_audit.json
+   ```
+
+3. **Finalize Reporting Bundle**:
+   ```bash
+   python scripts/finalize_phase08_reporting.py \
+       --base-dir . \
+       --evidence-dir experiments/local_reproduction \
+       --audit-path experiments/local_reproduction/independent_audit.json \
+       --report-dir research/results/local_reproduction
+   ```
 
 ---
 
