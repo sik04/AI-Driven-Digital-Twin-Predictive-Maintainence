@@ -20,7 +20,7 @@ import json
 from collections import defaultdict
 from fractions import Fraction
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pandas as pd
@@ -207,7 +207,7 @@ def _reconstruct_reference_score(
     a = sigma * np.exp(beta * z)
     b = sigma * np.exp(-beta * z)
     score = np.maximum(np.maximum((p - y) / a, (y - p) / b), 0.0)
-    return score
+    return cast(np.ndarray[Any, Any], score)
 
 
 def _reconstruct_reference_quantile(
@@ -346,7 +346,11 @@ def _reconstruct_reference_intervals(
 
     lower = np.maximum(0.0, p - thresholds * a_p)
     upper = p + thresholds * b_p
-    return lower, upper, fallback_used
+    return (
+        cast(np.ndarray[Any, Any], lower),
+        cast(np.ndarray[Any, Any], upper),
+        cast(np.ndarray[Any, Any], fallback_used),
+    )
 
 
 def _reconstruct_reference_simulation(
@@ -459,7 +463,7 @@ def _generate_reference_perturbation_stream(
         raise ValueError(f"Unknown condition_type: {condition_type}")
 
     features = np.hstack([settings, sensors])
-    return features
+    return cast(np.ndarray[Any, Any], features)
 
 
 def _construct_reference_windows(
@@ -483,7 +487,7 @@ def _construct_reference_windows(
     )
     if windows.shape != (n_cycles - window_size + 1, window_size, 17):
         raise ValueError(f"Unexpected windows shape: {windows.shape}")
-    return windows
+    return cast(np.ndarray[Any, Any], windows)
 
 
 def _reconstruct_independent_bootstrap_draws(
@@ -512,7 +516,7 @@ def _reconstruct_independent_bootstrap_draws(
                     row_engs.append(engs[idx])
         draws[b, :] = row_engs
 
-    return draws
+    return cast(np.ndarray[Any, Any], draws)
 
 
 # =============================================================================
