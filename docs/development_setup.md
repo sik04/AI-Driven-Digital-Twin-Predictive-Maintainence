@@ -18,8 +18,10 @@ This document details the configuration of the local development environment for
 
 1. Clone or navigate to the repository:
    ```powershell
-   cd c:\www\AI-Driven-Digital-Twin-Predictive-Maintainence
+   git clone https://github.com/sik04/AI-Driven-Digital-Twin-Predictive-Maintainence.git
+   cd AI-Driven-Digital-Twin-Predictive-Maintainence
    ```
+   *Run these commands from your chosen parent directory. If the repository is already cloned, open a terminal at its root and continue with environment setup.*
 
 2. Create and activate a virtual environment:
    ```powershell
@@ -36,10 +38,12 @@ This document details the configuration of the local development environment for
 
 ### POSIX (Linux / macOS / WSL)
 
-1. Navigate to the repository:
+1. Clone or navigate to the repository:
    ```bash
+   git clone https://github.com/sik04/AI-Driven-Digital-Twin-Predictive-Maintainence.git
    cd AI-Driven-Digital-Twin-Predictive-Maintainence
    ```
+   *Run these commands from your chosen parent directory. If the repository is already cloned, open a terminal at its root and continue with environment setup.*
 
 2. Create and activate a virtual environment:
    ```bash

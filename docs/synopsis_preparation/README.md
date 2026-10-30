@@ -1,5 +1,14 @@
 # IntelliTwin Research Writing & Documentation Package
 
+> [!WARNING]
+> **HISTORICAL PRE-CONFIRMATORY DRAFT PACKAGE — NOT A FINAL SUBMISSION.**<br>
+> This package records the earlier v4 pre-test documentation baseline. Its `NOT_STARTED`, `PENDING`, and `PENDING_EXPERIMENT` statements describe that historical baseline or unfinished manuscript sections, not the current state of repository experiments. Confirmatory evaluation has subsequently completed, with RQ1–RQ4 classified as `UNSUPPORTED` under the frozen decision rules. Phase 8 exploratory results and their independent audit are also available. The LaTeX drafts and preview PDFs still require results integration and a new document build before final submission.
+>
+> Authoritative post-baseline experimental and reporting references:
+> - Confirmatory evaluation results: [research/results/confirmatory_v1/](../../research/results/confirmatory_v1/)
+> - Phase 8 exploratory writing handoff: [research/results/phase08_submission_v2/writing_handoff.md](../../research/results/phase08_submission_v2/writing_handoff.md)
+> - Phase 8 independent audit: [experiments/phase08_submission_verification_v1/independent_audit.json](../../experiments/phase08_submission_verification_v1/independent_audit.json)
+
 **Document Version**: `2.0 (v4 Audit Alignment)`  
 **Branch**: `fix/research-docs-v4-alignment`  
 **Reviewed Repository Baseline**: `c163bb279e7427b8f1b6e75955af4969ff9370fd`  
@@ -7,7 +16,7 @@
 **Authoring Team**: Mayank Singh (Lead Software Developer), Shiksha Pandey, Ruchi Gupta (Individual partner attributions pending consensus confirmation)  
 **Package Scope**: Complete, evidence-linked working drafts for Research Synopsis, IEEE Conference/Journal Manuscript, Academic Thesis / Project Report Draft, and Standalone Hypothesis Appendix.
 
-> **Status Statement**: Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST_READY. Held-out execution has not started, and RQ1–RQ4 outcomes remain pending. Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness.
+> **Historical Baseline Status Statement (Pre-Confirmatory)**: Base predictors and conformal calibrators are implemented and frozen. The committed v4 pre-test audit reports PASS and PRETEST_READY. Held-out execution has not started, and RQ1–RQ4 outcomes remain pending. *(Historical note: This status reflects the pre-test snapshot when this package was compiled. Held-out evaluation has since completed under `experiments/confirmatory_v1/` with RQ1–RQ4 UNSUPPORTED, and Phase 8 exploratory analysis completed under `experiments/phase08_exploratory_v3/`.)* Development validation and audit results do not establish confirmatory maintenance benefit, subgroup reliability, or robustness.
 
 ---
 
@@ -75,7 +84,9 @@ docs/synopsis_preparation/
 
 ---
 
-## 3. Current Draft Status
+## 3. Historical Draft Baseline and Remaining Manuscript Integration
+
+> **Note on Baseline Status**: The table below records the historical v4 pre-test documentation baseline. Remaining `PENDING` entries describe document integration work where the corresponding experiments have already been completed in the repository (see [Confirmatory Results](../../research/results/confirmatory_v1/) and [Phase 8 Writing Handoff](../../research/results/phase08_submission_v2/writing_handoff.md)), but their verified numerical findings and figures have not yet been integrated into a new compilation of these draft deliverables.
 
 | Deliverable | Format | Completion Status | Result Dependency | Target Role |
 | :--- | :--- | :--- | :--- | :--- |
@@ -130,6 +141,8 @@ latexmk -pdf -interaction=nonstopmode main.tex
 ## 5. Updating after Development Milestones
 
 When experimental verification and held-out evaluations are completed, the results must be incorporated systematically into this documentation package.
+
+> **Status Clarification**: The experiments corresponding to milestones `UPD-02` through `UPD-05` have already been completed in the repository (see [Confirmatory Results](../../research/results/confirmatory_v1/) and [Phase 8 Writing Handoff](../../research/results/phase08_submission_v2/writing_handoff.md)). The `PENDING` statuses below record that document integration into the LaTeX drafts remains to be performed in a future document compilation.
 
 ### Mandatory Update IDs
 - `UPD-01`: Committed v4 pretest readiness verification (`experiments/pretest_verification_v4/`). Status: `COMMITTED`.

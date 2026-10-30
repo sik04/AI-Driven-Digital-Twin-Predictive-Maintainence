@@ -353,7 +353,9 @@ def test_empty_missing_duplicate_selections_raise_rather_than_report_zero(tmp_pa
 
     with patch("intellitwin.robustness.reporting.compute_sha256", return_value="abc"):
         with pytest.raises(ValueError, match="Stress noise contrast key mismatch"):
-            generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+            generate_phase08_reports_and_figures(
+                evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+            )
 
 
 # =============================================================================
@@ -456,8 +458,15 @@ def test_changing_contrast_changes_generated_report(tmp_path: Path) -> None:
     with open(ev_dir / "independent_audit.json", "w", encoding="utf-8") as f:
         json.dump(audit, f)
 
+    conf_dir = tmp_path / "experiments/confirmatory_v1"
+    conf_dir.mkdir(parents=True, exist_ok=True)
+    for fname in ["rq_decisions.json", "component_evidence.csv", "independent_audit.json"]:
+        (conf_dir / fname).write_text("{}", encoding="utf-8")
+
     with patch("intellitwin.robustness.reporting.compute_sha256", return_value="abc"):
-        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+        generate_phase08_reports_and_figures(
+            evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+        )
         summary_text = (rep_dir / "results_summary.md").read_text(encoding="utf-8")
         assert "+2." in summary_text or "99.9" in summary_text or "+2" in summary_text
 
@@ -744,7 +753,9 @@ def test_pass_with_missing_mandatory_checks_rejected(tmp_path: Path) -> None:
     with pytest.raises(
         RuntimeError, match="mandatory audit check 'exact_endpoint_membership' is missing"
     ):
-        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+        generate_phase08_reports_and_figures(
+            evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+        )
 
 
 # =============================================================================
@@ -764,7 +775,9 @@ def test_pass_with_nonempty_failing_reasons_rejected(tmp_path: Path) -> None:
         json.dump(audit, f)
 
     with pytest.raises(RuntimeError, match="independent audit contains failing reasons"):
-        generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+        generate_phase08_reports_and_figures(
+            evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+        )
 
 
 # =============================================================================
@@ -796,4 +809,6 @@ def test_report_audit_bound_to_another_evidence_manifest_rejected(tmp_path: Path
         return_value="hash_beta_456",  # Different manifest hash!
     ):
         with pytest.raises(RuntimeError, match="audit evidence-manifest hash mismatch"):
-            generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
+            generate_phase08_reports_and_figures(
+                evidence_dir=ev_dir, output_report_dir=rep_dir, base_dir=tmp_path
+            )

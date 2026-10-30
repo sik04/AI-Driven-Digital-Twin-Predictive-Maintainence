@@ -7,13 +7,18 @@ Binds reporting strictly to an audited, passing Phase 8 evidence bundle.
 from __future__ import annotations
 
 import argparse
+import shutil
 import sys
 from pathlib import Path
 
 import intellitwin.robustness.verification as verif_mod
 from intellitwin.data.artifacts import compute_sha256
 from intellitwin.provenance import write_immutable_json
-from intellitwin.robustness.reporting import generate_phase08_reports_and_figures
+from intellitwin.robustness.reporting import (
+    generate_phase08_reports_and_figures,
+    resolve_repo_path,
+    to_repo_relative_posix,
+)
 
 
 def finalize_phase08_reporting(
@@ -28,16 +33,21 @@ def finalize_phase08_reporting(
     Raises:
         FileExistsError: If output_report_dir contains completed reports and overwrite is False.
         RuntimeError: If independent audit did not pass or manifest hashes mismatch.
+        ValueError: If evidence, report, or audit paths are outside base_dir.
     """
     base = Path(base_dir).resolve()
-    ev_dir = Path(evidence_dir).resolve()
-    rep_dir = Path(output_report_dir).resolve()
-
+    ev_dir = resolve_repo_path(evidence_dir, base)
+    rep_dir = resolve_repo_path(output_report_dir, base)
     audit_p = (
-        Path(audit_path).resolve()
+        resolve_repo_path(audit_path, base)
         if audit_path is not None
         else (ev_dir / "independent_audit.json")
     )
+
+    # Validate repository containment before writing any files
+    _ = to_repo_relative_posix(ev_dir, base)
+    _ = to_repo_relative_posix(rep_dir, base)
+    _ = to_repo_relative_posix(audit_p, base)
 
     if rep_dir.exists() and not overwrite:
         # Check if already contains completed reports
@@ -67,10 +77,10 @@ def finalize_phase08_reporting(
     print(f"Successfully generated scientific synthesis at: {results['results_summary']}")
     print(f"Successfully generated writing handoff at:      {results['writing_handoff']}")
 
-    # Copy independent_audit.json into rep_dir if not already there
+    # Copy independent_audit.json into rep_dir if not already there (binary byte-for-byte)
     dest_audit = rep_dir / "independent_audit.json"
     if audit_p != dest_audit:
-        dest_audit.write_text(audit_p.read_text(encoding="utf-8"), encoding="utf-8")
+        shutil.copyfile(audit_p, dest_audit)
 
     # 2. Build non-circular final receipt
     man_p = ev_dir / "execution_manifest.json"

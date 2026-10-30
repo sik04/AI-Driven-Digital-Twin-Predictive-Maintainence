@@ -11,7 +11,7 @@ This document outlines the master research and development roadmap for the Intel
 | **Phase 0** | Research Project Setup and Governance | Completed | Repository reset, governance framework, tooling, CI |
 | **Phase 1** | Systematic Literature Review | In Progress | Comprehensive review of RUL, UQ, and Digital Twin literature |
 | **Phase 2** | Research Gap, Questions, Hypotheses & Contributions | Completed | Formalize gaps, testable hypotheses, contribution matrix |
-| **Phase 3** | Dataset Study and Experimental Protocol | In Progress — Step 5 complete; Step 6 complete (ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
+| **Phase 3** | Dataset Study and Experimental Protocol | Completed (Step 5 complete; Step 6 complete under ADR-018 numerical freeze) | C-MAPSS dataset exploration, split protocol, metrics |
 | **Phase 4** | Research Proposal and Paper Foundations | Planned | Initial manuscript draft, methodology formulation |
 | **Phase 5** | Reproducible GBR and LSTM Base Predictor Experiments | Completed | Train, audit, and freeze 30 point-RUL base predictors (Step 7 Complete under ADR-020) |
 | **Phase 6** | Decision-Aware Conformal Calibration Development | Completed | Step 8 calibration matrix, validation selection, and reverified audit (ADR-021, ADR-022) |
@@ -197,14 +197,14 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: Completed & Verified for Submission (Authoritative Successor Bundle `phase08_exploratory_v3`, Submission Audit `phase08_submission_verification_v1`, and Reporting Bundle `phase08_submission_v1` Verified; Historic `phase08_exploratory_v1` and `phase08_exploratory_v2` Preserved as Superseded)
+- **Status**: Completed & Verified for Submission (Authoritative Successor Bundle `phase08_exploratory_v3`, Submission Audit `phase08_submission_verification_v1`, Active Reporting Bundle `phase08_submission_v2`, and Historical Initial Reporting Bundle `phase08_submission_v1` Verified; Historic `phase08_exploratory_v1` and `phase08_exploratory_v2` Preserved as Superseded)
 - **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
   - Systematic factorial component ablation records (240 cells across 122 test engines).
   - Engineering stress testing report (1,620 method evaluations under 18 stream conditions).
   - Paired lifetime-stratified engine bootstrap intervals (10,000 draws, PCG64).
-  - Authoritative successor evidence bundle in `experiments/phase08_exploratory_v3/` with submission independent reference audit report in `experiments/phase08_submission_verification_v1/independent_audit.json` (schema `phase08-independent-audit-v3`, PASS, 0 failing reasons across all 10 mandatory checks, maximum discrepancy $\le 4.55 \times 10^{-13}$) and cryptographic non-circular receipt in `research/results/phase08_submission_v1/final_receipt.json`.
-  - Authoritative submission reporting, CSV tables, publication figures (PDF/PNG), and writing handoff in `research/results/phase08_submission_v1/`.
+  - Authoritative successor evidence bundle in `experiments/phase08_exploratory_v3/` with submission independent reference audit report in `experiments/phase08_submission_verification_v1/independent_audit.json` (schema `phase08-independent-audit-v3`, PASS, 0 failing reasons across all 10 mandatory checks, maximum discrepancy $\le 4.55 \times 10^{-13}$) and cryptographic non-circular receipt in `research/results/phase08_submission_v2/final_receipt.json` (historical receipt in `research/results/phase08_submission_v1/final_receipt.json`).
+  - Authoritative submission reporting, CSV tables, publication figures (PDF/PNG), and writing handoff in `research/results/phase08_submission_v2/` (`phase08_submission_v2` corrects documentation-path portability using the same audited evidence. It does not represent a new experiment or changed result; historical `phase08_submission_v1/` bundle preserved unchanged).
   - Provenance review in `docs/development/phase08_v2_provenance_review.md` documenting why v1 and v2 are preserved as historical superseded records and unsuitable for manuscript writing (v2 had dirty execution tree, multi-day span, and reused ablation evidence).
 - **Acceptance Criteria**:
   - Each specified component evaluated through controlled ablation, with positive, negative and inconclusive findings reported.
