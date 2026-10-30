@@ -22,6 +22,7 @@ from typing import Any
 
 import pandas as pd
 import pytest
+from test_phase08_submission_verification import _build_valid_contrasts_df
 
 from intellitwin.data.artifacts import compute_sha256
 from intellitwin.robustness.reporting import (
@@ -29,7 +30,6 @@ from intellitwin.robustness.reporting import (
     to_repo_relative_posix,
 )
 from scripts.finalize_phase08_reporting import finalize_phase08_reporting
-from test_phase08_submission_verification import _build_valid_contrasts_df
 
 
 def _build_synthetic_factor_effects_df() -> pd.DataFrame:
