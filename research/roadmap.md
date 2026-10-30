@@ -197,22 +197,22 @@ This document outlines the master research and development roadmap for the Intel
 ---
 
 ### Phase 8: Ablation, Robustness, and Statistical Analysis
-- **Status**: Completed (Authoritative Successor Bundle `phase08_exploratory_v3` Executed and Independently Audited; Historic `phase08_exploratory_v1` and `phase08_exploratory_v2` Preserved as Superseded)
+- **Status**: Completed & Verified for Submission (Authoritative Successor Bundle `phase08_exploratory_v3`, Submission Audit `phase08_submission_verification_v1`, and Reporting Bundle `phase08_submission_v1` Verified; Historic `phase08_exploratory_v1` and `phase08_exploratory_v2` Preserved as Superseded)
 - **Objective**: Perform exploratory post-confirmatory component ablations, sensor noise injection, operating condition perturbations, and engine-level paired bootstrap statistical evaluation.
 - **Expected Deliverables**:
   - Systematic factorial component ablation records (240 cells across 122 test engines).
   - Engineering stress testing report (1,620 method evaluations under 18 stream conditions).
   - Paired lifetime-stratified engine bootstrap intervals (10,000 draws, PCG64).
-  - Authoritative successor evidence bundle in `experiments/phase08_exploratory_v3/` with full independent reference audit report in `experiments/phase08_exploratory_v3/independent_audit.json` (PASS, 0 failing reasons) and cryptographic non-circular receipt in `final_receipt.json`.
-  - Synthesis reporting, CSV tables, and publication figures in `research/results/phase08_exploratory_v3/`.
+  - Authoritative successor evidence bundle in `experiments/phase08_exploratory_v3/` with submission independent reference audit report in `experiments/phase08_submission_verification_v1/independent_audit.json` (schema `phase08-independent-audit-v3`, PASS, 0 failing reasons across all 10 mandatory checks, maximum discrepancy $\le 4.55 \times 10^{-13}$) and cryptographic non-circular receipt in `research/results/phase08_submission_v1/final_receipt.json`.
+  - Authoritative submission reporting, CSV tables, publication figures (PDF/PNG), and writing handoff in `research/results/phase08_submission_v1/`.
   - Provenance review in `docs/development/phase08_v2_provenance_review.md` documenting why v1 and v2 are preserved as historical superseded records and unsuitable for manuscript writing (v2 had dirty execution tree, multi-day span, and reused ablation evidence).
 - **Acceptance Criteria**:
   - Each specified component evaluated through controlled ablation, with positive, negative and inconclusive findings reported.
   - Phase 8 intervals and conclusions are exploratory post-confirmatory; original confirmatory RQ1–RQ4 classifications remain unchanged (`UNSUPPORTED`).
   - No new model training, architecture search, threshold selection on test engines, cost-scenario search, or production recalibration.
-  - Independent reference audit passes with zero failing reasons.
+  - Independent reference audit passes with zero failing reasons across 10 mandatory checks with `checked_count == expected_count`.
 - **Dependencies**: Phase 7.
-- **Research Observations to Record**: Controlled $2 \times 2 \times 2$ factorial evaluation of scale dilation ($\gamma$), score asymmetry ($\beta$), and regime routing. Engineering stress probe degradation boundaries under Gaussian sensor noise, causal forward-fill sensor dropout, and operating setting bias. All Phase 8 intervals are exploratory and unadjusted for multiple comparisons; they do not alter or overturn frozen Step 9 confirmatory outcomes.
+- **Research Observations to Record**: Controlled $2 \times 2 \times 2$ factorial evaluation of scale dilation ($\gamma$), score asymmetry ($\beta$), and regime routing. Engineering stress probe degradation boundaries under Gaussian sensor noise, causal forward-fill sensor dropout, and operating setting bias. All Phase 8 intervals are exploratory and unadjusted for multiple comparisons; they do not alter or overturn frozen Step 9 confirmatory outcomes. Ready for manuscript writing: YES.
 
 ---
 

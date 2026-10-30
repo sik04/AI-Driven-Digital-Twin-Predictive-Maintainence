@@ -761,15 +761,11 @@ def test_reporting_fails_closed_when_audit_missing_or_failing(tmp_path: Path) ->
 
 def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
     """Requirement G: Changing input estimates or reversing direction dynamically changes report."""
+    from intellitwin.data.artifacts import compute_sha256
+
     ev_dir = tmp_path / "ev"
     ev_dir.mkdir(parents=True, exist_ok=True)
     rep_dir = tmp_path / "rep"
-
-    # Passing audit
-    (ev_dir / "independent_audit.json").write_text(
-        json.dumps({"overall_status": "PASS", "failing_reasons": []}),
-        encoding="utf-8",
-    )
 
     # Factor effects with reversed effect (positive cost increase)
     df_fac = pd.DataFrame(
@@ -787,23 +783,52 @@ def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
     )
     df_fac.to_csv(ev_dir / "factor_main_effects.csv", index=False)
 
-    # Minimal paired contrasts and summary fixtures
-    df_contrasts = pd.DataFrame(
-        [
-            {
-                "comparison_type": "ablation",
-                "dataset": "FD001",
-                "model_family": "GBR",
-                "variant_or_condition": "gamma0_beta0_global",
-                "baseline_or_full": "gamma2_betam1_regime",
-                "metric": "cost",
-                "delta_point": 5.0,
-                "ci_95_low": 3.0,
-                "ci_95_high": 7.0,
-            }
-        ]
-    )
-    df_contrasts.to_csv(ev_dir / "paired_contrasts.csv", index=False)
+    # Complete paired contrasts fixture with valid 54 noise and 36 dropout rows
+    contrast_rows: list[dict[str, object]] = [
+        {
+            "comparison_type": "ablation",
+            "dataset": "FD001",
+            "model_family": "GBR",
+            "variant_or_condition": "gamma0_beta0_global",
+            "baseline_or_full": "gamma2_betam1_regime",
+            "metric": "cost",
+            "delta_point": 5.0,
+            "ci_95_low": 3.0,
+            "ci_95_high": 7.0,
+        }
+    ]
+    for d in ["FD001", "FD002", "FD004"]:
+        for m in ["GBR", "LSTM"]:
+            for met in ["global_hcp", "regime_hcp", "decision_aware_hcp"]:
+                for c in ["noise_std_005", "noise_std_010", "noise_std_020"]:
+                    contrast_rows.append(
+                        {
+                            "comparison_type": "stress_vs_clean",
+                            "dataset": d,
+                            "model_family": m,
+                            "variant_or_condition": f"{met}:{c}",
+                            "baseline_or_full": f"{met}:clean",
+                            "metric": "cost",
+                            "delta_point": 0.5,
+                            "ci_95_low": 0.1,
+                            "ci_95_high": 0.9,
+                        }
+                    )
+                for c in ["dropout_prob_005", "dropout_prob_010"]:
+                    contrast_rows.append(
+                        {
+                            "comparison_type": "stress_vs_clean",
+                            "dataset": d,
+                            "model_family": m,
+                            "variant_or_condition": f"{met}:{c}",
+                            "baseline_or_full": f"{met}:clean",
+                            "metric": "coverage",
+                            "delta_point": -0.001,
+                            "ci_95_low": -0.005,
+                            "ci_95_high": 0.002,
+                        }
+                    )
+    pd.DataFrame(contrast_rows).to_csv(ev_dir / "paired_contrasts.csv", index=False)
 
     df_abl_sum = pd.DataFrame(
         [
@@ -863,6 +888,45 @@ def test_reporting_direction_reversal_is_dynamic(tmp_path: Path) -> None:
         ]
     )
     df_subgroups.to_csv(ev_dir / "subgroup_metrics.csv", index=False)
+
+    manifest_hashes = {
+        tbl: compute_sha256(ev_dir / tbl)
+        for tbl in [
+            "factor_main_effects.csv",
+            "paired_contrasts.csv",
+            "ablation_summary.csv",
+            "stress_summary.csv",
+            "subgroup_metrics.csv",
+        ]
+    }
+    man_data = {"artifact_hashes": manifest_hashes}
+    man_p = ev_dir / "execution_manifest.json"
+    man_p.write_text(json.dumps(man_data), encoding="utf-8")
+    man_hash = compute_sha256(man_p)
+
+    mandatory_checks = [
+        "exact_endpoint_membership",
+        "calibration_reconstruction",
+        "full_checkpoint_prediction_parity",
+        "full_interval_reconstruction",
+        "full_simulation_reconstruction",
+        "endpoint_to_engine_metric_reconstruction",
+        "full_subgroup_reconstruction",
+        "full_bootstrap_reconstruction",
+        "artifact_and_provenance_integrity",
+        "protected_input_integrity",
+    ]
+    audit_data = {
+        "schema_version": "phase08-independent-audit-v3",
+        "overall_status": "PASS",
+        "failing_reasons": [],
+        "execution_manifest_sha256": man_hash,
+        "checks": {
+            chk: {"status": "PASS", "expected_count": 1, "checked_count": 1}
+            for chk in mandatory_checks
+        },
+    }
+    (ev_dir / "independent_audit.json").write_text(json.dumps(audit_data), encoding="utf-8")
 
     res = generate_phase08_reports_and_figures(evidence_dir=ev_dir, output_report_dir=rep_dir)
     assert Path(res["results_summary"]).exists()
