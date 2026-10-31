@@ -19,9 +19,6 @@ This directory contains the authoritative B.Tech final-year project synopsis doc
 ### Team Members (Official Order)
 1. **Shiksha Pandey** — Roll No: `2300270110112`
 2. **Mayank Singh** — Roll No: `2300270310115`
-3. **Prateek Gangwar** — Roll No: `2300270110089`
-4. **Rishikesh Chaurasia** — Roll No: `2300270110100`
-5. **Surya Ranjha** — Roll No: `2300270110124`
 
 ---
 
@@ -75,3 +72,4 @@ synopsis/
 ├── RESEARCH_PAPER_INVENTORY.md        # Physical & cited research paper audit and recommendations
 └── references/                        # Storage for reference notes and bibliography assets
 ```
+

@@ -142,3 +142,4 @@ For the B.Tech final-year synopsis, the literature review must cover four core p
     - **Journal**: Neurocomputing, Vol. 494, pp. 79–88
     - **DOI**: [10.1016/j.neucom.2022.04.055](https://doi.org/10.1016/j.neucom.2022.04.055)
     - **Relevance**: Demonstrates how predictive uncertainty intervals directly feed into cost-optimal replacement and inspection scheduling.
+

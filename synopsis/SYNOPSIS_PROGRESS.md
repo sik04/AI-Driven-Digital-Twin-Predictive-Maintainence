@@ -17,9 +17,6 @@
 | :---: | :--- | :--- | :--- |
 | 1 | **Shiksha Pandey** | 2300270110112 | Information Technology |
 | 2 | **Mayank Singh** | 2300270310115 | Information Technology |
-| 3 | **Prateek Gangwar** | 2300270110089 | Information Technology |
-| 4 | **Rishikesh Chaurasia** | 2300270110100 | Information Technology |
-| 5 | **Surya Ranjha** | 2300270110124 | Information Technology |
 
 ---
 

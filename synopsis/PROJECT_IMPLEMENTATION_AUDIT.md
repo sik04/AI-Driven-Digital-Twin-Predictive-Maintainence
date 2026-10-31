@@ -89,4 +89,5 @@ This audit provides an exhaustive, evidence-based verification of all components
 | **Uncertainty Quantification** | Heuristic prediction probability thresholding (`predict_proba`) | Engine-weighted hierarchical split conformal prediction | **Major Discrepancy (Modernized)** |
 | **Decision Support** | Rule-based advice based on feature importance | Sequential discrete-event simulator with standardized cost units | **Major Discrepancy (Modernized)** |
 | **User Interface** | Streamlit + Plotly | FastAPI backend + HTML5/CSS3/JavaScript operator UI | **Modernized Implementation** |
-| **Team Authorship** | 4 members (Mayank Singh missing; Shiksha Pandey listed 3rd) | 5 members (Shiksha Pandey 1st, Mayank Singh 2nd, exact order) | **Corrected in New Workspace** |
+| **Team Authorship** | 4 members in legacy proposal (Mayank Singh missing; Shiksha Pandey listed 3rd) | 2 contributing members: Shiksha Pandey (1st), Mayank Singh (2nd) | **Updated Project Team** |
+
