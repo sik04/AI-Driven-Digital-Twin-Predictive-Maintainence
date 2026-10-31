@@ -1,0 +1,164 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage{hyperref}
+
+\setstretch{1.5} % 1.5 line spacing per AKGEC departmental guidelines
+\pagestyle{plain} % Page numbering at bottom
+
+% Heading formatting per college guidelines: Main heading 14pt Bold, Sub-heading 12pt Bold
+\titleformat{\section}{\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsubsection}{1em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\section*{3. Problem Definition, Research Gap and Research Questions}
+
+\subsection*{3.1 Problem Statement}
+In modern industrial systems and mission-critical cyber-physical production environments, rotary engineering assets—most notably commercial aviation turbofan engines, industrial gas turbines, and high-load transmission assemblies—operate under relentless thermal gradients, mechanical fatigue, and variable aerodynamic stresses. Sustaining high operational availability while precluding in-service catastrophic failure constitutes the primary objective of Prognostics and Health Management (PHM) and Predictive Maintenance (PdM) [1], [2]. 
+
+Formally, consider a fleet of industrial assets indexed by $i \in \{1, 2, \dots, N\}$. Each asset undergoes continuous physical degradation across discrete operational time cycles $t \in \{1, 2, \dots, T_i\}$, where $T_i \in \mathbb{N}$ denotes the true, unobserved end-of-life cycle at which the machine suffers functional failure. At any operational cycle $t$, the true Remaining Useful Life (RUL) of asset $i$ is defined as the remaining operational duration prior to terminal failure:
+\begin{equation}
+y_i(t) = T_i - t
+\end{equation}
+At each cycle $t$, onboard condition-monitoring sensors record a multivariate telemetry observation vector $\mathbf{x}_i(t) \in \mathbb{R}^{d_x}$ alongside external operating regime descriptors $\mathbf{s}_i(t) \in \mathbb{R}^{d_s}$ (such as altitude, Mach number, and throttle settings) [1]. To ensure physical causality and prevent future-state data leakage, prognostic predictions at cycle $t$ must depend strictly upon the causal historical trajectory up to time $t$, encapsulated by a fixed sliding window of length $W$:
+\begin{equation}
+\mathbf{X}_i(t) = [\mathbf{z}_i(t-W+1), \mathbf{z}_i(t-W+2), \dots, \mathbf{z}_i(t)] \in \mathbb{R}^{W \times (d_x + d_s)}
+\end{equation}
+where $\mathbf{z}_i(t) = [\mathbf{x}_i(t), \mathbf{s}_i(t)]$ denotes the combined condition-setting feature vector at cycle $t$.
+
+While standard machine learning approaches train a deterministic regression function $f: \mathbb{R}^{W \times (d_x + d_s)} \to \mathbb{R}_+$ to generate scalar point estimates $\hat{y}_i(t) = f(\mathbf{X}_i(t))$, point predictions fail to capture aleatoric sensor noise and epistemic model uncertainty [3], [4]. In safety-critical industrial operations, predictive maintenance requires calibrated prediction intervals:
+\begin{equation}
+\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t)) = [L_i(t), U_i(t)]
+\end{equation}
+targeting a pre-specified nominal marginal coverage probability $1 - \alpha \in (0, 1)$, such that:
+\begin{equation}
+\mathbb{P}\left( y_i(t) \in [L_i(t), U_i(t)] \right) \ge 1 - \alpha
+\end{equation}
+
+Crucially, predictive maintenance is not an isolated statistical estimation task; rather, prognostic intervals directly drive a sequential operational stopping time $\tau_i \in \{W, W+1, \dots\}$ at which the asset is retired for overhaul:
+\begin{equation}
+\tau_i = \inf \left\{ t \ge W : \pi\left(\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t))\right) = \text{MAINTAIN} \right\}
+\end{equation}
+where $\pi$ represents the operational maintenance policy. The resulting lifecycle economic cost incurred by asset $i$ is governed by severe asymmetric penalties:
+\begin{equation}
+C_i(\tau_i) = C_{\text{PM}} \cdot \mathbb{1}(\tau_i < T_i) + C_{\text{FAIL}} \cdot \mathbb{1}(\tau_i \ge T_i) + C_{\text{WASTE}} \cdot (T_i - \tau_i) \cdot \mathbb{1}(\tau_i < T_i)
+\end{equation}
+where $C_{\text{PM}}$ represents the baseline cost of a scheduled preventive replacement, $C_{\text{FAIL}}$ is the severe penalty associated with an unscheduled, catastrophic in-service breakdown ($C_{\text{FAIL}} \gg C_{\text{PM}}$), and $C_{\text{WASTE}}$ denotes the economic penalty per cycle of unutilized, discarded useful life [5], [6]. The central problem investigated by IntelliTwin is formulating an uncertainty-aware framework that connects condition-adaptive conformal RUL prediction intervals directly with this sequential stopping decision, systematically evaluating whether decision-aware calibration can enhance maintenance utility while preserving rigorous coverage guarantees [3], [7].
+
+\subsection*{3.2 Limitations of Existing Approaches}
+A systematic audit of the contemporary prognostic and predictive maintenance literature reveals four major structural limitations in existing approaches:
+
+\begin{enumerate}
+    \item \textbf{Pervasive Reliance on Uncalibrated Point Predictions}: The overwhelming majority of deep learning and ensemble RUL models benchmark performance exclusively on symmetric loss metrics such as Mean Squared Error (MSE) or Root Mean Squared Error (RMSE) [1], [8]. Point estimators implicitly treat every prediction with uniform certainty, providing no probabilistic margin or tail risk quantification [3], [4]. In real-world asset management, overestimating RUL by 10 cycles produces catastrophic in-flight failure, whereas underestimating RUL by 10 cycles merely causes premature overhaul [1]. Point predictors are fundamentally incapable of communicating this operational asymmetry to plant decision-makers.
+    \item \textbf{Conditional Miscalibration and Subgroup Vulnerability}: Conventional uncertainty quantification methods—including Gaussian Process regression, Monte Carlo dropout, and standard Inductive Conformal Prediction (ICP)—predominantly assume exchangeable or independent and identically distributed (i.i.d.) observations [4], [9]. However, machine degradation telemetry violates exchangeability due to profound temporal autocorrelation and operating regime transitions (e.g., multi-altitude flight envelopes in C-MAPSS FD002) [1], [3]. While global conformal calibration guarantees marginal coverage over the entire population, recent studies indicate that it frequently conceals severe conditional miscalibration, suffering systematic undercoverage during high-stress operating regimes or critical late-life degradation stages ($t \to T_i$) [3], [10]. An engine approaching its end-of-life may experience true coverage substantially below the nominal $1-\alpha$ target, creating hidden catastrophic operational hazards.
+    \item \textbf{Decoupling of Statistical Uncertainty from Downstream Decision Economics}: In published prognostic research, uncertainty quantification and maintenance decision optimization are almost universally formulated as disjoint, uncoupled problems [6], [7]. Statistical calibrators are typically optimized to minimize symmetric interval width (MPIW) or Winkler interval loss [11], without accounting for the fact that downstream maintenance policies trigger replacement based predominantly on the conservative lower prediction bound $L_i(t)$ [6], [7]. Consequently, an interval calibration that appears statistically optimal under symmetric loss may trigger excessive false alarms in low-risk operational states or fail to provide adequate conservatism during critical wear phases.
+    \item \textbf{Conflation of Genuine Decision Value with Trivial Over-Conservatism}: When maintenance policies employ lower confidence bounds to schedule overhauls, naive baselines—such as uniformly widening prediction intervals, adding ad-hoc point-prediction safety margins, or systematically shifting maintenance triggers to earlier flight cycles—can artificially eliminate in-service failures [6], [12]. However, this failure avoidance is achieved through extreme conservatism that squanders immense usable component life ($C_{\text{WASTE}}$) and inflates overall fleet lifecycle expenditure [5], [6]. Current literature lacks rigorous experimental controls to disambiguate whether observed maintenance cost reductions stem from informative, decision-aware uncertainty calibration or merely reflect trivial, over-conservative early replacement policies.
+\end{enumerate}
+Crucially, these limitations do not imply that all existing techniques fail simultaneously; rather, prior literature addresses these challenges in fragmented silos without a cohesive framework that unifies conditional calibration with downstream sequential maintenance utility [3], [6], [7].
+
+\subsection*{3.3 Research Gap}
+Synthesizing the state-of-the-art across prognostic health management, conformal prediction, and maintenance optimization reveals a distinct research gap:
+
+\begin{quote}
+\textit{Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.}
+\end{quote}
+
+The boundaries of this research gap are delineated relative to verified prior art:
+\begin{itemize}
+    \item Javanmardi and H{\"u}llermeier (2023) [4] evaluated split conformal prediction on C-MAPSS turbofan data, but focused strictly on marginal coverage without condition-adaptive scaling or downstream maintenance decision evaluation.
+    \item Diao et al. (2026) [3] integrated conformalized quantile regression (CQR) with LSTM networks on C-MAPSS FD001 and FD002, conducting life-stage analysis and target adaptation, but explicitly positioned their methodology upstream of prescriptive maintenance optimization.
+    \item Zhu et al. (2025) [5] and Walia and Kumar (2026) [8] modeled maintenance-cost optimization and reinforcement learning scheduling on aero-engine telemetry, but utilized parametric distributions or quantile heuristics that lack finite-sample, distribution-free coverage guarantees.
+    \item Robinson (2026) [10] developed asymmetric CQR prediction intervals across C-MAPSS subsets, but did not incorporate hierarchical engine-level weighting or benchmark against prespecified matched-conservatism baselines.
+    \item Cortes-Gomez et al. (2025) [7] introduced utility-directed conformal prediction in generic machine learning benchmarks, yet its formulation has not been investigated or established for the sequential, non-exchangeable degradation dynamics inherent to predictive maintenance digital twins.
+\end{itemize}
+IntelliTwin does not assert absolute novelty for conformal prediction, deep prognostic modeling, or maintenance cost simulation in isolation; rather, the project investigates their method-level integration within a rigorous, pre-registered empirical framework.
+
+\subsection*{3.4 Proposed Research Questions}
+To investigate the identified research gap, the IntelliTwin research design establishes four formal, pre-registered research questions (RQ1--RQ4). In strict accordance with the project's frozen research protocol (ADR-018), the exact approved wording is preserved:
+
+\subsubsection*{Research Question 1 (RQ1)}
+\textit{Can a decision-aware, condition-adaptive conformal RUL calibration method improve sequential maintenance utility while preserving reliable prediction-interval coverage?}
+\begin{itemize}
+    \item \textbf{Investigation \& Experiment Mapping}: Evaluated via \textbf{Experiment A}, benchmarking the proposed decision-aware, condition-adaptive conformal calibration method against global conformal calibration and standard condition-aware calibration on C-MAPSS FD002 under the primary reference scenario ($C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$) at 90\% nominal coverage [1], [6].
+    \item \textbf{Evaluation Criteria}: Primary outcome is total simulated maintenance cost contrast $\Delta_{\text{cost}} = \overline{\text{Cost}}_B - \overline{\text{Cost}}_P > 0.20$ Standardized Cost Units (SCU) per engine over both baselines, subject to marginal and subgroup absolute coverage error ceilings $E < 0.05$ and non-increasing fleet failure rates.
+\end{itemize}
+
+\subsubsection*{Research Question 2 (RQ2)}
+\textit{Can the proposed method improve reliability across operating regimes and degradation conditions without excessively widening prediction intervals?}
+\begin{itemize}
+    \item \textbf{Investigation \& Experiment Mapping}: Evaluated via \textbf{Experiment B}, assessing conditional coverage and worst-group reliability across six discrete operating regimes and four degradation lifecycle quartiles on FD002 [1], [3].
+    \item \textbf{Evaluation Criteria}: Primary outcome is worst-group conditional coverage error contrast $\Delta_{\text{error}} = \text{WorstErr}_B - \text{WorstErr}_P > 0.01$ (1 percentage point), while restricting Mean Prediction Interval Width (MPIW) and Winkler interval score deterioration to under 1.0 cycle ($D_{\text{width}} < 1.0$, $D_{\text{score}} < 1.0$) [11].
+\end{itemize}
+
+\subsubsection*{Research Question 3 (RQ3)}
+\textit{Are the maintenance benefits of the proposed method attributable to decision-aware uncertainty calibration rather than simply more conservative prediction intervals or earlier maintenance?}
+\begin{itemize}
+    \item \textbf{Investigation \& Experiment Mapping}: Evaluated via \textbf{Experiment C}, disambiguating true calibration decision value from naive conservatism by benchmarking against three prespecified matched-conservatism control families: widened prediction intervals, tuned point-prediction safety margins, and earlier-intervention heuristic policies [6].
+    \item \textbf{Evaluation Criteria}: Primary outcome is achieving maintenance cost contrast $\Delta_{\text{cost}} > 0.20$ SCU per engine against \textit{every} prespecified matched-conservatism control family while preserving coverage constraints ($E < 0.05$).
+\end{itemize}
+
+\subsubsection*{Research Question 4 (RQ4)}
+\textit{Does the proposed method retain its calibration and maintenance-decision benefits across operating conditions, base RUL predictors, datasets, and repeated experimental runs?}
+\begin{itemize}
+    \item \textbf{Investigation \& Experiment Mapping}: Evaluated via \textbf{Experiment D}, testing generalizability across a mandatory 6-cell configuration matrix: FD001 (single regime), FD002 (multi-regime), and FD004 (multi-regime, multi-fault) across both Gradient Boosted Regressors (GBR) and Long Short-Term Memory (LSTM) neural networks across five random seeds (2026--2030), weighted equally ($1/6$ each) [1].
+    \item \textbf{Evaluation Criteria}: Primary outcome is achieving weighted aggregate improvements ($\Delta_{\text{cost}} > 0.20$ SCU, $\Delta_{\text{error}} > 0.01$) without exhibiting material harm ($\Delta_{\text{cost}} < -0.20$ SCU, $\Delta_{\text{error}} < -0.01$) in any individual configuration cell.
+\end{itemize}
+
+\subsection*{3.5 Research Significance}
+The research significance of the IntelliTwin initiative resides in establishing a mathematically principled, economically grounded methodology that bridges statistical uncertainty quantification with physical asset management:
+
+\begin{enumerate}
+    \item \textbf{Methodological Grounding}: Conformal prediction provides finite-sample, distribution-free marginal coverage guarantees without relying on restrictive Gaussian or asymptotic assumptions [4], [9]. IntelliTwin extends this framework to address the temporal autocorrelation and operating regime shifts characteristic of turbofan engines, formulating engine-level cluster bootstrapping and family-wise error rate control (Bonferroni $\alpha = 0.05 / 4 = 0.0125$) to preclude false discoveries [13].
+    \item \textbf{Economic Alignment via Standardized Cost Units}: Rather than evaluating prognostic algorithms solely on abstract statistical loss functions, IntelliTwin evaluates decision policies within a discrete-event sequential simulator governed by Standardized Cost Units (SCU) [5], [6]. This ensures that prediction intervals are judged directly by their operational efficacy in balancing planned maintenance against catastrophic breakdown.
+    \item \textbf{Open-Science Governance and Demarcation}: In strict compliance with academic research integrity, all research questions, hypotheses, and decision criteria are pre-registered prior to confirmatory evaluation. The project explicitly distinguishes implemented engineering pipelines from experimental questions under empirical investigation. By establishing formal criteria for both supportive and non-supportive outcomes, IntelliTwin ensures that its empirical findings deliver unbiased, reproducible scientific value to the engineering community.
+\end{enumerate}
+
+\subsection*{3.6 Problem Scope and Boundaries}
+To maintain academic rigor and engineering precision, the experimental boundaries of the IntelliTwin framework are explicitly delineated based on repository evidence:
+
+\begin{itemize}
+    \item \textbf{Target Benchmark Assets}: The study evaluates turbofan engine degradation utilizing the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) benchmark suite [1]:
+    \begin{itemize}
+        \item \textit{FD001}: Single operating condition (Sea Level), single failure mode (High-Pressure Compressor degradation); 100 training engines, 100 test engines. Used as baseline control.
+        \item \textit{FD002}: Six operating conditions, single failure mode (HPC degradation); 260 training engines, 259 test engines. Primary benchmark for multi-regime calibration.
+        \item \textit{FD004}: Six operating conditions, two failure modes (HPC and Fan degradation); 249 training engines, 248 test engines. Primary benchmark for complex multi-fault robustness.
+    \end{itemize}
+    \item \textbf{Feature Representation}: In accordance with the project's verified schema, 6 invariant/non-informative sensor channels (indices 1, 5, 10, 16, 18, 19) are removed, leaving 14 active degradation sensor measurements alongside 3 operational setting descriptors (17 features total). Sensor values are standardized via training-only Z-score normalization ($\mu, \sigma$ fitted solely on training splits with $\text{ddof}=0$).
+    \item \textbf{Causal Windowing Protocol}: Telemetry is processed into strictly causal backward sliding windows of length $W=30$ cycles, completely barring future-cycle information.
+    \item \textbf{Base Prognostic Models}: Evaluates two distinct supervised learning paradigms: Histogram Gradient Boosting Regressors (\texttt{HistGradientBoostingRegressor}) over flattened $30 \times 17 = 510$-dimensional vectors, and unidirectional PyTorch Long Short-Term Memory (\texttt{LSTMRegressor}) networks over 3D sequence tensors $(B, 30, 17)$ [1], [8].
+    \item \textbf{Decision Simulator Parameters}: Evaluated within a discrete-event sequential maintenance simulator under Standardized Cost Units ($C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$ per cycle) [6].
+    \item \textbf{Explicit Scope Exclusions}:
+    \begin{itemize}
+        \item \textit{No Live Physical Sensor Ingestion}: The framework does not interface with live edge IoT hardware, physical sensor transceivers, or industrial fieldbus protocols (e.g., OPC UA, MQTT, Modbus).
+        \item \textit{No Physical Closed-Loop Actuation}: The framework does not transmit physical actuation signals or feedback control back into operational machinery.
+        \item \textit{Digital Twin Scope}: The Digital Twin is implemented as an offline, trace-driven simulation replay engine (\texttt{TwinReplayEngine} and FastAPI web service at port 8000) that streams historical C-MAPSS telemetry cycle-by-cycle at verified numerical parity ($\text{atol} \le 10^{-4}$), providing real-time prognostic dashboard visualization without physical back-coupling [2].
+    \end{itemize}
+\end{itemize}
+
+\begin{thebibliography}{14}
+\bibitem{saxena2008damage} A. Saxena, K. Goebel, D. Simon, and N. Eklund, ``Damage propagation modeling for aircraft engine run-to-failure simulation,'' in \textit{2008 International Conference on Prognostics and Health Management}, IEEE, 2008, pp. 1--9, doi: 10.1109/PHM.2008.4711414.
+\bibitem{huang2021survey} Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, ``A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics,'' \textit{Sensors}, vol. 21, no. 19, p. 6340, 2021, doi: 10.3390/s21196340.
+\bibitem{diao2026turbofan} R. Diao, M. Zhou, G. Meng, and S. Wang, ``Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration,'' \textit{Sensors}, vol. 26, no. 7, p. 2249, 2026, doi: 10.3390/s26072249.
+\bibitem{javanmardi2023conformal} A. Javanmardi and E. H{\"u}llermeier, ``Conformal prediction intervals for remaining useful lifetime estimation,'' \textit{International Journal of Prognostics and Health Management}, vol. 14, no. 2, pp. 1--14, 2023, doi: 10.36001/ijphm.2023.v14i2.3417.
+\bibitem{zhu2025predictive} Z. Zhu, L. Wang, M. Chen, and X. Zhao, ``Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval,'' \textit{Quality and Reliability Engineering International}, 2025, doi: 10.1002/qre.70043.
+\bibitem{chen2022data} C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, ``Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction,'' \textit{Neurocomputing}, vol. 494, pp. 79--88, 2022, doi: 10.1016/j.neucom.2022.04.055.
+\bibitem{cortesgomez2025utility} S. Cortes-Gomez, C. M. Pati{\~n}o, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, ``Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification,'' in \textit{International Conference on Learning Representations (ICLR)}, 2025.
+\bibitem{walia2026uncertainty} G. K. Walia and M. Kumar, ``Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT,'' \textit{Reliability Engineering \& System Safety}, p. 112356, 2026, doi: 10.1016/j.ress.2026.112356.
+\bibitem{lee2023hierarchical} Y. Lee, R. F. Barber, and R. Willett, ``Distribution-free inference with hierarchical data,'' \textit{arXiv preprint arXiv:2306.06342}, 2023.
+\bibitem{robinson2026riskaware} C. D. Robinson, ``Remaining Useful Life Estimation for Aircraft Engines with Risk-Aware Prediction Intervals via Conformalized Quantile Regression,'' \textit{International Journal of Prognostics and Health Management}, vol. 17, no. 1, p. 4724, 2026, doi: 10.36001/ijphm.2026.v17i1.4724.
+\bibitem{gneiting2007strictly} T. Gneiting and A. E. Raftery, ``Strictly proper scoring rules, prediction, and estimation,'' \textit{Journal of the American Statistical Association}, vol. 102, no. 477, pp. 359--378, 2007, doi: 10.1198/016214506000001437.
+\bibitem{benabdennour2026grouped} A. BenAbdennour, ``Leakage-Controlled Grouped Validation and Interval-Safety Calibration for RUL/SOH Prediction Using Engine, Battery, and Bearing Degradation Data,'' \textit{Machines}, vol. 14, no. 10, p. 1124, 2026, doi: 10.3390/machines14101124.
+\bibitem{lakens2017equivalence} D. Lakens, ``Equivalence tests: A practical primer for t tests, correlations, and meta-analyses,'' \textit{Social Psychological and Personality Science}, vol. 8, no. 4, pp. 355--362, 2017, doi: 10.1177/1948550617697177.
+\bibitem{wu2026research} J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, ``Research on remaining useful life prediction of equipment based on digital twins,'' \textit{Sensors}, vol. 26, no. 4, p. 1240, 2026, doi: 10.3390/s26041240.
+\end{thebibliography}
+
+\end{document}

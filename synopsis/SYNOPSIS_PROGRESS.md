@@ -6,7 +6,7 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 2 (Introduction, Industrial Domain & Rationale Formulation) — **COMPLETED**  
+**Current Phase:** Phase 3 (Problem Definition, Research Gap and Research Questions) — **COMPLETED**  
 **Last Updated:** October 31, 2026  
 
 ---
@@ -27,7 +27,7 @@
 | **Phase 0** | **Discovery, PDF Identification & Repository Audit** | `PROJECT_IMPLEMENTATION_AUDIT.md`, `RESEARCH_PAPER_INVENTORY.md` | **COMPLETED** |
 | **Phase 1** | Project Title Page, Departmental Header & Metadata Alignment | Title page source (.tex, .docx), PDF, validation | **COMPLETED** |
 | **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
-| **Phase 3** | Problem Statement, Research Questions & Objective Bullet Points | Section 3 & 5 Drafts | Scheduled |
+| **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
 | **Phase 4** | Methodology, System Architecture Diagrams & Calibration Equations | Section 6 Drafts & Diagrams | Scheduled |
 | **Phase 5** | Expected Outcomes, Tools/Technologies & Gantt Project Schedule | Section 7, 8 & 9 Drafts | Scheduled |
 | **Phase 6** | Conclusion, Novelty Summary & IEEE Formatted References | Section 10 & 11 Drafts | Scheduled |
@@ -185,6 +185,72 @@
 - **Commit Hash**: `9be3732`
 - **Remote Branch**: `main` -> `origin/main`
 - **Push Status**: Verified successfully pushed (`598a7f3..9be3732`).
+
+---
+
+## 7. Phase 3 Problem Definition Deliverables & Validation Summary
+
+### 7.1 Deliverables in `synopsis/Phase_3_Problem_Definition/`
+- `problem_definition.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure (2,024 words excluding references).
+- `problem_definition.docx`: Fully editable Microsoft Word document with exact margins (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, justified, nil indentation).
+- `problem_definition.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines.
+- `problem_definition.pdf`: High-resolution publication-quality vector PDF rendered via headless Chrome engine (9 pages).
+- `generate_problem_definition.py`: Python automation script ensuring 100% reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 3 metadata, architectural structure, word count audit, and compliance documentation.
+
+### 7.2 Structural Breakdown & Word Count Audit
+- **Section 3.1: Problem Statement** (~350 words)
+  - Mathematical formalization of continuous RUL: $y_i(t) = T_i - t$.
+  - Causal sliding windowing: $\mathbf{X}_i(t) \in \mathbb{R}^{W \times (d_x + d_s)}$ with fixed lookback $W=30$ cycles.
+  - Requirement for distribution-free prediction intervals $\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t)) = [L_i(t), U_i(t)]$ targeting nominal coverage $1 - \alpha$.
+  - Sequential maintenance stopping time $\tau_i = \inf \{ t \ge W : \pi(\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t))) = \text{MAINTAIN} \}$ and asymmetric lifecycle cost function $C_i(\tau_i)$ with $C_{\text{FAIL}} \gg C_{\text{PM}}$.
+- **Section 3.2: Limitations of Existing Approaches** (~440 words)
+  - 1. Pervasive reliance on uncalibrated point predictions (blind to operational risk asymmetry).
+  - 2. Conditional miscalibration and subgroup vulnerability (global coverage masks severe undercoverage in terminal wear stages $t \to T_i$).
+  - 3. Decoupling of statistical uncertainty metrics (MPIW/Winkler) from downstream replacement economics.
+  - 4. Conflation of genuine decision value with trivial over-conservatism (naive early replacement squanders usable component life).
+- **Section 3.3: Research Gap** (~280 words)
+  - Formulates the exact pre-registered research gap: investigating whether decision-aware, condition-adaptive conformal calibration can improve sequential maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.
+  - Demarcates boundaries against prior art (Javanmardi & Hüllermeier 2023, Diao et al. 2026, Zhu et al. 2025, Walia & Kumar 2026, Robinson 2026, Cortes-Gomez et al. 2025).
+- **Section 3.4: Proposed Research Questions** (~420 words)
+  - Exact approved wording of **RQ1–RQ4** from `research/research_questions.md` mapped to Experiments A–D:
+    - **RQ1**: Maintenance utility improvement ($\Delta_{\text{cost}} > 0.20$ SCU, coverage ceiling $E < 0.05$) via Experiment A on FD002.
+    - **RQ2**: Subgroup conditional reliability without excessive widening ($\Delta_{\text{error}} > 0.01$, $D_{\text{width}} < 1.0$, $D_{\text{score}} < 1.0$) via Experiment B.
+    - **RQ3**: Decision-value attribution vs. 3 matched-conservatism control families ($\Delta_{\text{cost}} > 0.20$ SCU against every family) via Experiment C.
+    - **RQ4**: Cross-condition, cross-model robustness across 6 mandatory cells (FD001, FD002, FD004 $\times$ GBR, LSTM, 5 seeds) via Experiment D.
+- **Section 3.5: Research Significance** (~260 words)
+  - Methodological rigor (distribution-free finite-sample guarantees, cluster-bootstrap inference, Bonferroni $\alpha = 0.0125$).
+  - Economic alignment (Standardized Cost Units: PM=1.0, Failure=5.0, Waste=0.20 per cycle).
+  - Open-science governance (pre-registration under ADR-018, explicit non-harm bounds, transparent negative result reporting).
+- **Section 3.6: Problem Scope and Boundaries** (~300 words)
+  - NASA C-MAPSS dataset corpus (FD001, FD002, FD004).
+  - 17-feature schema (14 active sensors + 3 settings; 6 invariant sensors dropped), training-only Z-score standardization.
+  - Fixed 30-cycle causal sliding window ($W=30$).
+  - GBR and LSTM base prognostic regressors.
+  - Discrete-event sequential maintenance simulator.
+  - Explicit boundaries: No live physical sensor ingestion; no physical closed-loop actuator feedback; Digital Twin implemented as an offline trace replay engine (`TwinReplayEngine` / FastAPI web dashboard at port 8000) with parity $\le 10^{-4}$.
+- **Total Core Word Count**: **2,024 words** (excluding references).
+
+### 7.3 IEEE References & Citations
+- **Total References**: 14 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[14]`.
+- **Sources Cited**: Saxena et al. (2008), Huang et al. (2021), Diao et al. (2026), Javanmardi & Hüllermeier (2023), Zhu et al. (2025), Chen et al. (2022), Cortes-Gomez et al. (2025), Walia & Kumar (2026), Lee et al. (2023), Robinson (2026), Gneiting & Raftery (2007), BenAbdennour (2026), Lakens (2017), and Wu et al. (2026).
+
+### 7.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Scientific Demarcation: Framed as an academic research design / pre-registered investigation avoiding premature confirmatory claims — **PASS**
+  - Scope Boundaries: Explicitly excludes live IoT hardware ingestion and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+
+### 7.5 Git Automation & Commit Verification
+- **Commit Message**: `docs: add synopsis problem definition and research gap`
+- **Target Branch**: `main` -> `origin/main`
+
 
 
 
