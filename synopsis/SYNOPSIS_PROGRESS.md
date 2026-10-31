@@ -6,7 +6,7 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 1 (Official Project Synopsis Title Page) — **COMPLETED**  
+**Current Phase:** Phase 2 (Introduction, Industrial Domain & Rationale Formulation) — **COMPLETED**  
 **Last Updated:** October 31, 2026  
 
 ---
@@ -26,7 +26,7 @@
 | :---: | :--- | :--- | :---: |
 | **Phase 0** | **Discovery, PDF Identification & Repository Audit** | `PROJECT_IMPLEMENTATION_AUDIT.md`, `RESEARCH_PAPER_INVENTORY.md` | **COMPLETED** |
 | **Phase 1** | Project Title Page, Departmental Header & Metadata Alignment | Title page source (.tex, .docx), PDF, validation | **COMPLETED** |
-| **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | Section 2 & 4 Drafts | Scheduled |
+| **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
 | **Phase 3** | Problem Statement, Research Questions & Objective Bullet Points | Section 3 & 5 Drafts | Scheduled |
 | **Phase 4** | Methodology, System Architecture Diagrams & Calibration Equations | Section 6 Drafts & Diagrams | Scheduled |
 | **Phase 5** | Expected Outcomes, Tools/Technologies & Gantt Project Schedule | Section 7, 8 & 9 Drafts | Scheduled |
@@ -141,5 +141,48 @@
 - **Commit Hash**: `1b78c07`
 - **Remote Branch**: `main` -> `origin/main`
 - **Push Status**: Verified successfully pushed (`df7c0be..1b78c07`).
+
+---
+
+## 6. Phase 2 Introduction Deliverables & Validation Summary
+
+### 6.1 Deliverables in `synopsis/Phase_2_Introduction/`
+- `introduction.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure (1,115 words excluding references).
+- `introduction.docx`: Fully editable Microsoft Word document with exact margins (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, justified, nil indentation).
+- `introduction.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines.
+- `introduction.pdf`: High-resolution publication-quality vector PDF rendered via headless Chrome engine (5 pages).
+- `generate_introduction.py`: Python automation script ensuring 100% reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 2 metadata, architectural structure, word count audit, and compliance documentation.
+
+### 6.2 Structural Breakdown & Word Count Audit
+- **Section 1.1: Background** (~285 words)
+  - Cyber-physical systems (CPPS), Industry 4.0, sensor telemetry generation in rotational machinery (turbofan engines), shift from reactive to predictive maintenance, and Digital Twin foundations (Grieves, ISO 23247).
+- **Section 1.2: Overview of IntelliTwin** (~295 words)
+  - Continuous multi-sensor telemetry ingestion, 30-cycle causal sliding windowing, dual ML inference backends (HistGradientBoostingRegressor and PyTorch LSTM), finite-sample hierarchical split conformal prediction, sequential maintenance decision simulation, and trace-driven digital twin replay engine.
+- **Section 1.3: Research Motivation** (~275 words)
+  - Critical literature gaps addressed: (1) Uncalibrated point-prediction risks in safety-critical systems, (2) Disconnect between statistical loss metrics (RMSE/MAE) and operational maintenance economics (SCU penalties), and (3) Inadequate treatment of multi-regime operational drift and temporal dynamics.
+- **Section 1.4: Research Significance** (~260 words)
+  - Methodological rigor (distribution-free coverage bounds), economic grounding (Standardized Cost Units: PM=1, Failure=5, Inspection=0.20), and engineering realism (simulation replay parity $\le 10^{-4}$).
+- **Total Core Word Count**: **1,115 words** (target: 900–1,200 words).
+
+### 6.3 IEEE References & Citations
+- **Total References**: 12 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[12]`.
+- **Foundational Works**: Grieves & Vickers (Digital Twins), Tao et al. (Industry DT), Lei et al. (Machinery PHM), Saxena et al. (C-MAPSS damage propagation), Liu et al. (AI in PHM), Zheng et al. (LSTM for RUL), Ke et al. (LightGBM/GBDT), Angelopoulos & Bates (Conformal Prediction), Vovk et al. (Algorithmic Learning), Zio (PHM directions), Huynh et al. (Maintenance optimization), and ISO 23247-1:2021.
+
+### 6.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[12]` — **PASS**
+  - Scientific Demarcation: Framed as an academic research design / pre-registered investigation avoiding premature confirmatory claims — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+
+### 6.5 Git Automation & Commit Verification
+- **Commit Message**: `docs: add synopsis introduction`
+- **Target Branch**: `main` -> `origin/main`
+
 
 

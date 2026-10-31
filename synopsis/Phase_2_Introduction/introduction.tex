@@ -1,0 +1,71 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage{mathptmx} % Times New Roman font
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{cite}
+\usepackage{hyperref}
+
+\setstretch{1.5} % 1.5 line spacing per college guidelines
+\pagestyle{plain} % Page numbering at bottom of page
+
+% Section formatting per guidelines: Main heading 14pt Bold, Sub-heading 12pt Bold
+\titleformat{\section}{\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+
+\begin{document}
+
+\section{Introduction}
+
+\subsection{Background}
+Industrial systems and high-capital engineering assets—most notably commercial aviation turbofan engines, high-output power generation turbines, and precision manufacturing equipment—operate under severe aerodynamic, thermal, and mechanical stresses. Sustaining uninterrupted operational availability while preventing catastrophic in-service degradation is a central imperative of modern industrial engineering and asset lifecycle management [1], [2]. Historically, industrial maintenance strategies have been governed by two traditional paradigms: reactive maintenance and preventive maintenance [3], [4]. In reactive (corrective or run-to-failure) maintenance, an asset is operated until a functional breakdown occurs. While this maximizes the physical life extracted from individual components, unscheduled breakdowns in mission-critical machinery introduce severe operational delays, secondary structural damage, and grave safety hazards [1]. Conversely, conventional preventive (time-based or calendar-based) maintenance enforces component overhauls or replacements at predetermined, conservative operating intervals (such as fixed flight hours or operational cycles) [4]. Although scheduled overhauls significantly reduce unexpected failures, they incur severe economic waste, as healthy components exhibiting minimal wear are routinely retired with substantial usable life remaining [5].
+
+To resolve this operational dilemma, Condition-Based Maintenance (CBM) and Predictive Maintenance (PdM) have emerged through the integration of cyber-physical telemetry, comprehensive onboard sensor instrumentation, and advanced data analytics [2], [4]. Under the PdM paradigm, streaming sensor observations—including rotational speeds, static and total pressures, gas path temperatures, and coolant flow rates—are continuously monitored to track physical wear and quantify Remaining Useful Life (RUL) [1], [6]. RUL denotes the remaining operational duration (expressed in flight cycles or operating hours) before an asset breaches minimum acceptable structural or thermodynamic margins [1]. In parallel, Digital Twin (DT) technology has gained widespread prominence as a virtual, computational counterpart of a physical asset that mirrors its operating states, degradation trajectories, and environmental interactions [2], [3]. Combined with artificial intelligence and machine learning (AI/ML), a predictive Digital Twin provides an extensible computational architecture that ingests operational telemetry, estimates ongoing health indices, and delivers actionable, forward-looking maintenance intelligence to plant and fleet operators [2], [6].
+
+\subsection{Overview of IntelliTwin}
+The IntelliTwin project formulates an AI-driven digital twin framework specifically designed for predictive maintenance and prognostic decision support in complex engineering assets. The framework investigates prognostics on commercial turbofan aircraft engines, utilizing the widely acknowledged Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) benchmark datasets developed by NASA [1]. The study focuses primarily on the complex, multi-regime degradation environments represented by subset FD002 (characterizing six distinct operating regimes and a single dominant high-pressure compressor failure mode), alongside subsets FD001 and FD004 for baseline control and robustness assessment [1], [7].
+
+Architecturally, the IntelliTwin framework comprises five modular layers:
+\begin{enumerate}
+    \item \textbf{Data Preprocessing and Causal Windowing}: Ingests raw multi-sensor telemetry, removes uninformative invariant sensors, performs training-only Z-score standardization, groups operating regimes via K-means clustering ($k=6$), and extracts strictly causal 30-cycle backward lookback feature windows ($W=30$) to prevent future-state data leakage [7].
+    \item \textbf{Prognostic Base Predictors}: Evaluates two complementary supervised learning paradigms for continuous RUL regression—a high-capacity non-neural tabular ensemble using Histogram Gradient Boosting Regressors (GBR) over flattened feature vectors, and a sequential recurrent neural network using unidirectional Long Short-Term Memory (LSTM) networks over multivariate time-series tensors [7], [8].
+    \item \textbf{Uncertainty Quantification and Conformal Calibration}: Implements an engine-weighted hierarchical split conformal calibration subsystem designed to construct finite-sample valid, distribution-free prediction intervals targeting a nominal 90\% coverage level [9], [10].
+    \item \textbf{Sequential Maintenance Decision Simulator}: A discrete-event decision environment that translates predicted RUL intervals into concrete replacement decisions, penalizing maintenance actions using Standardized Cost Units (SCU) that weigh planned replacements against costly in-service failures and diagnostic inspections [6], [11].
+    \item \textbf{Digital Twin Telemetry Replay Prototype}: A trace-driven simulation replay service and web dashboard that emulates cycle-by-cycle sensor telemetry streaming, displays real-time health metrics, and visualizes calibrated prediction bounds [2], [3].
+\end{enumerate}
+Importantly, IntelliTwin is formally scoped and evaluated as an offline, trace-driven research prototype; the system does not assert physical IoT hardware deployment or live bidirectional engine actuation, focusing instead on methodological rigor and decision reliability [2].
+
+\subsection{Research Motivation}
+Despite substantial advances in deep learning for asset prognostics, the overwhelming majority of existing RUL models operate as deterministic point predictors [6], [8]. A deterministic model outputs a single scalar estimate $\hat{y}$ (for instance, predicting an asset has exactly 15 cycles remaining) but provides no indication of predictive confidence or tail risk [9]. In safety-critical aerospace and industrial operations, relying exclusively on point predictions is hazardous [6], [11]. If an asset's true remaining life is subject to substantial variance, deferring maintenance based on an overconfident point estimate can result in sudden, catastrophic in-flight failure [1]. Conversely, underestimating RUL triggers premature servicing, squandering remaining component life and inflating operational budgets [5].
+
+This asymmetry underscores the necessity of calibrated uncertainty quantification (UQ) that yields reliable prediction intervals $C(x) = [L(x), U(x)]$ [7], [9]. However, traditional Bayesian and parametric UQ techniques (such as Gaussian Processes and Monte Carlo Dropout) rely heavily on restrictive distributional assumptions that rarely hold across complex, non-linear wear dynamics [9], [12]. While conformal prediction provides rigorous, distribution-free marginal coverage guarantees under data exchangeability [9], its application to degrading assets encounters critical domain challenges [7], [10]. Telemetry sequences within degrading engines are autocorrelated and non-exchangeable, creating risks of localized undercoverage during high-stress operational regimes or critical terminal life stages [10], [12]. Furthermore, downstream maintenance policies do not utilize prediction intervals symmetrically; replacement thresholds are predominantly triggered by the lower prediction bound $L(x)$ [11]. A standard interval that widens symmetrically may achieve nominal coverage while severely inflating false-alarm costs, whereas an overly aggressive interval risks catastrophic missed failures [6], [11].
+
+Motivated by these challenges, IntelliTwin investigates the alignment between statistical conformal calibration and sequential maintenance economics, guided by four core research questions:
+\begin{itemize}
+    \item \textbf{RQ1 (Maintenance Utility)}: Can decision-aware conformal RUL calibration reduce sequential maintenance costs while preserving reliable prediction-interval coverage?
+    \item \textbf{RQ2 (Subgroup Reliability)}: Can condition-adaptive calibration maintain acceptable coverage across distinct operating regimes and degradation stages without excessively expanding interval width?
+    \item \textbf{RQ3 (Decision-Value Attribution)}: Are maintenance cost differences attributable to genuine uncertainty calibration rather than trivial over-conservatism or arbitrary early replacement?
+    \item \textbf{RQ4 (Robustness and Generalization)}: Does the calibration framework generalize consistently across diverse base model architectures and operational datasets?
+\end{itemize}
+
+\subsection{Research Significance}
+The research significance of the IntelliTwin initiative lies in bridging the foundational divide between distribution-free statistical uncertainty quantification and actionable industrial decision-making [9], [11]. By establishing a formal, reproducible methodology that links conformal nonconformity scores to downstream maintenance loss functions, the project contributes an evidence-based perspective on how prediction intervals can guide risk-informed replacement policies [6], [11].
+
+From an academic perspective, the project enforces open-science principles, including strict pre-registration of experimental hypotheses, immutable baseline freezes, and complete split isolation to prevent data leakage [7]. From an industrial perspective, evaluating prognostic models within a standardized sequential cost simulator demonstrates how digital twin frameworks can systematically account for economic trade-offs between planned overhauls and unplanned breakdowns [2], [11]. In accordance with rigorous scientific practice, all hypotheses and prospective economic benefits are evaluated through pre-registered statistical protocols rather than assumed beforehand, ensuring that IntelliTwin provides an objective, verifiable contribution to the field of predictive maintenance [7], [10].
+
+\begin{thebibliography}{12}
+\bibitem{saxena2008damage} A. Saxena, K. Goebel, D. Simon, and N. Eklund, ``Damage propagation modeling for aircraft engine run-to-failure simulation,'' in \textit{2008 International Conference on Prognostics and Health Management}, IEEE, 2008, pp. 1--9, doi: 10.1109/PHM.2008.4711414.
+\bibitem{huang2021survey} Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, ``A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics,'' \textit{Sensors}, vol. 21, no. 19, p. 6340, 2021, doi: 10.3390/s21196340.
+\bibitem{tao2019digital} F. Tao, H. Zhang, A. Liu, and A. Y. C. Nee, ``Digital twin in industry: State-of-the-art,'' \textit{IEEE Transactions on Industrial Informatics}, vol. 15, no. 4, pp. 2405--2415, 2019, doi: 10.1109/TII.2018.2873186.
+\bibitem{fuller2020digital} A. Fuller, Z. Fan, C. Day, and C. Barlow, ``Digital twin: Enabling technologies, challenges and open research,'' \textit{IEEE Access}, vol. 8, pp. 108952--108971, 2020, doi: 10.1109/ACCESS.2020.3001836.
+\bibitem{shehadeh2024evaluating} H. K. Shehadeh, ``Evaluating the impact of transitioning maintenance strategy from reactive to proactive in power generation companies: An empirical analysis,'' \textit{WSEAS Transactions on Business and Economics}, vol. 21, pp. 838--856, 2024, doi: 10.37394/23207.2024.21.69.
+\bibitem{chen2022data} C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, ``Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction,'' \textit{Neurocomputing}, vol. 494, pp. 79--88, 2022, doi: 10.1016/j.neucom.2022.04.055.
+\bibitem{diao2026turbofan} R. Diao, M. Zhou, G. Meng, and S. Wang, ``Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration,'' \textit{Sensors}, vol. 26, no. 7, p. 2249, 2026, doi: 10.3390/s26072249.
+\bibitem{ma2021deep} M. Ma and Z. Mao, ``Deep-convolution-based LSTM network for remaining useful life prediction,'' \textit{IEEE Transactions on Industrial Informatics}, vol. 17, no. 3, pp. 1658--1667, 2021, doi: 10.1109/TII.2020.2991796.
+\bibitem{javanmardi2023conformal} A. Javanmardi and E. H{\"u}llermeier, ``Conformal prediction intervals for remaining useful lifetime estimation,'' \textit{International Journal of Prognostics and Health Management}, vol. 14, no. 2, pp. 1--14, 2023, doi: 10.36001/ijphm.2023.v14i2.3417.
+\bibitem{lee2023hierarchical} Y. Lee, R. F. Barber, and R. Willett, ``Distribution-free inference with hierarchical data,'' \textit{arXiv preprint arXiv:2306.06342}, 2023.
+\bibitem{cortesgomez2025utility} S. Cortes-Gomez, C. M. Pati{\~n}o, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, ``Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification,'' in \textit{International Conference on Learning Representations (ICLR)}, 2025.
+\bibitem{gneiting2007strictly} T. Gneiting and A. E. Raftery, ``Strictly proper scoring rules, prediction, and estimation,'' \textit{Journal of the American Statistical Association}, vol. 102, no. 477, pp. 359--378, 2007, doi: 10.1198/016214506000001437.
+\end{thebibliography}
+
+\end{document}
