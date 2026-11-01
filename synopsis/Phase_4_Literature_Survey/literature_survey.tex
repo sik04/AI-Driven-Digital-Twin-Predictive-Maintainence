@@ -1,0 +1,158 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+
+\setstretch{1.5} % 1.5 line spacing per AKGEC departmental guidelines
+\pagestyle{plain} % Page numbering at bottom
+
+% Heading formatting per college guidelines: Main heading 14pt Bold, Sub-heading 12pt Bold
+\titleformat{\section}{\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsubsection}{1em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\section*{4. Literature Survey}
+
+\subsection*{4.1 Thematic Overview and Survey Taxonomy}
+The rapid convergence of cyber-physical systems, advanced sensory instrumentation, and artificial intelligence has catalyzed a fundamental paradigm shift in industrial reliability engineering and asset lifecycle management [1]--[3]. In mission-critical environments—most prominently commercial aviation turbofan propulsion, high-capacity energy generation, and automated industrial tooling—preventing unexpected mechanical failure while eliminating premature maintenance waste represents a paramount economic and operational objective [1], [4]. Achieving this balance requires transitioning from traditional calendar-based preventative overhauls and reactive corrective repairs toward condition-based predictive maintenance (PdM) governed by prognostic Digital Twins [2], [5].
+
+To establish an authoritative empirical baseline for the IntelliTwin project, a systematic literature review was conducted across 25 verified scholarly works cataloged in the repository's literature matrix alongside five foundational methodological papers. The analyzed corpus bifurcates into two distinct, complementary investigative domains:
+\begin{enumerate}
+    \item \textbf{Local Repository Literature Corpus (15 Studies, LOC-01 to LOC-15)}: Encompasses peer-reviewed journal articles, comprehensive domain surveys, and doctoral dissertations evaluating multi-tier Digital Twin architectures, IoT telemetry integration, industrial failure classification, and operational maintenance economics across smart manufacturing, civil infrastructure, and renewable energy platforms [2], [4]--[16].
+    \item \textbf{Supplemental Closest-Work Corpus (10 Studies, SUP-01 to SUP-10)}: Comprises peer-reviewed prognostic publications and verified software artifacts investigating continuous Remaining Useful Life (RUL) regression, distribution-free conformal prediction intervals, conditional coverage calibration across degradation stages, and risk-directed maintenance scheduling heuristics on benchmark datasets [17]--[26].
+\end{enumerate}
+
+To synthesize these scholarly contributions systematically, the literature is organized into four core thematic pillars:
+\begin{itemize}
+    \item \textit{Theme 1: Cyber-Physical Digital Twins and Predictive Maintenance Systems}
+    \item \textit{Theme 2: Data-Driven RUL Estimation and Prognostic Regression}
+    \item \textit{Theme 3: Distribution-Free Conformal Prediction and Uncertainty Calibration}
+    \item \textit{Theme 4: Decision-Aware Maintenance Optimization and Cost Modeling}
+\end{itemize}
+
+\subsection*{4.2 Critical Thematic Review of Prior Art}
+
+\subsubsection*{Theme 1: Cyber-Physical Digital Twins in Predictive Maintenance}
+A Digital Twin (DT) is conceptually defined as an evolving, multi-scale computational model of a physical asset that continuously mirrors its physical state, operating kinematics, and degradation trajectory through bi-directional data synchronization [2], [3]. Comprehensive surveys by Huang et al. (2021) [3], Hasan and Crawford (2025) [13], and Pathri and Ganduri (2025) [14] document the historical evolution of industrial DTs from static computer-aided design (CAD) representations into dynamic, data-driven decision frameworks within Industry 4.0. These surveys formalize a consensus four-tier architectural taxonomy comprising: (i) Physical Perception and Sensor Telemetry Ingestion, (ii) Virtual Twin Modeling and State Synchronization, (iii) Computational Analytics and Machine Learning, and (iv) Operational Decision Support Services [3], [12].
+
+In civil and industrial infrastructure, Diana et al. (2025) [2], Mazzetto (2024) [4], Mousavi et al. (2024) [9], and Mahmud et al. (2025) [12] investigate AI-augmented DT frameworks linking IoT sensor networks with predictive structural maintenance, demonstrating how synchronized virtual counterparts enhance operational resilience. Similarly, Wei (2024) [5] presents a doctoral investigation at Nanyang Technological University detailing the physical deployment of an AI-driven digital twin for HVAC and chiller plant maintenance, addressing telemetry synchronization and automated fault detection. Bello et al. (2024) [6] and Shehadeh (2024) [8] examine the operational and macroeconomic rationale for proactive maintenance, with Shehadeh providing empirical evidence that transitioning from reactive to proactive maintenance in power generation facilities reduces unscheduled breakdown frequency by 35\% and lowers total maintenance expenditure by over 20\%. Belay et al. (2026) [16] explore communication-efficient federated anomaly detection leveraging DT simulation to generate synthetic training streams for distributed Industrial IoT (IIoT) networks.
+
+Most critically within the local corpus, Wu et al. (2026) [15] formulate an empirical Digital Twin maintenance-support platform for equipment RUL estimation, evaluated on CS2\_35 lithium-ion battery laboratory data. Their framework couples a genetic algorithm (GA) ensemble—combining Relevance Vector Machines (RVM), Random Forests (RF), Elastic Net, Autoregression (AR), and Long Short-Term Memory (LSTM) networks—with an interactive operational dashboard. However, the authors explicitly conclude that their framework operates purely on deterministic point predictions, formally designating the quantification of prediction uncertainty and confidence bounds as critical future work [15].
+
+\textit{Methodological Synthesis}: The literature conclusively establishes that constructing a Digital Twin architecture for industrial asset monitoring is mature prior art [3], [13]. However, existing DT platforms predominantly treat machine learning components as black-box point estimators, lacking calibrated uncertainty quantification and risk-directed decision policies [14], [15].
+
+\subsubsection*{Theme 2: Data-Driven RUL Estimation and Prognostic Regression}
+Data-driven prognostic modeling seeks to estimate an asset's Remaining Useful Life ($y_i(t) = T_i - t$) directly from historical degradation sensor observations without requiring explicit physical partial differential equations [1], [7]. The foundational benchmark in this field is the Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset developed by Saxena et al. (2008) at NASA Ames Research Center [1]. Generating run-to-failure degradation trajectories for commercial turbofan engines under varying flight altitudes, Mach numbers, and throttle resolver angles, Saxena et al. also formulated an asymmetric scoring metric to reflect industrial reality, penalizing late prognostic estimates (which risk catastrophic breakdown) far more severely than early estimates [1].
+
+In the contemporary literature, hundreds of machine learning studies have investigated RUL regression on C-MAPSS. Within the local corpus, Hosseinzadeh et al. (2023) [7] benchmarked Random Forests, Support Vector Machines, Multilayer Perceptrons, and LSTMs for early failure detection on manufacturing telemetry, establishing that deep temporal architectures systematically outperform shallow classifiers in capturing non-linear wear dynamics. In broader literature, Zheng et al. (2017) and Ma and Mao (2021) established Convolutional Neural Networks (CNNs) and deep LSTMs as state-of-the-art baselines for temporal feature extraction from multivariate sensor sequences.
+
+\textit{Methodological Synthesis}: Data-driven RUL point prediction is thoroughly investigated in the reliability literature. However, deterministic point estimators optimize symmetric loss functions (such as MSE or RMSE) that treat positive and negative prediction errors identically [1], [7]. In real-world aviation and energy operations, an overestimation error of $+10$ cycles leads to catastrophic in-service engine failure, whereas an underestimation error of $-10$ cycles merely results in premature maintenance [1]. Point predictors are fundamentally incapable of communicating tail risk or epistemic uncertainty to human operators.
+
+\subsubsection*{Theme 3: Distribution-Free Conformal Prediction and Uncertainty Calibration}
+Recognizing the hazards of deterministic forecasting, reliability researchers have developed probabilistic prognostic methods, such as Gaussian Process regression, Bayesian Neural Networks, and Monte Carlo dropout [18], [21]. However, traditional Bayesian and parametric techniques depend heavily upon restrictive distributional assumptions (e.g., Gaussian noise priors) that rarely hold across severe, non-linear machine degradation dynamics [21], [23].
+
+To provide distribution-free statistical validity, Inductive Conformal Prediction (ICP)—founded on algorithmic learning theory by Vovk et al.—has gained significant momentum in prognostics [23], [29]. Javanmardi and H{\"u}llermeier (2023) [23] provided the first systematic evaluation of split conformal prediction for RUL estimation on NASA C-MAPSS, utilizing CNN and Gradient Boosted Decision Tree (GBDT) predictors to construct prediction intervals with guaranteed marginal coverage under exchangeability assumptions. Diao et al. (2026) [19] advanced this paradigm by combining LSTM-based Quantile Regression with Conformalized Quantile Regression (CQR) on C-MAPSS FD001 and FD002, demonstrating that conformal calibration corrects empirical undercoverage and incorporating degradation life-stage analysis. Robinson (2026) [25] introduced asymmetric CQR across all four C-MAPSS subsets, establishing risk-aware intervals that adjust coverage bounds to reflect operational risk. BenAbdennour (2026) [26] evaluated interval-safety calibration and leakage-controlled grouped validation across engine, battery, and bearing degradation benchmarks, emphasizing the critical importance of preventing temporal data leakage.
+
+Despite these advancements, standard conformal prediction assumes data exchangeability, which is fundamentally violated by industrial time-series telemetry exhibiting strong temporal autocorrelation and discrete operating regime shifts [22], [29]. Yang et al. (2026) [22] investigated bearing RUL degradation under operating regime shifts, proposing empirical residual calibration and revealing that global conformal calibration frequently masks severe conditional miscalibration across distinct operational regimes. Similarly, Hong Yan (2026) [24] deposited a comprehensive software reproducibility artifact auditing conformal prediction intervals across C-MAPSS operating regimes, exposing localized coverage vulnerabilities. To address clustered data structures, Lee, Barber, and Willett (2023) [29] established theoretical bounds for distribution-free hierarchical inference, providing mathematical foundations for multi-level calibration.
+
+\textit{Methodological Synthesis}: Conformal prediction offers mathematically rigorous, finite-sample marginal coverage guarantees [23]. However, existing applications in prognostics either evaluate global marginal coverage in isolation or examine conditional diagnostics post-hoc without establishing how conditional calibration influences downstream operational decisions [19], [22].
+
+\subsubsection*{Theme 4: Decision-Aware Maintenance Optimization and Cost Modeling}
+Prognostic models derive operational value exclusively through the maintenance decisions they inform [17], [18]. Chen et al. (2022) [17] investigated data-driven predictive maintenance strategies that explicitly account for RUL prediction uncertainty, modeling maintenance scheduling thresholds. Zhu et al. (2025) [18] investigated aero-engine predictive maintenance strategies on C-MAPSS by generating prediction intervals via deep-learning Monte Carlo dropout and integrating them into a maintenance-cost optimization model that weighs preventive replacement against unscheduled failure costs. Walia and Kumar (2026) [20] coupled quantile regression (CNN/GRU) with Proximal Policy Optimization (PPO) reinforcement learning to formulate an optimal sequential maintenance scheduling policy on NASA turbofan telemetry.
+
+In structural reliability, Brighenti et al. (2024) [10] developed a decision support system (DSS) integrating Markov Chain damage forecasting to prioritize maintenance interventions under budget constraints. Hisamuddin et al. (2026) [11] emphasized the necessity of integrating predictive models directly with multi-criteria maintenance decision engines in urban infrastructure. From a statistical decision-theoretic perspective, Cortes-Gomez et al. (2025) [30] introduced "Utility-Directed Conformal Prediction" at ICLR 2025, formulating a framework where conformal nonconformity scores are calibrated directly against downstream utility and decision loss rather than generic symmetric interval width. Standard scoring rules, such as the Winkler interval score analyzed by Gneiting and Raftery (2007) [28], provide statistical penalization for interval width and coverage breaches, while Lakens (2017) [27] formalizes statistical equivalence testing necessary for non-inferiority comparisons.
+
+\textit{Methodological Synthesis}: Prior work demonstrates that linking uncertainty to maintenance decisions is vital [17], [18], [20]. However, existing frameworks either optimize decision heuristics using uncalibrated parametric intervals or evaluate calibrated conformal intervals using purely statistical loss metrics (MPIW/Winkler score) decoupled from sequential operational costs [18], [19], [30]. Furthermore, the literature lacks rigorous controls to verify whether observed maintenance benefits stem from genuine uncertainty calibration or merely reflect trivial over-conservatism (e.g., arbitrarily replacing components early) [17], [20].
+
+\subsection*{4.3 Comparative Synthesis and Closest-Work Comparison Matrix}
+To delineate the precise boundaries between existing literature and the IntelliTwin framework, Table 1 provides a multi-dimensional comparative synthesis of the ten closest verified works cataloged in the repository corpus.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparative Synthesis of Closest Works vs. IntelliTwin Framework}
+\label{tab:closest_works}
+\fontsize{8.5pt}{11pt}\selectfont
+\begin{tabularx}{\textwidth}{l p{2.2cm} p{2.5cm} p{2.5cm} c c c p{2.5cm}}
+\toprule
+\textbf{Study \& Citation} & \textbf{Asset Benchmark} & \textbf{Base Model Architecture} & \textbf{Uncertainty / Calibration Method} & \textbf{Cond. Cov.?} & \textbf{Cost Sim.?} & \textbf{DT Comp.?} & \textbf{Primary Stated Boundary / Gap} \\
+\midrule
+Wu et al. (2026) [15] & CS2\_35 Battery & GA-Ensemble (RVM, RF, AR, LSTM) & None (Deterministic Point Prediction) & No & No & Yes & Uncertainty quantification formally identified as future work. \\
+Chen et al. (2022) [17] & Industrial Assets & Parametric Regression & Variance Modeling & No & Yes & No & Relies on parametric uncertainty; no distribution-free guarantees. \\
+Zhu et al. (2025) [18] & C-MAPSS Aero-Engine & Deep Learning & Monte Carlo Dropout Intervals & No & Yes & No & Parametric Gaussian assumptions; lacks conformal calibration. \\
+Diao et al. (2026) [19] & C-MAPSS FD001, FD002 & LSTM Quantile Regression & Conformalized Quantile Regression (CQR) & Yes & No & No & Upstream of decision support; no maintenance cost simulation. \\
+Walia \& Kumar (2026) [20] & NASA Turbofan & CNN / GRU & Quantile Regression + PPO Scheduling & No & Yes & No & Lacks finite-sample conformal calibration guarantees. \\
+Xu et al. (2026) [21] & Degradation Data & Deep Neural Network & Uncertainty Quantification \& Calibration & No & No & No & Framework focused on UQ; uncoupled from maintenance policy. \\
+Yang et al. (2026) [22] & PHME Bearings & Representation Model & Empirical Residual Calibration & Yes & Retros. & No & Post-hoc diagnostics; lacks prospective sequential policy. \\
+Javanmardi et al. (2023) [23] & C-MAPSS Benchmark & CNN \& GBDT & Split Conformal Prediction (ICP) & No & No & No & Strictly marginal coverage; no regime or maintenance modeling. \\
+Robinson (2026) [25] & C-MAPSS FD001--FD004 & Gradient Boosting & Asymmetric CQR Conformal Calibration & Yes & No & No & Lacks hierarchical engine weighting and matched controls. \\
+BenAbdennour (2026) [26] & Engine, Battery, Bearing & Multi-Domain ML & Interval-Safety Calibration & Yes & Safety & No & Diagnostic safety scoring; lacks economic policy optimization. \\
+\midrule
+\textbf{IntelliTwin (Proposed)} & \textbf{C-MAPSS FD001, FD002, FD004} & \textbf{HistGBR \& PyTorch LSTM} & \textbf{Decision-Aware Engine-Weighted Conformal} & \textbf{Yes} & \textbf{Yes (SCU)} & \textbf{Yes (Replay)} & \textbf{Jointly evaluates condition-adaptive calibration, sequential utility, and matched-conservatism controls.} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection*{4.4 Critical Methodological Observations and Research Gap Formulation}
+A rigorous analysis of Table 1 and the broader literature synthesis yields four foundational methodological observations that formally establish the research gap addressed by IntelliTwin:
+
+\begin{enumerate}
+    \item \textbf{Fragmentation between Conformal Calibration and Operational Economics}: Prior research has treated conformal RUL prediction [19], [23], [25] and uncertainty-aware maintenance optimization [17], [18], [20] as completely decoupled disciplines. Studies developing conformal prediction intervals evaluate their performance exclusively against statistical metrics such as Mean Prediction Interval Width (MPIW) or Winkler scores [19], [23], which do not reflect the asymmetric economic reality where catastrophic in-service engine failure costs dramatically outweigh scheduled overhaul expenses ($C_{\text{FAIL}} \gg C_{\text{PM}}$) [1], [18]. Conversely, studies evaluating maintenance cost policies rely on parametric distributions (e.g., Gaussian assumptions in MC dropout) or heuristic quantile regression that lack finite-sample, distribution-free statistical coverage guarantees [18], [20].
+    \item \textbf{Vulnerability of Marginal Conformal Guarantees Under Operational Shifts}: Standard split conformal prediction provides guaranteed marginal coverage over the entire data population under the assumption of exchangeability [23], [29]. However, machine degradation telemetry violates exchangeability due to operating regime transitions (e.g., 6 distinct flight conditions in C-MAPSS FD002) and non-stationary wear accumulation [1], [22]. As demonstrated by Diao et al. [19] and Yang et al. [22], global calibration can satisfy a nominal 90\% marginal coverage requirement across a fleet while simultaneously exhibiting severe, systematic undercoverage during high-stress operational regimes or critical terminal life stages ($t \to T_i$). In safety-critical aerospace operations, a localized failure rate of 30\% during terminal wear stages is unacceptable, regardless of whether fleet-wide marginal coverage reaches 90\%.
+    \item \textbf{Absence of Matched-Conservatism Attribution Controls}: In prognostic decision frameworks that utilize lower prediction bounds $L_i(t)$ as replacement triggers, simple heuristic policies—such as arbitrarily widening prediction intervals, enforcing ad-hoc safety margins, or systematically shifting maintenance interventions to earlier flight cycles—can artificially eliminate catastrophic failures [17], [18]. However, this safety is purchased through extreme conservatism that squanders massive usable component life ($C_{\text{WASTE}}$) and inflates lifecycle expenditure [8], [18]. Existing prognostic literature almost universally fails to include matched-conservatism control baselines, leaving it fundamentally unverified whether observed maintenance improvements stem from genuine decision-aware uncertainty calibration or merely reflect trivial over-conservative early replacement [20].
+    \item \textbf{Disconnection between Machine Learning Models and Digital Twin Platforms}: While industrial surveys emphasize the transformative potential of Digital Twins for predictive maintenance [3], [13], deployed and prototype DT platforms (such as Wu et al. [15]) remain reliant on deterministic point predictions, treating uncertainty quantification as an unresolved future problem [14], [15]. There is an absence of reproducible Digital Twin architectures that integrate continuous telemetry streaming, causal feature windowing, and calibrated conformal uncertainty intervals into an actionable operator dashboard [3], [15].
+\end{enumerate}
+
+\subsubsection*{The Identified Research Gap}
+Synthesizing these observations confirms the precise research gap formulated in the project's pre-registered research design (ADR-018):
+\begin{quote}
+\textit{Existing RUL research has separately studied conformal uncertainty calibration, condition/regime-aware calibration, and uncertainty-aware maintenance decision-making. What remains insufficiently established is a RUL-specific method that jointly adapts calibration to operating conditions and downstream sequential maintenance consequences while preserving reliable uncertainty coverage. Our study will therefore investigate whether decision-aware, condition-adaptive conformal calibration can improve maintenance utility without sacrificing subgroup reliability or merely becoming more conservative.}
+\end{quote}
+
+In strict adherence to academic integrity, IntelliTwin does not assert global novelty for conformal prediction, deep learning prognostics, or Digital Twin architectures individually. Rather, the project's scientific contribution lies in the \textbf{method-level integration} and rigorous empirical investigation of condition-adaptive conformal calibration coupled directly to sequential maintenance economics and audited against matched-conservatism baselines [19], [23], [30].
+
+\begin{thebibliography}{30}
+\bibitem{saxena2008damage} A. Saxena, K. Goebel, D. Simon, and N. Eklund, ``Damage propagation modeling for aircraft engine run-to-failure simulation,'' in \textit{2008 International Conference on Prognostics and Health Management}, IEEE, 2008, pp. 1--9, doi: 10.1109/PHM.2008.4711414.
+\bibitem{diana2025ai} D. Diana, Putri, and A. A. Mukti, ``AI-Driven Digital Twin for predictive maintenance in urban infrastructure: Enhancing structural resilience and sustainability,'' \textit{Civil Engineering Science and Technology}, vol. 1, no. 1, pp. 63--74, 2025, doi: 10.51903/3c72e647.
+\bibitem{huang2021survey} Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, ``A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics,'' \textit{Sensors}, vol. 21, no. 19, p. 6340, 2021, doi: 10.3390/s21196340.
+\bibitem{mazzetto2024review} S. Mazzetto, ``A review of urban digital twins integration, challenges, and future directions in smart city development,'' \textit{Sustainability}, vol. 16, no. 19, p. 8337, 2024, doi: 10.3390/su16198337.
+\bibitem{wei2024digital} H. Wei, ``Digital twin and AI enabled predictive maintenance in building industry,'' Ph.D. dissertation, School of Mechanical and Aerospace Engineering, Nanyang Technological University, Singapore, 2024.
+\bibitem{bello2024ai} S. F. Bello, I. U. Wada, O. B. Ige, E. C. Chianumba, and S. A. Adebayo, ``AI-driven predictive maintenance and optimization of renewable energy systems for enhanced operational efficiency and longevity,'' \textit{International Journal of Science and Research Archive}, vol. 13, no. 1, pp. 2823--2837, 2024, doi: 10.30574/ijsra.2024.13.1.1992.
+\bibitem{hosseinzadeh2023predictive} A. Hosseinzadeh, F. F. Chen, M. Shahin, and H. Bouzary, ``A predictive maintenance approach in manufacturing systems via AI-based early failure detection,'' \textit{Manufacturing Letters}, vol. 35, pp. 1179--1186, 2023, doi: 10.1016/j.mfglet.2023.08.125.
+\bibitem{shehadeh2024evaluating} H. K. Shehadeh, ``Evaluating the impact of transitioning maintenance strategy from reactive to proactive in power generation companies: An empirical analysis,'' \textit{WSEAS Transactions on Business and Economics}, vol. 21, pp. 838--856, 2024, doi: 10.37394/23207.2024.21.69.
+\bibitem{mousavi2024evolution} V. Mousavi, M. Rashidi, M. Mohammadi, and B. Samali, ``Evolution of digital twin frameworks in bridge management: Review and future directions,'' \textit{Remote Sensing}, vol. 16, no. 11, p. 1887, 2024, doi: 10.3390/rs16111887.
+\bibitem{brighenti2024forecasting} F. Brighenti, M. F. Bado, F. Romeo, and D. Zonta, ``Forecasting bridge damage within a predictive structural reliability-based DSS,'' \textit{Automation in Construction}, vol. 168, p. 105740, 2024, doi: 10.1016/j.autcon.2024.105740.
+\bibitem{hisamuddin2026ai} M. Hisamuddin, M. T. Hussain, and R. Fatima, ``AI-driven digital twins for smart urban infrastructure: A comparative survey of monitoring and predictive maintenance methodologies,'' Khaja Bandanawaz University, Research Report, 2026.
+\bibitem{mahmud2025ai} A. K. M. R. Mahmud, R. I. Hriti, M. M. Hasan, M. N. Uddin, and A. R. Roy, ``AI-augmented digital twin architecture for predictive maintenance in smart urban infrastructure: A cross-domain engineering framework,'' \textit{European Journal of Applied Science, Engineering and Technology}, vol. 3, no. 5, pp. 45--58, 2025, doi: 10.59324/ejaset.2025.3(5).04.
+\bibitem{hasan2025new} S. K. K. Hasan and C. W. Crawford, ``A new era for digital twins: Progress and industry adoption,'' \textit{Digital Twin}, vol. 2, no. 4, p. 2555877, 2025, doi: 10.1080/27525783.2025.2555877.
+\bibitem{pathri2025smart} B. P. Pathri and K. V. Ganduri, ``From smart cities to manufacturing: A comprehensive study on digital twin applications and barrier,'' \textit{IET Digital Twins and Applications}, vol. 2, p. e70014, 2025, doi: 10.1049/dgt2.70014.
+\bibitem{wu2026research} J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, ``Research on remaining useful life prediction of equipment based on digital twins,'' \textit{Sensors}, vol. 26, no. 4, p. 1240, 2026, doi: 10.3390/s26041240.
+\bibitem{belay2026digital} M. A. Belay, A. Rasheed, and P. S. Rossi, ``Digital twin-driven communication-efficient federated anomaly detection for industrial IoT,'' Preprint submitted to IEEE / NTNU, 2026.
+\bibitem{chen2022data} C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, ``Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction,'' \textit{Neurocomputing}, vol. 494, pp. 79--88, 2022, doi: 10.1016/j.neucom.2022.04.055.
+\bibitem{zhu2025predictive} Z. Zhu, L. Wang, M. Chen, and X. Zhao, ``Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval,'' \textit{Quality and Reliability Engineering International}, 2025, doi: 10.1002/qre.70043.
+\bibitem{diao2026turbofan} R. Diao, M. Zhou, G. Meng, and S. Wang, ``Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration,'' \textit{Sensors}, vol. 26, no. 7, p. 2249, 2026, doi: 10.3390/s26072249.
+\bibitem{walia2026uncertainty} G. K. Walia and M. Kumar, ``Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT,'' \textit{Reliability Engineering \& System Safety}, p. 112356, 2026, doi: 10.1016/j.ress.2026.112356.
+\bibitem{xu2026novel} W. Xu, S. Gao, Z. Wang, and E. Zio, ``A novel uncertainty-aware framework for remaining useful life prediction integrating uncertainty quantification and calibration,'' \textit{Reliability Engineering \& System Safety}, vol. 275, p. 112763, 2026, doi: 10.1016/j.ress.2026.112763.
+\bibitem{yang2026empirical} S. Yang, J. Wang, and Y. Wang, ``Empirical calibration and conditional-reliability diagnostics for bearing RUL prediction under operating-regime shift,'' \textit{arXiv preprint arXiv:2607.08273}, 2026.
+\bibitem{javanmardi2023conformal} A. Javanmardi and E. H{\"u}llermeier, ``Conformal prediction intervals for remaining useful lifetime estimation,'' \textit{International Journal of Prognostics and Health Management}, vol. 14, no. 2, pp. 1--14, 2023, doi: 10.36001/ijphm.2023.v14i2.3417.
+\bibitem{yan2026audit} H. Yan, ``Conformal prediction intervals for turbofan remaining useful life: An audit across operating regimes (code and run artifacts),'' Zenodo reproducibility artifact, DOI: 10.5281/zenodo.21330745, 2026.
+\bibitem{robinson2026riskaware} C. D. Robinson, ``Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression,'' \textit{International Journal of Prognostics and Health Management}, vol. 17, no. 1, p. 4724, 2026, doi: 10.36001/ijphm.2026.v17i1.4724.
+\bibitem{benabdennour2026grouped} A. BenAbdennour, ``Leakage-controlled grouped validation and interval-safety calibration for RUL/SOH prediction using engine, battery, and bearing degradation data,'' \textit{Machines}, vol. 14, no. 10, p. 1124, 2026, doi: 10.3390/machines14101124.
+\bibitem{lakens2017equivalence} D. Lakens, ``Equivalence tests: A practical primer for t tests, correlations, and meta-analyses,'' \textit{Social Psychological and Personality Science}, vol. 8, no. 4, pp. 355--362, 2017, doi: 10.1177/1948550617697177.
+\bibitem{gneiting2007strictly} T. Gneiting and A. E. Raftery, ``Strictly proper scoring rules, prediction, and estimation,'' \textit{Journal of the American Statistical Association}, vol. 102, no. 477, pp. 359--378, 2007, doi: 10.1198/016214506000001437.
+\bibitem{lee2023hierarchical} Y. Lee, R. F. Barber, and R. Willett, ``Distribution-free inference with hierarchical data,'' \textit{arXiv preprint arXiv:2306.06342}, 2023.
+\bibitem{cortesgomez2025utility} S. Cortes-Gomez, C. M. Pati{\~n}o, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, ``Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification,'' in \textit{International Conference on Learning Representations (ICLR)}, 2025.
+\end{thebibliography}
+
+\end{document}

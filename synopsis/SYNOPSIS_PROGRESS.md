@@ -6,8 +6,8 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 3 (Problem Definition, Research Gap and Research Questions) — **COMPLETED**  
-**Last Updated:** October 31, 2026  
+**Current Phase:** Phase 4 (Literature Survey) — **COMPLETED**  
+**Last Updated:** November 1, 2026  
 
 ---
 
@@ -28,11 +28,14 @@
 | **Phase 1** | Project Title Page, Departmental Header & Metadata Alignment | Title page source (.tex, .docx), PDF, validation | **COMPLETED** |
 | **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
 | **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
-| **Phase 4** | Methodology, System Architecture Diagrams & Calibration Equations | Section 6 Drafts & Diagrams | Scheduled |
-| **Phase 5** | Expected Outcomes, Tools/Technologies & Gantt Project Schedule | Section 7, 8 & 9 Drafts | Scheduled |
-| **Phase 6** | Conclusion, Novelty Summary & IEEE Formatted References | Section 10 & 11 Drafts | Scheduled |
-| **Phase 7** | Viva / Review Defense Answers (100-word Q1, Q2, Q3) | Synopsis Review Defense Guide | Scheduled |
-| **Phase 8** | Overleaf LaTeX Synchronization & Final Page-Budget Audit (6–8 pages) | Clean Compilable LaTeX Zip & PDF | Scheduled |
+| **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **COMPLETED** |
+| **Phase 5** | Objectives and Scope | Objectives & Scope Drafts | Scheduled |
+| **Phase 6** | Proposed Methodology & Algorithmic Formulation | Methodology & Formulation Drafts | Scheduled |
+| **Phase 7** | System Architecture & Workflow Diagrams | Architecture Diagrams & Pipeline Specs | Scheduled |
+| **Phase 8** | Implementation Status and Results / Expected Results | Experimental Artifacts & Status Reports | Scheduled |
+| **Phase 9** | Tools, Technologies and System Requirements | Requirements & Technology Stack | Scheduled |
+| **Phase 10** | Conclusion and Future Work | Conclusion & Roadmap | Scheduled |
+| **Final Phase** | Overleaf LaTeX Synchronization & Final Page-Budget Audit (6–8 pages) | Clean Compilable LaTeX Zip & PDF | Scheduled |
 
 ---
 
@@ -252,6 +255,56 @@
 - **Commit Hash**: `5763192`
 - **Remote Branch**: `main` -> `origin/main`
 - **Push Status**: Verified successfully pushed (`78b8364..5763192`).
+
+---
+
+## 8. Phase 4 Literature Survey Deliverables & Validation Summary
+
+### 8.1 Deliverables in `synopsis/Phase_4_Literature_Survey/`
+- `literature_survey.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure (2,355 words excluding references).
+- `literature_survey.docx`: Fully editable Microsoft Word document with exact margins (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, justified, nil indentation, including Table 1).
+- `literature_survey.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines.
+- `literature_survey.pdf`: High-resolution publication-quality vector PDF rendered via headless Chrome engine (11 pages).
+- `generate_literature_survey.py`: Python automation script ensuring 100% reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 4 metadata, architectural structure, word count audit, and compliance documentation.
+
+### 8.2 Structural Breakdown & Word Count Audit
+- **Section 4.1: Thematic Overview and Survey Taxonomy** (~310 words)
+  - Methodological taxonomy across 25 verified scholarly works in `research/literature/literature_matrix.csv` and 5 foundational papers.
+  - Dual corpus classification: 15 local repository works (`LOC-01` to `LOC-15`) and 10 supplemental closest works (`SUP-01` to `SUP-10`).
+  - Four core themes: Cyber-Physical Digital Twins, Data-Driven RUL Estimation, Distribution-Free Conformal Prediction, and Decision-Aware Maintenance Optimization.
+- **Section 4.2: Critical Thematic Review of Prior Art** (~1,300 words)
+  - *Theme 1: Cyber-Physical Digital Twins*: Surveys by Huang et al. (2021), Hasan & Crawford (2025), Pathri & Ganduri (2025); implementations by Wei (2024), Diana et al. (2025), Mazzetto (2024), Mousavi et al. (2024), Mahmud et al. (2025), Bello et al. (2024), Shehadeh (2024), Belay et al. (2026); DT RUL platform by Wu et al. (2026) battery platform, identifying UQ as critical future work.
+  - *Theme 2: Data-Driven RUL Estimation*: Run-to-failure benchmark by Saxena et al. (2008) (NASA C-MAPSS dataset and asymmetric scoring); deep learning models by Hosseinzadeh et al. (2023), Zheng et al. (2017), Ma & Mao (2021). Point estimators optimize symmetric loss, unable to quantify tail risk or reflect in-service breakdown penalties.
+  - *Theme 3: Distribution-Free Conformal Prediction*: Split conformal prediction on C-MAPSS by Javanmardi & Hüllermeier (2023); conformalized quantile regression (CQR) with LSTM by Diao et al. (2026); asymmetric CQR and risk-aware intervals by Robinson (2026); grouped validation by BenAbdennour (2026); regime-shift diagnostics by Yang et al. (2026), Hong Yan (2026) software audit; hierarchical conformal prediction by Lee, Barber, and Willett (2023).
+  - *Theme 4: Decision-Aware Maintenance Optimization*: Maintenance optimization under RUL uncertainty by Chen et al. (2022), Zhu et al. (2025), Walia & Kumar (2026); structural reliability decision support by Brighenti et al. (2024), Hisamuddin et al. (2026); utility-directed conformal prediction by Cortes-Gomez et al. (2025); proper scoring rules by Gneiting & Raftery (2007); equivalence testing by Lakens (2017).
+- **Section 4.3: Comparative Synthesis and Closest-Work Comparison Matrix** (~150 words + Table 1)
+  - Detailed multi-dimensional comparative synthesis table contrasting 10 verified closest works across 8 key dimensions.
+- **Section 4.4: Critical Methodological Observations and Research Gap Formulation** (~595 words)
+  - Synthesis of four literature gaps: (1) Fragmentation between conformal calibration and operational economics ($C_{\text{FAIL}} \gg C_{\text{PM}}$); (2) Vulnerability of marginal conformal guarantees under operational shifts (localized terminal wear undercoverage); (3) Absence of matched-conservatism attribution controls (disambiguating true decision value from naive early overhaul); (4) Disconnection between ML models and Digital Twin platforms.
+  - Restates the exact pre-registered research gap (ADR-018) and defines IntelliTwin's scientific positioning as a method-level integration.
+- **Total Core Word Count**: **2,355 words** (excluding references and table captions).
+
+### 8.3 IEEE References & Citations
+- **Total References**: 30 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[30]`.
+- **Sources Cited**: Saxena et al. (2008), Diana et al. (2025), Huang et al. (2021), Mazzetto (2024), Wei (2024), Bello et al. (2024), Hosseinzadeh et al. (2023), Shehadeh (2024), Mousavi et al. (2024), Brighenti et al. (2024), Hisamuddin et al. (2026), Mahmud et al. (2025), Hasan & Crawford (2025), Pathri & Ganduri (2025), Wu et al. (2026), Belay et al. (2026), Chen et al. (2022), Zhu et al. (2025), Diao et al. (2026), Walia & Kumar (2026), Xu et al. (2026), Yang et al. (2026), Javanmardi & Hüllermeier (2023), Yan (2026), Robinson (2026), BenAbdennour (2026), Lakens (2017), Gneiting & Raftery (2007), Lee et al. (2023), and Cortes-Gomez et al. (2025).
+
+### 8.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Comparative Table: Formatted multi-dimensional comparison matrix (Table 1) — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[30]` — **PASS**
+  - Scientific Demarcation: Framed as an academic research design / pre-registered investigation avoiding premature confirmatory claims — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+
+### 8.5 Git Automation & Commit Verification
+- **Commit Message**: `docs: add synopsis literature survey`
+- **Target Branch**: `main` -> `origin/main`
+
 
 
 
