@@ -6,8 +6,8 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 4 (Literature Survey) — **COMPLETED**  
-**Last Updated:** November 1, 2026  
+**Current Phase:** Phase 4 (Literature Survey) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Last Updated:** November 1, 2026 (Forensic Audit & Reconciliation Completed)  
 
 ---
 
@@ -28,7 +28,7 @@
 | **Phase 1** | Project Title Page, Departmental Header & Metadata Alignment | Title page source (.tex, .docx), PDF, validation | **COMPLETED** |
 | **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
 | **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
-| **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **COMPLETED** |
+| **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **COMPLETED (AWAITING APPROVAL)** |
 | **Phase 5** | Objectives and Scope | Objectives & Scope Drafts | Scheduled |
 | **Phase 6** | Proposed Methodology & Algorithmic Formulation | Methodology & Formulation Drafts | Scheduled |
 | **Phase 7** | System Architecture & Workflow Diagrams | Architecture Diagrams & Pipeline Specs | Scheduled |
@@ -307,7 +307,20 @@
 - **Remote Branch**: `main` -> `origin/main`
 - **Push Status**: Verified successfully pushed (`c487f90..85d160a`).
 
-
-
-
+### 8.6 Phase 4 Forensic Audit & Reconciliation Summary
+- **Audit Date**: November 1, 2026
+- **Duplicate Directory & File Scan**: Completed repository-wide. Confirmed zero duplicate directories (no `Phase_4_Final`, `Phase_4_New`, etc.) and zero orphan copies of deliverables.
+- **Uploaded Package Verification**: User-uploaded `literature_survey.zip` was verified to be 100% byte-identical to repository deliverables across `.docx`, `.pdf`, `.tex`, and `.html`.
+- **Content Duplication**: AST and XML parsing confirmed zero duplicate paragraphs, zero duplicate headings, zero duplicate table rows, and zero duplicate references.
+- **Deterministic Packaging Fix**: Modified `generate_literature_survey.py` to embed fixed zip entry timestamps `(2026, 11, 1, 0, 0, 0)` in `build_docx()`, guaranteeing bit-for-bit reproducible SHA-256 hashes across runs.
+- **Literature Count Reconciliation**:
+  - `paper/references.bib`: 30 verified entries (26 domain works + 4 foundational methodological papers).
+  - `research/literature/source_verification.csv`: 26 domain works (23 Crossref DOI + 3 pending publication/institutional).
+  - `research/literature/literature_matrix.csv`: 25 comparative studies (15 local `LOC-01`..`LOC-15` + 10 supplemental `SUP-01`..`SUP-10`).
+  - `research/literature/screening_log.csv`: 27 records (26 domain works + 1 documented excluded lead).
+  - `research/literature/paper_inventory.csv`: 15 local repository PDFs.
+  - `research/literature/closest_work_matrix.csv`: 11 entries (10 primary + 1 candidate comparator).
+  - Root `README.md` and `research/roadmap.md` synchronized with audited counts.
+- **Detailed Forensic Audit Document**: Recorded in [`synopsis/Phase_4_Literature_Survey/PHASE_4_FORENSIC_AUDIT.md`](Phase_4_Literature_Survey/PHASE_4_FORENSIC_AUDIT.md).
+- **Current Phase 4 Status**: **COMPLETED — AWAITING USER APPROVAL**. (Execution paused awaiting formal user approval before starting Phase 5).
 

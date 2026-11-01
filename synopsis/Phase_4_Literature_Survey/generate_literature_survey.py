@@ -443,12 +443,18 @@ def build_docx():
   </w:body>
 </w:document>"""
 
-    with zipfile.ZipFile(DOCX_PATH, "w", zipfile.ZIP_DEFLATED) as z:
-        z.writestr("[Content_Types].xml", content_types)
-        z.writestr("_rels/.rels", package_rels)
-        z.writestr("word/_rels/document.xml.rels", doc_rels)
-        z.writestr("word/styles.xml", styles_xml)
-        z.writestr("word/document.xml", document_xml)
+    fixed_time = (2026, 11, 1, 0, 0, 0)
+    with zipfile.ZipFile(DOCX_PATH, "w") as z:
+        for arcname, data in [
+            ("[Content_Types].xml", content_types),
+            ("_rels/.rels", package_rels),
+            ("word/_rels/document.xml.rels", doc_rels),
+            ("word/styles.xml", styles_xml),
+            ("word/document.xml", document_xml)
+        ]:
+            zinfo = zipfile.ZipInfo(arcname, date_time=fixed_time)
+            zinfo.compress_type = zipfile.ZIP_DEFLATED
+            z.writestr(zinfo, data)
 
     print(f"Generated DOCX: {DOCX_PATH} ({os.path.getsize(DOCX_PATH)} bytes)")
 

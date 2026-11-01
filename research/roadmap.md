@@ -49,13 +49,14 @@ This document outlines the master research and development roadmap for the Intel
 - **Status**: In Progress (Step 2 active)
 - **Objective**: Conduct a thorough, evidence-based literature review of deep learning for RUL estimation, uncertainty quantification, and predictive maintenance digital twins.
 - **Expected Deliverables**:
-  - Fully populated `screening_log.csv` (25 records audited across seed corpus, searches, and citation tracing).
+  - Fully populated `screening_log.csv` (27 records audited: 26 domain studies screened + 1 unresolved lead documented).
   - Complete `paper_inventory.csv` auditing all 15 local repository PDFs.
-  - Expanded `literature_matrix.csv` benchmarking 23 peer-reviewed studies.
-  - Stress-testing competitor matrix in `closest_work_matrix.csv`.
+  - Expanded `literature_matrix.csv` benchmarking 25 comparative studies (15 local + 10 supplemental closest works).
+  - Stress-testing competitor matrix in `closest_work_matrix.csv` (11 entries: 10 closest works + 1 candidate comparator).
   - Claim-to-source mapping in `citation_map.csv`.
+  - Source verification in `source_verification.csv` (26 domain works: 23 Crossref-verified + 3 institutional/pre-publication).
   - Thematic narrative literature synthesis in `literature_synthesis.md`.
-  - Curated and validated BibTeX entries in `paper/references.bib` (23 verified entries).
+  - Curated and validated BibTeX entries in `paper/references.bib` (30 verified entries: 26 domain literature works + 4 foundational methodology papers).
 - **Acceptance Criteria**:
   - All cited papers verified via genuine scholarly DOIs and venues.
   - Inclusion/exclusion criteria rigorously applied and documented.

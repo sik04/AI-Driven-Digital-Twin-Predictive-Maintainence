@@ -7,7 +7,7 @@
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
 **Project Group ID:** CSIT 4 2023-27/IT/SECTION/GID  
-**Phase Status:** Phase 4 (Literature Survey) — **COMPLETED & VERIFIED**  
+**Phase Status:** Phase 4 (Literature Survey) — **COMPLETED (AWAITING USER APPROVAL)**  
 **Date:** November 1, 2026  
 
 ---

@@ -96,8 +96,8 @@ IntelliTwin/
 │   ├── author_contributions.md        # CRediT authorship tracking
 │   └── literature/
 │       ├── paper_inventory.csv        # Inventory of 15 local PDF papers
-│       ├── literature_matrix.csv      # Expanded 23-study literature comparison matrix
-│       ├── screening_log.csv          # PRISMA literature screening log (25 entries)
+│       ├── literature_matrix.csv      # Expanded 25-study literature comparison matrix
+│       ├── screening_log.csv          # PRISMA literature screening log (27 entries: 26 domain + 1 excluded)
 │       ├── closest_work_matrix.csv    # Direct closest-work comparison matrix
 │       ├── citation_map.csv           # Claim-to-source mapping matrix
 │       ├── literature_synthesis.md    # Thematic literature synthesis and gap analysis
@@ -109,7 +109,7 @@ IntelliTwin/
 ├── paper/
 │   ├── outline.md                     # Provisional manuscript/thesis outline
 │   ├── claims_evidence_matrix.csv     # Paper claims and validation audit
-│   └── references.bib                 # Verified scholarly bibliography (23 verified entries)
+│   └── references.bib                 # Verified scholarly bibliography (30 entries: 26 domain + 4 methodological)
 ├── src/
 │   └── intellitwin/
 │       └── __init__.py                # Package initialization and metadata
