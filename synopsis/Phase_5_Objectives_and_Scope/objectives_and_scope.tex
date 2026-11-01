@@ -1,0 +1,125 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+
+\setstretch{1.5} % 1.5 line spacing per AKGEC departmental guidelines
+\pagestyle{plain} % Page numbering at bottom
+
+% Heading formatting per college guidelines: Main heading 14pt Bold, Sub-heading 12pt Bold
+\titleformat{\section}{\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsubsection}{1em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\section*{5. Objectives and Scope}
+
+\subsection*{5.1 Aim of the Project}
+The overarching aim of the IntelliTwin research initiative is to design, implement, and rigorously evaluate an AI-driven Digital Twin framework that bridges the critical methodological division between data-driven Remaining Useful Life (RUL) prognostic regression, distribution-free uncertainty calibration, and sequential operational maintenance decision-making for safety-critical industrial rotational assets [1]--[3]. In modern cyber-physical production systems and aerospace operations, mechanical degradation processes are governed by highly non-linear kinematics, complex environmental stressors, and abrupt operational regime transitions [1], [4]. Traditional maintenance paradigms—predominantly calendar-based preventative maintenance (PM) or reactive run-to-failure corrective repairs—either squander substantial usable component life or expose critical infrastructure to catastrophic in-service breakdowns [5], [6]. 
+
+While state-of-the-art prognostic frameworks leverage deep temporal neural networks and gradient-boosted decision trees to forecast RUL, they overwhelmingly operate as deterministic point predictors [3], [4], [13]. In operational environments characterized by severe asymmetric risk—where an unscheduled in-flight engine failure carries economic and safety costs orders of magnitude higher than a planned hangar overhaul—uncalibrated point estimates fail to communicate epistemic and aleatoric uncertainties to human operators [1], [5]. Furthermore, existing attempts to quantify prognostic uncertainty via parametric assumptions (e.g., Gaussian noise priors) or standard split conformal prediction frequently suffer from conditional miscalibration under operational regime shifts or decouple statistical interval metrics from downstream replacement economics [3], [7], [9]. IntelliTwin directly resolves these structural challenges by formulating a condition-adaptive, engine-weighted conformal calibration framework that explicitly optimizes sequential maintenance utility while preserving finite-sample coverage guarantees and providing trace-driven digital twin synchronization [2], [7], [14].
+
+\subsection*{5.2 Primary Objective}
+The primary research objective of this B.Tech project is formally defined as:
+\begin{quote}
+\textit{To formulate, implement, and empirically validate an engine-weighted, condition-adaptive conformal calibration methodology for Remaining Useful Life (RUL) estimation that explicitly incorporates downstream sequential maintenance utility, achieving a statistically significant reduction in total lifecycle maintenance cost (exceeding 0.20 Standardized Cost Units per engine) while strictly preserving finite-sample prediction-interval coverage reliability across heterogeneous operating regimes without inducing trivial over-conservatism.}
+\end{quote}
+This primary objective directly operationalizes the pre-registered research gap (ADR-018) and provides an empirical evaluation mechanism for Research Question 1 (RQ1) within a controlled, leakage-free benchmark setting [1], [7].
+
+\subsection*{5.3 Specific Objectives}
+To accomplish the primary aim, the project is structured into eight concrete, measurable, and technically verifiable specific objectives traceable to the pre-registered research questions (RQ1--RQ4), statistical inference protocol, and software implementation architecture:
+
+\begin{enumerate}
+    \item \textbf{Systematic Telemetry Ingestion and Anti-Leakage Preprocessing}: Ingest, clean, and standardize multi-regime multivariate run-to-failure telemetry from the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) turbofan benchmark corpus [1]. Specifically prepare subset FD002 (primary multi-regime benchmark across six discrete operating conditions with high-pressure compressor degradation), subset FD001 (single-condition control benchmark), and subset FD004 (multi-regime, dual failure modes for robustness assessment). Implement a fixed 30-cycle causal sliding lookback window ($W = 30$ cycles), eliminate six invariant and uninformative sensor channels to retain an approved 17-feature schema (14 active degradation sensors plus three operational settings), apply training-only Z-score standardization, and enforce strict engine-level isolation across train, calibration, validation, and test subsets to completely eliminate temporal and cross-engine data leakage.
+    
+    \item \textbf{Development and Checkpoint Freezing of Base Prognostic Predictors}: Construct, optimize, and freeze two complementary machine learning prognostic regression model families exhibiting distinct inductive biases: (i) shallow non-linear ensemble models based on \texttt{HistGradientBoostingRegressor} (GBR) operating on flattened multi-sensor temporal features, and (ii) deep temporal neural networks based on PyTorch Long Short-Term Memory (\texttt{LSTM}) networks operating on sequential tensor sequences. Train, validate, and freeze a complete 30-model benchmark matrix spanning three datasets, two model families, and five official random seeds ($[2026, 2027, 2028, 2029, 2030]$) to guarantee 100\% independent reproducibility across all downstream calibration stages.
+    
+    \item \textbf{Formulation of Engine-Weighted Hierarchical Conformal Calibration}: Implement an Inductive Conformal Prediction (ICP) calibration subsystem utilizing asymmetric nonconformity score inversion targeting a nominal 90\% finite-sample prediction-interval coverage ($1 - \alpha = 0.90$). Enhance standard conformal calibration with engine-level observation weighting to address within-engine temporal autocorrelation, and incorporate condition-adaptive calibration bins mapped to operating flight regimes and temporal lifecycle wear stages ($t \to T_i$) to preserve conditional coverage validity where data exchangeability is violated [4], [9], [10].
+    
+    \item \textbf{Comprehensive Evaluation of Prediction Interval Validity and Sharpness}: Evaluate the statistical validity, efficiency, and reliability of the generated conformal prediction intervals $\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t)) = [L_i(t), U_i(t)]$. Quantify marginal empirical coverage, Mean Prediction Interval Width (MPIW), Winkler interval scores [11], and worst-subgroup conditional coverage error across operating regimes and degradation stages. Verify whether the proposed condition-adaptive calibration achieves significant reductions in conditional error ($\Delta_{\text{error}} > 0.01$) without causing excessive interval widening or quality deterioration ($D_{\text{width}} < 1.0$ cycle, $D_{\text{score}} < 1.0$ cycle), directly addressing Research Question 2 (RQ2).
+    
+    \item \textbf{Discrete-Event Sequential Maintenance Utility Simulation}: Develop and execute a cycle-by-cycle discrete-event sequential maintenance decision simulator governing engine retirement stopping times $\tau_i = \inf \{ t \ge W : \pi(\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t))) = \text{MAINTAIN} \}$ triggered by lower conformal prediction bounds $L_i(t)$. Formalize maintenance economics in Standardized Cost Units (SCU) with asymmetric parameters reflecting industrial reality: preventive overhaul cost $C_{\text{PM}} = 1.0$, unscheduled catastrophic failure penalty $C_{\text{FAIL}} = 5.0$, and discarded usable life penalty $C_{\text{WASTE}} = 0.20$ per cycle. Quantify simulated lifecycle costs, fleet failure rates, and usable life utilization across diverse operating policies [5], [6], [8].
+    
+    \item \textbf{Decision-Value Attribution Analysis Against Matched-Conservatism Controls}: Execute a controlled comparative attribution study contrasting the proposed decision-aware conformal framework against three prespecified matched-conservatism control baseline families: (i) widened prediction intervals, (ii) point-prediction safety margins, and (iii) earlier scheduled maintenance intervention heuristics. Empirically verify whether observed lifecycle cost improvements ($\Delta_{\text{cost}} > 0.20$ SCU per engine) represent genuine decision-relevant uncertainty information rather than trivial, risk-averse early overhaul policies that artificially inflate component waste, addressing Research Question 3 (RQ3).
+    
+    \item \textbf{Cross-Condition, Multi-Model Robustness and Non-Harm Verification}: Evaluate framework consistency across a six-cell confirmatory matrix (FD001, FD002, FD004 $\times$ GBR, LSTM across five seeds). Measure weighted aggregate utility contrasts alongside rigorous non-harm equivalence bounds ($\Delta_{\text{cost}} \ge -0.20$ SCU and $\Delta_{\text{error}} \ge -0.01$) across every individual evaluation cell under family-wise Bonferroni-corrected statistical significance ($\alpha = 0.05 / 4 = 0.0125$) utilizing 10,000 engine-level cluster-bootstrap resamples [12], addressing Research Question 4 (RQ4).
+    
+    \item \textbf{Development and Validation of Digital Twin Synchronization Replay Prototype}: Construct an operational software-based Digital Twin synchronization engine (\texttt{TwinReplayEngine}) capable of streaming multi-sensor degradation telemetry under causal lookback constraints with strict numerical parity ($\text{atol} \le 10^{-4}$ against offline batch execution). Couple the replay engine with a high-performance FastAPI REST API backend and an interactive HTML5/JavaScript operator dashboard that visualizes asset state trajectories, continuous RUL forecasts, dynamic health indices, calibrated conformal uncertainty bands, and real-time maintenance intervention triggers [2], [13], [14].
+\end{enumerate}
+
+\subsection*{5.4 Scope of the Project}
+The scope of the IntelliTwin framework is rigorously defined across technical, operational, and computational dimensions:
+
+\subsubsection*{1. Research and Application Domain}
+The investigation is situated within cyber-physical reliability engineering, machine learning for engineering prognostics, and Digital Twin-based operational decision support [2], [3]. The operational focus centers on industrial rotating machinery subject to continuous operational stress and wear degradation, using commercial aircraft gas turbine propulsion systems as the primary exemplar [1].
+
+\subsubsection*{2. Asset and Dataset Domain}
+The empirical corpus is derived exclusively from the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) benchmark suite [1]:
+\begin{itemize}
+    \item \textbf{Subset FD002 (Primary Benchmark)}: Comprises 260 training engines and 259 test engines operating under complex combinations of six distinct flight conditions (altitude 0--42,000 ft, Mach number 0.0--0.84, throttle resolver angle 20--100) with high-pressure compressor (HPC) degradation. This serves as the primary dataset for condition-adaptive calibration and decision evaluation.
+    \item \textbf{Subset FD001 (Single-Condition Control)}: Comprises 100 training and 100 test engines operating under sea-level static flight conditions with single-mode HPC degradation, providing a baseline control without regime shifts.
+    \item \textbf{Subset FD004 (Multi-Regime / Multi-Fault Robustness)}: Comprises 249 training and 248 test engines operating under six flight conditions with complex dual failure modes (HPC and fan degradation), providing a rigorous stress-testing environment for cross-condition generalization.
+\end{itemize}
+
+\subsubsection*{3. Prognostic Task and Feature Representation}
+The modeling task is formulated as continuous Remaining Useful Life regression $y_i(t) = T_i - t$ for flight cycle $t \ge W$. Telemetry features are structured into causal temporal sliding windows $\mathbf{X}_i(t) \in \mathbb{R}^{W \times 17}$ with fixed lookback $W = 30$ cycles. The feature schema comprises 14 informative degradation sensor channels (total temperature, total pressure, bypass duct pressure, burner fuel-air ratio, physical and corrected core/fan speeds, static pressure, engine pressure ratio) and three operational settings. Six invariant sensor channels exhibiting zero variance or uninformative responses are excluded to prevent covariance degeneration.
+
+\subsubsection*{4. Prognostic Architectures and Calibration Engine}
+Prognostic regression is executed via scikit-learn \texttt{HistGradientBoostingRegressor} (GBR) using multi-quantile loss and PyTorch \texttt{LSTM} recurrent neural networks using mean squared error loss. Uncertainty calibration is implemented via Inductive Split Conformal Prediction with asymmetric nonconformity scores $s_i(t) = \max(L_i(t) - y_i(t), y_i(t) - U_i(t))$ calibrated at nominal $1 - \alpha = 0.90$ using engine-weighted empirical quantile estimators [4], [7], [9].
+
+\subsubsection*{5. Decision Simulation and Economic Metrics}
+Operational decision evaluation is modeled through a sequential threshold replacement policy evaluated over complete run-to-failure trajectories in a discrete-event maintenance simulator. Primary evaluation metrics are formulated in Standardized Cost Units (SCU) under the reference scenario ($C_{\text{PM}} = 1.0, C_{\text{FAIL}} = 5.0, C_{\text{WASTE}} = 0.20$ per cycle). Statistical reliability metrics include marginal empirical coverage error, worst-group conditional coverage error across K-means operational clusters ($k = 6$) and piece-wise linear degradation stages, Mean Prediction Interval Width (MPIW), and Winkler interval scores [11].
+
+\subsubsection*{6. Software and Computational Environment}
+The software pipeline is implemented entirely in Python 3.12/3.13 utilizing NumPy, Pandas, Scikit-Learn, PyTorch, SciPy, and FastAPI. Computational experiments are verified on multicore CPU and CUDA GPU hardware architectures. Quality assurance is enforced via an automated test suite containing 37 pytest modules validating data loaders, windowing causality, split isolation, model inference, conformal calibration bounds, and simulator economics.
+
+\subsection*{5.5 Scope Boundaries and Limitations}
+To uphold academic integrity and prevent unsubstantiated claims, explicit boundaries and operational limitations are established:
+
+\begin{enumerate}
+    \item \textbf{Trace-Driven Simulation vs. Live Hardware Ingestion}: The Digital Twin implementation operates strictly as an offline trace-driven replay engine (\texttt{TwinReplayEngine}) streaming pre-recorded run-to-failure sensor trajectories. The scope excludes physical Internet-of-Things (IoT) edge hardware integration, live wireless sensor network deployment, and real-time physical communication bus protocols (e.g., CAN bus or ARINC 429).
+    
+    \item \textbf{Advisory Decision Support vs. Closed-Loop Actuation}: The decision-support subsystem outputs predictive recommendations, risk alerts, and scheduled maintenance intervals for human fleet managers. It does not perform autonomous physical closed-loop actuator control, remote engine throttle modification, or automated shutdown sequencing.
+    
+    \item \textbf{Benchmark Data vs. In-Flight Avionics Certification}: The research evaluates simulated physics-based degradation models from the NASA C-MAPSS dataset. The framework is not certified under FAA or EASA DO-178C / DO-254 avionics software certification standards and has not undergone flight testing on commercial passenger aircraft.
+    
+    \item \textbf{Pre-Registered Evaluation vs. Final Confirmatory Outcome Claims}: The project methodology is strictly pre-registered under Architecture Decision Record ADR-018. The scope of this synopsis focuses on the mathematical formulation, algorithmic architecture, benchmark protocol, and validation pipeline. Experimental hypotheses (RQ1--RQ4) are framed as empirical questions under formal test rather than prematurely established positive results.
+\end{enumerate}
+
+\subsection*{5.6 Expected Scientific and Practical Contributions}
+The anticipated contributions of the IntelliTwin framework encompass:
+\begin{itemize}
+    \item \textbf{Methodological Integration}: Formulating a unified prognostic framework that couples condition-adaptive, engine-weighted conformal calibration directly with downstream sequential maintenance economics, eliminating the prevailing disconnection between statistical coverage metrics and industrial lifecycle costs [7], [8].
+    \item \textbf{Rigorous Matched-Control Attribution Protocol}: Establishing a formal empirical benchmark that subjects prognostic maintenance policies to matched-conservatism controls, providing a replicable standard to disambiguate true uncertainty value from naive early-replacement conservatism.
+    \item \textbf{Reproducible Open-Source Digital Twin Prototype}: Delivering a modular, fully tested, and open-source software implementation integrating data-driven RUL forecasting, conformal calibration bounds, and discrete-event decision simulation with an interactive operator dashboard and validation parity $\le 10^{-4}$ [2], [14].
+\end{itemize}
+
+\begin{thebibliography}{14}
+\bibitem{saxena2008damage} A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage propagation modeling for aircraft engine run-to-failure simulation," in \textit{Proc. 2008 Int. Conf. Prognostics and Health Management (PHM)}, IEEE, 2008, pp. 1--9.
+\bibitem{huang2021survey} Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, "A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics," \textit{Sensors}, vol. 21, no. 19, p. 6340, 2021.
+\bibitem{diao2026turbofan} R. Diao, M. Zhou, G. Meng, and S. Wang, "Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration," \textit{Sensors}, vol. 26, no. 7, p. 2249, 2026.
+\bibitem{javanmardi2023conformal} A. Javanmardi and E. H{\"u}llermeier, "Conformal prediction intervals for remaining useful lifetime estimation," \textit{Int. J. Progn. Health Manag.}, vol. 14, no. 2, pp. 1--14, 2023.
+\bibitem{zhu2025predictive} Z. Zhu, L. Wang, M. Chen, and X. Zhao, "Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval," \textit{Qual. Reliab. Eng. Int.}, 2025, doi: 10.1002/qre.70043.
+\bibitem{chen2022data} C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, "Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction," \textit{Neurocomputing}, vol. 494, pp. 79--88, 2022.
+\bibitem{cortesgomez2025utility} S. Cortes-Gomez, C. M. Pati{\~n}o, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, "Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification," in \textit{Int. Conf. Learn. Represent. (ICLR)}, 2025.
+\bibitem{walia2026uncertainty} G. K. Walia and M. Kumar, "Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT," \textit{Reliab. Eng. Syst. Saf.}, p. 112356, 2026.
+\bibitem{lee2023hierarchical} Y. Lee, R. F. Barber, and R. Willett, "Distribution-free inference with hierarchical data," \textit{arXiv preprint arXiv:2306.06342}, 2023.
+\bibitem{robinson2026riskaware} C. D. Robinson, "Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression," \textit{Int. J. Progn. Health Manag.}, vol. 17, no. 1, p. 4724, 2026.
+\bibitem{gneiting2007strictly} T. Gneiting and A. E. Raftery, "Strictly proper scoring rules, prediction, and estimation," \textit{J. Am. Stat. Assoc.}, vol. 102, no. 477, pp. 359--378, 2007.
+\bibitem{lakens2017equivalence} D. Lakens, "Equivalence tests: A practical primer for t tests, correlations, and meta-analyses," \textit{Soc. Psychol. Personal. Sci.}, vol. 8, no. 4, pp. 355--362, 2017.
+\bibitem{wu2026research} J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, "Research on remaining useful life prediction of equipment based on digital twins," \textit{Sensors}, vol. 26, no. 4, p. 1240, 2026.
+\bibitem{iso23247} ISO 23247-1:2021, "Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles," International Organization for Standardization, Geneva, Switzerland, 2021.
+\end{thebibliography}
+
+\end{document}

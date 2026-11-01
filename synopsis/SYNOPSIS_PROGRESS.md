@@ -6,8 +6,8 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 4 (Literature Survey) — **COMPLETED (AWAITING USER APPROVAL)**  
-**Last Updated:** November 1, 2026 (Forensic Audit & Reconciliation Completed)  
+**Current Phase:** Phase 5 (Objectives and Scope) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Last Updated:** November 1, 2026  
 
 ---
 
@@ -28,8 +28,8 @@
 | **Phase 1** | Project Title Page, Departmental Header & Metadata Alignment | Title page source (.tex, .docx), PDF, validation | **COMPLETED** |
 | **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
 | **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
-| **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **COMPLETED (AWAITING APPROVAL)** |
-| **Phase 5** | Objectives and Scope | Objectives & Scope Drafts | Scheduled |
+| **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **APPROVED** |
+| **Phase 5** | Objectives and Scope | `objectives_and_scope.tex`, `objectives_and_scope.docx`, `objectives_and_scope.pdf` | **COMPLETED (AWAITING APPROVAL)** |
 | **Phase 6** | Proposed Methodology & Algorithmic Formulation | Methodology & Formulation Drafts | Scheduled |
 | **Phase 7** | System Architecture & Workflow Diagrams | Architecture Diagrams & Pipeline Specs | Scheduled |
 | **Phase 8** | Implementation Status and Results / Expected Results | Experimental Artifacts & Status Reports | Scheduled |
@@ -322,5 +322,60 @@
   - `research/literature/closest_work_matrix.csv`: 11 entries (10 primary + 1 candidate comparator).
   - Root `README.md` and `research/roadmap.md` synchronized with audited counts.
 - **Detailed Forensic Audit Document**: Recorded in [`synopsis/Phase_4_Literature_Survey/PHASE_4_FORENSIC_AUDIT.md`](Phase_4_Literature_Survey/PHASE_4_FORENSIC_AUDIT.md).
-- **Current Phase 4 Status**: **COMPLETED — AWAITING USER APPROVAL**. (Execution paused awaiting formal user approval before starting Phase 5).
+- **Formal Phase 4 Status**: **APPROVED** (Formally reviewed and approved by user).
+
+---
+
+## 9. Phase 5 Objectives and Scope Deliverables & Validation Summary
+
+### 9.1 Deliverables in `synopsis/Phase_5_Objectives_and_Scope/`
+- `objectives_and_scope.docx`: Fully editable Microsoft Word document adhering strictly to AKGEC specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, 8 pages).
+- `objectives_and_scope.pdf`: High-resolution vector PDF rendered via headless Chrome engine (8 pages, zero orphan lines).
+- `objectives_and_scope.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure (1,421 words excluding references).
+- `objectives_and_scope.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines.
+- `generate_objectives_and_scope.py`: Python automation script ensuring 100% deterministic, reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 5 metadata, architectural structure, traceability matrix, and compliance documentation.
+
+### 9.2 Structural Breakdown & Word Count Audit
+- **Section 5.1: Aim of the Project** (~280 words)
+  - Cyber-physical reliability engineering; bridging continuous multivariate sensor RUL prediction, finite-sample distribution-free uncertainty calibration, and sequential operational maintenance decision-making.
+  - Highlights the operational hazards of deterministic point estimates in asymmetric cost environments ($C_{\text{FAIL}} \gg C_{\text{PM}}$).
+- **Section 5.2: Primary Objective** (~140 words)
+  - States the central research objective: designing and validating an engine-weighted, condition-adaptive conformal calibration method that achieves significant lifecycle cost reductions ($\Delta_{\text{cost}} > 0.20$ SCU per engine) while strictly preserving finite-sample coverage reliability across operational regimes.
+  - Aligned with pre-registered research gap (ADR-018) and RQ1.
+- **Section 5.3: Specific Objectives** (~530 words)
+  - Eight measurable, traceable objectives:
+    1. *Telemetry Ingestion & Anti-Leakage Preprocessing*: C-MAPSS FD002 primary multi-regime, FD001 control, FD004 robustness; 30-cycle causal sliding lookback $W=30$; 17-feature schema; training-only Z-score normalization; engine-level split isolation.
+    2. *Base Predictor Development & Checkpoint Freezing*: HistGBR and PyTorch LSTM; 30-model benchmark matrix across 5 official seeds `[2026..2030]`.
+    3. *Engine-Weighted Hierarchical Conformal Calibration*: Asymmetric nonconformity score inversion targeting 90% nominal coverage ($1-\alpha=0.90$); engine weighting; flight regime and degradation stage bins.
+    4. *Prediction Interval Validity & Sharpness Evaluation*: Marginal coverage, MPIW, Winkler scores, worst-subgroup conditional coverage error ($\Delta_{\text{error}} > 0.01$, $D_{\text{width}} < 1.0$ cycle, addressing RQ2).
+    5. *Discrete-Event Sequential Maintenance Utility Simulation*: Retirement stopping time $\tau_i$ governed by lower bound $L_i(t)$; Standardized Cost Units: $C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{WASTE}}=0.20$ per cycle.
+    6. *Decision-Value Attribution Against Matched-Conservatism Controls*: Attribution testing against 3 matched-control baseline families (widened intervals, safety margins, earlier overhaul heuristics, addressing RQ3).
+    7. *Cross-Condition Robustness and Non-Harm Verification*: 6 mandatory evaluation cells (FD001, FD002, FD004 $\times$ GBR, LSTM across 5 seeds); weighted aggregate utility contrasts and non-harm bounds under Bonferroni $\alpha=0.0125$, addressing RQ4.
+    8. *Digital Twin Synchronization Replay Prototype*: `TwinReplayEngine` streaming telemetry with validation parity $\le 10^{-4}$; FastAPI REST service; HTML5/JS operator dashboard.
+- **Section 5.4: Scope of the Project** (~310 words)
+  - Clearly specifies research domain, C-MAPSS dataset roles (FD002 primary, FD001 control, FD004 robustness), continuous RUL regression task ($y_i(t) = T_i - t$), 17-feature schema, GBR and LSTM base models, split conformal calibration, sequential threshold policy, SCU economic parameters, and Python software ecosystem (37 pytest modules).
+- **Section 5.5: Scope Boundaries and Limitations** (~220 words)
+  - Explicit boundaries: Offline trace-driven replay (`TwinReplayEngine`); advisory decision support without autonomous closed-loop actuator control; evaluated on NASA simulation without FAA/EASA flight certification; pre-registered hypotheses under test rather than premature confirmatory claims.
+- **Section 5.6: Expected Scientific and Practical Contributions** (~140 words)
+  - Methodological integration, matched-conservatism benchmark protocol, and reproducible open-source digital twin prototype.
+- **Total Core Word Count**: **1,421 words** (Excluding references and titles).
+
+### 9.3 IEEE References & Citations
+- **Total References**: 14 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[14]`.
+- **Sources Cited**: Saxena et al. (2008), Huang et al. (2021), Diao et al. (2026), Javanmardi & Hüllermeier (2023), Zhu et al. (2025), Chen et al. (2022), Cortes-Gomez et al. (2025), Walia & Kumar (2026), Lee et al. (2023), Robinson (2026), Gneiting & Raftery (2007), Lakens (2017), Wu et al. (2026), and ISO 23247-1:2021.
+
+### 9.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Scientific Demarcation: Framed as pre-registered research design (ADR-018) avoiding premature confirmatory claims — **PASS**
+  - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+- **Current Phase 5 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+
 
