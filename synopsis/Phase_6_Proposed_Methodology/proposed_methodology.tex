@@ -1,0 +1,238 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[top=1in,bottom=1in,left=1.5in,right=1in]{geometry}
+\usepackage{mathptmx} % Times New Roman
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+
+\setstretch{1.5} % 1.5 line spacing per AKGEC departmental guidelines
+\pagestyle{plain} % Page numbering at bottom
+
+% Heading formatting per college guidelines: Main heading 14pt Bold, Sub-heading 12pt Bold
+\titleformat{\section}{\fontsize{14pt}{17pt}\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\fontsize{12pt}{15pt}\bfseries}{\thesubsubsection}{1em}{}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+\begin{document}
+
+\section*{6. Proposed Methodology}
+
+\subsection*{6.1 Methodological Framework and Algorithmic Overview}
+The proposed IntelliTwin methodology establishes an integrated, mathematically grounded pipeline that transforms high-frequency multivariate telemetry from degrading industrial rotational machinery into calibrated, risk-aware sequential maintenance decisions [1]--[3]. Existing predictive maintenance approaches predominantly exhibit severe methodological fragmentation: machine learning models optimize symmetric statistical loss functions (e.g., Mean Squared Error) decoupled from operational cost penalties [1], [4]; conformal prediction algorithms evaluate marginal coverage in isolation without adapting to regime-induced non-exchangeability [3], [9]; and maintenance decision models rely on parametric distributional assumptions that fail under non-linear wear dynamics [5], [6].
+
+To resolve these limitations, the IntelliTwin framework formulates a unified seven-stage methodological pipeline governed by rigorous data-leakage controls:
+\begin{enumerate}
+    \item \textbf{Causal Telemetry Ingestion and Multi-Regime Normalization}: Standardizing continuous multivariate sensor streams from NASA C-MAPSS under strict 30-cycle causal lookback windowing ($W = 30$) and training-only Z-score normalization [1].
+    \item \textbf{Dual Base Prognostic Estimation}: Generating continuous point forecasts $\hat{y}_i(t)$ of Remaining Useful Life via complementary shallow gradient-boosted decision trees (\texttt{HistGradientBoostingRegressor}) and deep recurrent neural networks (PyTorch \texttt{LSTM}) [3], [4].
+    \item \textbf{Engine-Weighted Asymmetric Conformal Calibration}: Inverting nonconformity scores weighted at the engine level to construct finite-sample prediction intervals $\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t)) = [L_i(t), U_i(t)]$ targeting nominal 90\% coverage ($1 - \alpha = 0.90$) [7], [9].
+    \item \textbf{Condition-Adaptive Regime and Wear-Stage Partitioning}: Structuring calibration bins across discrete operational flight regimes ($k = 6$) and piece-wise linear wear stages ($t \to T_i$) to preserve conditional reliability under operational drift [4], [10].
+    \item \textbf{Discrete-Event Sequential Maintenance Utility Simulation}: Evaluating dynamic stopping times $\tau_i$ governed by lower prediction bounds $L_i(t)$ under asymmetric operational economics ($C_{\text{FAIL}} \gg C_{\text{PM}}$) formalized in Standardized Cost Units (SCU) [5], [8].
+    \item \textbf{Matched-Conservatism Attribution Auditing}: Contrasting policy outcomes against widened-interval, safety-margin, and early-intervention control families to verify genuine decision-relevant uncertainty value [8], [12].
+    \item \textbf{Digital Twin Replay Synchronization}: Mirroring asset degradation in real time via an offline trace-driven replay engine (\texttt{TwinReplayEngine}) with strict numerical verification parity ($\text{atol} \le 10^{-4}$) linked to a FastAPI REST service and operator dashboard [2], [13], [14].
+\end{enumerate}
+
+\subsection*{6.2 Telemetry Ingestion, Anti-Leakage Windowing and Normalization}
+The experimental data foundation is established using the Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) benchmark corpus developed by NASA Ames Research Center [1]. To rigorously investigate multi-regime degradation dynamics, single-condition baselines, and cross-fault generalizability, three distinct sub-corpora are utilized:
+\begin{itemize}
+    \item \textbf{FD002 (Primary Multi-Regime Benchmark)}: 260 training engines and 259 test engines operating across six discrete environmental regimes (altitude 0--42,000 ft, Mach number 0.0--0.84, throttle resolver angle 20--100) subject to high-pressure compressor (HPC) degradation.
+    \item \textbf{FD001 (Single-Condition Control Benchmark)}: 100 training engines and 100 test engines operating under sea-level static flight conditions with single-mode HPC degradation, providing a stationary reference baseline.
+    \item \textbf{FD004 (Multi-Regime / Multi-Fault Robustness Benchmark)}: 249 training engines and 248 test engines operating across six flight conditions with combined HPC and fan degradation modes.
+\end{itemize}
+
+\subsubsection*{Causal Sliding Window Formulation}
+At each discrete operating cycle $t \ge W$, historical multivariate sensor telemetry is segmented into a causal sliding lookback window with fixed temporal horizon $W = 30$ cycles:
+\begin{equation}
+\mathbf{X}_i(t) = \begin{bmatrix}
+\mathbf{x}_i(t - W + 1) \\
+\mathbf{x}_i(t - W + 2) \\
+\vdots \\
+\mathbf{x}_i(t)
+\end{bmatrix} \in \mathbb{R}^{W \times d}
+\end{equation}
+where $\mathbf{x}_i(\tau) \in \mathbb{R}^d$ denotes the sensory observation vector recorded for engine $i$ at operating cycle $\tau$. Causal windowing enforces that predictions at cycle $t$ depend strictly on historical observations $\tau \le t$, eliminating prospective temporal data leakage. During the initial warm-up phase ($1 \le t < W$), prognostic inference is deferred until a complete 30-cycle observation history is accumulated.
+
+\subsubsection*{Feature Selection and Sensor Pruning}
+The raw C-MAPSS telemetry schema contains 26 columns: engine identifier, cycle index, three operational flight settings, and 21 thermo-mechanical degradation sensors. An automated variance and rank-correlation audit across all datasets revealed six completely invariant or uninformative channels exhibiting zero variance or uninformative responses:
+\begin{equation}
+\mathcal{S}_{\text{dropped}} = \{ s_1 \text{ (T2)}, s_5 \text{ (P2)}, s_6 \text{ (P15)}, s_{10} \text{ (epr)}, s_{16} \text{ (farB)}, s_{19} \text{ (Nf\_dmd)} \}
+\end{equation}
+These six invariant channels are pruned to prevent covariance rank deficiency and numerical instability during gradient backpropagation. The retained feature space comprises $d = 17$ dimensions: three operational flight condition settings ($z_1, z_2, z_3$) and 14 informative degradation sensors (total temperatures at LPC/HPC/LPT outlets, total pressures, physical and corrected core/fan rotational speeds, static pressure, fuel flow ratio, coolant bleed rates).
+
+\subsubsection*{Anti-Leakage Normalization and Partitioning}
+To prevent data snooping across experimental splits, Z-score standardization parameters (mean $\boldsymbol{\mu}_{\text{train}}$ and standard deviation $\boldsymbol{\sigma}_{\text{train}}$) are computed exclusively on the designated training split:
+\begin{equation}
+\tilde{\mathbf{X}}_i(t) = \frac{\mathbf{X}_i(t) - \boldsymbol{\mu}_{\text{train}}}{\boldsymbol{\sigma}_{\text{train}} + \epsilon}
+\end{equation}
+where $\epsilon = 10^{-8}$ prevents division by zero. The exact training parameters $(\boldsymbol{\mu}_{\text{train}}, \boldsymbol{\sigma}_{\text{train}})$ are subsequently applied immutably to normalize calibration, validation, and held-out test splits. Partitioning is strictly enforced at the engine level: all time-series observations originating from a given physical engine $i$ belong exclusively to one split (Train, Calibration, Validation, or Test), ensuring zero inter-engine correlation leakage.
+
+\subsection*{6.3 Base Prognostic Regression Models}
+Prognostic regression estimates the continuous Remaining Useful Life $y_i(t) = T_i - t$ directly from the standardized window $\tilde{\mathbf{X}}_i(t)$, where $T_i$ denotes the total failure cycle of engine $i$. In accordance with standard aerospace reliability engineering [1], RUL targets are capped at an upper piece-wise linear threshold $R_{\text{max}} = 125$ cycles:
+\begin{equation}
+y_i^*(t) = \min(R_{\text{max}}, T_i - t)
+\end{equation}
+reflecting the empirical physical reality that initial operational wear does not exhibit measurable degradation signatures during early engine life.
+
+To evaluate algorithmic robustness across diverse learning paradigms, two complementary base model families are constructed and frozen:
+
+\subsubsection*{1. HistGradientBoostingRegressor (GBR)}
+The GBR base model represents high-capacity tree-based ensemble learning. The temporal window $\tilde{\mathbf{X}}_i(t) \in \mathbb{R}^{30 \times 17}$ is flattened into a 510-dimensional vector $\mathbf{v}_i(t) = \text{vec}(\tilde{\mathbf{X}}_i(t))$. Multi-quantile gradient boosting optimizes the asymmetric pinball loss function:
+\begin{equation}
+\mathcal{L}_{\rho}(y, \hat{y}) = \max(\rho(y - \hat{y}), (1 - \rho)(\hat{y} - y))
+\end{equation}
+trained across quantiles $\rho \in \{0.05, 0.50, 0.95\}$ with histogram-binned split finding (max bins $= 255$, learning rate $= 0.05$, max depth $= 8$, L2 regularization $= 1.0$).
+
+\subsubsection*{2. PyTorch Deep Long Short-Term Memory (LSTM)}
+The LSTM base model captures temporal dependencies directly from sequential tensor representations. The architecture comprises:
+\begin{itemize}
+    \item Input recurrent layer processing sequential vectors $\mathbf{x}_i(\tau) \in \mathbb{R}^{17}$ over sequence length $W = 30$.
+    \item Two stacked bidirectional LSTM layers with hidden dimension $h = 64$ (128 units bidirectional) incorporating variational dropout ($p = 0.20$) between recurrent layers to mitigate co-adaptation.
+    \item Fully connected projection head with non-linear LeakyReLU activation ($\alpha = 0.01$), linear projection, and a scalar output neuron forecasting continuous point predictions $\hat{y}_i(t)$.
+    \item Optimization using AdamW ($\beta_1 = 0.9, \beta_2 = 0.999$, weight decay $= 10^{-4}$, initial learning rate $\eta = 10^{-3}$) under Mean Squared Error loss with cosine annealing learning rate scheduling.
+\end{itemize}
+
+A complete 30-model benchmark matrix (3 datasets $\times$ 2 architectures $\times$ 5 seeds $[2026, 2027, 2028, 2029, 2030]$) is trained and frozen under Architecture Decision Record ADR-018.
+
+\subsection*{6.4 Condition-Adaptive Hierarchical Conformal Calibration}
+To provide finite-sample, distribution-free prediction intervals with mathematically guaranteed coverage, the IntelliTwin framework formulates an engine-weighted, condition-adaptive Inductive Conformal Prediction (ICP) calibration methodology [4], [7], [9].
+
+\subsubsection*{Asymmetric Decision-Aware Nonconformity Scoring}
+Standard conformal prediction utilizes symmetric absolute residuals $s_i(t) = |y_i(t) - \hat{y}_i(t)|$, which treat overestimation and underestimation errors identically [4]. In safety-critical aerospace prognostics, overestimation errors ($\hat{y} > y$) risk catastrophic in-flight failure, whereas underestimation errors ($\hat{y} < y$) result merely in premature overhaul [1]. To reflect this operational asymmetry, nonconformity scoring incorporates dynamic shape factors parameterized by scaling exponent $\gamma \in \{0, 1, 2\}$ and asymmetry coefficient $\beta \in \mathbb{R}$:
+\begin{equation}
+\sigma(\hat{p}) = \left(1 + \frac{\hat{p}}{125.0}\right)^\gamma, \quad z(\hat{p}) = \exp\left(-\frac{\hat{p}}{20.0}\right)
+\end{equation}
+\begin{equation}
+a(\hat{p}) = \sigma(\hat{p}) \cdot \exp(\beta \cdot z(\hat{p})), \quad b(\hat{p}) = \sigma(\hat{p}) \cdot \exp(-\beta \cdot z(\hat{p}))
+\end{equation}
+The decision-aware nonconformity score function is then formulated as:
+\begin{equation}
+s_i(t) = \max\left( \frac{\hat{p}_i(t) - y_i(t)}{a(\hat{p}_i(t))}, \frac{y_i(t) - \hat{p}_i(t)}{b(\hat{p}_i(t))}, 0 \right)
+\end{equation}
+where $\hat{p}_i(t) = \hat{y}_i(t)$ represents the base point prediction. When $\gamma = 0$ and $\beta = 0$, the shape factors reduce to $a(\hat{p}) = 1$ and $b(\hat{p}) = 1$, recovering the classical symmetric absolute residual score $s_i(t) = |y_i(t) - \hat{p}_i(t)|$.
+
+\subsubsection*{Engine-Weighted Hierarchical Empirical Quantiles}
+Because run-to-failure engine telemetry contains multiple observations per physical asset, pooling all cycle observations equally violates the foundational exchangeability assumption of conformal prediction due to strong temporal autocorrelation and unequal engine lifespans [9]. To address this clustered data structure without discarding observations, calibration quantile estimation applies exact engine-level observation weighting.
+
+Let $\mathcal{D}_{\text{cal}}$ denote the calibration split containing $m$ distinct physical engines, where engine $i$ contributes $n_i$ valid temporal windows. Each individual observation from engine $i$ is assigned weight $w_{i,t} = \frac{1}{m \cdot n_i}$, guaranteeing that every physical engine exerts identical aggregate influence $\sum_{t=1}^{n_i} w_{i,t} = \frac{1}{m}$. The engine-weighted empirical cumulative distribution function is defined as:
+\begin{equation}
+F_{\text{dev}}(q) = \frac{1}{m} \sum_{i=1}^m \left[ \frac{1}{n_i} \sum_{t=1}^{n_i} \mathbb{I}(s_{i,t} \le q) \right]
+\end{equation}
+For a target nominal coverage level $1 - \alpha = 0.90$, the conformal quantile threshold $\hat{q}_{1-\alpha}$ is defined as the smallest observed calibration score satisfying:
+\begin{equation}
+\hat{q}_{1-\alpha} = \inf \left\{ q \in \mathbb{R} : F_{\text{dev}}(q) \ge \frac{\lceil (m + 1)(1 - \alpha) \rceil}{m} \right\}
+\end{equation}
+which provides finite-sample coverage validity on held-out test engines under cluster exchangeability [9].
+
+\subsubsection*{Condition-Adaptive Regime Partitioning}
+To prevent localized undercoverage during high-stress operating regimes (e.g., high altitude and high Mach number in FD002), operational conditions are clustered into $K = 6$ distinct regimes using K-means clustering on flight settings $(z_1, z_2, z_3)$. Conformal thresholds $\hat{q}_{1-\alpha}^{(k)}$ are calibrated conditionally within each regime cluster $k \in \{1, \dots, K\}$, ensuring that high-stress operational profiles receive appropriately calibrated uncertainty bands [4], [10].
+
+\subsubsection*{Interval Inversion}
+Given the calibrated threshold $\hat{q}_{1-\alpha}$, the finite-sample prediction interval $\mathcal{C}_{1-\alpha}(\mathbf{X}_i(t)) = [L_i(t), U_i(t)]$ is computed via exact closed-form score inversion:
+\begin{equation}
+L_i(t) = \max(0, \hat{p}_i(t) - \hat{q}_{1-\alpha} \cdot a(\hat{p}_i(t)))
+\end{equation}
+\begin{equation}
+U_i(t) = \hat{p}_i(t) + \hat{q}_{1-\alpha} \cdot b(\hat{p}_i(t))
+\end{equation}
+where $L_i(t)$ represents the conservative lower bound on Remaining Useful Life utilized for risk-directed maintenance decisions.
+
+\subsection*{6.5 Discrete-Event Sequential Maintenance Utility Simulation}
+Operational value is realized exclusively through the maintenance intervention decisions guided by prognostic intervals [5], [8]. IntelliTwin models sequential asset health monitoring via a cycle-by-cycle discrete-event maintenance simulator.
+
+\subsubsection*{Sequential Decision Rule}
+At each flight cycle $t \ge W$, the Digital Twin evaluates the lower conformal bound $L_i(t)$. When the conservative lower bound drops below a prespecified operational intervention threshold $\theta$ (with default $\theta = 0$), a preventive maintenance (PM) order is dispatched:
+\begin{equation}
+\tau_i = \inf \{ t \ge W : L_i(t) \le \theta \}
+\end{equation}
+where $\tau_i$ denotes the sequential stopping time for physical engine $i$.
+
+\subsubsection*{Standardized Cost Units (SCU) Lifecycle Evaluation}
+If engine retirement occurs prior to catastrophic mechanical failure ($\tau_i < T_i$), planned maintenance is successfully executed. If the engine reaches its terminal cycle before maintenance is triggered ($\tau_i \ge T_i$), an unscheduled in-service failure occurs at cycle $T_i$. To quantify lifecycle economic consequences independent of fluctuating currency values, costs are evaluated in Standardized Cost Units (SCU) under the reference scenario:
+\begin{equation}
+\text{Cost}_i(\tau_i) = \begin{cases}
+C_{\text{PM}} + C_{\text{WASTE}} \cdot (T_i - \tau_i), & \text{if } \tau_i < T_i \text{ (Successful Preventive Maintenance)} \\
+C_{\text{FAIL}}, & \text{if } \tau_i \ge T_i \text{ (Unscheduled In-Service Failure)}
+\end{cases}
+\end{equation}
+with standardized economic weights:
+\begin{itemize}
+    \item $C_{\text{PM}} = 1.0$ SCU: Cost of a planned, scheduled hangar overhaul.
+    \item $C_{\text{FAIL}} = 5.0$ SCU: Severe penalty of an uncontained in-service engine failure (including emergency diversion, secondary damage, and operational disruption).
+    \item $C_{\text{WASTE}} = 0.20$ SCU per cycle: Cost penalty for usable component life discarded by premature early replacement ($T_i - \tau_i$).
+\end{itemize}
+Total fleet maintenance cost is computed as the average lifecycle expenditure across all evaluated engines: $\overline{\text{Cost}} = \frac{1}{N} \sum_{i=1}^N \text{Cost}_i(\tau_i)$.
+
+\subsection*{6.6 Controlled Attribution Protocol (Matched-Conservatism Baselines)}
+A critical methodological vulnerability in prognostic literature is the failure to disambiguate genuine uncertainty calibration from trivial over-conservatism [8]. An uncalibrated heuristic that arbitrarily replaces engines 30 cycles early will trivially eliminate in-service failures ($C_{\text{FAIL}}$), but does so by squandering massive usable life ($C_{\text{WASTE}}$) [5], [8].
+
+To address Research Question 3 (RQ3), IntelliTwin benchmarks the proposed decision-aware method against three prespecified matched-conservatism control families:
+\begin{enumerate}
+    \item \textbf{Family 1: Uniformly Widened Conformal Intervals ($\delta$-Widened)}: Inflates the global conformal threshold by fixed scalar constants $\hat{q}' = \hat{q} + \delta$, testing whether improvements stem merely from wider coverage bands.
+    \item \textbf{Family 2: Point-Prediction Safety Margins ($\Delta$-Margin)}: Implements deterministic safety offsets $\hat{p}'(t) = \hat{p}(t) - \Delta$, triggering maintenance when $\hat{p}'(t) \le \theta$ without interval calibration.
+    \item \textbf{Family 3: Earlier Scheduled Intervention Thresholds ($\theta$-Offset)}: Advances maintenance triggers by raising the intervention threshold $\theta' = \theta + \tau_{\text{advance}}$, evaluating whether simple early scheduling reproduces the proposed method's cost savings.
+\end{enumerate}
+A positive decision attribution is established only if the proposed method achieves statistically significant lifecycle cost savings ($\Delta_{\text{cost}} > 0.20$ SCU per engine) against \textit{every} matched-conservatism control family [12].
+
+\subsection*{6.7 Statistical Inference Protocol and Decision Rules}
+To ensure rigorous hypothesis testing without distributional assumptions, statistical inference is conducted using engine-level cluster bootstrap with 10,000 resamples [12]. 
+
+\subsubsection*{Family-Wise Error Rate Control}
+Across the four formal research questions (RQ1--RQ4), family-wise type I error is strictly controlled at $\alpha_{\text{family}} = 0.05$ using the Bonferroni correction:
+\begin{equation}
+\alpha_{\text{test}} = \frac{0.05}{4} = 0.0125
+\end{equation}
+All decision intervals are evaluated as 98.75\% two-sided percentile bootstrap intervals ($[Q_{0.00625}, Q_{0.99375}]$).
+
+\subsubsection*{Two One-Sided Tests (TOST) for Robustness}
+For Research Question 4 (RQ4), cross-condition robustness across the six evaluation cells (FD001, FD002, FD004 $\times$ GBR, LSTM) is audited against pre-registered non-harm equivalence bounds [12]:
+\begin{equation}
+\text{Lower } 98.75\% \text{ CI of } \Delta_{\text{cost}} \ge -0.20 \text{ SCU}, \quad \text{Lower } 98.75\% \text{ CI of } \Delta_{\text{error}} \ge -0.01
+\end{equation}
+guaranteeing that condition-adaptive calibration does not induce material operational degradation in any individual configuration.
+
+\subsection*{6.8 Digital Twin Synchronization Replay Prototype}
+To ground the algorithmic formulation in operational engineering reality, IntelliTwin implements a real-time trace-driven Digital Twin synchronization engine (\texttt{TwinReplayEngine}) [2], [13], [14].
+
+\subsubsection*{Trace-Driven State Synchronization}
+The replay engine ingests pre-recorded run-to-failure sensor matrices and emits discrete telemetry frames cycle-by-cycle. State synchronization adheres to ISO 23247 digital twin principles [14], maintaining:
+\begin{itemize}
+    \item Telemetry sliding buffer maintaining the active 30-cycle causal lookback window $\mathbf{X}_i(t)$.
+    \item Feature scaling layer applying training Z-scores $\tilde{\mathbf{X}}_i(t)$ in real time.
+    \item Inference executor generating dual RUL point predictions $\hat{y}_{\text{GBR}}(t)$ and $\hat{y}_{\text{LSTM}}(t)$.
+    \item Conformal calibration filter generating lower and upper bounds $[L_i(t), U_i(t)]$.
+    \item Dynamic health index estimator $\text{HI}_i(t) = \min(1.0, \frac{\hat{p}_i(t)}{R_{\text{max}}})$ reflecting remaining operational integrity.
+    \item Decision trigger monitor assessing intervention rules $\mathbb{I}(L_i(t) \le \theta)$ and dispatching warning states (NOMINAL, ADVISORY, CRITICAL\_INTERVENTION).
+\end{itemize}
+
+\subsubsection*{Numerical Parity Verification}
+To guarantee that real-time replay does not introduce numerical artifacts or windowing drift, the replay engine is audited against offline batch execution:
+\begin{equation}
+\max_{t} | \hat{p}_{\text{stream}}(t) - \hat{p}_{\text{batch}}(t) | \le 10^{-4}, \quad \max_{t} | L_{\text{stream}}(t) - L_{\text{batch}}(t) | \le 10^{-4}
+\end{equation}
+Parity is verified across all benchmark datasets via 37 automated pytest modules, establishing that the interactive Digital Twin operator dashboard at port 8000 displays mathematically identical outputs to the scientific evaluation pipeline.
+
+\begin{thebibliography}{14}
+\bibitem{saxena2008damage} A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage propagation modeling for aircraft engine run-to-failure simulation," in \textit{Proc. 2008 Int. Conf. Prognostics and Health Management (PHM)}, IEEE, 2008, pp. 1--9.
+\bibitem{huang2021survey} Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, "A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics," \textit{Sensors}, vol. 21, no. 19, p. 6340, 2021.
+\bibitem{diao2026turbofan} R. Diao, M. Zhou, G. Meng, and S. Wang, "Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration," \textit{Sensors}, vol. 26, no. 7, p. 2249, 2026.
+\bibitem{javanmardi2023conformal} A. Javanmardi and E. H{\"u}llermeier, "Conformal prediction intervals for remaining useful lifetime estimation," \textit{Int. J. Progn. Health Manag.}, vol. 14, no. 2, pp. 1--14, 2023.
+\bibitem{zhu2025predictive} Z. Zhu, L. Wang, M. Chen, and X. Zhao, "Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval," \textit{Qual. Reliab. Eng. Int.}, 2025, doi: 10.1002/qre.70043.
+\bibitem{chen2022data} C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, "Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction," \textit{Neurocomputing}, vol. 494, pp. 79--88, 2022.
+\bibitem{cortesgomez2025utility} S. Cortes-Gomez, C. M. Pati{\~n}o, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, "Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification," in \textit{Int. Conf. Learn. Represent. (ICLR)}, 2025.
+\bibitem{walia2026uncertainty} G. K. Walia and M. Kumar, "Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT," \textit{Reliab. Eng. Syst. Saf.}, p. 112356, 2026.
+\bibitem{lee2023hierarchical} Y. Lee, R. F. Barber, and R. Willett, "Distribution-free inference with hierarchical data," \textit{arXiv preprint arXiv:2306.06342}, 2023.
+\bibitem{robinson2026riskaware} C. D. Robinson, "Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression," \textit{Int. J. Progn. Health Manag.}, vol. 17, no. 1, p. 4724, 2026.
+\bibitem{gneiting2007strictly} T. Gneiting and A. E. Raftery, "Strictly proper scoring rules, prediction, and estimation," \textit{J. Am. Stat. Assoc.}, vol. 102, no. 477, pp. 359--378, 2007.
+\bibitem{lakens2017equivalence} D. Lakens, "Equivalence tests: A practical primer for t tests, correlations, and meta-analyses," \textit{Soc. Psychol. Personal. Sci.}, vol. 8, no. 4, pp. 355--362, 2017.
+\bibitem{wu2026research} J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, "Research on remaining useful life prediction of equipment based on digital twins," \textit{Sensors}, vol. 26, no. 4, p. 1240, 2026.
+\bibitem{iso23247} ISO 23247-1:2021, "Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles," International Organization for Standardization, Geneva, Switzerland, 2021.
+\end{thebibliography}
+
+\end{document}

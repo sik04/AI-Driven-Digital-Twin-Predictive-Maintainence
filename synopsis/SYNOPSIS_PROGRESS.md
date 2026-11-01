@@ -6,7 +6,7 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 5 (Objectives and Scope) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Current Phase:** Phase 6 (Proposed Methodology) — **COMPLETED (AWAITING USER APPROVAL)**  
 **Last Updated:** November 1, 2026  
 
 ---
@@ -29,8 +29,8 @@
 | **Phase 2** | Introduction, Industrial Domain & Rationale Formulation | `introduction.tex`, `introduction.docx`, `introduction.pdf` | **COMPLETED** |
 | **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
 | **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **APPROVED** |
-| **Phase 5** | Objectives and Scope | `objectives_and_scope.tex`, `objectives_and_scope.docx`, `objectives_and_scope.pdf` | **COMPLETED (AWAITING APPROVAL)** |
-| **Phase 6** | Proposed Methodology & Algorithmic Formulation | Methodology & Formulation Drafts | Scheduled |
+| **Phase 5** | Objectives and Scope | `objectives_and_scope.tex`, `objectives_and_scope.docx`, `objectives_and_scope.pdf` | **APPROVED** |
+| **Phase 6** | Proposed Methodology & Algorithmic Formulation | `proposed_methodology.tex`, `proposed_methodology.docx`, `proposed_methodology.pdf` | **COMPLETED (AWAITING APPROVAL)** |
 | **Phase 7** | System Architecture & Workflow Diagrams | Architecture Diagrams & Pipeline Specs | Scheduled |
 | **Phase 8** | Implementation Status and Results / Expected Results | Experimental Artifacts & Status Reports | Scheduled |
 | **Phase 9** | Tools, Technologies and System Requirements | Requirements & Technology Stack | Scheduled |
@@ -376,13 +376,74 @@
   - Scientific Demarcation: Framed as pre-registered research design (ADR-018) avoiding premature confirmatory claims — **PASS**
   - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
 - **Overall Validation Status**: **PASS (100% Compliant)**.
-- **Current Phase 5 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+- **Formal Phase 5 Status**: **APPROVED** (Formally reviewed and approved by user).
 
 ### 9.5 Git Automation & Commit Verification
 - **Commit Message**: `docs: add synopsis objectives and scope`
 - **Commit Hash**: `576d033`
 - **Remote Branch**: `main` -> `origin/main`
 - **Push Status**: Verified successfully pushed (`24783ea..576d033`).
+
+---
+
+## 10. Phase 6 Proposed Methodology Deliverables & Validation Summary
+
+### 10.1 Deliverables in `synopsis/Phase_6_Proposed_Methodology/`
+- `proposed_methodology.docx`: Fully editable Microsoft Word document adhering strictly to AKGEC specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, 10 pages).
+- `proposed_methodology.pdf`: High-resolution vector PDF rendered via headless Chrome engine (10 pages, zero orphan lines).
+- `proposed_methodology.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure (2,418 words excluding references).
+- `proposed_methodology.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines.
+- `generate_proposed_methodology.py`: Python automation script ensuring 100% deterministic, reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 6 metadata, architectural structure, mathematical formulation audit, traceability matrix, and compliance documentation.
+
+### 10.2 Structural Breakdown & Mathematical Formulation Audit
+- **Section 6.1: Methodological Framework and Algorithmic Overview** (~310 words)
+  - End-to-end 7-stage architectural pipeline: (1) Causal telemetry ingestion; (2) Dual base prognostic estimation; (3) Engine-weighted asymmetric conformal calibration; (4) Condition-adaptive regime/wear-stage partitioning; (5) Discrete-event sequential maintenance simulation; (6) Matched-conservatism attribution auditing; (7) Digital Twin replay synchronization.
+  - Resolves methodological fragmentation between statistical point estimation and operational maintenance utility.
+- **Section 6.2: Telemetry Ingestion, Anti-Leakage Windowing and Normalization** (~420 words)
+  - *Benchmark Corpus*: NASA C-MAPSS sub-corpora (FD002 primary multi-regime, FD001 single-condition control, FD004 multi-regime/multi-fault robustness).
+  - *Causal Sliding Window*: Fixed lookback horizon $W = 30$ cycles ($\mathbf{X}_i(t) \in \mathbb{R}^{30 \times 17}$) eliminating temporal lookahead leakage.
+  - *Sensor Pruning*: Automated drop of six invariant or uninformative channels ($\mathcal{S}_{\text{dropped}} = \{ s_1, s_5, s_6, s_{10}, s_{16}, s_{19} \}$) yielding $d = 17$ features (3 settings + 14 degradation sensors).
+  - *Anti-Leakage Normalization*: Training-only Z-scores $(\boldsymbol{\mu}_{\text{train}}, \boldsymbol{\sigma}_{\text{train}})$ with strict engine-level split isolation.
+- **Section 6.3: Base Prognostic Regression Models** (~350 words)
+  - *Target RUL*: Piece-wise linear ground truth capped at $R_{\text{max}} = 125$ cycles.
+  - *HistGradientBoostingRegressor (GBR)*: Multi-quantile boosting over flattened 510-dim vectors minimizing asymmetric pinball loss $\mathcal{L}_{\rho}$ across $\rho \in \{0.05, 0.50, 0.95\}$.
+  - *PyTorch BiLSTM*: 2 stacked bidirectional LSTM layers ($h = 64$), variational recurrent dropout ($p = 0.20$), LeakyReLU projection head, AdamW optimization under MSE loss.
+  - *Checkpoints*: Full 30-model benchmark matrix (3 datasets $\times$ 2 architectures $\times$ 5 seeds `[2026..2030]`) registered under ADR-018.
+- **Section 6.4: Condition-Adaptive Hierarchical Conformal Calibration** (~480 words)
+  - *Asymmetric Nonconformity Scoring*: Parameterized shape factors $\sigma(\hat{p}) = (1+\hat{p}/125)^\gamma$, $z(\hat{p}) = \exp(-\hat{p}/20)$, $a(\hat{p}) = \sigma(\hat{p})\exp(\beta z(\hat{p}))$, $b(\hat{p}) = \sigma(\hat{p})\exp(-\beta z(\hat{p}))$ penalizing hazardous overestimation ($\hat{y} > y$) more heavily than premature underestimation ($\hat{y} < y$).
+  - *Engine-Weighted Hierarchical Empirical CDF*: Assigns weights $w_{i,t} = \frac{1}{m \cdot n_i}$ to resolve non-exchangeability across engines with variable trajectory lengths, targeting nominal $1-\alpha = 0.90$ coverage.
+  - *Condition-Adaptive Partitioning*: K-means clustering ($K = 6$) on flight settings $(z_1, z_2, z_3)$ for regime-stratified conformal thresholds $\hat{q}_{1-\alpha}^{(k)}$.
+  - *Interval Inversion*: Exact closed-form bounds $L_i(t) = \max(0, \hat{p}_i(t) - \hat{q}_{1-\alpha} a(\hat{p}_i(t)))$ and $U_i(t) = \hat{p}_i(t) + \hat{q}_{1-\alpha} b(\hat{p}_i(t))$.
+- **Section 6.5: Discrete-Event Sequential Maintenance Utility Simulation** (~290 words)
+  - *Stopping Time*: Maintenance dispatched when lower conformal bound breaches threshold: $\tau_i = \inf \{ t \ge W : L_i(t) \le \theta \}$.
+  - *Standardized Cost Units (SCU)*: Planned overhaul $C_{\text{PM}} = 1.0$ SCU, in-service failure $C_{\text{FAIL}} = 5.0$ SCU, usable life waste $C_{\text{WASTE}} = 0.20$ SCU/cycle.
+- **Section 6.6: Controlled Attribution Protocol (Matched-Conservatism Baselines)** (~220 words)
+  - Disambiguates genuine uncertainty value from trivial over-conservatism across three pre-registered baseline families: (1) $\delta$-widened conformal intervals; (2) $\Delta$-margin deterministic safety offsets; (3) $\theta$-offset earlier intervention thresholds.
+- **Section 6.7: Statistical Inference Protocol and Decision Rules** (~160 words)
+  - 10,000 engine-level cluster bootstrap resamples; Bonferroni family-wise error rate control $\alpha_{\text{test}} = 0.0125$ (98.75% CI); Two One-Sided Tests (TOST) non-harm equivalence bounds ($\Delta_{\text{cost}} \ge -0.20$ SCU, $\Delta_{\text{error}} \ge -0.01$).
+- **Section 6.8: Digital Twin Synchronization Replay Prototype** (~190 words)
+  - ISO 23247-aligned `TwinReplayEngine` streaming sliding buffers, training Z-scores, dual inference, conformal bounds, dynamic Health Index $\text{HI}_i(t)$, and status alerts.
+  - Verified numerical parity against offline batch execution: $\max_t | \hat{p}_{\text{stream}}(t) - \hat{p}_{\text{batch}}(t) | \le 10^{-4}$ and $\max_t | L_{\text{stream}}(t) - L_{\text{batch}}(t) | \le 10^{-4}$ across 37 automated pytest modules, backing FastAPI service and operator dashboard.
+- **Total Core Word Count**: **2,418 words** (Excluding references and preamble).
+
+### 10.3 IEEE References & Citations
+- **Total References**: 14 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[14]`.
+- **Sources Cited**: Saxena et al. (2008), Huang et al. (2021), Diao et al. (2026), Javanmardi & Hüllermeier (2023), Zhu et al. (2025), Chen et al. (2022), Cortes-Gomez et al. (2025), Walia & Kumar (2026), Lee et al. (2023), Robinson (2026), Gneiting & Raftery (2007), Lakens (2017), Wu et al. (2026), and ISO 23247-1:2021.
+
+### 10.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Mathematical Formulations: Numbered LaTeX equations fully consistent with implementation in `src/intellitwin/` — **PASS**
+  - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+- **Current Phase 6 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+
 
 
 
