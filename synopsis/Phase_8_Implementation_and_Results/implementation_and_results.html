@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 8 — Implementation Status and Results / Expected Results</title>
+<style>
+  @page {
+    size: A4;
+    margin-top: 1.0in;
+    margin-bottom: 1.0in;
+    margin-left: 1.5in;
+    margin-right: 1.0in;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+    }
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+  }
+
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  h1.section-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 16pt;
+    text-align: left;
+    page-break-after: avoid;
+  }
+
+  h2.subsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    page-break-after: avoid;
+  }
+
+  h3.subsubsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-indent: 0;
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    padding-left: 24pt;
+  }
+
+  li {
+    margin-bottom: 4pt;
+    text-align: justify;
+  }
+
+  .formula-box {
+    text-align: center;
+    font-style: italic;
+    margin: 10pt 0;
+    font-family: "Times New Roman", Times, serif;
+    page-break-inside: avoid;
+  }
+
+  table.academic-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14pt 0 16pt 0;
+    font-size: 9pt;
+    line-height: 1.35;
+    page-break-inside: avoid;
+  }
+
+  table.academic-table th {
+    border-top: 1.5pt solid #000000;
+    border-bottom: 1pt solid #000000;
+    padding: 6pt 4pt;
+    text-align: left;
+    font-weight: bold;
+    background-color: #f9f9f9;
+  }
+
+  table.academic-table td {
+    padding: 5pt 4pt;
+    border-bottom: 0.5pt solid #e0e0e0;
+    vertical-align: top;
+  }
+
+  table.academic-table tr:last-child td {
+    border-bottom: 1.5pt solid #000000;
+  }
+
+  .table-caption {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 6pt;
+    text-align: left;
+  }
+
+  .badge-pass {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #1a7f37;
+    background-color: #dafbe1;
+    border: 1px solid #1a7f37;
+    border-radius: 3px;
+  }
+
+  .badge-ready {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #0969da;
+    background-color: #ddf4ff;
+    border: 1px solid #0969da;
+    border-radius: 3px;
+  }
+
+  .badge-pending {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #9a6700;
+    background-color: #fff8c5;
+    border: 1px solid #9a6700;
+    border-radius: 3px;
+  }
+
+  .badge-notstarted {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: #cf222e;
+    background-color: #ffebe9;
+    border: 1px solid #cf222e;
+    border-radius: 3px;
+  }
+
+  .reference-item {
+    font-size: 10pt;
+    line-height: 1.35;
+    margin-bottom: 6pt;
+    text-align: left;
+    padding-left: 22pt;
+    text-indent: -22pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="content-container">
+
+<h1 class="section-title">8. Implementation Status and Results / Expected Results</h1>
+
+<h2 class="subsection-title">8.1 Current Implementation Status and Verified Milestones</h2>
+<p>
+The implementation of the IntelliTwin research framework is structured around a modular, reproducible Python codebase residing in <code>src/intellitwin/</code> [1]–[3]. In strict compliance with pre-registered confirmatory research standards (Architecture Decision Records ADR-018 and ADR-022), all primary algorithmic subsystems, base model checkpoints, conformal calibration engines, maintenance simulation routines, and digital twin replay interfaces have been fully engineered, validated, and frozen prior to held-out test evaluation [4], [7], [9].
+</p>
+
+<p>
+The implemented software architecture comprises seven fully integrated functional modules, supported by a comprehensive automated test suite spanning 37 unit and integration test modules:
+</p>
+<ol>
+  <li><strong>Data Ingestion and Anti-Leakage Preprocessing Subsystem (<code>src/intellitwin/data/</code>)</strong>: Implements automated ingestion pipelines for the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) corpus [1]. Performs systematic feature qualification by pruning six uninformative sensor channels displaying zero variance or rank correlation (<em>S</em><sub>dropped</sub> = {<em>s</em><sub>1</sub>, <em>s</em><sub>5</sub>, <em>s</em><sub>6</sub>, <em>s</em><sub>10</sub>, <em>s</em><sub>16</sub>, <em>s</em><sub>19</sub>}), retaining <em>d</em> = 17 informative operational channels. Enforces training-only Z-score standardization (<strong>μ</strong><sub>train</sub>, <strong>σ</strong><sub>train</sub>, computed with <code>ddof=0</code>), <em>K</em> = 6 K-means regime clustering on standardized flight settings, and causal sliding lookback windowing (<em>W</em> = 30 cycles, stride 1, zero-padding prohibited) [1], [10].</li>
+  <li><strong>Prognostic Base Estimator Subsystem (<code>src/intellitwin/models/</code>)</strong>: Houses two complementary model families: (i) multi-quantile <code>HistGradientBoostingRegressor</code> (GBR) operating on flattened 510-dimensional causal vectors, minimizing pinball loss across quantiles <em>ρ</em> ∈ {0.05, 0.50, 0.95}; and (ii) PyTorch deep Bidirectional <code>LSTM</code> processing sequential matrices <strong>X</strong><sub><em>i</em></sub>(<em>t</em>) ∈ ℝ<sup>30 × 17</sup> with two recurrent layers (<em>h</em> = 64), variational dropout (<em>p</em> = 0.20), and AdamW optimization [3], [4]. A full 30-checkpoint benchmark matrix (3 sub-corpora × 2 architectures × 5 frozen seeds [2026, 2027, 2028, 2029, 2030]) has been trained, verified, and frozen under ADR-020.</li>
+  <li><strong>Hierarchical Conformal Calibration Subsystem (<code>src/intellitwin/uncertainty/</code>)</strong>: Formulates exact rational nonconformity quantile solvers addressing cluster non-exchangeability across engines with variable trajectory lengths [9]. Implements asymmetric decision-aware nonconformity scoring parameterized by scaling exponent <em>γ</em> ∈ {0, 1, 2} and asymmetry coefficient <em>β</em> ∈ ℝ:
+    <div class="formula-box">
+      <em>σ</em>(<em>p̂</em>) = (1 + <em>p̂</em> / 125.0)<sup><em>γ</em></sup>, &emsp; <em>z</em>(<em>p̂</em>) = exp(−<em>p̂</em> / 20.0)<br>
+      <em>a</em>(<em>p̂</em>) = <em>σ</em>(<em>p̂</em>) · exp(<em>β</em> · <em>z</em>(<em>p̂</em>)), &emsp; <em>b</em>(<em>p̂</em>) = <em>σ</em>(<em>p̂</em>) · exp(−<em>β</em> · <em>z</em>(<em>p̂</em>))<br>
+      <em>s<sub>i</sub></em>(<em>t</em>) = max( (<em>p̂<sub>i</sub></em>(<em>t</em>) − <em>y<sub>i</sub></em>(<em>t</em>)) / <em>a</em>(<em>p̂<sub>i</sub></em>(<em>t</em>)), &ensp; (<em>y<sub>i</sub></em>(<em>t</em>) − <em>p̂<sub>i</sub></em>(<em>t</em>)) / <em>b</em>(<em>p̂<sub>i</sub></em>(<em>t</em>)), &ensp; 0 )
+    </div>
+    Calibration quantiles place finite probability mass <em>m</em> / (<em>m</em> + 1) with point-at-infinity mass 1 / (<em>m</em> + 1), targeting nominal 1 − <em>α</em> = 0.90 coverage with automatic global fallback routing for regime clusters containing fewer than <em>m<sub>g</sub></em> ≥ 10 calibration units [9].
+  </li>
+  <li><strong>Sequential Decision and Maintenance Simulator (<code>src/intellitwin/simulator/</code>)</strong>: Implements cycle-by-cycle discrete-event asset lifecycle simulation [5], [8]. Evaluates dynamic stopping times <em>τ<sub>i</sub></em> = inf{<em>t</em> ≥ <em>W</em> : <em>L<sub>i</sub></em>(<em>t</em>) ≤ 1.0} governed by lower conformal bounds, tracks economic lifecycle expenditures under the primary reference scenario in Standardized Cost Units (<em>C</em><sub>PM</sub> = 1.0, <em>C</em><sub>FAIL</sub> = 5.0, <em>C</em><sub>WASTE</sub> = 0.20 SCU per cycle), and logs intervention events [5], [8].</li>
+  <li><strong>Controlled Attribution and Baseline Protocol (<code>src/intellitwin/decision/</code>)</strong>: Parameterizes four frozen matched-conservatism control configurations across three families (<em>δ</em>-widened intervals, Δ-safety margins, and <em>θ</em>-earlier intervention thresholds) to disambiguate genuine uncertainty calibration from heuristic over-conservatism [8], [12].</li>
+  <li><strong>Confirmatory Statistical Inference Engine (<code>src/intellitwin/evaluation/</code>)</strong>: Executes 10,000 stratified engine-cluster bootstrap resamples with replacement (using PCG64 PRNG), enforces Bonferroni family-wise error rate control (<em>α</em><sub>test</sub> = 0.0125, 98.75% decision intervals), and evaluates Intersection-Union Testing (IUT) decision rules across all 152 pre-registered hypothesis components [12].</li>
+  <li><strong>Digital Twin Replay Engine and Operator Dashboard (<code>src/intellitwin/twin/</code>, <code>apps/twin_dashboard/</code>)</strong>: Implements an ISO 23247-aligned state replication engine (<code>TwinReplayEngine</code>) managing a 4-state lifecycle machine (<code>WARMING_UP</code>, <code>ACTIVE</code>, <code>MAINTAINED</code>, <code>FAILED</code>) [14]. Guarantees strict numerical verification parity (atol ≤ 10<sup>−4</sup>) against offline batch execution, exposed via a modular FastAPI service at port 8000 and an interactive HTML5/JavaScript dashboard [2], [13].</li>
+</ol>
+
+<div class="table-caption">Table 8.1: Implementation Status of IntelliTwin Architectural Subsystems and QA Verification.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 22%;">Subsystem</th>
+      <th style="width: 44%;">Primary Implemented Capabilities</th>
+      <th style="width: 22%;">Core Module Path</th>
+      <th style="width: 12%; text-align: center;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Data Preprocessing</strong></td>
+      <td>Ingestion, 17-feature selection, Z-scores, <em>W</em>=30 windowing</td>
+      <td><code>src/intellitwin/data/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Base Prognostics</strong></td>
+      <td>HistGBR (pinball loss) &amp; PyTorch BiLSTM (MSE loss), 30 models</td>
+      <td><code>src/intellitwin/models/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Conformal Calibration</strong></td>
+      <td>Engine-weighted CDF, asymmetric scoring, regime stratification</td>
+      <td><code>src/intellitwin/uncertainty/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Maintenance Simulator</strong></td>
+      <td>Stopping time <em>τ<sub>i</sub></em>, SCU lifecycle accounting, event logging</td>
+      <td><code>src/intellitwin/simulator/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Matched Controls</strong></td>
+      <td>3 matched-conservatism baseline families (<em>δ</em>, Δ, <em>θ</em>)</td>
+      <td><code>src/intellitwin/decision/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Statistical Inference</strong></td>
+      <td>10k cluster bootstrap, Bonferroni <em>α</em>=0.0125, 152 IUT rules</td>
+      <td><code>src/intellitwin/evaluation/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Digital Twin Prototype</strong></td>
+      <td>State machine, parity ≤ 10<sup>−4</sup>, FastAPI API, HTML5/JS dashboard</td>
+      <td><code>src/intellitwin/twin/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">VERIFIED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Automated Test Suite</strong></td>
+      <td>37 unit/integration test modules across all core subsystems</td>
+      <td><code>tests/</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS (37/37)</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="subsection-title">8.2 Dataset Qualification and Partition Split Statistics</h2>
+<p>
+The empirical foundation of IntelliTwin is established on the NASA C-MAPSS turbofan degradation benchmark corpus [1]. To ensure rigorous evaluation across varying operational complexity, three distinct sub-corpora are utilized under immutable engine-level disjoint split manifests (ADR-011).
+</p>
+
+<div class="table-caption">Table 8.2: C-MAPSS Dataset Characteristics, Operating Regimes, and Disjoint Split Partitioning.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th>Dataset</th>
+      <th>Flight Conditions</th>
+      <th>Fault Modes</th>
+      <th style="text-align: center;">Total Engines</th>
+      <th style="text-align: center;">Train (50%)</th>
+      <th style="text-align: center;">Cal (20%)</th>
+      <th style="text-align: center;">Val (10%)</th>
+      <th style="text-align: center;">Test (20%)</th>
+      <th>Window (<em>W</em>)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FD001</strong></td>
+      <td>1 (Sea level)</td>
+      <td>1 (HPC)</td>
+      <td style="text-align: center;">100</td>
+      <td style="text-align: center;">50</td>
+      <td style="text-align: center;">20</td>
+      <td style="text-align: center;">10</td>
+      <td style="text-align: center;">20</td>
+      <td>30 cycles</td>
+    </tr>
+    <tr>
+      <td><strong>FD002</strong></td>
+      <td>6 (<em>C</em><sub>1</sub>–<em>C</em><sub>6</sub>)</td>
+      <td>1 (HPC)</td>
+      <td style="text-align: center;">260</td>
+      <td style="text-align: center;">130</td>
+      <td style="text-align: center;">52</td>
+      <td style="text-align: center;">26</td>
+      <td style="text-align: center;">52</td>
+      <td>30 cycles</td>
+    </tr>
+    <tr>
+      <td><strong>FD004</strong></td>
+      <td>6 (<em>C</em><sub>1</sub>–<em>C</em><sub>6</sub>)</td>
+      <td>2 (HPC + Fan)</td>
+      <td style="text-align: center;">249</td>
+      <td style="text-align: center;">124</td>
+      <td style="text-align: center;">50</td>
+      <td style="text-align: center;">25</td>
+      <td style="text-align: center;">50</td>
+      <td>30 cycles</td>
+    </tr>
+    <tr style="font-weight: bold; background-color: #f6f8fa;">
+      <td>Total Fleet</td>
+      <td>—</td>
+      <td>—</td>
+      <td style="text-align: center;">609</td>
+      <td style="text-align: center;">304</td>
+      <td style="text-align: center;">122</td>
+      <td style="text-align: center;">61</td>
+      <td style="text-align: center;">122</td>
+      <td>30 cycles</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+As detailed in Table 8.2, the complete fleet comprises 609 run-to-failure engines partitioned into 304 Training, 122 Calibration, 61 Validation, and 122 held-out Test engines. Every split manifest is cryptographically hashed and stored in <code>data/splits/</code>, guaranteeing that no engine trajectory crosses partition boundaries.
+</p>
+
+<h2 class="subsection-title">8.3 Frozen Base Model Performance and Development Validation Results</h2>
+<p>
+During the offline model development and qualification phase (Step 7 and Step 8 of the research protocol), hyperparameter grid searches and calibration candidate selections were performed strictly on the Training and Validation partitions [4], [7].
+</p>
+
+<div class="table-caption">Table 8.3: Frozen Base Model Configurations, Validation Errors, and Selected Conformal Candidates.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th>Evaluation Cell</th>
+      <th>Architecture</th>
+      <th>Winning Configuration &amp; Hyperparameters</th>
+      <th style="text-align: center;">Validation RMSE (cycles)</th>
+      <th>Selected Candidate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>FD001 × GBR</strong></td>
+      <td>HistGradientBoosting</td>
+      <td><code>gbr_lr010_leaf15_l2_0</code> (lr=0.10, leaf=15)</td>
+      <td style="text-align: center;">28.42 ± 0.00</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+    <tr>
+      <td><strong>FD001 × LSTM</strong></td>
+      <td>Bidirectional LSTM</td>
+      <td><code>lstm_h64_lr0010</code> (<em>h</em>=64, drop=0.20, lr=10<sup>−3</sup>)</td>
+      <td style="text-align: center;">29.90 ± 0.23</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+    <tr>
+      <td><strong>FD002 × GBR</strong></td>
+      <td>HistGradientBoosting</td>
+      <td><code>gbr_lr010_leaf31_l2_0</code> (lr=0.10, leaf=31)</td>
+      <td style="text-align: center;">34.66 ± 0.00</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+    <tr>
+      <td><strong>FD002 × LSTM</strong></td>
+      <td>Bidirectional LSTM</td>
+      <td><code>lstm_h64_lr0010</code> (<em>h</em>=64, drop=0.20, lr=10<sup>−3</sup>)</td>
+      <td style="text-align: center;">35.14 ± 0.23</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+    <tr>
+      <td><strong>FD004 × GBR</strong></td>
+      <td>HistGradientBoosting</td>
+      <td><code>gbr_lr010_leaf31_l2_0</code> (lr=0.10, leaf=31)</td>
+      <td style="text-align: center;">48.83 ± 0.00</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+    <tr>
+      <td><strong>FD004 × LSTM</strong></td>
+      <td>Bidirectional LSTM</td>
+      <td><code>lstm_h64_lr0010</code> (<em>h</em>=64, drop=0.20, lr=10<sup>−3</sup>)</td>
+      <td style="text-align: center;">48.67 ± 0.36</td>
+      <td><code>gamma2_betam1</code> (<em>γ</em>=2, <em>β</em>=−ln 2)</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>
+As documented in Table 8.3, across all six evaluation cells, the candidate <code>gamma2_betam1</code> (<em>γ</em> = 2, <em>β</em> = −ln 2 ≈ −0.693147) was identified as the feasible optimal configuration under leave-one-engine-out validation cross-validation (ADR-021). The reported validation RMSE values represent the mean and standard deviation across the five frozen random seeds ([2026..2030]).
+</p>
+
+<h3 class="subsubsection-title">Scientific Demarcation Statement</h3>
+<p>
+In strict accordance with confirmatory empirical protocols, the validation metrics in Table 8.3 represent development partition performance. Held-out test trajectories (122 engines across FD001, FD002, FD004) remain strictly blinded prior to official confirmatory execution. Development validation success confirms the numerical stability and convergence of the base models, but does not constitute confirmatory evidence of maintenance cost superiority, subgroup reliability, or cross-condition generalizability.
+</p>
+
+<h2 class="subsection-title">8.4 Pre-Registered Confirmatory Protocol and Expected Experimental Results</h2>
+<p>
+The final scientific evaluation of IntelliTwin is framed around four pre-registered Research Questions (RQ1–RQ4) evaluated via 152 formal hypothesis components structured under an Intersection-Union Test (IUT) framework [12].
+</p>
+
+<div class="table-caption">Table 8.4: Pre-Registered Confirmatory Research Questions, Evaluation Metrics, and Decision Margins.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 25%;">Research Question</th>
+      <th style="width: 45%;">Evaluation Target &amp; Target Metric</th>
+      <th style="width: 20%;">Pre-Registered Practical Margin</th>
+      <th style="width: 10%; text-align: center;">Components</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>RQ1: Maintenance Utility</strong></td>
+      <td>Cost reduction &amp; coverage validity on FD002 primary multi-regime</td>
+      <td>Δ<sub>cost</sub> &gt; 0.20 SCU, <em>E</em> &lt; 0.05, Δ<sub>fail</sub> ≤ 0</td>
+      <td style="text-align: center;">14</td>
+    </tr>
+    <tr>
+      <td><strong>RQ2: Subgroup Reliability</strong></td>
+      <td>Worst-subgroup coverage error across 6 regimes &amp; 3 wear stages</td>
+      <td>Δ<sub>error</sub> &gt; 0.01, <em>E</em>(<em>g</em>) &lt; 0.05, <em>D</em><sub>width</sub> &lt; 1.0</td>
+      <td style="text-align: center;">20</td>
+    </tr>
+    <tr>
+      <td><strong>RQ3: Decision Attribution</strong></td>
+      <td>Cost improvement over 4 matched-conservatism control baselines</td>
+      <td>Δ<sub>cost</sub> &gt; 0.20 SCU, <em>E</em> &lt; 0.05, Δ<sub>fail</sub> ≤ 0</td>
+      <td style="text-align: center;">22</td>
+    </tr>
+    <tr>
+      <td><strong>RQ4: Matrix Generalization</strong></td>
+      <td>Weighted aggregate superiority &amp; non-harm across all 6 cells</td>
+      <td>Agg: &gt;0.20, &gt;0.01; Cell: ≥ −0.20, ≥ −0.01</td>
+      <td style="text-align: center;">96</td>
+    </tr>
+    <tr style="font-weight: bold; background-color: #f6f8fa;">
+      <td>Total Components</td>
+      <td>Full Intersection-Union Test (IUT) specification across all cells</td>
+      <td>Strictly fail-closed component logic</td>
+      <td style="text-align: center;">152</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsubsection-title">Expected Confirmatory Experimental Outcomes</h3>
+<p>
+Based on the validated mathematical formulation and development experiments, the expected empirical outcomes on held-out test partitions are specified as follows:
+</p>
+<ul>
+  <li><strong>Expected Outcome for RQ1 (Maintenance Utility)</strong>: The proposed condition-adaptive conformal calibration method (<code>decision_aware_hcp</code>) is expected to achieve a statistically significant reduction in average fleet lifecycle maintenance cost exceeding 0.20 Standardized Cost Units (Δ<sub>cost</sub> &gt; 0.20 SCU) relative to standard global conformal prediction and uncalibrated point-prediction baselines, while strictly preserving marginal prediction interval coverage error within 5% (<em>E</em> = |(1−<em>α</em>) − PICP| &lt; 0.05) without increasing observed in-service failure rates (Δ<sub>fail</sub> ≤ 0) [5], [7], [8].</li>
+  <li><strong>Expected Outcome for RQ2 (Subgroup Conditional Reliability)</strong>: Condition-adaptive regime and wear-stage partitioning is expected to eliminate severe localized undercoverage vulnerabilities observed in global conformal calibration. Specifically, worst-group coverage error is expected to improve by at least 1 percentage point (Δ<sub>error</sub> &gt; 0.01) across the six operational flight regimes (<em>C</em><sub>1</sub>–<em>C</em><sub>6</sub>) and three lifecycle wear stages (Early, Mid, Late), maintaining all subgroup errors within 5% (<em>E</em>(<em>g</em>) &lt; 0.05) without inducing excessive interval width inflation (<em>D</em><sub>width</sub> &lt; 1.0 cycle) [4], [10].</li>
+  <li><strong>Expected Outcome for RQ3 (Decision-Value Attribution)</strong>: The proposed method is expected to maintain statistically significant cost superiority (Δ<sub>cost</sub> &gt; 0.20 SCU) when contrasted against all three matched-conservatism control families (uniformly widened intervals, point safety margins, and earlier scheduled overhaul thresholds), establishing that operational savings stem from genuine risk-directed uncertainty quantification rather than arbitrary early intervention [8], [12].</li>
+  <li><strong>Expected Outcome for RQ4 (Cross-Condition Generalization and Non-Harm)</strong>: Across the complete 6-cell evaluation matrix (FD001, FD002, FD004 × GBR, LSTM), the weighted aggregate contrast is expected to demonstrate simultaneous cost reduction (Δ̄<sub>cost</sub> &gt; 0.20 SCU) and reliability improvement (Δ̄<sub>error</sub> &gt; 0.01). Concurrently, Two One-Sided Tests (TOST) are expected to establish non-harm in every individual evaluation cell (Lower 98.75% CI of Δ<sub>cost</sub> ≥ −0.20 SCU, Δ<sub>error</sub> ≥ −0.01) under strict Bonferroni family-wise error rate control (<em>α</em> = 0.0125) [12].</li>
+</ul>
+
+<h2 class="subsection-title">8.5 Verification, Audit Trail, and Reproducibility Matrix</h2>
+<p>
+To satisfy the highest standards of scientific reproducibility, the IntelliTwin repository maintains a comprehensive audit trail tracking executed verification, historical baselines, and pending confirmatory experiments (ADR-022).
+</p>
+
+<div class="table-caption">Table 8.5: IntelliTwin Reproducibility, Verification Audit, and Artifact Status Matrix.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 20%;">Category</th>
+      <th style="width: 22%;">Audit Item</th>
+      <th style="width: 32%;">Verification Scope &amp; Criterion</th>
+      <th style="width: 14%;">Evidence Artifact</th>
+      <th style="width: 12%; text-align: center;">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Base Model Registry</td>
+      <td>30 checkpoints across 3 datasets; SHA-256 integrity</td>
+      <td><code>model_registry.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Prediction Reproduction</td>
+      <td>Exact numerical output match (GBR max diff 0.0000)</td>
+      <td><code>step07_prediction_reproduction.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Calibration Bundles</td>
+      <td>90 calibrator bundles (270 coverage sets) validated</td>
+      <td><code>calibration_registry.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Candidate Selection</td>
+      <td>Validation selection frozen under ADR-021</td>
+      <td><code>selection_freeze.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Step 8 Reproduction</td>
+      <td>60 model/partition reproductions rechecked</td>
+      <td><code>reused_evidence.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Pre-Test Audit (v4)</td>
+      <td>Step 9 evaluation scripts &amp; controls audited</td>
+      <td><code>pretest_audit.json</code></td>
+      <td style="text-align: center;"><span class="badge-ready">PRETEST_READY</span></td>
+    </tr>
+    <tr>
+      <td><strong>Executed Verification</strong></td>
+      <td>Digital Twin Parity</td>
+      <td>Replay engine parity ≤ 10<sup>−4</sup> vs batch across 37 pytests</td>
+      <td><code>test_twin_replay.py</code></td>
+      <td style="text-align: center;"><span class="badge-pass">PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Historical Evidence</strong></td>
+      <td>Step 8 Full Audit v2</td>
+      <td>Historical PR #25 verification baseline</td>
+      <td><code>step08_full_audit.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">HISTORICAL_PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Historical Evidence</strong></td>
+      <td>Protected Artifacts</td>
+      <td>652 tracked protected artifacts verified</td>
+      <td><code>baseline_manifest.json</code></td>
+      <td style="text-align: center;"><span class="badge-pass">HISTORICAL_PASS</span></td>
+    </tr>
+    <tr>
+      <td><strong>Blinded Trajectories</strong></td>
+      <td>Held-Out Test Data</td>
+      <td>122 test engines strictly blinded prior to test</td>
+      <td><code>experiments/confirmatory/</code></td>
+      <td style="text-align: center;"><span class="badge-notstarted">NOT_STARTED</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pending Experiments</strong></td>
+      <td>Primary Test Execution</td>
+      <td>Held-out point and interval outcomes (UPD-02)</td>
+      <td>Test evaluation logs</td>
+      <td style="text-align: center;"><span class="badge-pending">PENDING</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pending Experiments</strong></td>
+      <td>Maintenance Simulation</td>
+      <td>Fleet lifecycle costs &amp; failure rates (UPD-03)</td>
+      <td>Simulation logs</td>
+      <td style="text-align: center;"><span class="badge-pending">PENDING</span></td>
+    </tr>
+    <tr>
+      <td><strong>Pending Experiments</strong></td>
+      <td>IUT Decisions (152)</td>
+      <td>10k cluster bootstrap hypothesis decisions (UPD-04)</td>
+      <td>Confirmatory report</td>
+      <td style="text-align: center;"><span class="badge-pending">PENDING</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="subsection-title">8.6 Milestone Delivery and Next Steps</h2>
+<p>
+With the completion of Phase 8, the software implementation, dataset qualification, base model freezing, calibration pipeline, simulation engine, and pre-registered statistical protocol stand fully verified with <code>PRETEST_READY</code> audit status. Subsequent synopsis phases will document system requirements and tools (Phase 9), followed by conclusion and future roadmap (Phase 10), culminating in final Overleaf synchronization and total page budget alignment (6–8 pages per institutional circular <code>AKGEC/IT/CSIT/26-27/PROJ-m</code>).
+</p>
+
+<h2 class="subsection-title">References</h2>
+<div class="reference-item">[1] A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage propagation modeling for aircraft engine run-to-failure simulation," in <em>Proc. 2008 Int. Conf. Prognostics and Health Management (PHM)</em>, IEEE, 2008, pp. 1–9.</div>
+<div class="reference-item">[2] Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, "A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics," <em>Sensors</em>, vol. 21, no. 19, p. 6340, 2021.</div>
+<div class="reference-item">[3] R. Diao, M. Zhou, G. Meng, and S. Wang, "Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration," <em>Sensors</em>, vol. 26, no. 7, p. 2249, 2026.</div>
+<div class="reference-item">[4] A. Javanmardi and E. Hüllermeier, "Conformal prediction intervals for remaining useful lifetime estimation," <em>Int. J. Progn. Health Manag.</em>, vol. 14, no. 2, pp. 1–14, 2023.</div>
+<div class="reference-item">[5] Z. Zhu, L. Wang, M. Chen, and X. Zhao, "Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval," <em>Qual. Reliab. Eng. Int.], 2025, doi: 10.1002/qre.70043.</div>
+<div class="reference-item">[6] C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, "Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction," <em>Neurocomputing</em>, vol. 494, pp. 79–88, 2022.</div>
+<div class="reference-item">[7] S. Cortes-Gomez, C. M. Patiño, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, "Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification," in <em>Int. Conf. Learn. Represent. (ICLR)</em>, 2025.</div>
+<div class="reference-item">[8] G. K. Walia and M. Kumar, "Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT," <em>Reliab. Eng. Syst. Saf.</em>, p. 112356, 2026.</div>
+<div class="reference-item">[9] Y. Lee, R. F. Barber, and R. Willett, "Distribution-free inference with hierarchical data," <em>arXiv preprint arXiv:2306.06342</em>, 2023.</div>
+<div class="reference-item">[10] C. D. Robinson, "Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression," <em>Int. J. Progn. Health Manag.</em>, vol. 17, no. 1, p. 4724, 2026.</div>
+<div class="reference-item">[11] T. Gneiting and A. E. Raftery, "Strictly proper scoring rules, prediction, and estimation," <em>J. Am. Stat. Assoc.</em>, vol. 102, no. 477, pp. 359–378, 2007.</div>
+<div class="reference-item">[12] D. Lakens, "Equivalence tests: A practical primer for t tests, correlations, and meta-analyses," <em>Soc. Psychol. Personal. Sci.</em>, vol. 8, no. 4, pp. 355–362, 2017.</div>
+<div class="reference-item">[13] J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, "Research on remaining useful life prediction of equipment based on digital twins," <em>Sensors</em>, vol. 26, no. 4, p. 1240, 2026.</div>
+<div class="reference-item">[14] ISO 23247-1:2021, "Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles," International Organization for Standardization, Geneva, Switzerland, 2021.</div>
+
+</div>
+
+</body>
+</html>
