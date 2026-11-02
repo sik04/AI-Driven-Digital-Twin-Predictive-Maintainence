@@ -6,8 +6,8 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 6 (Proposed Methodology) — **COMPLETED (AWAITING USER APPROVAL)**  
-**Last Updated:** November 1, 2026  
+**Current Phase:** Phase 7 (System Architecture and Workflow) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Last Updated:** November 2, 2026  
 
 ---
 
@@ -30,8 +30,8 @@
 | **Phase 3** | Problem Definition, Research Gap and Research Questions | `problem_definition.tex`, `problem_definition.docx`, `problem_definition.pdf` | **COMPLETED** |
 | **Phase 4** | Literature Survey (Thematic Review, Comparison Table & Gap) | `literature_survey.tex`, `literature_survey.docx`, `literature_survey.pdf` | **APPROVED** |
 | **Phase 5** | Objectives and Scope | `objectives_and_scope.tex`, `objectives_and_scope.docx`, `objectives_and_scope.pdf` | **APPROVED** |
-| **Phase 6** | Proposed Methodology & Algorithmic Formulation | `proposed_methodology.tex`, `proposed_methodology.docx`, `proposed_methodology.pdf` | **COMPLETED (AWAITING APPROVAL)** |
-| **Phase 7** | System Architecture & Workflow Diagrams | Architecture Diagrams & Pipeline Specs | Scheduled |
+| **Phase 6** | Proposed Methodology & Algorithmic Formulation | `proposed_methodology.tex`, `proposed_methodology.docx`, `proposed_methodology.pdf` | **APPROVED** |
+| **Phase 7** | System Architecture & Workflow Diagrams | `system_architecture.tex`, `system_architecture.docx`, `system_architecture.pdf` | **COMPLETED (AWAITING APPROVAL)** |
 | **Phase 8** | Implementation Status and Results / Expected Results | Experimental Artifacts & Status Reports | Scheduled |
 | **Phase 9** | Tools, Technologies and System Requirements | Requirements & Technology Stack | Scheduled |
 | **Phase 10** | Conclusion and Future Work | Conclusion & Roadmap | Scheduled |
@@ -442,13 +442,74 @@
   - Mathematical Formulations: Numbered LaTeX equations fully consistent with implementation in `src/intellitwin/` — **PASS**
   - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
 - **Overall Validation Status**: **PASS (100% Compliant)**.
-- **Current Phase 6 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+- **Formal Phase 6 Status**: **APPROVED** (Formally reviewed and approved by user).
 
 ### 10.5 Git Automation & Commit Verification
 - **Commit Message**: `docs: add synopsis proposed methodology`
-- **Commit Hash**: `319f3ff`
+- **Commit Hash**: `319f3ff` (Verification tracking commit: `23839b8`)
 - **Remote Branch**: `main` -> `origin/main`
-- **Push Status**: Verified successfully pushed (`193f5c0..319f3ff`).
+- **Push Status**: Verified successfully pushed (`193f5c0..23839b8`).
+
+---
+
+## 11. Phase 7 System Architecture & Workflow Deliverables & Validation Summary
+
+### 11.1 Deliverables in `synopsis/Phase_7_System_Architecture/`
+- `system_architecture.docx`: Fully editable Microsoft Word document adhering strictly to AKGEC specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, 10 pages).
+- `system_architecture.pdf`: High-resolution vector PDF rendered via headless Chrome engine (10 pages, zero orphan lines, embedded vector figures).
+- `system_architecture.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure, IEEE citation style, and native TikZ diagrams (2,112 words excluding references/TikZ).
+- `system_architecture.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines with embedded SVG vector diagrams.
+- `generate_system_architecture.py`: Python automation script ensuring 100% deterministic, reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 7 metadata, architectural tier breakdown, diagram specifications, traceability matrix, and compliance documentation.
+
+### 11.2 Structural Breakdown & Architectural Tier Audit
+- **Section 7.1: Architectural Overview and Multi-Tier Decomposition** (~360 words)
+  - 5-tier decoupled cyber-physical architecture: Tier 1 Data Ingestion & Preprocessing; Tier 2 Prognostic Base Inference; Tier 3 Hierarchical Conformal Calibration; Tier 4 Sequential Decision & Maintenance Simulation; Tier 5 Digital Twin Synchronization & Presentation.
+  - *Physical Integration Boundary*: Explicitly demarcated around offline trace-driven simulation of NASA C-MAPSS. Excludes live physical aircraft hardware, live IoT bus protocols, and closed-loop actuation.
+  - *Strict Anti-Leakage Boundary*: Impermeable partition isolating held-out test data from training and hyperparameter selection.
+- **Section 7.2: Data Ingestion, Normalization, and Causal Windowing Pipeline** (~430 words)
+  - *Schema & Invariant Pruning*: Dropped six invariant channels ($\mathcal{S}_{\text{dropped}} = \{ s_1, s_5, s_6, s_{10}, s_{16}, s_{19} \}$), retaining $d = 17$ informative channels (3 settings + 14 degradation sensors).
+  - *Engine-Level Disjoint Splits*: FD001 (50/20/10/20), FD002 (130/52/26/52), FD004 (124/50/25/50).
+  - *Training-Only Standardization*: Z-scores $(\boldsymbol{\mu}_{\text{train}}, \boldsymbol{\sigma}_{\text{train}})$ with `ddof=0`; K-means ($K=6$) regime clustering on flight settings.
+  - *Causal Sliding Lookback*: Fixed horizon $W = 30$ cycles with stride 1. Dual representations: $30 \times 17$ 2D sequential tensor (LSTM) and 510-dim 1D C-order vector (GBR).
+- **Section 7.3: Prognostic Base Inference Tier** (~320 words)
+  - *Dual Target Formulations*: Capped training targets $y_{\text{train}, i}(t) = \min(R_{\text{max}}, T_i - t)$ with $R_{\text{max}} = 125$ cycles vs. uncapped evaluation targets $y_{\text{eval}, i}(t) = T_i - t$.
+  - *Base Models*: Multi-quantile `HistGradientBoostingRegressor` (pinball loss across $\rho \in \{0.05, 0.50, 0.95\}$) and PyTorch Bidirectional LSTM (2 layers, $h=64$, recurrent dropout $0.20$, MSE loss). 30 frozen checkpoints across 5 seeds `[2026..2030]`.
+- **Section 7.4: Hierarchical Conformal Calibration and Interval Inversion Workflow** (~440 words)
+  - *Asymmetric Scoring*: Nonconformity scores with dynamic shape factors ($\sigma(p)=(1+p/125)^\gamma$, $z(p)=\exp(-p/20)$, $a(p)=\sigma(p)\exp(\beta z(p))$, $b(p)=\sigma(p)\exp(-\beta z(p))$ with $\gamma=2, \beta=-\ln 2$).
+  - *Engine-Weighted Quantiles*: Weights $w_{i,t} = \frac{1}{(m+1)n_i}$, finite mass $\frac{m}{m+1}$, point-at-infinity $\frac{1}{m+1}$, nominal $1-\alpha = 0.90$. Regime stratification with fallback for $m_g < 10$.
+  - *Closed-Form Bounds*: $L_i(t) = \max(0, \hat{p}_i(t) - \hat{q}_{1-\alpha} a(\hat{p}_i(t)))$ and $U_i(t) = \hat{p}_i(t) + \hat{q}_{1-\alpha} b(\hat{p}_i(t))$.
+- **Section 7.5: Discrete-Event Sequential Maintenance Utility Simulation Workflow** (~290 words)
+  - *Stopping Rule*: $\tau_i = \inf \{ t \ge W : L_i(t) \le 1.0 \text{ cycle} \}$.
+  - *Standardized Cost Units (SCU)*: Planned overhaul $C_{\text{PM}} = 1.0$, in-service failure $C_{\text{FAIL}} = 5.0$, wasted life $C_{\text{WASTE}} = 0.20$ SCU/cycle.
+  - *Attribution Testing*: 3 matched-conservatism control families; 10,000 engine cluster bootstraps; Bonferroni $\alpha = 0.0125$; TOST non-harm equivalence bounds.
+- **Section 7.6: Digital Twin State Synchronization and Replay Engine** (~280 words)
+  - *State Machine*: `WARMING_UP` (1..29) $\to$ `ACTIVE` (30..$\tau_i$) $\to$ `MAINTAINED` or `FAILED`.
+  - *Numerical Parity*: $\max_t | \hat{p}_{\text{stream}}(t) - \hat{p}_{\text{batch}}(t) | \le 10^{-4}$ and $\max_t | L_{\text{stream}}(t) - L_{\text{batch}}(t) | \le 10^{-4}$ verified across 37 pytest modules.
+  - *FastAPI & Dashboard*: Modular REST API and HTML5/JS operator dashboard at port 8000.
+- **Section 7.7: Architectural Schematics and Workflow Diagrams**
+  - **Figure 7.1**: Multi-Tier System Architecture and Information Flow.
+  - **Figure 7.2**: Causal Sliding Lookback Window Construction ($W=30$), Dual Representations, and Target Formulations.
+  - **Figure 7.3**: Cycle-by-Cycle Digital Twin Replay Engine and Sequential Maintenance Decision Flowchart.
+- **Total Core Word Count**: **2,112 words** (Excluding references, captions, and TikZ code).
+
+### 11.3 IEEE References & Citations
+- **Total References**: 14 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[14]`.
+- **Sources Cited**: Saxena et al. (2008), Huang et al. (2021), Diao et al. (2026), Javanmardi & Hüllermeier (2023), Zhu et al. (2025), Chen et al. (2022), Cortes-Gomez et al. (2025), Walia & Kumar (2026), Lee et al. (2023), Robinson (2026), Gneiting & Raftery (2007), Lakens (2017), Wu et al. (2026), and ISO 23247-1:2021.
+
+### 11.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Architectural Schematics: Native TikZ in LaTeX, crisp SVG in HTML, and formatted callouts in DOCX — **PASS**
+  - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+- **Current Phase 7 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+
 
 
 

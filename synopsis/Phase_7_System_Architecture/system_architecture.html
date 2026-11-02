@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 7 — System Architecture and Workflow</title>
+<style>
+  @page {
+    size: A4;
+    margin-top: 1.0in;
+    margin-bottom: 1.0in;
+    margin-left: 1.5in;
+    margin-right: 1.0in;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+    }
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+  }
+
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  h1.section-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 16pt;
+    text-align: left;
+    page-break-after: avoid;
+  }
+
+  h2.subsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    page-break-after: avoid;
+  }
+
+  h3.subsubsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-indent: 0;
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    padding-left: 24pt;
+  }
+
+  li {
+    margin-bottom: 4pt;
+    text-align: justify;
+  }
+
+  .formula-box {
+    text-align: center;
+    font-style: italic;
+    margin: 10pt 0;
+    font-family: "Times New Roman", Times, serif;
+    page-break-inside: avoid;
+  }
+
+  .figure-container {
+    margin: 16pt 0;
+    text-align: center;
+    page-break-inside: avoid;
+  }
+
+  .figure-caption {
+    font-size: 10.5pt;
+    font-weight: bold;
+    margin-top: 8pt;
+    text-align: justify;
+    line-height: 1.3;
+  }
+
+  .reference-item {
+    font-size: 10pt;
+    line-height: 1.35;
+    margin-bottom: 6pt;
+    text-align: left;
+    padding-left: 22pt;
+    text-indent: -22pt;
+  }
+
+  .svg-diagram {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #d0d7de;
+    background-color: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+</style>
+</head>
+<body>
+
+<div class="content-container">
+
+<h1 class="section-title">7. System Architecture and Workflow</h1>
+
+<h2 class="subsection-title">7.1 Architectural Overview and Multi-Tier Decomposition</h2>
+<p>
+The IntelliTwin framework is structured around a decoupled, multi-tier cyber-physical research architecture designed to resolve the pervasive gap between data-driven Remaining Useful Life (RUL) estimation, finite-sample distribution-free uncertainty calibration, and sequential operational maintenance decision-making [1]–[3]. In industrial rotating machinery, such as commercial turbofan aircraft engines, standard point predictions optimize symmetric statistical metrics that fail to reflect asymmetric downtime losses (where unscheduled in-service failure penalty significantly exceeds scheduled preventive overhaul cost, <em>C</em><sub>FAIL</sub> ≫ <em>C</em><sub>PM</sub>) [1], [5]. Concurrently, digital twin implementations in manufacturing literature frequently prioritize high-fidelity 3D geometric visualizations or centralized SCADA dashboards without mathematically formalizing how predictive uncertainty should govern discrete intervention decisions [2], [13], [14].
+</p>
+
+<p>
+To bridge these disjoint paradigms, IntelliTwin decomposes asset monitoring, prognostic estimation, uncertainty calibration, and maintenance simulation into five modular, decoupled architectural tiers:
+</p>
+<ol>
+  <li><strong>Tier 1: Data Ingestion and Anti-Leakage Preprocessing Tier</strong>: Ingests multi-sensor run-to-failure streams from the NASA C-MAPSS corpus, enforces immutable engine-level disjoint split isolation, performs invariant sensor pruning, fits training-only normalization parameters, clusters operational settings, and constructs causal sliding lookback windows [1].</li>
+  <li><strong>Tier 2: Prognostic Base Inference Tier</strong>: Houses complementary shallow gradient-boosted decision trees (<code>HistGradientBoostingRegressor</code>) and deep recurrent neural networks (PyTorch <code>LSTM</code>), generating continuous point predictions of Remaining Useful Life [3], [4].</li>
+  <li><strong>Tier 3: Hierarchical Conformal Calibration Tier</strong>: Computes asymmetric nonconformity scores, evaluates exact engine-weighted quantiles under cluster exchangeability, stratifies calibration bounds across operational flight regimes, and inverts scores into finite-sample prediction intervals [<em>L<sub>i</sub></em>(<em>t</em>), <em>U<sub>i</sub></em>(<em>t</em>)] targeting 90% nominal coverage [7], [9].</li>
+  <li><strong>Tier 4: Sequential Decision and Maintenance Simulation Tier</strong>: Evaluates dynamic cycle-by-cycle stopping rules <em>τ<sub>i</sub></em> = inf{<em>t</em> ≥ <em>W</em> : <em>L<sub>i</sub></em>(<em>t</em>) ≤ <em>θ</em>} against conservative lower conformal bounds, tracks economic lifecycle expenditures in Standardized Cost Units (SCU), executes matched-conservatism attribution controls, and conducts 10,000 cluster bootstrap hypothesis tests [5], [8], [12].</li>
+  <li><strong>Tier 5: Digital Twin Synchronization and Presentation Tier</strong>: Formulates a real-time trace-driven state replication engine (<code>TwinReplayEngine</code>) adhering to ISO 23247 principles [14], guarantees strict numerical verification parity (atol ≤ 10<sup>−4</sup>) against offline batch execution, and exposes streaming REST endpoints via FastAPI to an interactive HTML5/JavaScript operator dashboard [2], [13].</li>
+</ol>
+
+<h3 class="subsubsection-title">Physical Integration and Research Demarcation</h3>
+<p>
+In alignment with rigorous academic reporting standards, the physical integration boundary of the IntelliTwin system is explicitly demarcated:
+</p>
+<ul>
+  <li><strong>Offline Trace-Driven Simulation</strong>: The architecture operates on historical run-to-failure telemetry from the NASA C-MAPSS simulator [1]. No live turbofan engine is physically connected to the host system, and no hardware IoT sensor bus (e.g., MQTT, OPC UA) is claimed.</li>
+  <li><strong>Advisory Decision Support</strong>: Maintenance orders dispatched by the simulation tier represent advisory recommendations for maintenance engineers; closed-loop physical actuation (e.g., automatic engine shutdown or thrust throttling) is strictly out of scope.</li>
+  <li><strong>Strict Anti-Leakage Boundary</strong>: Held-out test trajectories are isolated from model training, hyperparameter grid search, and conformal score calibration. True failure times and oracle RUL values are revealed exclusively to offline evaluation routines for post-hoc scoring.</li>
+</ul>
+
+<h2 class="subsection-title">7.2 Data Ingestion, Normalization, and Causal Windowing Pipeline</h2>
+<p>
+The data pipeline ingests raw continuous multi-sensor records and transforms them into standardized tensor and vector representations while strictly eliminating temporal and inter-engine data leakage.
+</p>
+
+<h3 class="subsubsection-title">C-MAPSS Data Schema and Invariant Channel Pruning</h3>
+<p>
+The raw C-MAPSS dataset provides 26 columns per cycle: engine unit identifier, cycle index, 3 operational flight condition settings, and 21 thermo-mechanical degradation sensors [1]. Across multi-regime datasets (FD002, FD004), a systematic variance audit identified six invariant or uninformative channels exhibiting zero variance or uninformative responses across all regimes:
+</p>
+<div class="formula-box">
+  <em>S</em><sub>dropped</sub> = { <em>s</em><sub>1</sub> (T2), <em>s</em><sub>5</sub> (P2), <em>s</em><sub>6</sub> (P15), <em>s</em><sub>10</sub> (epr), <em>s</em><sub>16</sub> (farB), <em>s</em><sub>19</sub> (Nf_dmd) }
+</div>
+<p>
+Excluding these uninformative channels eliminates matrix rank deficiency and numerical instability. The retained schema comprises <em>d</em> = 17 informative channels: 3 operating settings (<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, <em>z</em><sub>3</sub>) and 14 dynamic thermo-mechanical sensors (temperatures, pressures, core/fan speeds, fuel ratios, and coolant bleeds).
+</p>
+
+<h3 class="subsubsection-title">Strict Engine-Level Split Partitioning</h3>
+<p>
+To prevent inter-engine correlation leakage, partitioning is strictly enforced at the engine unit level. For each benchmark dataset, entire run-to-failure engine trajectories belong exclusively to one split:
+</p>
+<ul>
+  <li><strong>FD001 (Single-Regime Control)</strong>: 100 total engines split into 50 Training, 20 Calibration, 10 Validation, and 20 Test engines.</li>
+  <li><strong>FD002 (Multi-Regime Primary)</strong>: 260 total engines split into 130 Training, 52 Calibration, 26 Validation, and 52 Test engines.</li>
+  <li><strong>FD004 (Multi-Regime / Multi-Fault Robustness)</strong>: 249 total engines split into 124 Training, 50 Calibration, 25 Validation, and 50 Test engines.</li>
+</ul>
+
+<h3 class="subsubsection-title">Training-Only Normalization and Regime Clustering</h3>
+<p>
+Standardization parameters (mean <strong>μ</strong><sub>train</sub> and population standard deviation <strong>σ</strong><sub>train</sub>, computed with <code>ddof=0</code>) are derived solely from the designated Training engines:
+</p>
+<div class="formula-box">
+  <strong>x̃</strong><sub><em>i</em></sub>(<em>t</em>) = (<strong>x</strong><sub><em>i</em></sub>(<em>t</em>) − <strong>μ</strong><sub>train</sub>) / (<strong>σ</strong><sub>train</sub> + <em>ε</em>)
+</div>
+<p>
+where <em>ε</em> = 10<sup>−8</sup> prevents division by zero. For multi-regime sub-corpora (FD002, FD004), operating settings (<em>z</em><sub>1</sub>, <em>z</em><sub>2</sub>, <em>z</em><sub>3</sub>) are standardized and clustered into <em>K</em> = 6 operational regimes (<em>C</em><sub>1</sub> to <em>C</em><sub>6</sub>) via K-means clustering (<em>K</em> = 6, <code>random_state=2026</code>, <code>n_init=10</code>) fitted exclusively on training data, preserving deterministic centroid ordering.
+</p>
+
+<h3 class="subsubsection-title">Causal Sliding-Window Formulation</h3>
+<p>
+To preserve temporal causality, feature representations are constructed using a fixed sliding lookback window of length <em>W</em> = 30 cycles with stride 1:
+</p>
+<div class="formula-box">
+  <strong>X</strong><sub><em>i</em></sub>(<em>t</em>) = [ <strong>x̃</strong><sub><em>i</em></sub>(<em>t</em> − <em>W</em> + 1),  <strong>x̃</strong><sub><em>i</em></sub>(<em>t</em> − <em>W</em> + 2),  …,  <strong>x̃</strong><sub><em>i</em></sub>(<em>t</em>) ]<sup>T</sup> ∈ ℝ<sup>30 × 17</sup>
+</div>
+<p>
+For early operational cycles (1 ≤ <em>t</em> &lt; <em>W</em> = 30), the causal buffer is filling; zero padding is strictly forbidden, and prognostic inference is deferred until cycle <em>t</em> = 30. Dual feature representations are constructed from this window:
+</p>
+<ul>
+  <li><strong>Sequential Tensor</strong>: A 2D matrix <strong>X</strong><sub><em>i</em></sub>(<em>t</em>) ∈ ℝ<sup>30 × 17</sup> preserving temporal ordering for the recurrent LSTM network.</li>
+  <li><strong>Flattened Vector</strong>: A 1D vector <strong>v</strong><sub><em>i</em></sub>(<em>t</em>) = vec(<strong>X</strong><sub><em>i</em></sub>(<em>t</em>)) ∈ ℝ<sup>510</sup> flattened in C-order (row-major) for gradient-boosted decision trees.</li>
+</ul>
+
+<h2 class="subsection-title">7.3 Prognostic Base Inference Tier</h2>
+<p>
+The prognostic inference tier transforms causal window representations into continuous point estimates of Remaining Useful Life <em>ŷ<sub>i</sub></em>(<em>t</em>).
+</p>
+
+<h3 class="subsubsection-title">Dual Target Conventions</h3>
+<p>
+During base model training, Remaining Useful Life targets are clamped at an upper threshold <em>R</em><sub>max</sub> = 125 cycles:
+</p>
+<div class="formula-box">
+  <em>y</em><sub>train,<em>i</em></sub>(<em>t</em>) = min(<em>R</em><sub>max</sub>, <em>T<sub>i</sub></em> − <em>t</em>)
+</div>
+<p>
+reflecting the empirical physical reality that initial operational wear does not exhibit measurable degradation signatures during early component life [1]. In contrast, during held-out test evaluation, the true uncapped linear degradation target <em>y</em><sub>eval,<em>i</em></sub>(<em>t</em>) = <em>T<sub>i</sub></em> − <em>t</em> is preserved to assess genuine lifetime prognostic accuracy.
+</p>
+
+<h3 class="subsubsection-title">Model Architecture Workflows</h3>
+<p>
+Two diverse, complementary model families are trained and frozen under Architecture Decision Record ADR-018:
+</p>
+<ul>
+  <li><strong>HistGradientBoostingRegressor (GBR)</strong>: Ingests flattened 510-dimensional vectors <strong>v</strong><sub><em>i</em></sub>(<em>t</em>). Optimizes the asymmetric pinball loss function <em>L</em><sub><em>ρ</em></sub>(<em>y</em>, <em>ŷ</em>) = max(<em>ρ</em>(<em>y</em> − <em>ŷ</em>), (1 − <em>ρ</em>)(<em>ŷ</em> − <em>y</em>)) across quantiles <em>ρ</em> ∈ {0.05, 0.50, 0.95} with histogram-binned split finding (max bins = 255, learning rate = 0.05, max leaf nodes = 31, L2 reg = 1.0).</li>
+  <li><strong>PyTorch Deep Bidirectional LSTM</strong>: Ingests sequential tensors <strong>X</strong><sub><em>i</em></sub>(<em>t</em>) ∈ ℝ<sup>30 × 17</sup>. Features two stacked bidirectional LSTM recurrent layers (<em>h</em> = 64 hidden units per direction, 128 concatenated), variational recurrent dropout (<em>p</em> = 0.20), and a LeakyReLU projection head. Optimized using AdamW (<em>η</em> = 10<sup>−3</sup>, weight decay = 10<sup>−4</sup>) under Mean Squared Error loss with cosine annealing scheduling.</li>
+</ul>
+<p>
+Point predictions are non-negatively clipped: <em>p̂<sub>i</sub></em>(<em>t</em>) = max(0, <em>ŷ<sub>i</sub></em>(<em>t</em>)). A total of 30 model checkpoints (3 datasets × 2 architectures × 5 seeds [2026..2030]) are registered and frozen.
+</p>
+
+<h2 class="subsection-title">7.4 Hierarchical Conformal Calibration and Interval Inversion Workflow</h2>
+<p>
+The conformal calibration tier converts raw point predictions into statistically guaranteed, finite-sample prediction intervals <em>C</em><sub>1−<em>α</em></sub>(<strong>X</strong><sub><em>i</em></sub>(<em>t</em>)) = [<em>L<sub>i</sub></em>(<em>t</em>), <em>U<sub>i</sub></em>(<em>t</em>)] targeting nominal 90% coverage (1 − <em>α</em> = 0.90) [4], [7], [9].
+</p>
+
+<h3 class="subsubsection-title">Asymmetric Decision-Aware Nonconformity Scoring</h3>
+<p>
+To penalize hazardous overestimation (<em>ŷ</em> &gt; <em>y</em>, risking in-service failure) more heavily than premature underestimation (<em>ŷ</em> &lt; <em>y</em>, resulting in early inspection), nonconformity scores incorporate state-dependent dynamic scaling [7]:
+</p>
+<div class="formula-box">
+  <em>σ</em>(<em>p̂</em>) = (1 + <em>p̂</em> / 125.0)<sup><em>γ</em></sup>, &emsp; <em>z</em>(<em>p̂</em>) = exp(−<em>p̂</em> / 20.0)<br>
+  <em>a</em>(<em>p̂</em>) = <em>σ</em>(<em>p̂</em>) · exp(<em>β</em> · <em>z</em>(<em>p̂</em>)), &emsp; <em>b</em>(<em>p̂</em>) = <em>σ</em>(<em>p̂</em>) · exp(−<em>β</em> · <em>z</em>(<em>p̂</em>))<br>
+  <em>s<sub>i</sub></em>(<em>t</em>) = max( (<em>p̂<sub>i</sub></em>(<em>t</em>) − <em>y<sub>i</sub></em>(<em>t</em>)) / <em>a</em>(<em>p̂<sub>i</sub></em>(<em>t</em>)), &ensp; (<em>y<sub>i</sub></em>(<em>t</em>) − <em>p̂<sub>i</sub></em>(<em>t</em>)) / <em>b</em>(<em>p̂<sub>i</sub></em>(<em>t</em>)), &ensp; 0 )
+</div>
+<p>
+with candidate parameters <em>γ</em> = 2 and <em>β</em> = −ln 2 ≈ −0.693147, optimized via grid search on the Validation split.
+</p>
+
+<h3 class="subsubsection-title">Exact Engine-Weighted Quantile Solver</h3>
+<p>
+To resolve the clustered temporal autocorrelation of repeated observations within engines, each observation (<em>i</em>, <em>t</em>) from calibration engine <em>i</em> ∈ {1, …, <em>m</em>} is assigned weight <em>w</em><sub><em>i</em>,<em>t</em></sub> = 1 / ((<em>m</em> + 1) · <em>n<sub>i</sub></em>). Total finite probability mass equals <em>m</em> / (<em>m</em> + 1), with the remaining 1 / (<em>m</em> + 1) assigned to +∞ [9]:
+</p>
+<div class="formula-box">
+  <em>F</em><sub>dev</sub>(<em>q</em>) = (1 / (<em>m</em> + 1)) · ∑<sub><em>i</em>=1..<em>m</em></sub> [ (1 / <em>n<sub>i</sub></em>) · ∑<sub><em>t</em>=1..<em>n<sub>i</sub></em></sub> 𝕀(<em>s</em><sub><em>i</em>,<em>t</em></sub> ≤ <em>q</em>) ]
+</div>
+<p>
+The conformal quantile <em>q̂</em><sub>1−<em>α</em></sub> is the smallest observed calibration score satisfying <em>F</em><sub>dev</sub>(<em>q̂</em><sub>1−<em>α</em></sub>) ≥ 1 − <em>α</em>. When calibrating within specific operational flight regimes <em>k</em> ∈ {1, …, <em>K</em>}, condition-adaptive thresholds <em>q̂</em><sub>1−<em>α</em></sub><sup>(<em>k</em>)</sup> are computed; if a regime cluster contains fewer than <em>m<sub>g</sub></em> ≥ 10 calibration engines, fallback routing to the global threshold <em>q̂</em><sub>1−<em>α</em></sub><sup>(global)</sup> is automatically triggered.
+</p>
+
+<h3 class="subsubsection-title">Closed-Form Prediction Interval Inversion</h3>
+<p>
+Given the calibrated threshold <em>q̂</em><sub>1−<em>α</em></sub>, the finite-sample prediction interval is evaluated via closed-form inversion:
+</p>
+<div class="formula-box">
+  <em>L<sub>i</sub></em>(<em>t</em>) = max(0, <em>p̂<sub>i</sub></em>(<em>t</em>) − <em>q̂</em><sub>1−<em>α</em></sub> · <em>a</em>(<em>p̂<sub>i</sub></em>(<em>t</em>))), &emsp; <em>U<sub>i</sub></em>(<em>t</em>) = <em>p̂<sub>i</sub></em>(<em>t</em>) + <em>q̂</em><sub>1−<em>α</em></sub> · <em>b</em>(<em>p̂<sub>i</sub></em>(<em>t</em>))
+</div>
+<p>
+where <em>L<sub>i</sub></em>(<em>t</em>) represents the conservative lower bound on Remaining Useful Life that directly drives downstream maintenance policies.
+</p>
+
+<h2 class="subsection-title">7.5 Discrete-Event Sequential Maintenance Utility Simulation Workflow</h2>
+<p>
+The simulation tier models asset lifecycle progression cycle-by-cycle using a discrete-event simulator (<code>src/intellitwin/simulator/engine.py</code>) [5], [8].
+</p>
+
+<h3 class="subsubsection-title">Sequential Stopping Policy</h3>
+<p>
+At each operational cycle <em>t</em> ≥ 30, the simulator evaluates the lower conformal bound <em>L<sub>i</sub></em>(<em>t</em>). When the lower bound breaches an operational threshold <em>θ</em> (with default <em>θ</em> = 1.0 cycle), a preventive maintenance order is dispatched immediately:
+</p>
+<div class="formula-box">
+  <em>τ<sub>i</sub></em> = inf{ <em>t</em> ≥ <em>W</em> : <em>L<sub>i</sub></em>(<em>t</em>) ≤ 1.0 }
+</div>
+<p>
+If <em>τ<sub>i</sub></em> &lt; <em>T<sub>i</sub></em>, planned maintenance is successfully executed at cycle <em>τ<sub>i</sub></em>, terminating the trajectory without in-service incident. If the engine reaches its terminal cycle before maintenance is triggered (<em>τ<sub>i</sub></em> ≥ <em>T<sub>i</sub></em>), an unscheduled catastrophic failure occurs at cycle <em>T<sub>i</sub></em>.
+</p>
+
+<h3 class="subsubsection-title">Standardized Cost Units (SCU) Evaluation</h3>
+<p>
+Total simulated lifecycle cost for engine <em>i</em> is calculated under the primary reference scenario:
+</p>
+<div class="formula-box">
+  Cost<sub><em>i</em></sub>(<em>τ<sub>i</sub></em>) = <em>C</em><sub>PM</sub> + <em>C</em><sub>WASTE</sub> · (<em>T<sub>i</sub></em> − <em>τ<sub>i</sub></em>) &emsp; if <em>τ<sub>i</sub></em> &lt; <em>T<sub>i</sub></em> (Planned Maintenance)<br>
+  Cost<sub><em>i</em></sub>(<em>τ<sub>i</sub></em>) = <em>C</em><sub>FAIL</sub> &emsp; if <em>τ<sub>i</sub></em> ≥ <em>T<sub>i</sub></em> (Unscheduled In-Service Failure)
+</div>
+<p>
+with economic parameters: planned overhaul <em>C</em><sub>PM</sub> = 1.0 SCU, in-service failure penalty <em>C</em><sub>FAIL</sub> = 5.0 SCU, and wasted component life penalty <em>C</em><sub>WASTE</sub> = 0.20 SCU per cycle.
+</p>
+
+<h3 class="subsubsection-title">Controlled Attribution Protocol</h3>
+<p>
+To verify that cost reductions stem from genuine uncertainty calibration rather than heuristic over-conservatism, outcomes are evaluated against three pre-registered matched-conservatism control families:
+</p>
+<ol>
+  <li><strong>Uniformly Widened Intervals (<em>δ</em>-Widened)</strong>: <em>q̂</em>′ = <em>q̂</em> + <em>δ</em>.</li>
+  <li><strong>Point Safety Margins (Δ-Margin)</strong>: <em>p̂</em>′(<em>t</em>) = <em>p̂</em>(<em>t</em>) − Δ.</li>
+  <li><strong>Earlier Scheduled Intervention (<em>θ</em>-Offset)</strong>: <em>θ</em>′ = <em>θ</em> + <em>τ</em><sub>advance</sub>.</li>
+</ol>
+<p>
+Statistical significance is established via 10,000 engine-level cluster bootstrap draws under Bonferroni family-wise error rate control (<em>α</em> = 0.0125) and Two One-Sided Tests (TOST) non-harm equivalence bounds [12].
+</p>
+
+<h2 class="subsection-title">7.6 Digital Twin State Synchronization and Replay Engine</h2>
+<p>
+To translate scientific models into an interactive operational prototype, IntelliTwin implements a real-time trace-driven Digital Twin synchronization engine (<code>TwinReplayEngine</code>) in <code>src/intellitwin/twin/replay.py</code> [2], [13], [14].
+</p>
+
+<h3 class="subsubsection-title">Thread-Safe Replay State Machine</h3>
+<p>
+The replay engine manages asset state transitions through an explicit lifecycle state machine protected by mutual exclusion locks:
+</p>
+<ul>
+  <li><strong>WARMING_UP (Cycles 1 … 29)</strong>: Sensor frames are buffered into the causal history. Inference is deferred; no prediction bounds or maintenance actions are emitted.</li>
+  <li><strong>ACTIVE (Cycles 30 … min(<em>τ<sub>i</sub></em>, <em>T<sub>i</sub></em> − 1))</strong>: The engine maintains the active 30 × 17 sliding window, applies training Z-scores, computes dual GBR/LSTM forecasts, derives conformal bounds [<em>L<sub>i</sub></em>(<em>t</em>), <em>U<sub>i</sub></em>(<em>t</em>)], calculates dynamic Health Index HI<sub><em>i</em></sub>(<em>t</em>) = min(1.0, <em>p̂<sub>i</sub></em>(<em>t</em>) / 125), and evaluates maintenance policy rules.</li>
+  <li><strong>MAINTAINED (Cycle <em>τ<sub>i</sub></em>)</strong>: Triggered when <em>L<sub>i</sub></em>(<em>t</em>) ≤ 1.0. The session locks, records a planned overhaul event, and halts further telemetry advancement.</li>
+  <li><strong>FAILED (Cycle <em>T<sub>i</sub></em>)</strong>: Reached if cycle <em>t</em> attains total failure cycle <em>T<sub>i</sub></em> without intervention. Records catastrophic failure and terminates the session.</li>
+</ul>
+
+<h3 class="subsubsection-title">Numerical Parity Verification</h3>
+<p>
+To guarantee that real-time replay does not introduce numerical artifacts or windowing drift, the replay engine is audited against offline batch execution:
+</p>
+<div class="formula-box">
+  max<sub><em>t</em></sub> | <em>p̂</em><sub>stream</sub>(<em>t</em>) − <em>p̂</em><sub>batch</sub>(<em>t</em>) | ≤ 10<sup>−4</sup>, &emsp; max<sub><em>t</em></sub> | <em>L</em><sub>stream</sub>(<em>t</em>) − <em>L</em><sub>batch</sub>(<em>t</em>) | ≤ 10<sup>−4</sup>
+</div>
+<p>
+Parity is verified across all benchmark datasets via 37 automated pytest modules, establishing that the interactive operator dashboard displays mathematically identical outputs to the scientific evaluation pipeline.
+</p>
+
+<h3 class="subsubsection-title">REST API Architecture and Operator Dashboard</h3>
+<p>
+The replay engine is exposed via a high-performance FastAPI service (<code>src/intellitwin/twin/api.py</code>):
+</p>
+<ul>
+  <li><code>GET /api/health</code>: System health check, runtime metadata, and frozen model registry status.</li>
+  <li><code>GET /api/catalog</code>: Available benchmark datasets (FD001, FD002, FD004), model families, and test engines.</li>
+  <li><code>POST /api/sessions</code>: Spawns a stateful replay session for a designated engine unit.</li>
+  <li><code>POST /api/sessions/{id}/advance</code>: Consumes exactly one cycle observation, returning updated telemetry, predictions, bounds, and maintenance status.</li>
+  <li><code>POST /api/sessions/{id}/reset</code>: Resets the replay session to cycle 0.</li>
+  <li><code>GET /api/sessions/{id}/trace.csv</code>: Exports complete cycle-by-cycle operational traces for auditing.</li>
+</ul>
+<p>
+The frontend interface (<code>apps/twin_dashboard/</code>) renders an interactive HTML5/JavaScript cockpit featuring dynamic sensor time-series charts, RUL prediction intervals with confidence bands, gauge dials for Health Index, and visual alert indicators (<code>NOMINAL</code>, <code>ADVISORY</code>, <code>CRITICAL_INTERVENTION</code>).
+</p>
+
+<h2 class="subsection-title">7.7 Architectural Schematics and Workflow Diagrams</h2>
+
+<!-- FIGURE 7.1: SYSTEM ARCHITECTURE -->
+<div class="figure-container">
+  <svg class="svg-diagram" viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#333333" />
+      </marker>
+      <marker id="arrow-red" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 1 L 8 5 L 0 9 z" fill="#cf222e" />
+      </marker>
+    </defs>
+    
+    <!-- Title Banner -->
+    <rect x="15" y="10" width="730" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+    <text x="380" y="27" font-family="'Times New Roman', Times, serif" font-size="12pt" font-weight="bold" text-anchor="middle" fill="#24292f">INTELLITWIN MULTI-TIER SYSTEM ARCHITECTURE &amp; PARTITION ISOLATION</text>
+
+    <!-- Tier 1: Dataset Partitioning -->
+    <rect x="25" y="55" width="165" height="120" rx="4" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+    <text x="107" y="75" font-family="'Times New Roman', Times, serif" font-size="10.5pt" font-weight="bold" text-anchor="middle" fill="#0969da">Engine Disjoint Splits</text>
+    <text x="107" y="93" font-family="'Times New Roman', Times, serif" font-size="9pt" text-anchor="middle" fill="#24292f">NASA C-MAPSS Corpus</text>
+    <text x="107" y="110" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#57606a">FD001: 50 / 20 / 10 / 20</text>
+    <text x="107" y="125" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#57606a">FD002: 130 / 52 / 26 / 52</text>
+    <text x="107" y="140" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#57606a">FD004: 124 / 50 / 25 / 50</text>
+    <text x="107" y="160" font-family="'Times New Roman', Times, serif" font-size="8pt" font-style="italic" text-anchor="middle" fill="#0969da">(Train / Cal / Val / Test)</text>
+
+    <!-- Connecting lines from split -->
+    <path d="M 190 85 L 235 85" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 190 115 L 235 150" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 190 135 L 235 215" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 190 160 L 210 160 L 210 305 L 235 305" fill="none" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="4" marker-end="url(#arrow-red)"/>
+
+    <!-- Training Partition -->
+    <rect x="235" y="55" width="165" height="60" rx="4" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="317" y="73" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#1a7f37">1. Training Partition</text>
+    <text x="317" y="88" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Training Z-scores &amp; 6 Regimes</text>
+    <text x="317" y="103" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">GBR &amp; LSTM: target min(RUL, 125)</text>
+
+    <!-- Validation Partition -->
+    <rect x="235" y="125" width="165" height="55" rx="4" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="317" y="143" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#9a6700">2. Validation Partition</text>
+    <text x="317" y="158" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Grid Search (γ=2, β=−ln 2)</text>
+    <text x="317" y="172" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Control Calibration Tuning</text>
+
+    <!-- Calibration Partition -->
+    <rect x="235" y="190" width="165" height="55" rx="4" fill="#fbefff" stroke="#8250df" stroke-width="1.5"/>
+    <text x="317" y="208" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#8250df">3. Reserved Calibration</text>
+    <text x="317" y="223" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Engine-Weighted Quantiles</text>
+    <text x="317" y="237" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Finite mass m/(m+1); Reg. mg ≥ 10</text>
+
+    <!-- Tier 4: Decision Policy -->
+    <rect x="445" y="115" width="145" height="85" rx="4" fill="#fff1e5" stroke="#bc4c00" stroke-width="1.5"/>
+    <text x="517" y="135" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#bc4c00">Frozen Decision Policy</text>
+    <text x="517" y="152" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">L(t) = max(0, p̂ − q̂ · a(p̂))</text>
+    <text x="517" y="167" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Rule: Maintain iff L(t) ≤ 1.0</text>
+    <text x="517" y="182" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Evaluated on cycles 30..T</text>
+
+    <!-- Arrows into Policy -->
+    <path d="M 400 85 L 420 85 L 420 145 L 445 145" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 400 152 L 445 152" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 400 215 L 420 215 L 420 170 L 445 170" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Offline Simulation Replay -->
+    <rect x="615" y="115" width="125" height="185" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+    <text x="677" y="135" font-family="'Times New Roman', Times, serif" font-size="9.5pt" font-weight="bold" text-anchor="middle" fill="#cf222e">Offline Simulation</text>
+    <text x="677" y="152" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">SCU Cost Pricing:</text>
+    <text x="677" y="167" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">CPM = 1.0 SCU</text>
+    <text x="677" y="182" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">CFAIL = 5.0 SCU</text>
+    <text x="677" y="197" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">CWASTE = 0.20/cyc</text>
+    <text x="677" y="222" font-family="'Times New Roman', Times, serif" font-size="8pt" font-weight="bold" text-anchor="middle" fill="#cf222e">10k Bootstrap Draws</text>
+    <text x="677" y="237" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">Bonferroni α=0.0125</text>
+    <text x="677" y="252" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">TOST Non-Harm</text>
+    <text x="677" y="280" font-family="'Times New Roman', Times, serif" font-size="7.5pt" font-style="italic" text-anchor="middle" fill="#cf222e">Oracle RUL Private</text>
+
+    <path d="M 590 157 L 615 157" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Strict Anti-Leakage Boundary -->
+    <rect x="225" y="275" width="520" height="95" rx="4" fill="none" stroke="#cf222e" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="235" y="292" font-family="'Times New Roman', Times, serif" font-size="8pt" font-weight="bold" fill="#cf222e">STRICT OFFLINE EVALUATION BOUNDARY (ZERO FEEDBACK TO MODEL SELECTION)</text>
+
+    <!-- Held-Out Test Partition Box inside Boundary -->
+    <rect x="235" y="300" width="165" height="60" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+    <text x="317" y="318" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#cf222e">4. Held-Out Test Split</text>
+    <text x="317" y="333" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Unseen run-to-failure engines</text>
+    <text x="317" y="348" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">FD001: 20 | FD002: 52 | FD004: 50</text>
+
+    <!-- Path from Test to Offline Sim -->
+    <path d="M 400 330 L 677 330 L 677 300" fill="none" stroke="#cf222e" stroke-width="1.5" marker-end="url(#arrow-red)"/>
+    <text x="535" y="324" font-family="'Times New Roman', Times, serif" font-size="7.5pt" fill="#cf222e" text-anchor="middle">Evaluated strictly post-hoc (No leakage)</text>
+
+    <!-- Digital Twin Replay Box -->
+    <rect x="25" y="200" width="165" height="160" rx="4" fill="#f6f8fa" stroke="#57606a" stroke-width="1.5"/>
+    <text x="107" y="220" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#24292f">Digital Twin Engine</text>
+    <text x="107" y="237" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">ISO 23247 Synchronization</text>
+    <text x="107" y="255" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">• Replay Session Machine</text>
+    <text x="107" y="272" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">• Numerical Parity ≤ 10⁻⁴</text>
+    <text x="107" y="289" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">• FastAPI REST API (:8000)</text>
+    <text x="107" y="306" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">• HTML5/JS Dashboard</text>
+    <text x="107" y="325" font-family="'Times New Roman', Times, serif" font-size="7.5pt" font-style="italic" text-anchor="middle" fill="#57606a">Advisory Decision Support</text>
+    <text x="107" y="342" font-family="'Times New Roman', Times, serif" font-size="7.5pt" font-style="italic" text-anchor="middle" fill="#cf222e">No Live Hardware Actuation</text>
+  </svg>
+  <div class="figure-caption">
+    <strong>Figure 7.1:</strong> Multi-Tier System Architecture and Information Flow. Telemetry is partitioned by physical engine unit across disjoint splits. Training parameters and conformal calibration bounds flow strictly forward into the frozen decision policy. Held-out test evaluation is isolated behind a strict offline boundary with zero feedback to model selection or parameter tuning.
+  </div>
+</div>
+
+<!-- FIGURE 7.2: CAUSAL WINDOWING -->
+<div class="figure-container">
+  <svg class="svg-diagram" viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg">
+    <!-- Title -->
+    <rect x="15" y="10" width="730" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+    <text x="380" y="27" font-family="'Times New Roman', Times, serif" font-size="12pt" font-weight="bold" text-anchor="middle" fill="#24292f">CAUSAL SLIDING-WINDOW FORMULATION AND TARGET ATTACHMENT</text>
+
+    <!-- Timeline Baseline -->
+    <line x1="35" y1="95" x2="720" y2="95" stroke="#8c959f" stroke-width="2"/>
+
+    <!-- Cycles 1 to 29 (Warm-up) -->
+    <rect x="40" y="70" width="28" height="50" rx="3" fill="#f6f8fa" stroke="#afb8c1" stroke-width="1"/>
+    <text x="54" y="100" font-family="'Times New Roman', Times, serif" font-size="9pt" text-anchor="middle" fill="#57606a">1</text>
+    <rect x="73" y="70" width="28" height="50" rx="3" fill="#f6f8fa" stroke="#afb8c1" stroke-width="1"/>
+    <text x="87" y="100" font-family="'Times New Roman', Times, serif" font-size="9pt" text-anchor="middle" fill="#57606a">2</text>
+    <text x="120" y="100" font-family="'Times New Roman', Times, serif" font-size="11pt" text-anchor="middle" fill="#8c959f">···</text>
+    <rect x="140" y="70" width="34" height="50" rx="3" fill="#f6f8fa" stroke="#afb8c1" stroke-width="1"/>
+    <text x="157" y="100" font-family="'Times New Roman', Times, serif" font-size="9pt" text-anchor="middle" fill="#57606a">29</text>
+
+    <!-- Warm-up Bracket -->
+    <path d="M 40 128 L 40 138 L 107 138 L 107 146 L 107 138 L 174 138 L 174 128" fill="none" stroke="#57606a" stroke-width="1.2"/>
+    <text x="107" y="160" font-family="'Times New Roman', Times, serif" font-size="8.5pt" font-weight="bold" text-anchor="middle" fill="#57606a">Warm-Up Horizon (Cycles 1–29)</text>
+    <text x="107" y="174" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">No prediction emitted; causal buffer accumulating</text>
+
+    <!-- Causal Window Cycles t-29 ... t -->
+    <rect x="220" y="70" width="42" height="50" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+    <text x="241" y="99" font-family="'Times New Roman', Times, serif" font-size="8pt" font-weight="bold" text-anchor="middle" fill="#0969da">t−29</text>
+
+    <rect x="268" y="70" width="42" height="50" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+    <text x="289" y="99" font-family="'Times New Roman', Times, serif" font-size="8pt" font-weight="bold" text-anchor="middle" fill="#0969da">t−28</text>
+
+    <text x="330" y="100" font-family="'Times New Roman', Times, serif" font-size="11pt" text-anchor="middle" fill="#0969da">···</text>
+
+    <rect x="350" y="70" width="38" height="50" rx="3" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+    <text x="369" y="99" font-family="'Times New Roman', Times, serif" font-size="8pt" font-weight="bold" text-anchor="middle" fill="#0969da">t−1</text>
+
+    <rect x="395" y="65" width="42" height="60" rx="3" fill="#ffebe9" stroke="#cf222e" stroke-width="2"/>
+    <text x="416" y="100" font-family="'Times New Roman', Times, serif" font-size="10.5pt" font-weight="bold" text-anchor="middle" fill="#cf222e">t</text>
+
+    <!-- Window Bracket Top -->
+    <path d="M 220 62 L 220 52 L 318 52 L 318 44 L 318 52 L 437 52 L 437 62" fill="none" stroke="#0969da" stroke-width="1.5"/>
+    <text x="328" y="40" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#0969da">Causal Observation Window (W = 30 Cycles, Stride = 1)</text>
+
+    <!-- Future Timeline -->
+    <rect x="460" y="70" width="36" height="50" rx="3" fill="#ffffff" stroke="#afb8c1" stroke-width="1"/>
+    <text x="478" y="99" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">t+1</text>
+    <text x="515" y="100" font-family="'Times New Roman', Times, serif" font-size="11pt" text-anchor="middle" fill="#8c959f">···</text>
+    <rect x="540" y="70" width="36" height="50" rx="3" fill="#ffffff" stroke="#afb8c1" stroke-width="1"/>
+    <text x="558" y="99" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">Ti</text>
+
+    <!-- Representations (Bottom Left) -->
+    <rect x="220" y="195" width="160" height="90" rx="4" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="300" y="215" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#1a7f37">PyTorch LSTM Tensor</text>
+    <text x="300" y="233" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#24292f">Sequential Matrix: 30 × 17</text>
+    <text x="300" y="250" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">30 time steps × 17 channels</text>
+    <text x="300" y="267" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">Bidirectional recurrent memory</text>
+
+    <rect x="400" y="195" width="160" height="90" rx="4" fill="#fbefff" stroke="#8250df" stroke-width="1.5"/>
+    <text x="480" y="215" font-family="'Times New Roman', Times, serif" font-size="10pt" font-weight="bold" text-anchor="middle" fill="#8250df">Scikit-Learn GBR Vector</text>
+    <text x="480" y="233" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#24292f">Flattened 1D: 510 features</text>
+    <text x="480" y="250" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">C-order row-major flattening</text>
+    <text x="480" y="267" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#57606a">Histogram-binned quantile trees</text>
+
+    <!-- Arrows from Window to Reps -->
+    <path d="M 310 120 L 300 195" fill="none" stroke="#1a7f37" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 370 120 L 440 195" fill="none" stroke="#8250df" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Target Attachments (Right) -->
+    <rect x="585" y="145" width="155" height="65" rx="4" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="662" y="165" font-family="'Times New Roman', Times, serif" font-size="9.5pt" font-weight="bold" text-anchor="middle" fill="#9a6700">Training Target</text>
+    <text x="662" y="182" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#24292f">ytrain = min(Ti − t, 125)</text>
+    <text x="662" y="198" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">Piecewise-linear RUL cap</text>
+
+    <rect x="585" y="225" width="155" height="65" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+    <text x="662" y="245" font-family="'Times New Roman', Times, serif" font-size="9.5pt" font-weight="bold" text-anchor="middle" fill="#cf222e">Evaluation Target</text>
+    <text x="662" y="262" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#24292f">yeval = Ti − t</text>
+    <text x="662" y="278" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">Uncapped true remaining life</text>
+
+    <!-- Connect cycle t to targets -->
+    <path d="M 437 80 L 510 80 L 510 177 L 585 177" fill="none" stroke="#9a6700" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <path d="M 437 110 L 525 110 L 525 257 L 585 257" fill="none" stroke="#cf222e" stroke-width="1.5" marker-end="url(#arrow)"/>
+  </svg>
+  <div class="figure-caption">
+    <strong>Figure 7.2:</strong> Causal Sliding Lookback Window Construction (<em>W</em> = 30), Dual Representation Mappings (Sequential LSTM Matrix vs. Flattened GBR Vector), and Target Ground Truth Assignment (Capped Training RUL vs. Uncapped Evaluation RUL).
+  </div>
+</div>
+
+<!-- FIGURE 7.3: TWIN REPLAY FLOWCHART -->
+<div class="figure-container">
+  <svg class="svg-diagram" viewBox="0 0 760 480" xmlns="http://www.w3.org/2000/svg">
+    <!-- Title -->
+    <rect x="15" y="10" width="730" height="26" rx="4" fill="#f6f8fa" stroke="#d0d7de" stroke-width="1"/>
+    <text x="380" y="27" font-family="'Times New Roman', Times, serif" font-size="12pt" font-weight="bold" text-anchor="middle" fill="#24292f">CYCLE-BY-CYCLE DIGITAL TWIN REPLAY &amp; SEQUENTIAL DECISION WORKFLOW</text>
+
+    <!-- Start Node -->
+    <rect x="290" y="50" width="180" height="32" rx="16" fill="#ddf4ff" stroke="#0969da" stroke-width="1.5"/>
+    <text x="380" y="70" font-family="'Times New Roman', Times, serif" font-size="9.5pt" font-weight="bold" text-anchor="middle" fill="#0969da">Ingest Cycle t Observation</text>
+
+    <path d="M 380 82 L 380 102" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Decision 1: Warmup? -->
+    <polygon points="380,102 470,127 380,152 290,127" fill="#fff8c5" stroke="#9a6700" stroke-width="1.5"/>
+    <text x="380" y="131" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#9a6700">t &lt; 30 (Warm-up)?</text>
+
+    <!-- Warmup branch (Right) -->
+    <path d="M 470 127 L 540 127" fill="none" stroke="#9a6700" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="500" y="120" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#9a6700">Yes</text>
+    
+    <rect x="540" y="107" width="190" height="40" rx="4" fill="#f6f8fa" stroke="#afb8c1" stroke-width="1.2"/>
+    <text x="635" y="124" font-family="'Times New Roman', Times, serif" font-size="8.5pt" text-anchor="middle" fill="#24292f">Buffer frame; Status: WARMING_UP</text>
+    <text x="635" y="138" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#57606a">Advance t ← t + 1</text>
+    <path d="M 635 107 L 635 66 L 470 66" fill="none" stroke="#8c959f" stroke-width="1.2" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+
+    <!-- No branch (Down) -->
+    <path d="M 380 152 L 380 172" fill="none" stroke="#1a7f37" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="395" y="165" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#1a7f37">No (t ≥ 30)</text>
+
+    <!-- Process: Window & Scale -->
+    <rect x="245" y="172" width="270" height="38" rx="4" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="380" y="188" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#1a7f37">Extract Causal 30-Cycle Window Xi(t)</text>
+    <text x="380" y="202" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Standardize via training parameters (μtrain, σtrain)</text>
+
+    <path d="M 380 210 L 380 226" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Process: Dual Inference & Calibration -->
+    <rect x="235" y="226" width="290" height="42" rx="4" fill="#fbefff" stroke="#8250df" stroke-width="1.5"/>
+    <text x="380" y="242" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#8250df">Dual Prognosis &amp; Conformal Inversion</text>
+    <text x="380" y="258" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">GBR &amp; LSTM → p̂(t); Bounds [L(t), U(t)]; HI(t) = min(1.0, p̂/125)</text>
+
+    <path d="M 380 268 L 380 286" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- Decision 2: Maintain? -->
+    <polygon points="380,286 470,311 380,336 290,311" fill="#fff1e5" stroke="#bc4c00" stroke-width="1.5"/>
+    <text x="380" y="315" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#bc4c00">L(t) ≤ 1.0 Cycle?</text>
+
+    <!-- Maintain Yes (Right) -->
+    <path d="M 470 311 L 540 311" fill="none" stroke="#1a7f37" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="495" y="304" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#1a7f37">Yes</text>
+
+    <rect x="540" y="286" width="195" height="50" rx="4" fill="#dafbe1" stroke="#1a7f37" stroke-width="1.5"/>
+    <text x="637" y="303" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#1a7f37">DISPATCH PLANNED OVERHAUL</text>
+    <text x="637" y="317" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Cost: CPM + CWASTE · (Ti − t)</text>
+    <text x="637" y="329" font-family="'Times New Roman', Times, serif" font-size="7.5pt" font-weight="bold" text-anchor="middle" fill="#1a7f37">Status: MAINTAINED (Episode Ends)</text>
+
+    <!-- Maintain No (Down) -->
+    <path d="M 380 336 L 380 354" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="395" y="348" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#57606a">No</text>
+
+    <!-- Decision 3: Terminal Cycle? -->
+    <polygon points="380,354 470,379 380,404 290,379" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+    <text x="380" y="383" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#cf222e">t = Ti (Terminal)?</text>
+
+    <!-- Failure Yes (Right) -->
+    <path d="M 470 379 L 540 379" fill="none" stroke="#cf222e" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="495" y="372" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#cf222e">Yes</text>
+
+    <rect x="540" y="356" width="195" height="46" rx="4" fill="#ffebe9" stroke="#cf222e" stroke-width="1.5"/>
+    <text x="637" y="373" font-family="'Times New Roman', Times, serif" font-size="9pt" font-weight="bold" text-anchor="middle" fill="#cf222e">CATASTROPHIC IN-SERVICE FAILURE</text>
+    <text x="637" y="386" font-family="'Times New Roman', Times, serif" font-size="8pt" text-anchor="middle" fill="#24292f">Penalty: CFAIL = 5.0 SCU</text>
+    <text x="637" y="397" font-family="'Times New Roman', Times, serif" font-size="7.5pt" font-weight="bold" text-anchor="middle" fill="#cf222e">Status: FAILED (Episode Ends)</text>
+
+    <!-- Failure No (Down) -->
+    <path d="M 380 404 L 380 422" fill="none" stroke="#333333" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="395" y="415" font-family="'Times New Roman', Times, serif" font-size="8pt" fill="#57606a">No</text>
+
+    <!-- Continue Process -->
+    <rect x="260" y="422" width="240" height="40" rx="4" fill="#f6f8fa" stroke="#0969da" stroke-width="1.5"/>
+    <text x="380" y="438" font-family="'Times New Roman', Times, serif" font-size="8.5pt" font-weight="bold" text-anchor="middle" fill="#0969da">Stream State to Dashboard (Port 8000)</text>
+    <text x="380" y="452" font-family="'Times New Roman', Times, serif" font-size="7.5pt" text-anchor="middle" fill="#24292f">Alert: NOMINAL / ADVISORY; Advance t ← t + 1</text>
+
+    <!-- Loop back to ingest -->
+    <path d="M 260 442 L 180 442 L 180 66 L 290 66" fill="none" stroke="#0969da" stroke-width="1.2" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+  </svg>
+  <div class="figure-caption">
+    <strong>Figure 7.3:</strong> Cycle-by-Cycle Digital Twin Replay Engine and Sequential Maintenance Decision Workflow. Telemetry frames enter the causal buffer; once <em>t</em> ≥ 30, point predictions and conformal bounds are computed. A maintenance intervention is dispatched when the conservative lower bound <em>L<sub>i</sub></em>(<em>t</em>) breaches the 1.0 cycle threshold, preventing costly in-service failure while avoiding excessive wasted component life.
+  </div>
+</div>
+
+<h2 class="subsection-title">References</h2>
+<div class="reference-item">[1] A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage propagation modeling for aircraft engine run-to-failure simulation," in <em>Proc. 2008 Int. Conf. Prognostics and Health Management (PHM)</em>, IEEE, 2008, pp. 1–9.</div>
+<div class="reference-item">[2] Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, "A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics," <em>Sensors</em>, vol. 21, no. 19, p. 6340, 2021.</div>
+<div class="reference-item">[3] R. Diao, M. Zhou, G. Meng, and S. Wang, "Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration," <em>Sensors</em>, vol. 26, no. 7, p. 2249, 2026.</div>
+<div class="reference-item">[4] A. Javanmardi and E. Hüllermeier, "Conformal prediction intervals for remaining useful lifetime estimation," <em>Int. J. Progn. Health Manag.</em>, vol. 14, no. 2, pp. 1–14, 2023.</div>
+<div class="reference-item">[5] Z. Zhu, L. Wang, M. Chen, and X. Zhao, "Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval," <em>Qual. Reliab. Eng. Int.</em>, 2025, doi: 10.1002/qre.70043.</div>
+<div class="reference-item">[6] C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, "Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction," <em>Neurocomputing</em>, vol. 494, pp. 79–88, 2022.</div>
+<div class="reference-item">[7] S. Cortes-Gomez, C. M. Patiño, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, "Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification," in <em>Int. Conf. Learn. Represent. (ICLR)</em>, 2025.</div>
+<div class="reference-item">[8] G. K. Walia and M. Kumar, "Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT," <em>Reliab. Eng. Syst. Saf.</em>, p. 112356, 2026.</div>
+<div class="reference-item">[9] Y. Lee, R. F. Barber, and R. Willett, "Distribution-free inference with hierarchical data," <em>arXiv preprint arXiv:2306.06342</em>, 2023.</div>
+<div class="reference-item">[10] C. D. Robinson, "Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression," <em>Int. J. Progn. Health Manag.</em>, vol. 17, no. 1, p. 4724, 2026.</div>
+<div class="reference-item">[11] T. Gneiting and A. E. Raftery, "Strictly proper scoring rules, prediction, and estimation," <em>J. Am. Stat. Assoc.</em>, vol. 102, no. 477, pp. 359–378, 2007.</div>
+<div class="reference-item">[12] D. Lakens, "Equivalence tests: A practical primer for t tests, correlations, and meta-analyses," <em>Soc. Psychol. Personal. Sci.</em>, vol. 8, no. 4, pp. 355–362, 2017.</div>
+<div class="reference-item">[13] J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, "Research on remaining useful life prediction of equipment based on digital twins," <em>Sensors</em>, vol. 26, no. 4, p. 1240, 2026.</div>
+<div class="reference-item">[14] ISO 23247-1:2021, "Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles," International Organization for Standardization, Geneva, Switzerland, 2021.</div>
+
+</div>
+
+</body>
+</html>
