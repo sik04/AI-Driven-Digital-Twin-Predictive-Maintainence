@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phase 9 — Tools, Technologies and System Requirements</title>
+<style>
+  @page {
+    size: A4;
+    margin-top: 1.0in;
+    margin-bottom: 1.0in;
+    margin-left: 1.5in;
+    margin-right: 1.0in;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+    }
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+  }
+
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  h1.section-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 0;
+    margin-bottom: 16pt;
+    text-align: left;
+    page-break-after: avoid;
+  }
+
+  h2.subsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    page-break-after: avoid;
+  }
+
+  h3.subsubsection-title {
+    font-size: 12pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    text-indent: 0;
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 8pt;
+    padding-left: 24pt;
+  }
+
+  li {
+    margin-bottom: 4pt;
+    text-align: justify;
+  }
+
+  table.academic-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14pt 0 16pt 0;
+    font-size: 9.5pt;
+    line-height: 1.35;
+    page-break-inside: avoid;
+  }
+
+  table.academic-table th {
+    border-top: 1.5pt solid #000000;
+    border-bottom: 1pt solid #000000;
+    padding: 6pt 6pt;
+    text-align: left;
+    font-weight: bold;
+    background-color: #f9f9f9;
+  }
+
+  table.academic-table td {
+    padding: 5pt 6pt;
+    border-bottom: 0.5pt solid #e0e0e0;
+    vertical-align: top;
+  }
+
+  table.academic-table tr:last-child td {
+    border-bottom: 1.5pt solid #000000;
+  }
+
+  .table-caption {
+    font-size: 10pt;
+    font-weight: bold;
+    margin-bottom: 6pt;
+    text-align: left;
+  }
+
+  .reference-item {
+    font-size: 10pt;
+    line-height: 1.35;
+    margin-bottom: 6pt;
+    text-align: left;
+    padding-left: 22pt;
+    text-indent: -22pt;
+  }
+</style>
+</head>
+<body>
+
+<div class="content-container">
+
+<h1 class="section-title">9. Tools, Technologies and System Requirements</h1>
+
+<h2 class="subsection-title">9.1 Programming Language and Runtime Environment</h2>
+<p>
+The IntelliTwin framework is implemented entirely in the Python programming language, utilizing modern, type-annotated CPython runtimes (Python 3.10, 3.11, 3.12, and 3.13) [1]–[3]. Python was chosen as the primary scientific computing foundation due to its mature mathematical ecosystem, extensive deep learning and ensemble regression libraries, and robust web service frameworks [2], [4].
+</p>
+
+<h3 class="subsubsection-title">Dependency Management and Environment Isolation</h3>
+<p>
+To guarantee reproducible execution across heterogeneous operating environments, dependency resolution is governed through modern Python packaging standards (PEP 517, PEP 518, and PEP 621) formalized in <code>pyproject.toml</code>:
+</p>
+<ul>
+  <li><strong>Isolated Virtual Environments</strong>: Isolated execution sandboxes are provisioned using Python's native <code>venv</code> module, preventing conflicting global library bindings.</li>
+  <li><strong>Deterministic Build Backend</strong>: The packaging backend utilizes <code>setuptools</code> (≥ 61.0) with editable source installation (<code>pip install -e ".[dev,research]"</code>), ensuring modular packaging of the <code>src/intellitwin/</code> namespace.</li>
+  <li><strong>Cross-Platform Portability</strong>: The runtime workflow is validated across Microsoft Windows 11 (PowerShell), Ubuntu Linux (20.04/22.04 LTS), and macOS (POSIX/Darwin).</li>
+  <li><strong>Source Line-Ending Normalization (<code>sha256-utf8-lf-v1</code>)</strong>: To guarantee identical cryptographic source hashes across Windows (CRLF) and Linux (LF), all code provenance digests normalize text to UTF-8 Unix line feeds (<code>\n</code>) prior to hashing, resolving cross-platform Git checkout discrepancies (ADR-022).</li>
+</ul>
+
+<h2 class="subsection-title">9.2 Core Frameworks and Scientific Computing Libraries</h2>
+<p>
+The scientific architecture of IntelliTwin integrates established machine learning, deep learning, statistical inference, and numerical processing libraries:
+</p>
+
+<h3 class="subsubsection-title">1. Machine Learning and Deep Learning Stack</h3>
+<ul>
+  <li><strong>PyTorch (≥ 2.2)</strong>: Serves as the primary deep learning framework for the temporal sequence prognostic engine. Houses the deep Bidirectional LSTM architecture with two recurrent layers (<em>h</em> = 64 hidden units), variational dropout (<em>p</em> = 0.20), and a LeakyReLU projection head. Supports both CUDA-accelerated GPU tensor computations and CPU fallback execution with deterministic seed control [3], [4].</li>
+  <li><strong>Scikit-Learn (≥ 1.2.0)</strong>: Provides the shallow ensemble regression and clustering foundation. Powers the <code>HistGradientBoostingRegressor</code> base models optimizing asymmetric pinball loss functions (<em>ρ</em> ∈ {0.05, 0.50, 0.95}) over flattened 510-dimensional feature representations. Implements K-means clustering (<em>K</em> = 6) for operating regime stratification and training-only feature scalers [1], [10].</li>
+</ul>
+
+<h3 class="subsubsection-title">2. Numerical Processing and Data Manipulation Stack</h3>
+<ul>
+  <li><strong>NumPy (≥ 1.24.0)</strong>: Provides vector and matrix operations for the 30-cycle causal sliding lookback windowing (<em>W</em> = 30), array reshaping (C-order row-major flattening), and element-wise array operations.</li>
+  <li><strong>Pandas (≥ 2.0.0)</strong>: Handles tabular ingestion of NASA C-MAPSS telemetry text streams, metadata alignment, engine-level split manifests, and cycle-by-cycle trajectory records [1].</li>
+  <li><strong>SciPy (≥ 1.10.0)</strong>: Supports statistical bootstrapping, cluster sampling, and empirical probability distribution calculations.</li>
+  <li><strong>Fractions Standard Module (<code>fractions.Fraction</code>)</strong>: Executes exact rational arithmetic for the engine-weighted conformal quantile solver, avoiding floating-point roundoff errors during empirical CDF threshold evaluation [9].</li>
+</ul>
+
+<div class="table-caption">Table 9.1: Core Scientific Computing and Machine Learning Toolchain.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 22%;">Library / Tool</th>
+      <th style="width: 16%;">Version</th>
+      <th style="width: 62%;">Functional Role in IntelliTwin Framework</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Python</strong></td>
+      <td>3.10–3.13</td>
+      <td>Core programming language and runtime execution environment</td>
+    </tr>
+    <tr>
+      <td><strong>PyTorch</strong></td>
+      <td>≥ 2.2.0</td>
+      <td>Deep bidirectional LSTM sequence modeling, GPU/CPU tensor graphs</td>
+    </tr>
+    <tr>
+      <td><strong>Scikit-Learn</strong></td>
+      <td>≥ 1.2.0</td>
+      <td>HistGradientBoosting multi-quantile regressors, K-means regime clustering</td>
+    </tr>
+    <tr>
+      <td><strong>NumPy</strong></td>
+      <td>≥ 1.24.0</td>
+      <td>High-dimensional causal array buffering, C-order flattening (510-dim)</td>
+    </tr>
+    <tr>
+      <td><strong>Pandas</strong></td>
+      <td>≥ 2.0.0</td>
+      <td>C-MAPSS telemetry ingestion, engine split manifests, event logs</td>
+    </tr>
+    <tr>
+      <td><strong>SciPy</strong></td>
+      <td>≥ 1.10.0</td>
+      <td>Statistical bootstrap resamplers, confidence interval estimators</td>
+    </tr>
+    <tr>
+      <td><strong>FastAPI</strong></td>
+      <td>≥ 0.110.0</td>
+      <td>Asynchronous REST API serving Digital Twin replay sessions</td>
+    </tr>
+    <tr>
+      <td><strong>Uvicorn</strong></td>
+      <td>≥ 0.28.0</td>
+      <td>High-performance ASGI production server hosting REST endpoints</td>
+    </tr>
+    <tr>
+      <td><strong>Pytest</strong></td>
+      <td>≥ 7.4.0</td>
+      <td>Test automation suite spanning 37 unit and integration modules</td>
+    </tr>
+    <tr>
+      <td><strong>Ruff</strong></td>
+      <td>≥ 0.1.0</td>
+      <td>High-speed code linter and PEP 8 formatter</td>
+    </tr>
+    <tr>
+      <td><strong>Mypy</strong></td>
+      <td>≥ 1.5.0</td>
+      <td>Strict static type checker verifying type safety across <code>src/</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 class="subsection-title">9.3 Digital Twin Simulation, API, and Visualization Stack</h2>
+<p>
+The operational prototype of IntelliTwin bridges scientific algorithms and interactive monitoring via a lightweight, production-ready web technology stack adhering to ISO 23247 principles [2], [13], [14]:
+</p>
+<ul>
+  <li><strong>FastAPI Backend Service (≥ 0.110.0)</strong>: A high-performance Python web framework based on Starlette and Pydantic. Exposes RESTful endpoints for session initialization, cycle advancement, resetting, catalog discovery, and trace export (<code>/api/sessions</code>, <code>/advance</code>, <code>/reset</code>, <code>/trace.csv</code>). Employs asynchronous request routing and strict schema validation [2].</li>
+  <li><strong>Uvicorn ASGI Server (≥ 0.28.0)</strong>: Serves the FastAPI application asynchronously on local port 8000 with low latency and high concurrency.</li>
+  <li><strong>Thread-Safe Replay Engine</strong>: Built on Python's <code>threading.Lock</code> primitives, guaranteeing mutually exclusive, cycle-by-cycle telemetry consumption and preventing race conditions during live streaming.</li>
+  <li><strong>Frontend Operator Dashboard (<code>apps/twin_dashboard/</code>)</strong>: Implemented in modern HTML5, CSS3, and vanilla JavaScript (ES6+). Provides:
+    <ol>
+      <li>Dynamic SVG/Canvas time-series charts displaying real-time thermo-mechanical degradation sensor trajectories.</li>
+      <li>Interactive RUL prediction charts with shaded conformal prediction interval bands [<em>L<sub>i</sub></em>(<em>t</em>), <em>U<sub>i</sub></em>(<em>t</em>)].</li>
+      <li>Circular gauge dials depicting the dynamic asset Health Index HI<sub><em>i</em></sub>(<em>t</em>) = min(1.0, <em>p̂<sub>i</sub></em>(<em>t</em>) / 125).</li>
+      <li>Multi-stage visual alert banners (<code>NOMINAL</code>, <code>ADVISORY</code>, <code>CRITICAL_INTERVENTION</code>) and maintenance order logs.</li>
+    </ol>
+  </li>
+</ul>
+
+<h2 class="subsection-title">9.4 Development Toolchain, Quality Assurance, and Testing Framework</h2>
+<p>
+To ensure commercial-grade software quality, maintainability, and scientific auditability, the repository enforces an automated development toolchain:
+</p>
+<ul>
+  <li><strong>Code Quality and Formatting (<code>ruff</code>)</strong>: The <code>ruff</code> linter and formatter enforces strict code style adherence to PEP 8, sorting imports with <code>isort</code>, and automatically fixing safe code anomalies. Line length is strictly limited to 100 characters.</li>
+  <li><strong>Static Type Analysis (<code>mypy</code>)</strong>: Strict static type checking (<code>strict = true</code>) is enforced across all modules in <code>src/intellitwin/</code>, ensuring complete type safety for function signatures, array dimensions, and data structures.</li>
+  <li><strong>Automated Test Suite (<code>pytest</code>)</strong>: An automated suite of 37 pytest modules validates:
+    <ol>
+      <li>Causal sliding-window boundary conditions and zero-leakage constraints (<code>tests/test_data_pipeline.py</code>).</li>
+      <li>Base model training, checkpoint loading, and forward-pass determinism (<code>tests/test_models.py</code>).</li>
+      <li>Exact engine-weighted rational conformal quantile computation (<code>tests/test_calibration.py</code>).</li>
+      <li>Discrete-event maintenance simulator cost accounting in SCU (<code>tests/test_simulation.py</code>).</li>
+      <li>Digital twin replay engine numerical parity against batch evaluation (atol ≤ 10<sup>−4</sup>) (<code>tests/test_twin_replay.py</code>).</li>
+    </ol>
+  </li>
+  <li><strong>Cryptographic Provenance Engine (<code>src/intellitwin/provenance.py</code>)</strong>: Interrogates the host system to capture execution metadata, package versions, random seeds, and Git commit hashes. Enforces a <em>git-clean</em> check (<code>git_dirty: false</code>) before permitting formal audit or confirmatory experiment execution.</li>
+</ul>
+
+<h2 class="subsection-title">9.5 Hardware and Operational System Requirements</h2>
+<p>
+The IntelliTwin framework is engineered for high computational efficiency, running effectively on standard commodity developer workstations as well as high-performance compute clusters.
+</p>
+
+<div class="table-caption">Table 9.2: Minimum and Recommended System Hardware Specifications.</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 25%;">Hardware Component</th>
+      <th style="width: 37%;">Minimum Development Specification</th>
+      <th style="width: 38%;">Recommended Research / Cluster Specification</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Processor (CPU)</strong></td>
+      <td>Quad-core Intel Core i5 / AMD Ryzen 5 (2.0 GHz+)</td>
+      <td>8+ cores (Intel Core i7/i9, AMD Ryzen 7/9, Apple M2/M3)</td>
+    </tr>
+    <tr>
+      <td><strong>System Memory (RAM)</strong></td>
+      <td>8 GB DDR4</td>
+      <td>16–32 GB DDR4/DDR5 (for 10,000 bootstrap resamples)</td>
+    </tr>
+    <tr>
+      <td><strong>Storage (SSD)</strong></td>
+      <td>10 GB free space (NVMe or SATA SSD)</td>
+      <td>25 GB free space (NVMe SSD for fast checkpoint I/O)</td>
+    </tr>
+    <tr>
+      <td><strong>Graphics (GPU)</strong></td>
+      <td>Integrated GPU (CPU fallback supported)</td>
+      <td>NVIDIA GPU with CUDA (≥ 8 GB VRAM, RTX 3060+)</td>
+    </tr>
+    <tr>
+      <td><strong>Operating System</strong></td>
+      <td>Windows 10/11 (64-bit), Ubuntu 20.04+, macOS 12+</td>
+      <td>Ubuntu Linux 22.04 LTS (64-bit x86_64)</td>
+    </tr>
+    <tr>
+      <td><strong>Network Interface</strong></td>
+      <td>Standard loopback interface for local REST API</td>
+      <td>Gigabit Ethernet for distributed cluster nodes</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="subsubsection-title">Physical Boundary Demarcation</h3>
+<p>
+Because IntelliTwin is formulated as an offline, trace-driven research prototype utilizing NASA C-MAPSS run-to-failure telemetry [1], no specialized physical avionics test benches, ARINC 429 databuses, or embedded edge microcontrollers (e.g., STM32, ESP32) are required for execution. Telemetry ingestion is entirely software-driven via the <code>TwinReplayEngine</code> streaming buffer.
+</p>
+
+<h2 class="subsection-title">9.6 Institutional Software Compliance and Authoring Standards</h2>
+<p>
+In compliance with the official guidelines of the Department of Information Technology at Ajay Kumar Garg Engineering College (Circular <code>AKGEC/IT/CSIT/26-27/PROJ-m</code>):
+</p>
+<ul>
+  <li><strong>Authoring Environment</strong>: The project synopsis is authored exclusively using Overleaf (LaTeX) utilizing the standard institutional template structure.</li>
+  <li><strong>Typography and Geometry</strong>: Adheres to standard A4 page dimensions (210 × 297 mm), margins (Left: 1.5", Top/Bottom/Right: 1.0"), Times New Roman typeface (14pt bold section headings, 12pt bold subheadings, 12pt regular body), and 1.5 line spacing.</li>
+  <li><strong>Citation Format</strong>: Bibliographic references follow IEEE numerical bracketed citation standards [1]–[14].</li>
+  <li><strong>Deterministic Multi-Format Tooling</strong>: Companion Python automation scripts generate bit-for-bit identical, publication-quality Microsoft Word (<code>.docx</code>) and PDF (<code>.pdf</code>) artifacts across platforms.</li>
+</ul>
+
+<h2 class="subsection-title">References</h2>
+<div class="reference-item">[1] A. Saxena, K. Goebel, D. Simon, and N. Eklund, "Damage propagation modeling for aircraft engine run-to-failure simulation," in <em>Proc. 2008 Int. Conf. Prognostics and Health Management (PHM)</em>, IEEE, 2008, pp. 1–9.</div>
+<div class="reference-item">[2] Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, "A survey on AI-driven digital twins in Industry 4.0: Smart manufacturing and advanced robotics," <em>Sensors</em>, vol. 21, no. 19, p. 6340, 2021.</div>
+<div class="reference-item">[3] R. Diao, M. Zhou, G. Meng, and S. Wang, "Turbofan engine remaining useful life prediction with reliable prediction intervals via LSTM-based quantile regression and conformal calibration," <em>Sensors</em>, vol. 26, no. 7, p. 2249, 2026.</div>
+<div class="reference-item">[4] A. Javanmardi and E. Hüllermeier, "Conformal prediction intervals for remaining useful lifetime estimation," <em>Int. J. Progn. Health Manag.</em>, vol. 14, no. 2, pp. 1–14, 2023.</div>
+<div class="reference-item">[5] Z. Zhu, L. Wang, M. Chen, and X. Zhao, "Predictive maintenance strategies for aero-engines considering remaining useful life prediction interval," <em>Qual. Reliab. Eng. Int.</em>, 2025, doi: 10.1002/qre.70043.</div>
+<div class="reference-item">[6] C. Chen, J. Shi, N. Lu, Z. H. Zhu, and B. Jiang, "Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction," <em>Neurocomputing</em>, vol. 494, pp. 79–88, 2022.</div>
+<div class="reference-item">[7] S. Cortes-Gomez, C. M. Patiño, Y. Byun, S. Wu, E. Horvitz, and B. Wilder, "Utility-directed conformal prediction: A decision-aware framework for actionable uncertainty quantification," in <em>Int. Conf. Learn. Represent. (ICLR)</em>, 2025.</div>
+<div class="reference-item">[8] G. K. Walia and M. Kumar, "Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling in industrial IoT," <em>Reliab. Eng. Syst. Saf.</em>, p. 112356, 2026.</div>
+<div class="reference-item">[9] Y. Lee, R. F. Barber, and R. Willett, "Distribution-free inference with hierarchical data," <em>arXiv preprint arXiv:2306.06342</em>, 2023.</div>
+<div class="reference-item">[10] C. D. Robinson, "Remaining useful life estimation for aircraft engines with risk-aware prediction intervals via conformalized quantile regression," <em>Int. J. Progn. Health Manag.</em>, vol. 17, no. 1, p. 4724, 2026.</div>
+<div class="reference-item">[11] T. Gneiting and A. E. Raftery, "Strictly proper scoring rules, prediction, and estimation," <em>J. Am. Stat. Assoc.</em>, vol. 102, no. 477, pp. 359–378, 2007.</div>
+<div class="reference-item">[12] D. Lakens, "Equivalence tests: A practical primer for t tests, correlations, and meta-analyses," <em>Soc. Psychol. Personal. Sci.</em>, vol. 8, no. 4, pp. 355–362, 2017.</div>
+<div class="reference-item">[13] J. Wu, Y. Zhou, X. Wang, C. Chen, Y. Ma, and C. Zhang, "Research on remaining useful life prediction of equipment based on digital twins," <em>Sensors</em>, vol. 26, no. 4, p. 1240, 2026.</div>
+<div class="reference-item">[14] ISO 23247-1:2021, "Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles," International Organization for Standardization, Geneva, Switzerland, 2021.</div>
+
+</div>
+
+</body>
+</html>

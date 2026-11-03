@@ -6,8 +6,8 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 8 (Implementation Status and Results / Expected Results) — **COMPLETED (AWAITING USER APPROVAL)**  
-**Last Updated:** November 2, 2026  
+**Current Phase:** Phase 9 (Tools, Technologies and System Requirements) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Last Updated:** November 3, 2026  
 
 ---
 
@@ -32,8 +32,8 @@
 | **Phase 5** | Objectives and Scope | `objectives_and_scope.tex`, `objectives_and_scope.docx`, `objectives_and_scope.pdf` | **APPROVED** |
 | **Phase 6** | Proposed Methodology & Algorithmic Formulation | `proposed_methodology.tex`, `proposed_methodology.docx`, `proposed_methodology.pdf` | **APPROVED** |
 | **Phase 7** | System Architecture & Workflow Diagrams | `system_architecture.tex`, `system_architecture.docx`, `system_architecture.pdf` | **APPROVED** |
-| **Phase 8** | Implementation Status and Results / Expected Results | `implementation_and_results.tex`, `implementation_and_results.docx`, `implementation_and_results.pdf` | **COMPLETED (AWAITING APPROVAL)** |
-| **Phase 9** | Tools, Technologies and System Requirements | Requirements & Technology Stack | Scheduled |
+| **Phase 8** | Implementation Status and Results / Expected Results | `implementation_and_results.tex`, `implementation_and_results.docx`, `implementation_and_results.pdf` | **APPROVED** |
+| **Phase 9** | Tools, Technologies and System Requirements | `tools_and_technologies.tex`, `tools_and_technologies.docx`, `tools_and_technologies.pdf` | **COMPLETED (AWAITING APPROVAL)** |
 | **Phase 10** | Conclusion and Future Work | Conclusion & Roadmap | Scheduled |
 | **Final Phase** | Overleaf LaTeX Synchronization & Final Page-Budget Audit (6–8 pages) | Clean Compilable LaTeX Zip & PDF | Scheduled |
 
@@ -563,13 +563,77 @@
   - Academic Tables: 5 formal styled tables with clear scientific demarcation — **PASS**
   - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
 - **Overall Validation Status**: **PASS (100% Compliant)**.
-- **Current Phase 8 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+- **Formal Phase 8 Status**: **APPROVED** (Formally reviewed and approved by user).
 
 ### 12.5 Git Automation & Commit Verification
 - **Commit Message**: `docs: add synopsis implementation and results`
-- **Commit Hash**: `1b5bb8c`
+- **Commit Hash**: `1b5bb8c` (Verification tracking commit: `ad6fb1c`)
 - **Remote Branch**: `main` -> `origin/main`
-- **Push Status**: Verified successfully pushed (`4328259..1b5bb8c`).
+- **Push Status**: Verified successfully pushed (`4328259..ad6fb1c`).
+
+---
+
+## 13. Phase 9 Tools, Technologies & System Requirements Deliverables & Validation Summary
+
+### 13.1 Deliverables in `synopsis/Phase_9_Tools_and_Technologies/`
+- `tools_and_technologies.docx`: Fully editable Microsoft Word document adhering strictly to AKGEC specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.5 line spacing, 2 styled academic tables, 7 pages, 8,917 bytes).
+- `tools_and_technologies.pdf`: High-resolution vector PDF rendered via headless Chrome engine (7 pages, zero orphan lines, styled academic tables with status badges, 259,223 bytes).
+- `tools_and_technologies.tex`: Standalone, Overleaf-compatible LaTeX source conforming to AKGEC synopsis template structure, IEEE citation style, and formal tabular environments (949 prose words excluding tables/references).
+- `tools_and_technologies.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines with academic tables and status badges.
+- `generate_tools_and_technologies.py`: Python automation script ensuring 100% deterministic, bit-for-bit reproducible generation of `.docx` and `.pdf` artifacts.
+- `README.md`: Phase 9 metadata, software toolchain breakdown, hardware specifications, traceability matrix, and compliance documentation.
+
+### 13.2 Structural Breakdown & Technology Stack Audit
+- **Section 9.1: Programming Language and Runtime Environment** (~220 words)
+  - Documents Python 3.10–3.13 as the central execution platform.
+  - Documents dependency management under PEP 517/518/621 (`pyproject.toml`) via `setuptools` ($\ge 61.0$) with editable source packaging (`src/intellitwin/`).
+  - Details cross-platform validation across Windows 11 (PowerShell), Ubuntu Linux (20.04/22.04 LTS), and macOS.
+  - Details cryptographic source line-ending normalization scheme (`sha256-utf8-lf-v1`) guaranteeing reproducible hashes across CRLF and LF checkouts (ADR-022).
+- **Section 9.2: Core Frameworks and Scientific Computing Libraries** (~260 words + Table 9.1)
+  - Deep Learning: PyTorch ($\ge 2.2$) powering the bidirectional LSTM prognostic sequence model, variational dropout ($p = 0.20$), LeakyReLU projection, AdamW optimizer, with CUDA acceleration and deterministic CPU reproduction.
+  - Machine Learning: Scikit-Learn ($\ge 1.2.0$) implementing `HistGradientBoostingRegressor` multi-quantile regressors (pinball loss $\rho \in \{0.05, 0.50, 0.95\}$) and K-means operational regime clustering ($K = 6$).
+  - Numerical & Data Processing: NumPy ($\ge 1.24.0$) for causal array buffering ($W = 30$) and C-order flattening (510-dim); Pandas ($\ge 2.0.0$) for C-MAPSS dataset ingestion; SciPy ($\ge 1.10.0$) for statistical bootstrapping; `fractions.Fraction` for exact rational quantile solving under cluster exchangeability.
+  - Table 9.1 summarizes all 12 key software libraries, minimum versions, and architectural responsibilities.
+- **Section 9.3: Digital Twin Simulation, API, and Visualization Stack** (~190 words)
+  - Backend Service: FastAPI ($\ge 0.110.0$) providing asynchronous REST endpoints (`/api/sessions`, `/advance`, `/reset`, `/trace.csv`) with Pydantic schema validation.
+  - ASGI Server: Uvicorn ($\ge 0.28.0$) hosting the local API service at port 8000.
+  - Thread Safety: Python `threading.Lock` primitives enforcing mutually exclusive cycle-by-cycle replay advances.
+  - Operator Dashboard: Lightweight HTML5, CSS3, vanilla JavaScript (ES6+) interface in `apps/twin_dashboard/` with dynamic SVG/Canvas sensor charts, conformal interval bands, Health Index dials, and alert banners.
+- **Section 9.4: Development Toolchain, Quality Assurance, and Testing Framework** (~160 words)
+  - Code Quality: `ruff` ($\ge 0.1.0$) enforcing PEP 8 compliance, `isort` imports, and 100-character line length limits.
+  - Static Typing: `mypy` ($\ge 1.5.0$) under strict type analysis (`strict = true`) across `src/intellitwin/`.
+  - Automated Testing: 37 automated pytest modules validating data pipelines, model determinism, calibration quantiles, maintenance simulation, and twin replay parity ($\text{atol} \le 10^{-4}$).
+  - Provenance Engine: `src/intellitwin/provenance.py` recording machine environment, dependencies, random seeds, and Git dirty checks (`git_dirty: false`).
+- **Section 9.5: Hardware and Operational System Requirements** (~150 words + Table 9.2)
+  - Quantifies minimum development workstations (quad-core CPU, 8 GB RAM, 10 GB SSD) and recommended cluster environments (8+ cores, 16–32 GB RAM, NVIDIA GPU with CUDA, 25 GB NVMe SSD).
+  - Physical Boundary Demarcation: Explicitly clarifies that no physical aircraft engine hardware, avionics buses (ARINC 429), or physical microcontrollers are required for this software-based, trace-driven research prototype.
+- **Section 9.6: Institutional Software Compliance and Authoring Standards** (~90 words)
+  - Documents alignment with AKGEC Department of Information Technology Circular `AKGEC/IT/CSIT/26-27/PROJ-m`: Overleaf (LaTeX) authoring, A4 geometry, 1.5" left margin, 1.0" top/bottom/right margins, Times New Roman, 1.5 line spacing, and IEEE numerical referencing `[1]`–`[14]`.
+- **Total Prose Word Count**: **949 words** (Excluding tables, headers, and references).
+
+### 13.3 IEEE References & Citations
+- **Total References**: 14 authentic, peer-reviewed foundational literature sources cited in IEEE bracketed format `[1]`–`[14]`.
+- **Sources Cited**: Saxena et al. (2008), Huang et al. (2021), Diao et al. (2026), Javanmardi & Hüllermeier (2023), Zhu et al. (2025), Chen et al. (2022), Cortes-Gomez et al. (2025), Walia & Kumar (2026), Lee et al. (2023), Robinson (2026), Gneiting & Raftery (2007), Lakens (2017), Wu et al. (2026), and ISO 23247-1:2021.
+
+### 13.4 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Academic Tables: 2 formal styled tables with clear scientific demarcation — **PASS**
+  - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+- **Current Phase 9 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+
+### 13.5 Git Automation & Commit Verification
+- **Commit Message**: `docs: add synopsis tools and technologies`
+- **Commit Hash**: Pending commit
+- **Remote Branch**: `main` -> `origin/main`
+- **Push Status**: Pending push
+
 
 
 
