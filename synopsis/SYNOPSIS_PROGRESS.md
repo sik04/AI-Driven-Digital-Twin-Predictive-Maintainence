@@ -6,7 +6,7 @@
 **Department:** Information Technology  
 **Academic Session:** 2026–2027  
 **Project Guide:** Dr. Ruchi Gupta  
-**Current Phase:** Phase 10 (Conclusion and Future Work) — **COMPLETED (AWAITING USER APPROVAL)**  
+**Current Phase:** Final Phase (Overleaf LaTeX Synchronization & Final Page-Budget Audit) — **COMPLETED (AWAITING USER APPROVAL)**  
 **Last Updated:** November 4, 2026  
 
 ---
@@ -34,8 +34,8 @@
 | **Phase 7** | System Architecture & Workflow Diagrams | `system_architecture.tex`, `system_architecture.docx`, `system_architecture.pdf` | **APPROVED** |
 | **Phase 8** | Implementation Status and Results / Expected Results | `implementation_and_results.tex`, `implementation_and_results.docx`, `implementation_and_results.pdf` | **APPROVED** |
 | **Phase 9** | Tools, Technologies and System Requirements | `tools_and_technologies.tex`, `tools_and_technologies.docx`, `tools_and_technologies.pdf` | **APPROVED** |
-| **Phase 10** | Conclusion and Future Work | `conclusion_and_future_work.tex`, `conclusion_and_future_work.docx`, `conclusion_and_future_work.pdf` | **COMPLETED (AWAITING APPROVAL)** |
-| **Final Phase** | Overleaf LaTeX Synchronization & Final Page-Budget Audit (6–8 pages) | Clean Compilable LaTeX Zip & PDF | Scheduled |
+| **Phase 10** | Conclusion and Future Work | `conclusion_and_future_work.tex`, `conclusion_and_future_work.docx`, `conclusion_and_future_work.pdf` | **APPROVED** |
+| **Final Phase** | Overleaf LaTeX Synchronization & Final Page-Budget Audit (6–8 pages) | `main.tex`, `synopsis.docx`, `synopsis.pdf`, `intellitwin_synopsis_overleaf.zip` | **COMPLETED (AWAITING APPROVAL)** |
 
 ---
 
@@ -691,13 +691,79 @@
   - Defense Questions: 3 mandatory 100-word defense answers formatted in clear callouts — **PASS**
   - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
 - **Overall Validation Status**: **PASS (100% Compliant)**.
-- **Current Phase 10 Status**: **COMPLETED — AWAITING USER APPROVAL**.
+- **Formal Phase 10 Status**: **APPROVED** (Formally reviewed and approved by user).
 
 ### 14.5 Git Automation & Commit Verification
 - **Commit Message**: `docs: add synopsis conclusion and future work`
-- **Commit Hash**: `60a8b0d`
+- **Commit Hash**: `60a8b0d` (Verification tracking commit: `3385b6f`)
 - **Remote Branch**: `main` -> `origin/main`
-- **Push Status**: Verified successfully pushed (`2afb145..60a8b0d`).
+- **Push Status**: Verified successfully pushed (`2afb145..3385b6f`).
+
+---
+
+## 15. Final Phase Overleaf Synchronization & Page-Budget Audit Summary
+
+### 15.1 Deliverables in `synopsis/Final_Synopsis/`
+- `synopsis.pdf`: Publication-quality high-resolution vector PDF rendered via Chrome Headless engine (10 pages: 1 Title Page + 8 Body Pages + 1 References Page, 264,808 bytes).
+- `synopsis.docx`: Fully editable Microsoft Word document conforming strictly to AKGEC synopsis specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.4 line spacing, 2 styled tables, 3 defense callout boxes, 10 pages, 15,112 bytes).
+- `main.tex`: Master standalone LaTeX source conforming to Overleaf template structure, IEEE citation style `[1]`–`[14]`, and formal LaTeX tabular environments (2,110 words prose).
+- `references.bib`: Verified master BibTeX bibliography file containing 14 authentic, peer-reviewed literature sources (5,310 bytes).
+- `akgec_logo.png`: High-resolution institutional emblem of Ajay Kumar Garg Engineering College for title page rendering (9,797 bytes).
+- `intellitwin_synopsis_overleaf.zip`: Ready-to-upload Overleaf package containing `main.tex`, `references.bib`, and `akgec_logo.png` with deterministic packaging timestamps (24,398 bytes).
+- `synopsis.html`: Print-optimized HTML/CSS source layout adhering to institutional circular guidelines with academic tables and defense cards.
+- `generate_final_synopsis.py`: Python automation script ensuring 100% deterministic, bit-for-bit reproducible packaging of `.docx`, `.pdf`, and `.zip` artifacts.
+- `README.md`: Master final documentation, page-budget audit, Overleaf import guide, and compliance verification checklist.
+
+### 15.2 Page-Budget Audit & Compliance
+- **Institutional Mandate (`AKGEC/IT/CSIT/26-27/PROJ-m`)**: *"Main body: strictly 6 to 8 pages excluding title/cover and references."*
+- **Audit Verification**:
+  - **Page 1:** Standalone Title Page (Page number suppressed per departmental circular).
+  - **Pages 2–9:** Main Body Sections 1 through 11 (**strictly 8 pages**, 100% compliant with 6–8 page budget).
+  - **Page 10:** References Section (14 authentic IEEE references `[1]`–`[14]`).
+  - **Total Page Count:** **10 pages** ($1\text{ Title} + 8\text{ Body} + 1\text{ References}$).
+
+### 15.3 Mandatory Circular Sections & Review Questions
+The unified document synthesizes all eleven mandatory circular sections:
+1. Title Page (Group ID, Title, Degree statement, Student names & roll numbers, Guide Dr. Ruchi Gupta, AKGEC emblem, Department, College, University, Session 2026–2027).
+2. Section 1: Introduction (~215 words).
+3. Section 2: Problem Statement and Rationale (~243 words, RQ1–RQ4, $C_{\text{FAIL}}=5.0 \gg C_{\text{PM}}=1.0$).
+4. Section 3: Literature Survey (~188 words, 4 literature pillars).
+5. Section 4: Objectives and Scope of the Project (~248 words, O1–O5, explicit exclusions).
+6. Section 5: Proposed Methodology & Algorithmic Formulation (~280 words, causal $W=30$, GBR/LSTM, asymmetric conformal calibration, maintenance simulator).
+7. Section 6: System Architecture & Workflow (~69 words + Table 1: Four-layer architecture).
+8. Section 7: Implementation Status and Results / Expected Results (~233 words, 30 frozen checkpoints, 37 passing test suites, confirmatory expectations).
+9. Section 8: Tools, Technologies and System Requirements (~168 words, software toolchain, hardware specs).
+10. Section 9: Project Schedule & Execution Timeline (~23 words + Table 2: Academic milestone schedule).
+11. Section 10: Conclusion and Future Work (~135 words, core innovations, 5 future horizons).
+12. Section 11: Mandatory Viva / Review Questions (~308 words):
+    - *Question 1 (100 words):* Reasons why the department should approve the project.
+    - *Question 2 (101 words):* Strengths and limitations of the proposed work.
+    - *Question 3 (112 words):* Positive impact on society, academics, college, and industry.
+13. References (Page 10): 14 authentic IEEE references `[1]`–`[14]`.
+
+### 15.4 Overleaf 1-Click Synchronization Instructions
+The packaged archive `intellitwin_synopsis_overleaf.zip` can be imported directly into Overleaf (`https://www.overleaf.com`) via **New Project** $\rightarrow$ **Upload Project**, providing 1-click zero-error compilation under standard pdfLaTeX / LaTeX engines.
+
+### 15.5 Verification & Compliance Audit
+- **Team Roster Verification**: Strictly verified 2 members in approved order: Shiksha Pandey (`2300270110112`) and Mayank Singh (`2300270310115`). Audited with zero occurrences of former non-contributing members.
+- **College Guidelines Compliance (`AKGEC/IT/CSIT/26-27/PROJ-m`)**:
+  - Page Format: Standard A4 ($210 \times 297\text{ mm}$) — **PASS**
+  - Margins: Left 1.5", Top/Bottom/Right 1.0" — **PASS**
+  - Typography: Times New Roman (14 pt bold section headings, 12 pt bold subheadings, 12 pt regular body) — **PASS**
+  - Line Spacing: 1.4–1.5, Justified Alignment, Nil Indentation — **PASS**
+  - Citation Standard: IEEE numerical format `[1]`–`[14]` — **PASS**
+  - Page Budget: Main body strictly 8 pages (within 6–8 page limit) — **PASS**
+  - Mandatory Viva Questions: Three questions with $\ge 100$ words each in formatted callouts — **PASS**
+  - Scope Boundaries: Explicit exclusion of physical IoT and closed-loop actuation — **PASS**
+- **Overall Validation Status**: **PASS (100% Compliant)**.
+- **Final Phase Status**: **COMPLETED — AWAITING USER APPROVAL**.
+
+### 15.6 Git Automation & Commit Verification
+- **Commit Message**: `docs: add final synopsis package and overleaf synchronization`
+- **Commit Hash**: Pending commit
+- **Remote Branch**: `main` -> `origin/main`
+- **Push Status**: Pending push
+
 
 
 

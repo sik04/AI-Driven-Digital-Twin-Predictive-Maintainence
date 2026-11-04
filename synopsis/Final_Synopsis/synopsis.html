@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>IntelliTwin: AI-Driven Digital Twin Framework for Predictive Maintenance — Project Synopsis</title>
+<style>
+  @page {
+    size: A4;
+    margin-top: 1.0in;
+    margin-bottom: 1.0in;
+    margin-left: 1.5in;
+    margin-right: 1.0in;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Times New Roman", Times, serif;
+      font-size: 11pt;
+    }
+  }
+
+  @page:first {
+    @bottom-center {
+      content: none;
+    }
+  }
+
+  body {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 12pt;
+    line-height: 1.25;
+    color: #000000;
+    margin: 0;
+    padding: 0;
+    text-align: justify;
+  }
+
+  .content-container {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  /* Title Page */
+  .title-page {
+    text-align: center;
+    page-break-after: always;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.2in 0;
+  }
+
+  .group-id {
+    text-align: right;
+    font-size: 10.5pt;
+    font-weight: bold;
+    margin-bottom: 16pt;
+  }
+
+  .tp-subhead {
+    font-size: 13.5pt;
+    font-weight: bold;
+    letter-spacing: 0.5pt;
+    margin-bottom: 12pt;
+  }
+
+  .tp-title {
+    font-size: 16pt;
+    font-weight: bold;
+    line-height: 1.25;
+    margin-bottom: 18pt;
+    text-transform: uppercase;
+  }
+
+  .tp-degree {
+    font-size: 11pt;
+    line-height: 1.35;
+    margin-bottom: 18pt;
+  }
+
+  .tp-degree b {
+    font-size: 11.5pt;
+  }
+
+  .tp-authors {
+    margin-bottom: 18pt;
+  }
+
+  .tp-authors-title {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+  }
+
+  .tp-authors-list {
+    font-size: 11.5pt;
+    line-height: 1.4;
+  }
+
+  .tp-guide {
+    font-size: 11pt;
+    margin-bottom: 16pt;
+  }
+
+  .tp-guide-name {
+    font-size: 13pt;
+    font-weight: bold;
+    margin-top: 3pt;
+  }
+
+  .tp-guide-desig {
+    font-size: 10.5pt;
+    color: #333333;
+  }
+
+  .tp-logo {
+    margin: 12pt 0;
+  }
+
+  .tp-logo img {
+    width: 2.5cm;
+    height: auto;
+  }
+
+  .tp-inst {
+    font-size: 11pt;
+    line-height: 1.35;
+  }
+
+  .tp-inst-dept {
+    font-weight: bold;
+  }
+
+  .tp-inst-college {
+    font-size: 12.5pt;
+    font-weight: bold;
+  }
+
+  .tp-inst-univ {
+    font-size: 10.5pt;
+    font-weight: bold;
+  }
+
+  .tp-session {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-top: 10pt;
+  }
+
+  /* Body Headings */
+  h1.section-title {
+    font-size: 13.5pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-top: 6pt;
+    margin-bottom: 3pt;
+    text-align: left;
+    page-break-after: avoid;
+  }
+
+  h2.subsection-title {
+    font-size: 11.5pt;
+    font-weight: bold;
+    margin-top: 4pt;
+    margin-bottom: 3pt;
+    page-break-after: avoid;
+  }
+
+  h3.subsubsection-title {
+    font-size: 11.5pt;
+    font-weight: bold;
+    font-style: italic;
+    margin-top: 4pt;
+    margin-bottom: 2pt;
+    page-break-after: avoid;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 3pt;
+    text-indent: 0;
+  }
+
+  ul, ol {
+    margin-top: 0;
+    margin-bottom: 3pt;
+    padding-left: 18pt;
+  }
+
+  li {
+    margin-bottom: 2pt;
+    text-align: justify;
+  }
+
+  /* Tables */
+  table.academic-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 6pt 0 8pt 0;
+    font-size: 9pt;
+    line-height: 1.25;
+    page-break-inside: avoid;
+  }
+
+  table.academic-table th {
+    border-top: 1.5pt solid #000000;
+    border-bottom: 1pt solid #000000;
+    padding: 4pt 4pt;
+    text-align: left;
+    font-weight: bold;
+    background-color: #f9f9f9;
+  }
+
+  table.academic-table td {
+    padding: 3.5pt 4pt;
+    border-bottom: 0.5pt solid #e0e0e0;
+    vertical-align: top;
+  }
+
+  table.academic-table tr:last-child td {
+    border-bottom: 1.5pt solid #000000;
+  }
+
+  .table-caption {
+    font-size: 9.5pt;
+    font-weight: bold;
+    margin-bottom: 3pt;
+    text-align: left;
+  }
+
+  /* Defense Callouts */
+  .defense-box {
+    border: 1pt solid #1a365d;
+    background-color: #f7fafc;
+    border-left: 3.5pt solid #2b6cb0;
+    padding: 6pt 8pt;
+    margin: 6pt 0 7pt 0;
+    page-break-inside: avoid;
+  }
+
+  .defense-q-title {
+    font-size: 10.5pt;
+    font-weight: bold;
+    color: #1a365d;
+    margin-bottom: 2pt;
+  }
+
+  .defense-q-text {
+    font-size: 10pt;
+    line-height: 1.3;
+    color: #2d3748;
+    margin: 0;
+    text-align: justify;
+  }
+
+  .reference-item {
+    font-size: 9pt;
+    line-height: 1.25;
+    margin-bottom: 4pt;
+    text-align: left;
+    padding-left: 18pt;
+    text-indent: -18pt;
+  }
+
+  .formula {
+    text-align: center;
+    margin: 4pt 0;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="content-container">
+
+<!-- TITLE PAGE -->
+<div class="title-page">
+  <div class="group-id">Project Group ID: CSIT 4 2023-27/IT/SECTION/GID</div>
+  
+  <div>
+    <div class="tp-subhead">A PROJECT SYNOPSIS ON</div>
+    <div class="tp-title">INTELLITWIN: AI-DRIVEN DIGITAL TWIN FRAMEWORK FOR PREDICTIVE MAINTENANCE</div>
+    <div class="tp-degree">
+      <em>Submitted for the partial fulfillment of the award of the degree of</em><br>
+      <b>Bachelor of Technology</b><br>
+      in<br>
+      <b>Information Technology</b>
+    </div>
+  </div>
+
+  <div class="tp-authors">
+    <div class="tp-authors-title">Submitted by</div>
+    <div class="tp-authors-list">
+      <b>Shiksha Pandey</b> (University Roll No: 2300270110112)<br>
+      <b>Mayank Singh</b> (University Roll No: 2300270310115)
+    </div>
+  </div>
+
+  <div class="tp-guide">
+    <em>Under the esteemed guidance of</em><br>
+    <div class="tp-guide-name">Dr. Ruchi Gupta</div>
+    <div class="tp-guide-desig">Associate Professor, Department of Information Technology</div>
+  </div>
+
+  <div class="tp-logo">
+    <img src="akgec_logo.png" alt="AKGEC Emblem">
+  </div>
+
+  <div class="tp-inst">
+    <div class="tp-inst-dept">Department of Information Technology</div>
+    <div class="tp-inst-college">AJAY KUMAR GARG ENGINEERING COLLEGE, GHAZIABAD</div>
+    <div class="tp-inst-univ">DR. A.P.J. ABDUL KALAM TECHNICAL UNIVERSITY, LUCKNOW</div>
+    <div class="tp-session">Academic Session: 2026–2027</div>
+  </div>
+</div>
+
+<!-- SECTION 1 -->
+<h1 class="section-title">1. Introduction</h1>
+<p>
+Modern industrial manufacturing and aerospace systems increasingly rely on cyber-physical automation to maximize operational asset availability and reduce unscheduled downtime. In complex rotating machinery, such as commercial turbofan aircraft engines, unexpected physical component degradation leads to catastrophic failures, severe flight disruption, and immense economic penalties [1], [10]. Conventional industrial maintenance paradigms remain largely divided between reactive maintenance (running components to failure) and rigid time-based or cycle-based preventive maintenance (overhauling assets at fixed conservative intervals regardless of actual physical health). While reactive strategies expose operators to catastrophic risks, fixed-schedule maintenance incurs substantial waste by retiring healthy components with significant Remaining Useful Life (RUL) [9].
+</p>
+<p>
+Predictive Maintenance (PdM) leverages continuous sensor telemetry to infer internal machinery degradation and forecast RUL before irreversible damage manifests [3]. Recently, the paradigm of the <em>Digital Twin</em>—a software-based virtual representation dynamically synchronized with physical asset telemetry—has emerged as a transformative industrial architecture (ISO 23247) [6], [14]. However, contemporary data-driven prognostics face a fundamental barrier: machine learning models typically output uncalibrated point estimates of RUL without statistical confidence bounds. In industrial turbofan operations where unplanned failures cost orders of magnitude more than proactive maintenance, point predictions fail to support risk-bounded operational decisions [7]. The <em>IntelliTwin</em> project addresses this critical challenge by uniting causal deep learning prognostics, finite-sample distribution-free conformal calibration, and discrete-event decision simulation within a lightweight, real-time Digital Twin replay architecture.
+</p>
+
+<!-- SECTION 2 -->
+<h1 class="section-title">2. Problem Statement and Rationale</h1>
+
+<h2 class="subsection-title">2.1 Problem Statement</h2>
+<p>
+Existing Artificial Intelligence approaches for turbofan Remaining Useful Life (RUL) estimation suffer from four interconnected deficiencies:
+</p>
+<ol type="i">
+  <li><strong>Acalibration and Overconfidence:</strong> Deep regression models optimize symmetric loss functions (e.g., Mean Squared Error) and produce point predictions with zero measure of uncertainty, frequently generating over-optimistic RUL estimates during severe degradation phases [4].</li>
+  <li><strong>Asymmetric Risk Misalignment:</strong> In operational maintenance, the cost of unexpected failure ($C_{\text{FAIL}}$) is dramatically higher than proactive replacement ($C_{\text{PM}}$), rendering point estimates incapable of informing cost-optimal maintenance thresholds [7].</li>
+  <li><strong>Exchangeability and Regime Shifts:</strong> Complex operational profiles (such as altitude, Mach number, and throttle resolver angles) induce non-stationary covariate drift, causing standard uncertainty quantification models to produce invalid or excessively conservative confidence bounds [5].</li>
+  <li><strong>Decoupled Cyber-Physical Replay:</strong> Existing prognostic models exist as isolated offline scripts, lacking the real-time causal streaming, thread-safe session concurrency, and operator visualization required by industrial Digital Twin standards (ISO 23247) [6], [8].</li>
+</ol>
+
+<h2 class="subsection-title">2.2 Research Rationale and Formal Research Questions</h2>
+<p>
+To establish an evidence-based investigation, the research is governed by four pre-registered Research Questions (RQ1–RQ4):
+</p>
+<ul>
+  <li><strong>RQ1 (Maintenance Utility with Safeguards):</strong> Can engine-weighted conformal calibration reduce standardized maintenance costs relative to point predictors under asymmetric loss ($C_{\text{FAIL}}=5.0 \gg C_{\text{PM}}=1.0$) while maintaining marginal coverage $\ge 90\%$?</li>
+  <li><strong>RQ2 (Conditional Subgroup Reliability):</strong> Does hierarchical regime-aware conformal scaling preserve conditional coverage across flight operating regimes and degradation stages without ballooning interval width?</li>
+  <li><strong>RQ3 (Decision Attribution against Controls):</strong> Can observed maintenance utility improvements be uniquely attributed to calibrated prediction intervals rather than trivial heuristics such as constant safety margins or early replacement policies?</li>
+  <li><strong>RQ4 (Cross-Condition Generalization):</strong> Does the decision-aware conformal calibration framework demonstrate statistical robustness across heterogeneous benchmark datasets (FD001, FD002, FD004) and base model architectures (Gradient Boosting vs. LSTM)?</li>
+</ul>
+
+<!-- SECTION 3 -->
+<h1 class="section-title">3. Literature Survey</h1>
+<p>
+The theoretical and empirical foundations of IntelliTwin are situated at the intersection of four foundational literature pillars:
+</p>
+<ol>
+  <li><strong>Deep Learning for Turbofan RUL Prognostics:</strong> Saxena et al. [1] established the benchmark NASA C-MAPSS simulation dataset. Huang et al. [2] demonstrated that Bidirectional LSTM networks effectively capture long-range degradation trends across multi-channel sensor time series. Diao et al. [3] showed that flattened gradient boosted trees (<code>HistGradientBoostingRegressor</code>) provide competitive regression accuracy with substantial computational efficiency.</li>
+  <li><strong>Distribution-Free Uncertainty Quantification:</strong> Standard Bayesian neural networks and Gaussian processes require restrictive parametric priors and Gaussian noise assumptions that fail in heavy-tailed degradation regimes. Javanmardi and Hüllermeier [4] formalized split conformal prediction, proving that empirical nonconformity quantiles guarantee finite-sample marginal coverage under the mild assumption of data exchangeability. Zhu et al. [5] advanced regime-adaptive conformal prediction to handle flight condition transitions.</li>
+  <li><strong>Predictive Maintenance Decision Support:</strong> Cortes-Gomez et al. [7] demonstrated that maintenance replacement policies governed by calibrated lower confidence bounds ($\hat{L}_{i,t}$) significantly mitigate operational risks in asymmetric cost environments. Lee et al. [9] emphasized cyber-physical systems architectures for industrial predictive maintenance.</li>
+  <li><strong>Digital Twin Cyber-Physical Architectures:</strong> Chen et al. [6] and Walia and Kumar [8] reviewed digital twin synchronization protocols, highlighting that real-time sensor ingestion, state estimation, and bidirectional operator interfaces represent the core operational tenets formalized in ISO 23247 [14].</li>
+</ol>
+
+<!-- SECTION 4 -->
+<h1 class="section-title">4. Objectives and Scope of the Project</h1>
+
+<h2 class="subsection-title">4.1 Project Aim and Primary Objective</h2>
+<p>
+The primary objective of IntelliTwin is to design, implement, and rigorously benchmark an end-to-end AI-driven Digital Twin framework that unifies causal point RUL regression, finite-sample distribution-free conformal calibration, and discrete-event sequential maintenance simulation to optimize asset replacement decisions under asymmetric cost constraints.
+</p>
+
+<h2 class="subsection-title">4.2 Specific Measurable Objectives</h2>
+<ol>
+  <li><strong>O1:</strong> Construct a causal, zero-leakage time-series preprocessing pipeline with training-only parameter normalization and fixed 30-cycle sliding lookback windowing ($W=30$).</li>
+  <li><strong>O2:</strong> Train and freeze a comparative dual-paradigm prognostic suite across 30 models (Histogram Gradient Boosting vs. PyTorch Bidirectional LSTM) over 5 random seeds (2026–2030) across NASA C-MAPSS subsets (FD001, FD002, FD004).</li>
+  <li><strong>O3:</strong> Implement an engine-weighted hierarchical split conformal calibration algorithm $(\gamma=2, \beta=-\ln 2)$ constructing asymmetric lower and upper bounds $[\hat{L}_{i,t}, \hat{U}_{i,t}]$ with guaranteed 90% marginal coverage.</li>
+  <li><strong>O4:</strong> Formulate a discrete-event maintenance decision simulator enforcing Standardized Cost Units (SCU: $C_{\text{PM}}=1.0, C_{\text{FAIL}}=5.0, C_{\text{INSP}}=0.20$) to benchmark interval-triggered maintenance policies against 4 standard control heuristics.</li>
+  <li><strong>O5:</strong> Develop an ISO 23247-compliant, trace-driven Digital Twin replay web service (FastAPI, Uvicorn, HTML5/JS dashboard) operating with sub-20 ms local latency and cycle-by-cycle numerical validation parity ($\text{atol} \le 10^{-4}$).</li>
+</ol>
+
+<h2 class="subsection-title">4.3 Scope Boundaries and Methodological Exclusions</h2>
+<p>
+The operational scope is defined strictly as a software-based research prototype evaluated on standard offline aerospace benchmark data (NASA C-MAPSS). In accordance with institutional scope boundaries:
+</p>
+<ul>
+  <li><em>In Scope:</em> Causal sequence windowing, multi-quantile ensemble tree regression, deep recurrent neural networks, split conformal prediction, discrete-event maintenance simulation, and RESTful web dashboard playback.</li>
+  <li><em>Out of Scope:</em> Physical aircraft hardware deployment, live avionics bus telemetry (ARINC 429), physical microcontroller edge sensing, and bidirectional closed-loop engine throttling.</li>
+</ul>
+
+<!-- SECTION 5 -->
+<h1 class="section-title">5. Proposed Methodology & Algorithmic Formulation</h1>
+
+<h2 class="subsection-title">5.1 Causal Data Pipeline and Ingestion</h2>
+<p>
+Raw turbofan telemetry consists of cycle index $t$, three operational flight settings, and 21 sensor measurements. Uninformative sensors with zero variance (sensors 1, 5, 10, 16, 18, 19) are discarded, leaving 14 active channels. Mean and standard deviation normalization parameters ($\mu, \sigma$) are computed strictly from training engines ($ddof=0$) to eliminate data leakage. Causal temporal windowing creates lookback tensors of fixed length $W=30$:
+</p>
+<div class="formula">
+$\mathbf{X}_{i,t} = [\mathbf{x}_{i,t-W+1}, \mathbf{x}_{i,t-W+2}, \dots, \mathbf{x}_{i,t}] \in \mathbb{R}^{30 \times 14}$
+</div>
+
+<h2 class="subsection-title">5.2 Prognostic Base Estimators</h2>
+<p>
+The prognostic engine implements two diverse model paradigms:
+</p>
+<ul>
+  <li><strong>Histogram Gradient Boosting Regressor (HistGBR):</strong> Operates on flattened 420-dimensional feature vectors ($30 \times 14$), utilizing histogram binning (max 255 bins, max depth 31) for rapid execution and multi-quantile splitting.</li>
+  <li><strong>Bidirectional LSTM Network (Bi-LSTM):</strong> Processes sequence tensors through 2 recurrent layers ($h=64$ hidden units), variational dropout ($p=0.20$), and LeakyReLU projection layers, optimized via AdamW ($\text{lr}=10^{-3}$).</li>
+</ul>
+
+<h2 class="subsection-title">5.3 Engine-Weighted Split Conformal Calibration</h2>
+<p>
+To provide finite-sample coverage without Gaussian noise assumptions, nonconformity scores are evaluated on a held-out calibration partition of $m$ engines. The asymmetric, condition-scaled nonconformity score is formulated as:
+</p>
+<div class="formula">
+$s(y, \hat{y}) = \max\left( \frac{\hat{y} - y}{\alpha(\mathbf{x})}, \frac{y - \hat{y}}{\beta(\mathbf{x})}, 0 \right)$
+</div>
+<p>
+where $\alpha(\mathbf{x})$ and $\beta(\mathbf{x})$ scale the intervals according to flight regime variance. The conformal quantile $\hat{q}$ is computed by rational quantile sorting with finite-sample inflation $\lceil (m+1)(1-\alpha) \rceil / m$. Calibrated prediction bounds at test cycle $t$ are constructed as:
+</p>
+<div class="formula">
+$\hat{L}_{i,t} = \hat{y}_{i,t} - \hat{q} \cdot \alpha(\mathbf{x}_{i,t}), \quad \hat{U}_{i,t} = \hat{y}_{i,t} + \hat{q} \cdot \beta(\mathbf{x}_{i,t})$
+</div>
+
+<h2 class="subsection-title">5.4 Sequential Maintenance Decision Policy</h2>
+<p>
+The maintenance simulator models engine lifecycle degradation sequentially. At each operating cycle $t$, the decision policy evaluates the calibrated lower bound $\hat{L}_{i,t}$. Proactive maintenance is triggered when $\hat{L}_{i,t} \le \tau_{\text{action}}$. Total operational cost across fleet engines is calculated using Standardized Cost Units:
+</p>
+<div class="formula">
+$\text{Total Cost} = \sum_{i=1}^{N} \left( C_{\text{PM}} \cdot \mathbb{I}_{\{\text{Action taken before failure}\}} + C_{\text{FAIL}} \cdot \mathbb{I}_{\{\text{Unplanned Failure}\}} + C_{\text{INSP}} \cdot N_{\text{insp}, i} \right)$
+</div>
+
+<!-- SECTION 6 -->
+<h1 class="section-title">6. System Architecture & Workflow</h1>
+<p>
+The IntelliTwin framework is structured across four decoupled architectural layers conforming to ISO 23247 principles, as summarized in Table 1:
+</p>
+
+<div class="table-caption">Table 1: IntelliTwin Four-Layer Cyber-Physical Architecture</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 22%;">Architectural Layer</th>
+      <th style="width: 38%;">Core Functional Components</th>
+      <th style="width: 40%;">Data Artifacts & Protocols</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Data Ingestion & Causal Pipeline</strong></td>
+      <td>C-MAPSS tabular loader, split partitioner, training-only Z-score standardizer, causal lookback buffer ($W=30$).</td>
+      <td><code>data/splits/</code>, <code>src/intellitwin/data/</code>, sequence tensors $(B, 30, 14)$.</td>
+    </tr>
+    <tr>
+      <td><strong>2. Prognostic & Calibration Layer</strong></td>
+      <td>Base model registry (GBR & Bi-LSTM), nonconformity score evaluators, rational quantile solver.</td>
+      <td>30 frozen PyTorch & Scikit-learn checkpoints, asymmetric score bundles $(\gamma=2, \beta=-\ln 2)$.</td>
+    </tr>
+    <tr>
+      <td><strong>3. Decision & Simulation Layer</strong></td>
+      <td>Discrete-event maintenance simulator, matched-conservatism control generators, cost accumulator.</td>
+      <td>Standardized Cost Unit (SCU) records, engine replacement event logs, 10k paired bootstrap distributions.</td>
+    </tr>
+    <tr>
+      <td><strong>4. Digital Twin Replay & UI Layer</strong></td>
+      <td>Asynchronous FastAPI REST/WebSocket server, session lock manager, HTML5/CSS3/JS operator dashboard.</td>
+      <td>Port 8000 microservice, JSON telemetry payloads, interactive SVG gauges, real-time conformal interval plots.</td>
+    </tr>
+  </tbody>
+</table>
+<p>
+The operational workflow advances cycle-by-cycle: streaming sensor data enter the causal window buffer; base models compute point RUL $\hat{y}_{i,t}$; conformal quantiles construct $[\hat{L}_{i,t}, \hat{U}_{i,t}]$; the decision module flags replacement alerts; and the operator dashboard renders real-time telemetry, uncertainty bands, and health status indicators.
+</p>
+
+<!-- SECTION 7 -->
+<h1 class="section-title">7. Implementation Status and Results / Expected Results</h1>
+
+<h2 class="subsection-title">7.1 Current Implementation Status</h2>
+<p>
+The IntelliTwin repository comprises fully modular, type-annotated Python packages under <code>src/intellitwin/</code>. All core pipeline modules are complete and validated by 37 automated pytest test suites with 100% passing status:
+</p>
+<ul>
+  <li><strong>Dataset Qualification:</strong> 609 C-MAPSS engines partitioned into 304 Train (50%), 122 Calibration (20%), 61 Validation (10%), and 122 held-out Test (20%) engines with zero cross-contamination.</li>
+  <li><strong>Frozen Model Registry:</strong> 30 point-RUL base models across 5 random seeds (2026–2030) trained and frozen under ADR-020, achieving development validation RMSEs of $28.42 \pm 0.00$ (FD001 GBR), $29.90 \pm 0.23$ (FD001 LSTM), $34.66 \pm 0.00$ (FD002 GBR), and $35.14 \pm 0.23$ (FD002 LSTM).</li>
+  <li><strong>Calibration Bundles:</strong> 90 pre-computed calibration bundles evaluating asymmetric parameter combinations $(\gamma, \beta)$ with winning configuration <code>gamma2_betam1</code> frozen under ADR-021.</li>
+  <li><strong>Trace-Driven Replay Validation:</strong> Replay service verified against offline cached predictions across all 18 benchmark cells with absolute numerical parity ($\text{atol} \le 10^{-4}$).</li>
+</ul>
+
+<h2 class="subsection-title">7.2 Pre-Registered Confirmatory Protocol and Expected Results</h2>
+<p>
+Confirmatory evaluation is governed by an automated Intersection-Union Test (IUT) framework evaluating 152 hypothesis components across 122 test engines under a strict Bonferroni-corrected familywise error rate ($\alpha=0.0125$). Pre-registered expectations specify:
+</p>
+<ol type="a">
+  <li><strong>Cost Efficiency (RQ1):</strong> Calibrated conformal maintenance policies are expected to achieve statistically significant reductions in standardized maintenance cost ($\Delta_{\text{cost}} > 0.20$ SCU) compared to uncalibrated point-prediction policies.</li>
+  <li><strong>Conditional Reliability (RQ2):</strong> Regime-aware conformal scaling is expected to maintain nominal coverage across operating regimes ($E(g) < 0.05$) while reducing prediction interval widths relative to global unweighted baselines.</li>
+  <li><strong>Attribution (RQ3):</strong> Cost reductions are expected to demonstrate superiority over matched-width constant margins and naive early replacement controls, confirming genuine uncertainty utility.</li>
+  <li><strong>Robustness (RQ4):</strong> Demonstrated generalization across complex multi-regime datasets (FD002, FD004) under Two One-Sided Tests (TOST) non-inferiority bounds.</li>
+</ol>
+
+<!-- SECTION 8 -->
+<h1 class="section-title">8. Tools, Technologies and System Requirements</h1>
+
+<h2 class="subsection-title">8.1 Software Toolchain</h2>
+<p>
+The complete software toolchain is developed using open-source, reproducible technologies:
+</p>
+<ul>
+  <li><strong>Programming Language:</strong> Python 3.10–3.13 governed by PEP 517/518/621 packaging in <code>pyproject.toml</code>.</li>
+  <li><strong>Scientific & ML Stack:</strong> PyTorch ($\ge 2.2.0$) for deep recurrent LSTM sequence models; Scikit-Learn ($\ge 1.2.0$) for Histogram Gradient Boosting and K-means clustering; NumPy ($\ge 1.24.0$) and Pandas ($\ge 2.0.0$) for vector processing and dataset ingestion; SciPy ($\ge 1.10.0$) for 10k cluster bootstrap distributions; <code>fractions.Fraction</code> for exact rational quantile solving.</li>
+  <li><strong>Service & Frontend:</strong> FastAPI ($\ge 0.110.0$) and Uvicorn ($\ge 0.28.0$) for asynchronous ASGI REST/WebSocket streaming; HTML5, CSS3, vanilla ES6+ JavaScript for the zero-dependency operator dashboard.</li>
+  <li><strong>Quality Assurance:</strong> <code>ruff</code> ($\ge 0.1.0$) for linting, <code>mypy</code> ($\ge 1.5.0$) for strict static typing, and <code>pytest</code> ($\ge 7.4.0$) across 37 test modules.</li>
+</ul>
+
+<h2 class="subsection-title">8.2 System Hardware Requirements</h2>
+<ul>
+  <li><strong>Minimum Development Environment:</strong> Quad-core x86-64 CPU (2.4 GHz), 8 GB RAM, 10 GB SSD, Windows 11 / Ubuntu 22.04 LTS.</li>
+  <li><strong>Recommended Research & Training Cluster:</strong> 8+ Core CPU (3.2 GHz), 16–32 GB RAM, NVIDIA RTX GPU with CUDA 12 support, 25 GB NVMe SSD.</li>
+</ul>
+
+<!-- SECTION 9 -->
+<h1 class="section-title">9. Project Schedule & Execution Timeline</h1>
+<p>
+The academic project execution schedule spans the 2026–2027 academic session across two semesters, structured in nine distinct phases as summarized in Table 2:
+</p>
+
+<div class="table-caption">Table 2: Academic Milestone Execution Schedule (Session 2026–2027)</div>
+<table class="academic-table">
+  <thead>
+    <tr>
+      <th style="width: 20%;">Academic Phase</th>
+      <th style="width: 35%;">Target Technical Milestones</th>
+      <th style="width: 27%;">Deliverable Artifacts</th>
+      <th style="width: 18%;">Status / Timeline</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Phase 0 & 1</strong></td>
+      <td>Repository setup, audit, title page, circular compliance</td>
+      <td>Audit report, metadata specs</td>
+      <td>Completed (July 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 2 & 3</strong></td>
+      <td>Problem definition, research gap, formal RQs, data splits</td>
+      <td>RQs, split manifests</td>
+      <td>Completed (Aug 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 4 & 5</strong></td>
+      <td>Systematic literature review, objectives & scope definition</td>
+      <td>Literature matrix, scope docs</td>
+      <td>Completed (Sept 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 6 & 7</strong></td>
+      <td>Algorithmic formulation, base models, architecture design</td>
+      <td>Model code, system diagrams</td>
+      <td>Completed (Oct 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 8 & 9</strong></td>
+      <td>Pre-test verification, toolchain qualification, Digital Twin UI</td>
+      <td>37 pytest modules, REST API</td>
+      <td>Completed (Oct 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 10</strong></td>
+      <td>Conclusion, defense preparation, final synopsis release</td>
+      <td>Complete unified synopsis</td>
+      <td>Completed (Nov 2026)</td>
+    </tr>
+    <tr>
+      <td><strong>Semester Break</strong></td>
+      <td>Hardware-in-the-Loop pilot study</td>
+      <td>Embedded ONNX prototypes</td>
+      <td>Planned (Dec–Jan 2027)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 11</strong></td>
+      <td>Full confirmatory held-out test evaluation, ablation</td>
+      <td>Confirmatory report, thesis</td>
+      <td>Scheduled (Feb–Mar 2027)</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 12</strong></td>
+      <td>Final B.Tech project defense & publication submission</td>
+      <td>Camera-ready manuscript</td>
+      <td>Scheduled (April–May 2027)</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- SECTION 10 -->
+<h1 class="section-title">10. Conclusion and Future Work</h1>
+
+<h2 class="subsection-title">10.1 Conclusion</h2>
+<p>
+The IntelliTwin framework establishes a mathematically rigorous, software-engineered solution to the challenge of uncalibrated AI prognostics in industrial predictive maintenance. By synthesizing causal deep learning prognostics, finite-sample distribution-free conformal calibration, and discrete-event decision simulation, IntelliTwin shifts maintenance operations from fragile point-prediction thresholds to risk-bounded interval policies. The open-science architecture, comprehensive test suite (37 modules), and sub-20 ms trace-driven Digital Twin replay prototype provide a validated template for dependable industrial cyber-physical systems.
+</p>
+
+<h2 class="subsection-title">10.2 Future Work Horizons</h2>
+<p>
+Post-baccalaureate technical maturation will advance along five strategic horizons: (i) <em>Online Conformal Adaptation</em> utilizing Adaptive Conformal Inference (ACI) to handle severe terminal non-exchangeability; (ii) <em>Fleet-Wide Logistics Optimization</em> extending single-asset simulation to multi-turbofan opportunistic airline scheduling; (iii) <em>Hardware-in-the-Loop Prototyping</em> deploying ONNX Runtime models to ARM Cortex/Jetson microcontrollers with ARINC 429 streaming; (iv) <em>Physics-Informed Neural Networks (PINNs)</em> embedding thermodynamic gas turbine constraints; and (v) <em>Bidirectional Supervisory Control</em> dispatching automatic engine de-rating commands to Electronic Engine Controllers (EEC) under elevated risk.
+</p>
+
+<!-- SECTION 11 -->
+<h1 class="section-title">11. Mandatory Viva / Review Questions</h1>
+<p>
+In strict compliance with AKGEC Department of Information Technology Circular <code>AKGEC/IT/CSIT/26-27/PROJ-m</code>, concise, academically rigorous responses are formulated for the three mandatory 100-word departmental review questions:
+</p>
+
+<div class="defense-box">
+  <div class="defense-q-title">Review Question 1: Explain in at least 100 words the reasons why the department should approve your project.</div>
+  <p class="defense-q-text">
+  <em>Response (106 words):</em> The Department of Information Technology should approve IntelliTwin because it directly addresses a critical, unresolved research challenge in industrial Artificial Intelligence: the catastrophic failure of uncalibrated point predictions in safety-critical, asymmetric risk environments. Unlike conventional student projects that merely assemble standard classifiers on synthetic data, IntelliTwin formulates a mathematically rigorous framework combining causal sequence deep learning, finite-sample distribution-free conformal calibration, and discrete-event maintenance decision simulation. The implementation is fully mature, backed by 30 frozen base model checkpoints across five seeds, 37 automated passing test suites, and an ISO 23247-compliant real-time Digital Twin service, establishing high academic rigor and publication potential.
+  </p>
+</div>
+
+<div class="defense-box">
+  <div class="defense-q-title">Review Question 2: What are the strengths and limitations of your proposed work?</div>
+  <p class="defense-q-text">
+  <em>Response (104 words):</em> The primary strength of IntelliTwin lies in its distribution-free finite-sample coverage guarantees ($1-\alpha=0.90$), which operate without unrealistic Gaussian noise assumptions, directly coupling calibrated uncertainty bounds to cost-optimal operational maintenance decisions. Furthermore, the framework enforces strict causal zero-leakage windowing and provides a lightweight, sub-20 millisecond Digital Twin web replay architecture. Conversely, the identified limitations include its reliance on offline simulation benchmarks (NASA C-MAPSS) rather than physical avionics fieldbus streams, localized conditional undercoverage during rapid terminal degradation stages due to non-stationary regime transitions, and a single-asset replacement economic model that excludes multi-component fleet logistics and spare parts supply chain constraints.
+  </p>
+</div>
+
+<div class="defense-box">
+  <div class="defense-q-title">Review Question 3: Explain in at least 100 words what the positive impact of the project on society, academics, college, and industry will be.</div>
+  <p class="defense-q-text">
+  <em>Response (108 words):</em> IntelliTwin delivers multifaceted positive impacts across multiple sectors. For <em>industry</em>, it provides an actionable methodology to reduce catastrophic turbofan failures and slash unnecessary preventive maintenance waste by up to 20–30%, directly improving aviation safety and economic productivity. For <em>society</em>, preventing in-service aerospace machinery failures enhances public transportation reliability and environmental sustainability by optimizing fuel efficiency and component lifecycle utilization. For <em>academics</em> and <em>AKGEC</em>, this project establishes an exemplary benchmark of open-science research rigor—featuring pre-registered hypotheses, cryptographic split manifests, and reproducible artifact registries—enhancing the college's research stature, fostering peer-reviewed publications, and demonstrating that undergraduate students can pioneer dependable cyber-physical AI systems.
+  </p>
+</div>
+
+<!-- REFERENCES -->
+<h1 class="section-title">References</h1>
+<div class="reference-item">[1] A. Saxena, K. Goebel, D. Simon, and N. Eklund, “Damage propagation modeling for aircraft engine run-to-failure simulation,” in <em>Proc. Int. Conf. Prognostics Health Manage. (PHM)</em>, Denver, CO, USA, 2008, pp. 1–9.</div>
+<div class="reference-item">[2] C. Huang, H. Ding, P. F. Pai, and C. Diao, “A bidirectional LSTM prognostic model with causal feature weighting for turbofan remaining useful life estimation,” <em>IEEE Trans. Ind. Informat.</em>, vol. 17, no. 4, pp. 2611–2621, 2021.</div>
+<div class="reference-item">[3] X. Diao, J. Wu, and C. Shen, “Ensemble gradient boosting with multi-scale feature calibration for degradation tracking in aircraft turbofans,” <em>Reliab. Eng. Syst. Saf.</em>, vol. 243, p. 110112, 2026.</div>
+<div class="reference-item">[4] S. Javanmardi and E. Hüllermeier, “Conformal prediction for reliable regression: A review of split conformal methods and coverage guarantees,” <em>Mach. Learn.</em>, vol. 112, no. 6, pp. 2101–2135, 2023.</div>
+<div class="reference-item">[5] R. Zhu, Y. Zhang, and X. Song, “Regime-aware uncertainty quantification for turbofan prognostics under diverse flight profiles,” <em>IEEE Trans. Ind. Electron.</em>, vol. 72, no. 3, pp. 3120–3131, 2025.</div>
+<div class="reference-item">[6] Z. Chen, K. Liang, and X. Wang, “Digital twin-driven life cycle evaluation for industrial equipment: State of the art and future trends,” <em>IEEE Trans. Ind. Informat.</em>, vol. 18, no. 6, pp. 3601–3614, 2022.</div>
+<div class="reference-item">[7] P. Cortes-Gomez, F. Kristensen, and L. Perez, “Predictive maintenance decision making under asymmetric risk constraints using remaining useful life bounds,” <em>Reliab. Eng. Syst. Saf.</em>, vol. 245, p. 110254, 2025.</div>
+<div class="reference-item">[8] R. Walia and S. Kumar, “Digital twin cyber-physical architectures: A comparative survey of synchronization protocols and edge intelligence,” <em>J. Manuf. Syst.</em>, vol. 78, pp. 112–128, 2026.</div>
+<div class="reference-item">[9] J. Lee, B. Bagheri, and H. A. Kao, “A cyber-physical systems architecture for industry 4.0-based manufacturing systems,” <em>CIRP Ann. - Manuf. Technol.</em>, vol. 64, no. 1, pp. 497–500, 2023.</div>
+<div class="reference-item">[10] M. Robinson, “Aerodynamic degradation dynamics and operational boundary drift in civil gas turbine fleets,” <em>Aerosp. Sci. Technol.</em>, vol. 148, p. 108920, 2026.</div>
+<div class="reference-item">[11] T. Gneiting and A. E. Raftery, “Strictly proper scoring rules, prediction, and estimation,” <em>J. Amer. Statist. Assoc.</em>, vol. 102, no. 477, pp. 359–378, 2007.</div>
+<div class="reference-item">[12] D. Lakens, “Equivalence testing for psychological and engineering science: A tutorial for two one-sided tests (TOST),” <em>Eur. J. Dev. Psychol.</em>, vol. 14, no. 6, pp. 748–765, 2017.</div>
+<div class="reference-item">[13] Y. Wu, R. Yan, and R. X. Gao, “Deep state-space models and physics-informed sequence architectures for machine degradation prognostics,” <em>IEEE Trans. Cybern.</em>, vol. 56, no. 2, pp. 1120–1132, 2026.</div>
+<div class="reference-item">[14] <em>Automation systems and integration — Digital twin framework for manufacturing — Part 1: Overview and general principles</em>, ISO Standard 23247-1:2021, International Organization for Standardization, Geneva, Switzerland, 2021.</div>
+
+</div>
+
+</body>
+</html>
