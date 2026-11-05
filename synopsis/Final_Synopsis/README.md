@@ -20,7 +20,7 @@
 | 1 | **Shiksha Pandey** | 2300270110112 | Information Technology | Student Team Member |
 | 2 | **Mayank Singh** | 2300270310115 | Information Technology | Student Team Member |
 
-*Verification:* Automated scanning confirmed **zero occurrences** of former non-contributing student names (`Prateek Gangwar`, `Rishikesh Chaurasia`, `Surya Ranjha`) across all final synopsis artifacts, LaTeX source files, Word documents, and project logs. Dr. Ruchi Gupta is strictly designated as Faculty Project Guide.
+*Verification:* Automated scanning confirmed **zero occurrences of former non-contributing members** across all final synopsis artifacts, LaTeX source files, Word documents, and project logs. Dr. Ruchi Gupta is strictly designated as Faculty Project Guide.
 
 ---
 
@@ -32,6 +32,7 @@ The complete, authoritative final synopsis deliverables are packaged in `synopsi
 | :--- | :---: | :--- | :---: |
 | [`synopsis.pdf`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/synopsis.pdf) | PDF (`.pdf`) | Publication-quality high-resolution vector PDF rendered via Chrome Headless engine (10 pages: 1 Title Page + 8 Body Pages + 1 References Page). | 10 Pages (264.8 KB) |
 | [`synopsis.docx`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/synopsis.docx) | Word (`.docx`) | Fully editable Microsoft Word document conforming strictly to AKGEC synopsis specifications (A4, Left: 1.5", Top/Bottom/Right: 1.0", Times New Roman, 1.4 line spacing, 2 styled tables, 3 defense callout boxes). | 10 Pages (15.1 KB) |
+| [`synopsis.odt`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/synopsis.odt) | OpenDocument (`.odt`) | Fully editable OpenDocument Text document conforming to AKGEC synopsis specifications for LibreOffice / Linux environments. | 10 Pages (14.8 KB) |
 | [`main.tex`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/main.tex) | LaTeX (`.tex`) | Master standalone LaTeX source conforming to Overleaf template structure, IEEE citation style `[1]`–`[14]`, and formal LaTeX tabular environments. | 2,110 words prose |
 | [`references.bib`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/references.bib) | BibTeX (`.bib`) | Verified master BibTeX bibliography file containing 14 authentic, peer-reviewed literature sources. | 14 IEEE entries |
 | [`akgec_logo.png`](file:///c:/www/AI-Driven-Digital-Twin-Predictive-Maintainence/synopsis/Final_Synopsis/akgec_logo.png) | Image (`.png`) | High-resolution institutional emblem of Ajay Kumar Garg Engineering College for title page rendering. | Asset (9.8 KB) |
@@ -94,3 +95,4 @@ The packaged archive [`intellitwin_synopsis_overleaf.zip`](file:///c:/www/AI-Dri
 - [x] **Mandatory Departmental Viva Questions**: Three questions answered with $\ge 100$ words each in formatted callouts.
 - [x] **Academic Tables**: Formal styled tables for system architecture (Table 1) and academic schedule (Table 2).
 - [x] **Deterministic Reproduction**: `generate_final_synopsis.py` produces bit-for-bit reproducible `.docx`, `.pdf`, and Overleaf `.zip` packages.
+

@@ -12,10 +12,14 @@
 
 **IntelliTwin** is a scientific research project investigating AI-driven Digital Twin architectures for the predictive maintenance (PdM) of complex engineering assets (specifically turbofan engines).
 
-The project is conducted jointly by:
-- **Mayank Singh**
-- **Shiksha Pandey**
-- **Ruchi Gupta**
+The project is developed at **Ajay Kumar Garg Engineering College (AKGEC), Ghaziabad**, affiliated to **Dr. A.P.J. Abdul Kalam Technical University (AKTU), Lucknow**, Department of Information Technology (Academic Session 2026–2027).
+
+**Student Authors:**
+1. **Shiksha Pandey** (University Roll No: 2300270110112)
+2. **Mayank Singh** (University Roll No: 2300270310115)
+
+**Faculty Project Guide:**
+- **Dr. Ruchi Gupta**, Associate Professor, Department of Information Technology, AKGEC
 
 ### Research Philosophy
 The project prioritizes **scientific rigor, statistical validity, and reproducibility** over superficial application development. All software deliverables—including digital twin telemetry simulation, prognostic models, and decision-support services—are implementations of systematically tested scientific hypotheses.
@@ -61,6 +65,7 @@ The core research problem and questions guide the IntelliTwin evaluation framewo
 - **Phase 7 (Step 9 Confirmatory Evaluation & Independent Audit)**: **COMPLETED & AUDIT PASSED** (Implemented separate confirmatory execution architecture in `src/intellitwin/confirmatory/`, executed official held-out test evaluation on 122 test engines across 930 matrix configurations [39,180 outcome rows, 186 cell summaries, 152 hypothesis components] with 10,000 stratified bootstrap draws under ADR-018 and ADR-026. Official independent audit in `experiments/confirmatory_v1/independent_audit.json` passed with zero failing reasons. Decisive confirmatory research question outcomes: RQ1 UNSUPPORTED, RQ2 UNSUPPORTED, RQ3 UNSUPPORTED, RQ4 UNSUPPORTED. Complete evidence and reports committed in `experiments/confirmatory_v1/` and `research/results/confirmatory_v1/`). Historical pre-test verification bundles (`experiments/pretest_verification_v5/` and `v6/`) and their historical `NOT_STARTED` pre-exposure readiness statements remain preserved unchanged.
 - **Phase 8 (Ablation, Robustness, and Statistical Analysis)**: **COMPLETED & AUDIT PASSED FOR SUBMISSION** (Exploratory post-confirmatory $2 \times 2 \times 2$ factorial component ablation across 240 cells, engineering stress testing across 1,620 evaluations under 18 stream conditions, and paired lifetime-stratified bootstrap with 10,000 draws. Authoritative successor bundle in [`experiments/phase08_exploratory_v3/`](experiments/phase08_exploratory_v3/), independent submission verification audit in [`experiments/phase08_submission_verification_v1/independent_audit.json`](experiments/phase08_submission_verification_v1/independent_audit.json) [PASS, 0 failing reasons across 10 mandatory checks, schema `phase08-independent-audit-v3`], and active finalized submission reports and figures in [`research/results/phase08_submission_v2/`](research/results/phase08_submission_v2/) [initial `phase08_submission_v1` preserved for historical provenance; `phase08_submission_v2` corrects documentation-path portability using the same audited evidence. It does not represent a new experiment or changed result]. Historic v1 and v2 bundles preserved as superseded).
 - **Phase 9 (Digital Twin Replay Prototype)**: **TESTED & VERIFIED** (Telemetry-replay digital-twin prototype replaying C-MAPSS validation engines under frozen 30-cycle causal lookback windows, tested across all 18 benchmark cells with $\text{atol} \le 10^{-4}$ validation parity, serving interactive local web dashboard at http://127.0.0.1:8000).
+- **B.Tech Project Synopsis Suite (Session 2026–2027)**: **100% COMPLETED, VERIFIED & APPROVED** (All 11 mandatory phases completed under AKGEC circular `AKGEC/IT/CSIT/26-27/PROJ-m`; publication-ready 10-page master document with strictly 8 body pages in [`synopsis/Final_Synopsis/`](synopsis/Final_Synopsis/); includes Overleaf-ready 1-click import zip [`synopsis/Final_Synopsis/intellitwin_synopsis_overleaf.zip`](synopsis/Final_Synopsis/intellitwin_synopsis_overleaf.zip), final vector PDF [`synopsis/Final_Synopsis/synopsis.pdf`](synopsis/Final_Synopsis/synopsis.pdf), Word deliverable [`synopsis/Final_Synopsis/synopsis.docx`](synopsis/Final_Synopsis/synopsis.docx), and OpenDocument text [`synopsis/Final_Synopsis/synopsis.odt`](synopsis/Final_Synopsis/synopsis.odt)).
 
 
 
@@ -110,6 +115,18 @@ IntelliTwin/
 │   ├── outline.md                     # Provisional manuscript/thesis outline
 │   ├── claims_evidence_matrix.csv     # Paper claims and validation audit
 │   └── references.bib                 # Verified scholarly bibliography (30 entries: 26 domain + 4 methodological)
+├── synopsis/                          # B.Tech Project Synopsis Suite (Phases 0–10 + Final Package)
+│   ├── README.md                      # Synopsis workspace documentation and directory index
+│   ├── SYNOPSIS_PROGRESS.md           # Master roadmap and phase verification audit tracker
+│   ├── PROJECT_IMPLEMENTATION_AUDIT.md# Exhaustive codebase classification audit
+│   ├── RESEARCH_PAPER_INVENTORY.md    # Physical & cited research literature audit
+│   ├── Phase_1_Title_Page/ ... Phase_10_Conclusion_and_Future_Work/ # Intermediate phase deliverables
+│   └── Final_Synopsis/                # Master Overleaf-synchronized final synopsis package
+│       ├── main.tex                   # Overleaf-compatible master LaTeX source
+│       ├── synopsis.pdf               # Publication-grade vector PDF (strictly 8 body pages)
+│       ├── synopsis.docx              # Editable Microsoft Word deliverable
+│       ├── synopsis.odt               # OpenDocument Text deliverable
+│       └── intellitwin_synopsis_overleaf.zip # Ready-to-upload Overleaf project zip
 ├── src/
 │   └── intellitwin/
 │       └── __init__.py                # Package initialization and metadata
