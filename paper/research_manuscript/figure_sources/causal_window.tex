@@ -1,0 +1,74 @@
+% Causal Window and Target Construction Diagram
+% Illustrates 30-cycle lookback, 1-29 warm-up, dual target attachment, and 30x17 vs 510 representation
+\begin{tikzpicture}[
+    scale=0.95,
+    cyclebox/.style={rectangle, draw=black!60, minimum width=0.5cm, minimum height=0.6cm, align=center, font=\tiny},
+    warmupbox/.style={rectangle, draw=gray!50, fill=gray!15, minimum width=0.5cm, minimum height=0.6cm, align=center, font=\tiny},
+    windowbox/.style={rectangle, draw=blue!80, fill=blue!10, minimum width=0.5cm, minimum height=0.6cm, align=center, font=\tiny},
+    endpointbox/.style={rectangle, draw=red!80, fill=red!15, minimum width=0.5cm, minimum height=0.6cm, align=center, font=\tiny\bfseries},
+    targetbox/.style={rectangle, draw=purple!80, fill=purple!10, rounded corners=2pt, minimum width=2.4cm, minimum height=0.7cm, align=center, font=\scriptsize},
+    repbox/.style={rectangle, draw=teal!80, fill=teal!10, rounded corners=2pt, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\scriptsize},
+    arrow/.style={-{Stealth[length=2mm]}, thick, draw=black!70}
+]
+
+% Timeline coordinates
+% Warm-up cycles 1, 2, ..., 28, 29
+\node[warmupbox] (c1) at (0,0) {1};
+\node[warmupbox] (c2) at (0.6,0) {2};
+\node[font=\tiny] at (1.3,0) {$\cdots$};
+\node[warmupbox] (c29) at (2.0,0) {29};
+
+% Window cycles t-29 ... t
+\node[windowbox] (ct29) at (3.0,0) {\tiny $t{-}29$};
+\node[windowbox] (ct28) at (3.8,0) {\tiny $t{-}28$};
+\node[font=\tiny] at (4.6,0) {$\cdots$};
+\node[windowbox] (ct1) at (5.4,0) {\tiny $t{-}1$};
+\node[endpointbox] (ct) at (6.2,0) {$t$};
+
+% Next cycles
+\node[cyclebox] (ctplus) at (7.0,0) {\tiny $t{+}1$};
+\node[font=\tiny] at (7.7,0) {$\cdots$};
+\node[cyclebox] (cT) at (8.4,0) {$T$};
+
+% Labels and Braces
+\draw[thick, decoration={brace, mirror, raise=4pt}, decorate, draw=gray!70] 
+    ($(c1.south west)+(0,-0.05)$) -- ($(c29.south east)+(0,-0.05)$) 
+    node[pos=0.5, below=8pt, font=\scriptsize, align=center] {Warm-up Horizon (Cycles 1--29)\\ \tiny No prediction generated; causal buffer filling};
+
+\draw[thick, decoration={brace, raise=4pt}, decorate, draw=blue!80] 
+    ($(ct29.north west)+(0,0.05)$) -- ($(ct.north east)+(0,0.05)$) 
+    node[pos=0.5, above=8pt, font=\scriptsize, align=center] {\textbf{Causal Observation Window} (Length = 30 cycles, Stride = 1)\\ \tiny Strictly within engine boundaries; zero future cycle leakage};
+
+% Feature Representation Nodes below
+\node[repbox] (lstm_rep) at (3.5, -2.0) {
+    \textbf{LSTM Representation}\\
+    \scriptsize Matrix: $30 \times 17$\\
+    \tiny 30 time steps $\times$ 17 features
+};
+
+\node[repbox] (gbr_rep) at (6.8, -2.0) {
+    \textbf{GBR Representation}\\
+    \scriptsize Vector: $510$ features\\
+    \tiny C-order row-major flattening
+};
+
+\draw[arrow] (4.6, -0.4) -- (lstm_rep.north);
+\draw[arrow] (5.4, -0.4) -- (gbr_rep.north);
+
+% Target nodes attached to endpoint t
+\node[targetbox] (train_target) at (9.6, 1.0) {
+    \textbf{Training Target}\\
+    \scriptsize $y_{\text{train}} = \min(\text{rul}_{\text{true}}, 125)$ cycles\\
+    \tiny Linear piecewise modeling convention
+};
+
+\node[targetbox] (eval_target) at (9.6, -0.6) {
+    \textbf{Evaluation Target}\\
+    \scriptsize $y_{\text{eval}} = \text{rul}_{\text{true}} = T - t$ cycles\\
+    \tiny Uncapped true remaining cycles
+};
+
+\draw[arrow, draw=purple!80] (ct.north) |- (train_target.west);
+\draw[arrow, draw=purple!80] (ct.south) |- (eval_target.west);
+
+\end{tikzpicture}

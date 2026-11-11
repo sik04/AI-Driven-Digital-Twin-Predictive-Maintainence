@@ -1,0 +1,87 @@
+% Architecture Diagram for IntelliTwin Pipeline
+% Strict partition isolation, split counts, and offline evaluation boundaries
+\begin{tikzpicture}[
+    node distance=1.2cm and 0.8cm,
+    box/.style={rectangle, draw=black!70, rounded corners=2pt, minimum width=2.4cm, minimum height=0.9cm, align=center, font=\footnotesize},
+    databox/.style={rectangle, draw=blue!70, fill=blue!5, rounded corners=2pt, minimum width=2.6cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    procbox/.style={rectangle, draw=teal!70, fill=teal!5, rounded corners=2pt, minimum width=2.6cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    evalbox/.style={rectangle, draw=purple!70, fill=purple!5, rounded corners=2pt, minimum width=2.6cm, minimum height=1.0cm, align=center, font=\footnotesize},
+    arrow/.style={-{Stealth[length=2.5mm]}, thick, draw=black!70},
+    dashedarrow/.style={-{Stealth[length=2.5mm]}, thick, dashed, draw=red!70}
+]
+
+% 1. Dataset Partition Layer
+\node[databox] (split) {
+    \textbf{Engine-Level Disjoint Split}\\
+    \scriptsize FD001: 50 / 20 / 10 / 20\\
+    \scriptsize FD002: 130 / 52 / 26 / 52\\
+    \scriptsize FD004: 124 / 50 / 25 / 50\\
+    \tiny (Train / Cal / Val / Test)
+};
+
+% 2. Partition Nodes
+\node[procbox, right=1.2cm of split, yshift=2.0cm] (train) {
+    \textbf{Training Partition}\\
+    \scriptsize Training-only z-score fit\\
+    \scriptsize 6 Regimes ($k$-means)\\
+    \scriptsize GBR / LSTM fitting\\
+    \scriptsize Target: $\min(\text{rul}, 125)$
+};
+
+\node[procbox, right=1.2cm of split, yshift=0.7cm] (val) {
+    \textbf{Validation Partition}\\
+    \scriptsize Validation-only selection\\
+    \scriptsize Grid search ($\gamma, \beta$)\\
+    \scriptsize Control parameter selection\\
+    \scriptsize No test leakage
+};
+
+\node[procbox, right=1.2cm of split, yshift=-0.7cm] (cal) {
+    \textbf{Reserved Calibration}\\
+    \scriptsize Engine-weighted quantiles\\
+    \scriptsize Finite mass: $\frac{m}{m+1}$\\
+    \scriptsize Mass at $+\infty$: $\frac{1}{m+1}$\\
+    \scriptsize Regime support $m_g \ge 10$
+};
+
+\node[evalbox, right=1.2cm of split, yshift=-2.2cm] (test) {
+    \textbf{Held-Out Test Partition}\\
+    \scriptsize Blended held-out trajectories\\
+    \scriptsize \textbf{NO FEEDBACK} to selection\\
+    \scriptsize Evaluated offline only
+};
+
+% 3. Decision & Simulator Layer
+\node[procbox, right=1.2cm of val, yshift=-0.7cm] (policy) {
+    \textbf{Frozen Decision Policy}\\
+    \scriptsize Input: $L(t) = \max(0, p(t) - q a(p))$\\
+    \scriptsize Rule: Maintain iff $L(t) \le 1.0$\\
+    \scriptsize Evaluation: cycles $30 \dots T-1$\\
+    \scriptsize Zero lead-time intervention
+};
+
+\node[evalbox, right=1.2cm of policy] (sim) {
+    \textbf{Offline Simulation Replay}\\
+    \scriptsize Synthetic SCU pricing:\\
+    \scriptsize $\CPM=1.0, \CFAIL=5.0, \CWASTE=0.20$\\
+    \scriptsize True RUL \& failure time\\
+    \scriptsize available \textbf{only} offline
+};
+
+% Connections
+\draw[arrow] (split.east) -- ++(0.5,0) |- (train.west);
+\draw[arrow] (split.east) -- ++(0.5,0) |- (val.west);
+\draw[arrow] (split.east) -- ++(0.5,0) |- (cal.west);
+\draw[arrow] (split.east) -- ++(0.5,0) |- (test.west);
+
+\draw[arrow] (train.east) -| ++(0.4,-1.2) -| (policy.north);
+\draw[arrow] (val.east) -| ++(0.4,-0.3) -- (policy.west);
+\draw[arrow] (cal.east) -| ++(0.4,0.3) -- (policy.west);
+\draw[arrow] (test.east) -| ++(0.5,0.7) -| (sim.south);
+\draw[arrow] (policy.east) -- (sim.west);
+
+% Anti-leakage boundary
+\draw[dashed, red!80, line width=0.8pt] ($(test.north west)+(-0.2,0.2)$) rectangle ($(sim.south east)+(0.2,-0.2)$);
+\node[red!80, font=\tiny\bfseries, above right] at ($(test.north west)+(-0.2,0.2)$) {Strict Offline Evaluation Boundary (No Feedback)};
+
+\end{tikzpicture}
