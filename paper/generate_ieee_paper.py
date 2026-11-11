@@ -80,12 +80,14 @@ def build_html():
   }
 
   .abstract-keywords-container {
-    margin: 0 auto 12pt auto;
-    width: 98%;
+    margin: 0 0 10pt 0;
+    width: 100%;
+    font-size: 8.5pt;
+    line-height: 1.22;
     text-align: justify;
-    font-size: 9pt;
-    line-height: 1.2;
-    padding: 2pt 0;
+    break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   .abstract-heading {
@@ -242,7 +244,8 @@ def build_html():
   </div>
 </div>
 
-<div class="abstract-keywords-container">
+<div class="columns-container">
+  <div class="abstract-keywords-container">
   <p class="no-indent">
     <span class="abstract-heading">Abstract&mdash;</span>In industrial predictive maintenance of gas turbine engines, unexpected mechanical failure incurs severe airworthiness risks and catastrophic economic penalties (5x to 10x scheduled overhaul), while premature overhaul discards valuable residual component life. Conventional Remaining Useful Life (RUL) prognostic systems rely on deterministic point estimators that optimize symmetric cycle error metrics without quantifying prediction variance or aligning with downstream maintenance costs. Standard inductive conformal prediction provides marginal coverage guarantees but conceals severe conditional undercoverage across accelerating degradation stages and varying operating regimes. In this work, we present <strong>IntelliTwin</strong>, an uncertainty-aware prognostic framework integrating Gradient Boosted Regressors (GBR) and Long Short-Term Memory (LSTM) networks with hierarchical, decision-aware conformal calibration. IntelliTwin enforces strictly disjoint engine-level partitioning, causal temporal windowing (w=30, stride 1), exact rational engine weighting (m/(m+1) mass), and an asymmetric nonconformity score parameterized by scale dilation (&gamma;=2) and directional asymmetry (&beta;=-ln 2). We evaluate the framework under a frozen confirmatory protocol on 122 held-out test engines from NASA C-MAPSS sub-corpora FD001, FD002, and FD004 across 10,000 lifetime-stratified cluster-bootstrap draws with Bonferroni-controlled 98.75% decision intervals. In confirmatory testing, the proposed method achieved substantial maintenance cost reductions (+7.50 to +11.32 Simulated Cost Units per engine on FD002) with zero fleet failures. However, under preregistered Intersection-Union Testing criteria, RQ1&ndash;RQ4 were formally classified as UNSUPPORTED because late-stage degradation coverage error breached the 0.05 ceiling (E_stage &asymp; 0.13, empirical coverage ~ 77%). Through post-confirmatory factorial ablation across 240 cells, we isolate that scale dilation (&gamma;) reduces cost by an unweighted mean of -10.48 SCU and directional asymmetry (&beta;) reduces cost by -1.21 SCU, whereas regime routing provides null effects on single-condition fleets and small cost penalties (+0.56 SCU) on multi-condition fleets due to partition sample dispersion. Finally, we provide an open, fully reproducible historical validation-telemetry replay prototype.
   </p>
@@ -251,23 +254,22 @@ def build_html():
   </div>
 </div>
 
-<div class="columns-container">
 
   <h2>I. Introduction</h2>
   <p>
-    Prognostics and Health Management (PHM) for high-value rotating machinery has emerged as a cornerstone of operational safety and economic sustainability across commercial aviation, energy generation, and advanced manufacturing [1], [2]. In commercial aircraft gas turbine turbofans, unscheduled engine removals and catastrophic in-flight failures impose disproportionate costs&mdash;frequently exceeding scheduled overhaul expenses by five- to ten-fold&mdash;while posing critical flight safety risks [7], [8]. Conversely, legacy time-based preventative maintenance discards substantial remaining operational lifespan, severely inflating life-cycle overhaul expenditure [6], [10].
+    Prognostics and Health Management (PHM) for high-value rotating machinery has emerged as a cornerstone of operational safety and economic sustainability across commercial aviation, energy generation, and advanced manufacturing [28], [13]. In commercial aircraft gas turbine turbofans, unscheduled engine removals and catastrophic in-flight failures impose disproportionate costs&mdash;frequently exceeding scheduled overhaul expenses by five- to ten-fold&mdash;while posing critical flight safety risks [22], [18]. Conversely, legacy time-based preventative maintenance discards substantial remaining operational lifespan, severely inflating life-cycle overhaul expenditure [30], [17].
   </p>
   <p>
-    Modern data-driven prognostic paradigms utilize multi-sensor telemetry to predict an asset's Remaining Useful Life (RUL) [15]. Deep learning models, including Long Short-Term Memory (LSTM) networks and gradient-boosted regression ensembles, have achieved impressive cycle-level error reductions on standardized run-to-failure benchmarks such as NASA C-MAPSS [1], [19]. However, standard point-regression models suffer from three structural shortcomings when deployed into operational maintenance decision pipelines:
+    Modern data-driven prognostic paradigms utilize multi-sensor telemetry to predict an asset's Remaining Useful Life (RUL) [5]. Deep learning models, including Long Short-Term Memory (LSTM) networks and gradient-boosted regression ensembles, have achieved impressive cycle-level error reductions on standardized run-to-failure benchmarks such as NASA C-MAPSS [28], [8]. However, standard point-regression models suffer from three structural shortcomings when deployed into operational maintenance decision pipelines:
   </p>
   <p>
-    <em>1) Unquantified Point Variance:</em> A single deterministic cycle estimate provides no measure of epistemic or aleatoric uncertainty, preventing operators from distinguishing high-confidence prognostic estimates from high-risk extrapolations [17], [20].
+    <em>1) Unquantified Point Variance:</em> A single deterministic cycle estimate provides no measure of epistemic or aleatoric uncertainty, preventing operators from distinguishing high-confidence prognostic estimates from high-risk extrapolations [25], [3].
   </p>
   <p>
-    <em>2) Conditional Reliability Breakdown:</em> Inductive split conformal prediction has emerged as an attractive, distribution-free methodology to construct finite-sample prediction intervals [L, U] with marginal coverage guarantees P(y &isin; [L, U]) &ge; 1 - &alpha; [23], [19]. Nevertheless, marginal coverage guarantees do not ensure conditional coverage across varying operating regimes or accelerating wear stages [22], [24]. In turbofan engines subject to dynamic throttle and atmospheric variations, standard conformal calibrators frequently undercover in late degradation phases where accurate risk bounds are most critical.
+    <em>2) Conditional Reliability Breakdown:</em> Inductive split conformal prediction has emerged as an attractive, distribution-free methodology to construct finite-sample prediction intervals [L, U] with marginal coverage guarantees P(y &isin; [L, U]) &ge; 1 - &alpha; [23], [8]. Nevertheless, marginal coverage guarantees do not ensure conditional coverage across varying operating regimes or accelerating wear stages [9], [4]. In turbofan engines subject to dynamic throttle and atmospheric variations, standard conformal calibrators frequently undercover in late degradation phases where accurate risk bounds are most critical.
   </p>
   <p>
-    <em>3) Decoupling of Uncertainty from Economic Consequences:</em> Standard prognostic objectives minimize symmetric errors (RMSE, MAE). In operational aviation maintenance, overestimating RUL leads to uncontained mechanical breakdown, whereas underestimating RUL causes only premature overhaul waste [18], [25]. Symmetric prediction intervals fail to reflect this severe operational loss asymmetry.
+    <em>3) Decoupling of Uncertainty from Economic Consequences:</em> Standard prognostic objectives minimize symmetric errors (RMSE, MAE). In operational aviation maintenance, overestimating RUL leads to uncontained mechanical breakdown, whereas underestimating RUL causes only premature overhaul waste [16], [2]. Symmetric prediction intervals fail to reflect this severe operational loss asymmetry.
   </p>
   <p>
     To bridge this operational and theoretical gap, we introduce <strong>IntelliTwin</strong>, an AI-driven framework that unifies deep sequence modeling, hierarchical conformal calibration, and asymmetric sequential maintenance simulation within an interactive Digital Twin replay architecture.
@@ -275,13 +277,13 @@ def build_html():
 
   <h2>II. Related Work</h2>
   <p>
-    <em>A. Prognostics and RUL Estimation:</em> Data-driven RUL estimation has evolved from classical statistical hazard modeling (Weibull, degradation filters) to complex neural architectures [1]. Modern benchmarks heavily leverage the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset, which models 90,000-lb thrust turbofan degradation under mixed sea-level and high-altitude flight envelopes [1], [19]. While recurrent and convolutional architectures achieve low RMSE, raw point predictions provide insufficient assurance for mission-critical dispatch [15], [16].
+    <em>A. Prognostics and RUL Estimation:</em> Data-driven RUL estimation has evolved from classical statistical hazard modeling (Weibull, degradation filters) to complex neural architectures [28]. Modern benchmarks heavily leverage the NASA Commercial Modular Aero-Propulsion System Simulation (C-MAPSS) dataset, which models 90,000-lb thrust turbofan degradation under mixed sea-level and high-altitude flight envelopes [28], [8]. While recurrent and convolutional architectures achieve low RMSE, raw point predictions provide insufficient assurance for mission-critical dispatch [5], [6].
   </p>
   <p>
-    <em>B. Uncertainty Quantification in PHM:</em> Bayesian neural networks, Monte Carlo dropout, and deep ensemble methods have been investigated to estimate RUL variance [17], [21]. However, Bayesian methods require strong prior assumptions, and ensemble variances often lack empirical coverage guarantees under distribution shift. Conformal prediction addresses this limitation by producing distribution-free, finite-sample prediction intervals [23]. Javanmardi and H&uuml;llermeier [23] demonstrated split conformal prediction on C-MAPSS FD001. Diao et al. [19] coupled LSTM quantile regression with conformal calibration. However, prior studies evaluated conformal intervals using standard symmetric coverage (PICP) and width (MPIW) metrics, overlooking the economic consequences of bound failures in sequential decision-making.
+    <em>B. Uncertainty Quantification in PHM:</em> Bayesian neural networks, Monte Carlo dropout, and deep ensemble methods have been investigated to estimate RUL variance [25], [10]. However, Bayesian methods require strong prior assumptions, and ensemble variances often lack empirical coverage guarantees under distribution shift. Conformal prediction addresses this limitation by producing distribution-free, finite-sample prediction intervals [23]. Javanmardi and H&uuml;llermeier [23] demonstrated split conformal prediction on C-MAPSS FD001. Diao et al. [8] coupled LSTM quantile regression with conformal calibration. However, prior studies evaluated conformal intervals using standard symmetric coverage (PICP) and width (MPIW) metrics, overlooking the economic consequences of bound failures in sequential decision-making.
   </p>
   <p>
-    <em>C. Digital Twins and Decision-Directed Conformal Inference:</em> Digital Twins combine sensor telemetry, virtual models, and real-time state synchronization to track physical degradation [3], [13], [14]. Recent theoretical developments by Cortes-Gomez et al. [30] formalized utility-directed conformal prediction for static decision problems, while Lee et al. [29] established distribution-free inference for hierarchical data. Robinson [25] introduced risk-aware conformal quantile regression for aircraft engines. IntelliTwin builds upon these foundations by unifying hierarchical engine weighting, state-dependent nonconformity scaling, and sequential discrete maintenance simulation into a single reproducible framework.
+    <em>C. Digital Twins and Decision-Directed Conformal Inference:</em> Digital Twins combine sensor telemetry, virtual models, and real-time state synchronization to track physical degradation [26], [15], [12]. Recent theoretical developments by Cortes-Gomez et al. [14] formalized utility-directed conformal prediction for static decision problems, while Lee et al. [24] established distribution-free inference for hierarchical data. Robinson [2] introduced risk-aware conformal quantile regression for aircraft engines. IntelliTwin builds upon these foundations by unifying hierarchical engine weighting, state-dependent nonconformity scaling, and sequential discrete maintenance simulation into a single reproducible framework.
   </p>
 
   <h2>III. Problem Formulation and Research Objectives</h2>
@@ -526,36 +528,36 @@ def build_html():
 
   <h2>References</h2>
   <ol class="references-list">
-    <li>A. Saxena, K. Goebel, D. Simon, and N. Eklund, &ldquo;Damage Propagation Modeling for Aircraft Engine Run-to-Failure Simulation,&rdquo; in <em>Proc. IEEE PHM</em>, 2008, pp. 1&ndash;9. DOI: <a class="doi-link" href="https://doi.org/10.1109/PHM.2008.4711414">10.1109/PHM.2008.4711414</a></li>
-    <li>D. Diana, Putri, and A. A. Mukti, &ldquo;AI-Driven Digital Twin for Predictive Maintenance in Urban Infrastructure,&rdquo; <em>Civil Eng. Sci. Technol.</em>, vol. 1, no. 1, pp. 63&ndash;74, 2025. DOI: <a class="doi-link" href="https://doi.org/10.51903/3c72e647">10.51903/3c72e647</a></li>
-    <li>Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, &ldquo;A Survey on AI-Driven Digital Twins in Industry 4.0,&rdquo; <em>Sensors</em>, vol. 21, no. 19, p. 6340, 2021. DOI: <a class="doi-link" href="https://doi.org/10.3390/s21196340">10.3390/s21196340</a></li>
-    <li>S. Mazzetto, &ldquo;A Review of Urban Digital Twins Integration, Challenges, and Future Directions,&rdquo; <em>Sustainability</em>, vol. 16, no. 19, p. 8337, 2024. DOI: <a class="doi-link" href="https://doi.org/10.3390/s21196340">10.3390/su16198337</a></li>
-    <li>H. Wei, &ldquo;Digital Twin and AI Enabled Predictive Maintenance in Building Industry,&rdquo; Ph.D. dissertation, Nanyang Technological University, Singapore, 2024.</li>
-    <li>S. F. Bello et al., &ldquo;AI-driven predictive maintenance and optimization of renewable energy systems,&rdquo; <em>Int. J. Sci. Res. Arch.</em>, vol. 13, no. 1, pp. 2823&ndash;2837, 2024. DOI: <a class="doi-link" href="https://doi.org/10.30574/ijsra.2024.13.1.1992">10.30574/ijsra.2024.13.1.1992</a></li>
-    <li>A. Hosseinzadeh et al., &ldquo;A Predictive Maintenance Approach in Manufacturing Systems via AI-based Early Failure Detection,&rdquo; <em>Mfg. Lett.</em>, vol. 35, pp. 1179&ndash;1186, 2023. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.mfglet.2023.08.125">10.1016/j.mfglet.2023.08.125</a></li>
-    <li>H. K. Shehadeh, &ldquo;Evaluating the Impact of Transitioning Maintenance Strategy from Reactive to Proactive,&rdquo; <em>WSEAS Trans. Bus. Econ.</em>, vol. 21, pp. 838&ndash;856, 2024. DOI: <a class="doi-link" href="https://doi.org/10.37394/23207.2024.21.69">10.37394/23207.2024.21.69</a></li>
-    <li>V. Mousavi et al., &ldquo;Evolution of Digital Twin Frameworks in Bridge Management,&rdquo; <em>Remote Sens.</em>, vol. 16, no. 11, p. 1887, 2024. DOI: <a class="doi-link" href="https://doi.org/10.3390/rs16111887">10.3390/rs16111887</a></li>
-    <li>F. Brighenti et al., &ldquo;Forecasting bridge damage within a predictive Structural Reliability-based DSS,&rdquo; <em>Autom. Constr.</em>, vol. 168, p. 105740, 2024. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.autcon.2024.105740">10.1016/j.autcon.2024.105740</a></li>
-    <li>M. Hisamuddin, M. T. Hussain, and R. Fatima, &ldquo;AI-Driven Digital Twins for Smart Urban Infrastructure,&rdquo; Tech. Report, Khaja Bandanawaz Univ., 2026.</li>
-    <li>A. K. M. R. Mahmud et al., &ldquo;AI-Augmented Digital Twin Architecture for Predictive Maintenance,&rdquo; <em>Eur. J. Appl. Sci. Eng. Technol.</em>, vol. 3, no. 5, pp. 45&ndash;58, 2025. DOI: <a class="doi-link" href="https://doi.org/10.59324/ejaset.2025.3(5).04">10.59324/ejaset.2025.3(5).04</a></li>
-    <li>S. K. K. Hasan and C. W. Crawford, &ldquo;A new era for digital twins: progress and industry adoption,&rdquo; <em>Digital Twin</em>, vol. 2, no. 4, p. 2555877, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1080/27525783.2025.2555877">10.1080/27525783.2025.2555877</a></li>
-    <li>B. P. Pathri and K. V. Ganduri, &ldquo;From Smart Cities to Manufacturing: A Comprehensive Study on Digital Twin Applications,&rdquo; <em>IET Digit. Twins Appl.</em>, vol. 2, p. e70014, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1049/dgt2.70014">10.1049/dgt2.70014</a></li>
+    <li>A. BenAbdennour, &ldquo;Leakage-Controlled Grouped Validation and Interval-Safety Calibration for RUL/SOH Prediction,&rdquo; <em>Machines</em>, vol. 14, no. 10, p. 1124, 2026. DOI: <a class="doi-link" href="https://doi.org/10.3390/machines14101124">10.3390/machines14101124</a></li>
+    <li>C. D. Robinson, &ldquo;Remaining Useful Life Estimation for Aircraft Engines with Risk-Aware Prediction Intervals,&rdquo; <em>Int. J. Progn. Health Manag.</em>, vol. 17, no. 1, p. 4724, 2026. DOI: <a class="doi-link" href="https://doi.org/10.36001/ijphm.2026.v17i1.4724">10.36001/ijphm.2026.v17i1.4724</a></li>
+    <li>G. K. Walia and M. Kumar, &ldquo;Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling,&rdquo; <em>Reliab. Eng. Syst. Saf.</em>, p. 112356, 2026. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.ress.2026.112356">10.1016/j.ress.2026.112356</a></li>
+    <li>H. Yan, &ldquo;Conformal prediction intervals for turbofan remaining useful life: an audit across operating regimes,&rdquo; Zenodo, 2026. DOI: <a class="doi-link" href="https://doi.org/10.5281/zenodo.21330745">10.5281/zenodo.21330745</a></li>
     <li>J. Wu et al., &ldquo;Research on Remaining Useful Life Prediction of Equipment Based on Digital Twins,&rdquo; <em>Sensors</em>, vol. 26, no. 4, p. 1240, 2026. DOI: <a class="doi-link" href="https://doi.org/10.3390/s26041240">10.3390/s26041240</a></li>
     <li>M. A. Belay, A. Rasheed, and P. S. Rossi, &ldquo;Digital Twin-Driven Communication-Efficient Federated Anomaly Detection for Industrial IoT,&rdquo; Preprint, NTNU / IEEE, 2026.</li>
-    <li>C. Chen et al., &ldquo;Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction,&rdquo; <em>Neurocomputing</em>, vol. 494, pp. 79&ndash;88, 2022. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.neucom.2022.04.055">10.1016/j.neucom.2022.04.055</a></li>
-    <li>Z. Zhu et al., &ldquo;Predictive Maintenance Strategies for Aero-Engines Considering Remaining Useful Life Prediction Interval,&rdquo; <em>Qual. Reliab. Eng. Int.</em>, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1002/qre.70043">10.1002/qre.70043</a></li>
+    <li>M. Hisamuddin, M. T. Hussain, and R. Fatima, &ldquo;AI-Driven Digital Twins for Smart Urban Infrastructure,&rdquo; Tech. Report, Khaja Bandanawaz Univ., 2026.</li>
     <li>R. Diao, M. Zhou, G. Meng, and S. Wang, &ldquo;Turbofan Engine Remaining Useful Life Prediction with Reliable Prediction Intervals,&rdquo; <em>Sensors</em>, vol. 26, no. 7, p. 2249, 2026. DOI: <a class="doi-link" href="https://doi.org/10.3390/s26072249">10.3390/s26072249</a></li>
-    <li>G. K. Walia and M. Kumar, &ldquo;Uncertainty-aware remaining useful life prediction and PPO based optimal maintenance scheduling,&rdquo; <em>Reliab. Eng. Syst. Saf.</em>, p. 112356, 2026. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.ress.2026.112356">10.1016/j.ress.2026.112356</a></li>
-    <li>W. Xu, S. Gao, Z. Wang, and E. Zio, &ldquo;A novel uncertainty-aware framework for remaining useful life prediction,&rdquo; <em>Reliab. Eng. Syst. Saf.</em>, vol. 275, p. 112763, 2026. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.ress.2026.112763">10.1016/j.ress.2026.112763</a></li>
     <li>S. Yang, J. Wang, and Y. Wang, &ldquo;Empirical Calibration and Conditional-Reliability Diagnostics for Bearing RUL Prediction,&rdquo; arXiv:2607.08273, 2026.</li>
-    <li>A. Javanmardi and E. H&uuml;llermeier, &ldquo;Conformal Prediction Intervals for Remaining Useful Lifetime Estimation,&rdquo; <em>Int. J. Progn. Health Manag.</em>, vol. 14, no. 2, p. 3417, 2023. DOI: <a class="doi-link" href="https://doi.org/10.36001/ijphm.2023.v14i2.3417">10.36001/ijphm.2023.v14i2.3417</a></li>
-    <li>H. Yan, &ldquo;Conformal prediction intervals for turbofan remaining useful life: an audit across operating regimes,&rdquo; Zenodo, 2026. DOI: <a class="doi-link" href="https://doi.org/10.5281/zenodo.21330745">10.5281/zenodo.21330745</a></li>
-    <li>C. D. Robinson, &ldquo;Remaining Useful Life Estimation for Aircraft Engines with Risk-Aware Prediction Intervals,&rdquo; <em>Int. J. Progn. Health Manag.</em>, vol. 17, no. 1, p. 4724, 2026. DOI: <a class="doi-link" href="https://doi.org/10.36001/ijphm.2026.v17i1.4724">10.36001/ijphm.2026.v17i1.4724</a></li>
-    <li>A. BenAbdennour, &ldquo;Leakage-Controlled Grouped Validation and Interval-Safety Calibration for RUL/SOH Prediction,&rdquo; <em>Machines</em>, vol. 14, no. 10, p. 1124, 2026. DOI: <a class="doi-link" href="https://doi.org/10.3390/machines14101124">10.3390/machines14101124</a></li>
-    <li>D. Lakens, &ldquo;Equivalence Tests: A Practical Primer for t Tests, Correlations, and Meta-Analyses,&rdquo; <em>Soc. Psychol. Personal. Sci.</em>, vol. 8, no. 4, pp. 355&ndash;362, 2017. DOI: <a class="doi-link" href="https://doi.org/10.1177/1948550617697177">10.1177/1948550617697177</a></li>
-    <li>T. Gneiting and A. E. Raftery, &ldquo;Strictly Proper Scoring Rules, Prediction, and Estimation,&rdquo; <em>J. Am. Stat. Assoc.</em>, vol. 102, no. 477, pp. 359&ndash;378, 2007. DOI: <a class="doi-link" href="https://doi.org/10.1198/016214506000001437">10.1198/016214506000001437</a></li>
-    <li>Y. Lee, R. F. Barber, and R. Willett, &ldquo;Distribution-Free Inference with Hierarchical Data,&rdquo; arXiv:2306.06342v4, 2023.</li>
+    <li>W. Xu, S. Gao, Z. Wang, and E. Zio, &ldquo;A novel uncertainty-aware framework for remaining useful life prediction,&rdquo; <em>Reliab. Eng. Syst. Saf.</em>, vol. 275, p. 112763, 2026. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.ress.2026.112763">10.1016/j.ress.2026.112763</a></li>
+    <li>A. K. M. R. Mahmud et al., &ldquo;AI-Augmented Digital Twin Architecture for Predictive Maintenance,&rdquo; <em>Eur. J. Appl. Sci. Eng. Technol.</em>, vol. 3, no. 5, pp. 45&ndash;58, 2025. DOI: <a class="doi-link" href="https://doi.org/10.59324/ejaset.2025.3(5).04">10.59324/ejaset.2025.3(5).04</a></li>
+    <li>B. P. Pathri and K. V. Ganduri, &ldquo;From Smart Cities to Manufacturing: A Comprehensive Study on Digital Twin Applications,&rdquo; <em>IET Digit. Twins Appl.</em>, vol. 2, p. e70014, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1049/dgt2.70014">10.1049/dgt2.70014</a></li>
+    <li>D. Diana, Putri, and A. A. Mukti, &ldquo;AI-Driven Digital Twin for Predictive Maintenance in Urban Infrastructure,&rdquo; <em>Civil Eng. Sci. Technol.</em>, vol. 1, no. 1, pp. 63&ndash;74, 2025. DOI: <a class="doi-link" href="https://doi.org/10.51903/3c72e647">10.51903/3c72e647</a></li>
     <li>S. Cortes-Gomez et al., &ldquo;Utility-Directed Conformal Prediction: A Decision-Aware Framework,&rdquo; in <em>Proc. ICLR</em>, 2025.</li>
+    <li>S. K. K. Hasan and C. W. Crawford, &ldquo;A new era for digital twins: progress and industry adoption,&rdquo; <em>Digital Twin</em>, vol. 2, no. 4, p. 2555877, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1080/27525783.2025.2555877">10.1080/27525783.2025.2555877</a></li>
+    <li>Z. Zhu et al., &ldquo;Predictive Maintenance Strategies for Aero-Engines Considering Remaining Useful Life Prediction Interval,&rdquo; <em>Qual. Reliab. Eng. Int.</em>, 2025. DOI: <a class="doi-link" href="https://doi.org/10.1002/qre.70043">10.1002/qre.70043</a></li>
+    <li>F. Brighenti et al., &ldquo;Forecasting bridge damage within a predictive Structural Reliability-based DSS,&rdquo; <em>Autom. Constr.</em>, vol. 168, p. 105740, 2024. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.autcon.2024.105740">10.1016/j.autcon.2024.105740</a></li>
+    <li>H. K. Shehadeh, &ldquo;Evaluating the Impact of Transitioning Maintenance Strategy from Reactive to Proactive,&rdquo; <em>WSEAS Trans. Bus. Econ.</em>, vol. 21, pp. 838&ndash;856, 2024. DOI: <a class="doi-link" href="https://doi.org/10.37394/23207.2024.21.69">10.37394/23207.2024.21.69</a></li>
+    <li>H. Wei, &ldquo;Digital Twin and AI Enabled Predictive Maintenance in Building Industry,&rdquo; Ph.D. dissertation, Nanyang Technological University, Singapore, 2024.</li>
+    <li>S. F. Bello et al., &ldquo;AI-driven predictive maintenance and optimization of renewable energy systems,&rdquo; <em>Int. J. Sci. Res. Arch.</em>, vol. 13, no. 1, pp. 2823&ndash;2837, 2024. DOI: <a class="doi-link" href="https://doi.org/10.30574/ijsra.2024.13.1.1992">10.30574/ijsra.2024.13.1.1992</a></li>
+    <li>S. Mazzetto, &ldquo;A Review of Urban Digital Twins Integration, Challenges, and Future Directions,&rdquo; <em>Sustainability</em>, vol. 16, no. 19, p. 8337, 2024. DOI: <a class="doi-link" href="https://doi.org/10.3390/su16198337">10.3390/su16198337</a></li>
+    <li>V. Mousavi et al., &ldquo;Evolution of Digital Twin Frameworks in Bridge Management,&rdquo; <em>Remote Sens.</em>, vol. 16, no. 11, p. 1887, 2024. DOI: <a class="doi-link" href="https://doi.org/10.3390/rs16111887">10.3390/rs16111887</a></li>
+    <li>A. Hosseinzadeh et al., &ldquo;A Predictive Maintenance Approach in Manufacturing Systems via AI-based Early Failure Detection,&rdquo; <em>Mfg. Lett.</em>, vol. 35, pp. 1179&ndash;1186, 2023. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.mfglet.2023.08.125">10.1016/j.mfglet.2023.08.125</a></li>
+    <li>A. Javanmardi and E. H&uuml;llermeier, &ldquo;Conformal Prediction Intervals for Remaining Useful Lifetime Estimation,&rdquo; <em>Int. J. Progn. Health Manag.</em>, vol. 14, no. 2, p. 3417, 2023. DOI: <a class="doi-link" href="https://doi.org/10.36001/ijphm.2023.v14i2.3417">10.36001/ijphm.2023.v14i2.3417</a></li>
+    <li>Y. Lee, R. F. Barber, and R. Willett, &ldquo;Distribution-Free Inference with Hierarchical Data,&rdquo; arXiv:2306.06342v4, 2023.</li>
+    <li>C. Chen et al., &ldquo;Data-driven predictive maintenance strategy considering the uncertainty in remaining useful life prediction,&rdquo; <em>Neurocomputing</em>, vol. 494, pp. 79&ndash;88, 2022. DOI: <a class="doi-link" href="https://doi.org/10.1016/j.neucom.2022.04.055">10.1016/j.neucom.2022.04.055</a></li>
+    <li>Z. Huang, Y. Shen, J. Li, M. Fey, and C. Brecher, &ldquo;A Survey on AI-Driven Digital Twins in Industry 4.0,&rdquo; <em>Sensors</em>, vol. 21, no. 19, p. 6340, 2021. DOI: <a class="doi-link" href="https://doi.org/10.3390/s21196340">10.3390/s21196340</a></li>
+    <li>D. Lakens, &ldquo;Equivalence Tests: A Practical Primer for t Tests, Correlations, and Meta-Analyses,&rdquo; <em>Soc. Psychol. Personal. Sci.</em>, vol. 8, no. 4, pp. 355&ndash;362, 2017. DOI: <a class="doi-link" href="https://doi.org/10.1177/1948550617697177">10.1177/1948550617697177</a></li>
+    <li>A. Saxena, K. Goebel, D. Simon, and N. Eklund, &ldquo;Damage Propagation Modeling for Aircraft Engine Run-to-Failure Simulation,&rdquo; in <em>Proc. IEEE PHM</em>, 2008, pp. 1&ndash;9. DOI: <a class="doi-link" href="https://doi.org/10.1109/PHM.2008.4711414">10.1109/PHM.2008.4711414</a></li>
+    <li>T. Gneiting and A. E. Raftery, &ldquo;Strictly Proper Scoring Rules, Prediction, and Estimation,&rdquo; <em>J. Am. Stat. Assoc.</em>, vol. 102, no. 477, pp. 359&ndash;378, 2007. DOI: <a class="doi-link" href="https://doi.org/10.1198/016214506000001437">10.1198/016214506000001437</a></li>
   </ol>
 
 </div>
@@ -654,6 +656,9 @@ def build_docx():
       <w:pPr>
         <w:jc w:val="center"/>
         <w:spacing w:before="0" w:after="200"/>
+        <w:sectPr>
+          <w:type w:val="continuous"/>
+        </w:sectPr>
       </w:pPr>
       <w:r>
         <w:rPr><w:sz w:val="18"/></w:rPr>
@@ -769,6 +774,7 @@ def build_docx():
     <w:sectPr>
       <w:pgSz w:w="11906" w:h="16838"/>
       <w:pgMar w:top="1080" w:right="900" w:bottom="1080" w:left="900"/>
+      <w:cols w:num="2" w:space="720"/>
     </w:sectPr>
   </w:body>
 </w:document>"""
