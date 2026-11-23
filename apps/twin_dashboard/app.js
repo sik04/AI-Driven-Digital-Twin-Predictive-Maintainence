@@ -54,7 +54,85 @@ const dom = {
   sensorSelect2: document.getElementById('sensor-select-2'),
   sensorSelect3: document.getElementById('sensor-select-3'),
   provenanceContent: document.getElementById('provenance-content'),
+  backendModal: document.getElementById('backend-modal'),
+  backendUrlInput: document.getElementById('backend-url-input'),
+  btnConfigBackend: document.getElementById('btn-config-backend'),
+  btnSaveBackend: document.getElementById('btn-save-backend'),
+  btnCancelBackend: document.getElementById('btn-cancel-backend'),
+  backendStatusDot: document.getElementById('backend-status-dot'),
+  backendStatusText: document.getElementById('backend-status-text'),
 };
+
+// API Base URL Resolution (Render backend / Vercel cross-origin)
+function getApiBaseUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const paramUrl = params.get('api') || params.get('backend');
+  if (paramUrl) {
+    const clean = paramUrl.replace(/\/+$/, '');
+    localStorage.setItem('intellitwin_api_url', clean);
+    return clean;
+  }
+  const stored = localStorage.getItem('intellitwin_api_url');
+  if (stored) {
+    return stored.replace(/\/+$/, '');
+  }
+  if (typeof window !== 'undefined' && window.__INTELLITWIN_API_URL__) {
+    return String(window.__INTELLITWIN_API_URL__).replace(/\/+$/, '');
+  }
+  const metaTag = document.querySelector('meta[name="intellitwin-api-url"]');
+  if (metaTag && metaTag.getAttribute('content')) {
+    return metaTag.getAttribute('content').replace(/\/+$/, '');
+  }
+  return '';
+}
+
+function setApiBaseUrl(url) {
+  const clean = (url || '').trim().replace(/\/+$/, '');
+  if (clean) {
+    localStorage.setItem('intellitwin_api_url', clean);
+  } else {
+    localStorage.removeItem('intellitwin_api_url');
+  }
+}
+
+function apiUrl(path) {
+  const base = getApiBaseUrl();
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return base ? `${base}${normalizedPath}` : normalizedPath;
+}
+
+function updateBackendStatus(statusType, text) {
+  if (dom.backendStatusDot) {
+    dom.backendStatusDot.className = `status-dot ${statusType}`;
+  }
+  if (dom.backendStatusText) {
+    dom.backendStatusText.textContent = text;
+  }
+}
+
+function openBackendModal() {
+  if (dom.backendUrlInput) {
+    dom.backendUrlInput.value = getApiBaseUrl();
+  }
+  if (dom.backendModal) {
+    dom.backendModal.style.display = 'flex';
+  }
+}
+
+function closeBackendModal() {
+  if (dom.backendModal) {
+    dom.backendModal.style.display = 'none';
+  }
+}
+
+async function onSaveBackend() {
+  const val = dom.backendUrlInput ? dom.backendUrlInput.value : '';
+  setApiBaseUrl(val);
+  closeBackendModal();
+  updateBackendStatus('connecting', 'Connecting...');
+  await loadCatalog();
+  await checkHealthAndActiveSession();
+}
 
 // Initial Setup
 document.addEventListener('DOMContentLoaded', async () => {
@@ -92,12 +170,15 @@ function bindEventListeners() {
   dom.btnStep.addEventListener('click', advanceSingleCycle);
   dom.btnReset.addEventListener('click', onReset);
   dom.btnDownloadTrace.addEventListener('click', onDownloadTrace);
+  if (dom.btnConfigBackend) dom.btnConfigBackend.addEventListener('click', openBackendModal);
+  if (dom.btnSaveBackend) dom.btnSaveBackend.addEventListener('click', onSaveBackend);
+  if (dom.btnCancelBackend) dom.btnCancelBackend.addEventListener('click', closeBackendModal);
 }
 
 // API Communication
 async function loadCatalog() {
   try {
-    const res = await fetch('/api/catalog');
+    const res = await fetch(apiUrl('/api/catalog'));
     if (!res.ok) throw new Error(`Catalog load failed: ${res.statusText}`);
     const data = await res.json();
     state.catalog = data;
@@ -143,27 +224,34 @@ function populateEngineDropdown(dataset) {
 }
 
 async function checkHealthAndActiveSession() {
+  updateBackendStatus('connecting', 'Connecting...');
   try {
-    const res = await fetch('/api/health');
+    const res = await fetch(apiUrl('/api/health'));
     if (!res.ok) {
+      updateBackendStatus('offline', 'Disconnected');
       showError(`Backend health check failed (HTTP ${res.status}).`);
       return;
     }
     const data = await res.json();
     if (data.status !== 'ok') {
+      updateBackendStatus('degraded', 'Degraded');
       showError(`Backend status degraded: dependencies_ready=${data.dependencies_ready}, artifacts_ready=${data.artifacts_ready}`);
+    } else {
+      updateBackendStatus('online', 'Connected');
     }
     if (data.active_session_id) {
       // Resume or fetch active session
-      const sRes = await fetch(`/api/sessions/${data.active_session_id}`);
+      const sRes = await fetch(apiUrl(`/api/sessions/${data.active_session_id}`));
       if (sRes.ok) {
         const sData = await sRes.json();
         setActiveSession(sData);
       }
     }
   } catch (err) {
+    updateBackendStatus('offline', 'Disconnected');
     console.warn('Initial health check notice:', err);
-    showError(`Cannot connect to backend server: ${err.message}. Ensure backend is running at http://127.0.0.1:8000.`);
+    const backendInfo = getApiBaseUrl() ? `at ${getApiBaseUrl()}` : 'at default origin';
+    showError(`Cannot connect to backend server: ${err.message}. Ensure backend is running ${backendInfo} or click ⚙ to configure backend URL.`);
   }
 }
 
@@ -180,18 +268,18 @@ async function onCreateSession() {
   // If there is an existing active session, release it first so the new session succeeds
   if (state.activeSession) {
     try {
-      await fetch(`/api/sessions/${state.activeSession.session_id}`, { method: 'DELETE' });
+      await fetch(apiUrl(`/api/sessions/${state.activeSession.session_id}`), { method: 'DELETE' });
     } catch (e) {
       console.warn('Could not cleanly release previous session before creation', e);
     }
   } else {
     // Check if an orphaned session exists on the backend
     try {
-      const hRes = await fetch('/api/health');
+      const hRes = await fetch(apiUrl('/api/health'));
       if (hRes.ok) {
         const hData = await hRes.json();
         if (hData.active_session_id) {
-          await fetch(`/api/sessions/${hData.active_session_id}`, { method: 'DELETE' });
+          await fetch(apiUrl(`/api/sessions/${hData.active_session_id}`), { method: 'DELETE' });
         }
       }
     } catch (_) {}
@@ -206,7 +294,7 @@ async function onCreateSession() {
 
   try {
     dom.btnCreateSession.disabled = true;
-    const res = await fetch('/api/sessions', {
+    const res = await fetch(apiUrl('/api/sessions'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -236,7 +324,7 @@ async function onReleaseSession() {
   clearError();
 
   try {
-    const res = await fetch(`/api/sessions/${state.activeSession.session_id}`, {
+    const res = await fetch(apiUrl(`/api/sessions/${state.activeSession.session_id}`), {
       method: 'DELETE',
     });
     if (!res.ok && res.status !== 404) {
@@ -262,7 +350,7 @@ async function advanceSingleCycle() {
 
   const expectedCycle = state.activeSession.cycle;
   try {
-    const res = await fetch(`/api/sessions/${state.activeSession.session_id}/advance`, {
+    const res = await fetch(apiUrl(`/api/sessions/${state.activeSession.session_id}/advance`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ expected_cycle: expectedCycle }),
@@ -342,7 +430,7 @@ async function onReset() {
   clearError();
 
   try {
-    const res = await fetch(`/api/sessions/${state.activeSession.session_id}/reset`, {
+    const res = await fetch(apiUrl(`/api/sessions/${state.activeSession.session_id}/reset`), {
       method: 'POST',
     });
     if (!res.ok) {
@@ -359,7 +447,7 @@ async function onReset() {
 
 function onDownloadTrace() {
   if (!state.activeSession) return;
-  const url = `/api/sessions/${state.activeSession.session_id}/trace.csv`;
+  const url = apiUrl(`/api/sessions/${state.activeSession.session_id}/trace.csv`);
   window.location.href = url;
 }
 

@@ -1,5 +1,7 @@
 """Tests for IntelliTwin replay engine, causal windowing, and invariants."""
 
+import shutil
+from pathlib import Path
 from unittest.mock import patch
 
 import numpy as np
@@ -418,3 +420,51 @@ def test_real_prediction_parity_and_calibrators_across_all_cells() -> None:
                 assert resp_corrupt.lower_rul == resp.lower_rul
                 assert resp_corrupt.upper_rul == resp.upper_rul
                 assert resp_corrupt.action == resp.action
+
+
+def test_bundled_validation_telemetry_loading_and_fallback(tmp_path: Path) -> None:
+    """Verify that load_engine_telemetry works from bundled validation CSV without raw files."""
+    mgr = ArtifactManager()
+    bundled_path = mgr.base_dir / "data/validation_telemetry/FD001_validation.csv"
+    assert bundled_path.exists()
+
+    # Load from the bundled data
+    df = mgr.load_engine_telemetry("FD001", 3)
+    assert isinstance(df, pd.DataFrame)
+    assert (df["unit"] == 3).all()
+    assert len(df) > 0
+    # Confirm no oracle columns
+    assert "rul_true" not in df.columns
+    assert "failure_cycle" not in df.columns
+    assert "lifecycle_stage" not in df.columns
+    # Confirm caching
+    assert "FD001" in mgr._telemetry_cache
+
+    # Confirm non-validation unit is strictly rejected
+    with pytest.raises(PermissionError, match="strictly limited to validation partition engines"):
+        mgr.load_engine_telemetry("FD001", 31)
+
+    # Now verify in an isolated directory where raw data does NOT exist, but bundled DOES exist
+    mock_dir = tmp_path / "mock_repo"
+    mock_dir.mkdir()
+    # Copy split manifests
+    shutil.copytree(mgr.base_dir / "data/splits", mock_dir / "data/splits")
+    # Copy bundled validation telemetry
+    shutil.copytree(
+        mgr.base_dir / "data/validation_telemetry",
+        mock_dir / "data/validation_telemetry",
+    )
+
+    isolated_mgr = ArtifactManager(base_dir=mock_dir)
+    # Ensure raw path does not exist
+    raw_path = mock_dir / "data/raw/cmapss/train_FD001.txt"
+    assert not raw_path.exists()
+
+    df_isolated = isolated_mgr.load_engine_telemetry("FD001", 3)
+    pd.testing.assert_frame_equal(df, df_isolated)
+
+    # If bundled telemetry is also deleted, FileNotFoundError must be raised
+    shutil.rmtree(mock_dir / "data/validation_telemetry")
+    isolated_mgr._telemetry_cache.clear()
+    with pytest.raises(FileNotFoundError, match="Neither bundled validation data"):
+        isolated_mgr.load_engine_telemetry("FD001", 3)

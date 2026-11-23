@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/static/(.*)",
+      "destination": "/apps/twin_dashboard/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/apps/twin_dashboard/$1"
+    }
+  ]
+}

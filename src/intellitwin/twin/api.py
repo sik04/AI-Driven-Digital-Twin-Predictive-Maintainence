@@ -15,6 +15,8 @@ Endpoints:
 from __future__ import annotations
 
 import logging
+import os
+import sys
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request, Response, status
@@ -48,16 +50,27 @@ app = FastAPI(
     version="0.1.0",
 )
 
+cors_origins_env = os.environ.get("CORS_ORIGINS", "*").strip()
+cors_origins = (
+    ["*"]
+    if cors_origins_env == "*"
+    else [origin.strip() for origin in cors_origins_env.split(",") if origin.strip()]
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Global in-memory state
-REPO_ROOT = Path(".").resolve()
+REPO_ROOT = Path(os.environ.get("INTELLITWIN_ROOT", Path(__file__).resolve().parents[3])).resolve()
+src_dir = REPO_ROOT / "src"
+if src_dir.exists() and str(src_dir) not in sys.path:
+    sys.path.insert(0, str(src_dir))
+
 artifact_manager = ArtifactManager(base_dir=REPO_ROOT)
 session_registry = SessionRegistry(artifact_manager=artifact_manager)
 
@@ -241,3 +254,11 @@ if DASHBOARD_DIR.exists():
     async def serve_index() -> FileResponse:
         index_p = DASHBOARD_DIR / "index.html"
         return FileResponse(str(index_p))
+
+    @app.get("/styles.css")
+    async def serve_styles() -> FileResponse:
+        return FileResponse(str(DASHBOARD_DIR / "styles.css"))
+
+    @app.get("/app.js")
+    async def serve_app_js() -> FileResponse:
+        return FileResponse(str(DASHBOARD_DIR / "app.js"))

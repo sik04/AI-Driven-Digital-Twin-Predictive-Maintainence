@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: intellitwin-backend
+    runtime: python
+    plan: free
+    buildCommand: pip install --upgrade pip && pip install -r requirements/twin-demo.lock.txt && pip install -e . --no-deps
+    startCommand: uvicorn intellitwin.twin.api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CORS_ORIGINS
+        value: "*"

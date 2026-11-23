@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>IntelliTwin — Engine Replay</title>
-  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div class="app-container">
@@ -15,6 +15,11 @@
         <span class="confirmatory-notice-pill">Validation replay — not confirmatory results</span>
       </div>
       <div class="header-right">
+        <div class="backend-status-badge" id="backend-status-badge" title="Click to configure backend URL">
+          <span class="status-dot connecting" id="backend-status-dot"></span>
+          <span class="status-text" id="backend-status-text">Connecting...</span>
+          <button type="button" class="btn-icon" id="btn-config-backend" aria-label="Backend settings" title="Configure Backend URL">⚙</button>
+        </div>
         <div class="coverage-badge">
           <span class="badge-label">Prediction Interval:</span>
           <span class="badge-value">90% nominal prediction interval</span>
@@ -193,6 +198,22 @@
     </footer>
   </div>
 
-  <script src="/static/app.js"></script>
+  <!-- Backend Connection Settings Modal -->
+  <div id="backend-modal" class="modal-backdrop" style="display: none;" role="dialog" aria-labelledby="backend-modal-title" aria-modal="true">
+    <div class="modal-card">
+      <h3 id="backend-modal-title" class="modal-title">Backend Connection Settings</h3>
+      <p class="modal-desc">Configure the FastAPI backend URL (e.g., your Render service URL: <code>https://intellitwin-backend.onrender.com</code>). Leave blank to use the same host origin.</p>
+      <div class="form-group">
+        <label for="backend-url-input">Backend Base URL</label>
+        <input type="text" id="backend-url-input" class="form-input" placeholder="https://your-backend.onrender.com" />
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="btn-save-backend" class="btn btn-primary">Save & Connect</button>
+        <button type="button" id="btn-cancel-backend" class="btn btn-outline">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>

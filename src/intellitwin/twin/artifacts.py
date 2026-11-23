@@ -60,6 +60,7 @@ class ArtifactManager:
         self.base_dir = Path(base_dir).resolve()
         self._validation_engines: dict[str, list[int]] = {}
         self._non_validation_engines: dict[str, set[int]] = {}
+        self._telemetry_cache: dict[str, pd.DataFrame] = {}
         self._load_split_catalogs()
 
     def _load_split_catalogs(self) -> None:
@@ -213,9 +214,28 @@ class ArtifactManager:
             method_id="decision_aware_hcp",
         )
 
+        # Check for bundled validation telemetry first (enables deployment without raw files)
+        bundled_path = self.base_dir / f"data/validation_telemetry/{dataset}_validation.csv"
+        if bundled_path.exists():
+            if dataset not in self._telemetry_cache:
+                self._telemetry_cache[dataset] = pd.read_csv(bundled_path)
+            cached_df = self._telemetry_cache[dataset]
+            engine_df = (
+                cached_df[cached_df["unit"] == engine_id]
+                .sort_values("cycle")
+                .reset_index(drop=True)
+            )
+            if len(engine_df) == 0:
+                raise ValueError(f"No records found for engine {engine_id} in {dataset}")
+            return engine_df
+
         raw_path = self.base_dir / f"data/raw/cmapss/train_{dataset}.txt"
         if not raw_path.exists():
-            raise FileNotFoundError(f"Raw data file missing at: {raw_path}")
+            raise FileNotFoundError(
+                f"Telemetry observations for {dataset} not found. "
+                f"Neither bundled validation data ({bundled_path}) "
+                f"nor raw data ({raw_path}) exists."
+            )
 
         expected_count = EXPECTED_ENGINE_COUNTS[dataset]
         raw_df = load_cmapss_run_to_failure(
